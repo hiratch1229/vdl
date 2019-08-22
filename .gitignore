@@ -1,0 +1,13 @@
+Debug/
+Release/
+Backup/
+Bin/
+SCREENSHOT/
+*.cso
+*.vcxproj.user
+*.VC.db
+*.VC.VC.opendb
+*.suo
+*.aps
+*.vs
+*.fbm
