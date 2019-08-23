@@ -3,12 +3,6 @@
 namespace vdl
 {
   //-------------------------
-  //  Angle.hpp
-  //-------------------------
-  class Radian;
-  class Degree;
-
-  //-------------------------
   //  Type.hpp
   //-------------------------
   template<class Type> struct Type2;
@@ -26,8 +20,30 @@ namespace vdl
   using float4 = Type4<float>;
 
   //-------------------------
+  //  Quaternion.hpp
+  //-------------------------
+  struct Quaternion;
+
+  //-------------------------
+  //  Matrix.hpp
+  //-------------------------
+  struct Matrix;
+
+  //-------------------------
+  //  Angle.hpp
+  //-------------------------
+  class Radian;
+  class Degree;
+
+  //-------------------------
   //  Color.hpp
   //-------------------------
   struct Color;
   struct ColorF;
+
+  //-------------------------
+  //  Vertex.hpp
+  //-------------------------
+  struct Vertex2D;
+  struct Vertex3D;
 }

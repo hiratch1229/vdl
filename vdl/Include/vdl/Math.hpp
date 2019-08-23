@@ -7,7 +7,7 @@ namespace vdl
   class Radian;
 }
 
-namespace vdl::Math
+namespace vdl::math
 {
   //  _Num0‚Æ_Num1‚ğ_Epsilon‚ÌŒë·‚ğl—¶‚µ‚½”äŠr
   inline constexpr bool isEqual(float _V0, float _V1, float _Epsilon = FLT_EPSILON)

@@ -101,8 +101,8 @@ namespace vdl
     {
       float Value = Value_;
 
-      while (Value > Math::HalfPI) Value -= Math::PI;
-      while (Value < -Math::HalfPI) Value += Math::PI;
+      while (Value > math::kHalfPI) Value -= math::kPI;
+      while (Value < -math::kHalfPI) Value += math::kPI;
 
       return Value;
     }
@@ -147,10 +147,10 @@ namespace vdl
   };
 
   inline constexpr Radian::Radian(const Degree& _Degree)noexcept
-    : Value_(Math::ToRadian(_Degree)) {}
+    : Value_(math::ToRadian(_Degree)) {}
 
   inline constexpr Degree::Degree(const Radian& _Radian)noexcept
-    : Value_(Math::ToDegree(_Radian)) {}
+    : Value_(math::ToDegree(_Radian)) {}
 
   COMMON_OPERATOR(Radian);
 

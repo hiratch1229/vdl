@@ -1,7 +1,7 @@
 #pragma once
 using UINT = unsigned int;
 
-namespace hdx
+namespace vdl
 {
   using int8_t = signed char;
   using int16_t = short;

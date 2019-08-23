@@ -1,58 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Include">
-      <UniqueIdentifier>{313902d3-1f28-4c06-a473-d0ff5bccce0e}</UniqueIdentifier>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Src">
-      <UniqueIdentifier>{43bab7ee-4942-4867-b865-70b6a1c129e4}</UniqueIdentifier>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Include\vdl">
-      <UniqueIdentifier>{c6c0efc3-83ba-440a-bb0e-0c6a61b9df8f}</UniqueIdentifier>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Include\vdl\Angle.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Camera.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Color.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Fwd.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Macro.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Math.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\MathConstants.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Matrix.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Quaternion.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Singleton.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Type2.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Type3.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Type4.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\Types.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
