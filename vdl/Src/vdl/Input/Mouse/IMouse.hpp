@@ -1,5 +1,6 @@
 #pragma once
 #include <vdl/Fwd.hpp>
+#include <vdl/Type2.hpp>
 
 class IMouse
 {
@@ -9,6 +10,8 @@ public:
   IMouse() = default;
 
   virtual ~IMouse() = default;
+
+  virtual void Initialize() = 0;
 
   virtual void Update() = 0;
 
@@ -20,15 +23,15 @@ public:
 
   virtual bool Release(int _Number)const = 0;
 
-  virtual const vdl::int2& GetPos()const = 0;
+  virtual vdl::int2 GetPos()const = 0;
 
-  virtual const vdl::int2& GetDelta()const = 0;
+  virtual vdl::int2 GetDelta()const = 0;
 
-  virtual const vdl::int2& GetWheel()const = 0;
+  virtual vdl::int2 GetWheel()const = 0;
 
-  virtual void SetPos(const vdl::int2& _Pos) = 0;
+  virtual void SetPos(vdl::int2 _Pos) = 0;
 
-  virtual void SetWheel(const vdl::int2& _Wheel) = 0;
+  virtual void SetWheel(vdl::int2 _Wheel) = 0;
 
   virtual bool AnyButtonPress()const = 0;
 

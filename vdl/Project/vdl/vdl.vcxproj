@@ -44,6 +44,7 @@
     <ClInclude Include="..\..\Include\vdl\Types.hpp" />
     <ClInclude Include="..\..\Include\vdl\Vertex.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\IBuffer.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Constants\Constants.hpp" />
     <ClInclude Include="..\..\Src\vdl\Engine.hpp" />
     <ClInclude Include="..\..\Src\vdl\GUI\IGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Gamepad\IGamepad.hpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="..\..\Src\vdl\Input\XInput\IXInput.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\IModelManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Mesh.hpp" />
+    <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
     <ClInclude Include="..\..\Src\vdl\Renderer\IRenderer.hpp" />
     <ClInclude Include="..\..\Src\vdl\ShaderManager\IShaderManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\IShader.hpp" />

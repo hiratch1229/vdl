@@ -18,6 +18,23 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Input\XInput\Windows\CXInput.cpp" />
+    <ClCompile Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Window\Windows\CWindow.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Input\XInput\Windows\CXInput.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Misc\Windows\Misc.hpp" />
+    <ClInclude Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Window\Windows\CWindow.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{4674F1B4-C552-4A2B-8741-4E3207D85740}</ProjectGuid>
@@ -93,6 +110,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

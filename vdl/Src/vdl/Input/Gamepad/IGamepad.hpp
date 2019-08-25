@@ -1,5 +1,6 @@
 #pragma once
 #include <vdl/Fwd.hpp>
+#include <vdl/Type2.hpp>
 #include <vdl/Button.hpp>
 
 class IGamepad
@@ -10,6 +11,8 @@ public:
   IGamepad() = default;
 
   virtual ~IGamepad() = default;
+
+  virtual void Initialize() = 0;
 
   virtual void Update() = 0;
 

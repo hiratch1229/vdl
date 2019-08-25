@@ -58,6 +58,12 @@
     <Filter Include="Src\Window">
       <UniqueIdentifier>{a7e8202c-5fe7-45d8-9daf-f6ff7bf3c4af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Constants">
+      <UniqueIdentifier>{678f04d8-ed02-4b3b-a7bb-afbc8fc9e764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\RefrenceCount">
+      <UniqueIdentifier>{f2fdf1a3-e810-4c35-93ea-4dd0f23f7c7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -185,6 +191,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Window\IWindow.hpp">
       <Filter>Src\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Constants\Constants.hpp">
+      <Filter>Src\Constants</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp">
+      <Filter>Src\RefrenceCount</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
