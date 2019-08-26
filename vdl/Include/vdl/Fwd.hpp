@@ -46,4 +46,61 @@ namespace vdl
   //-------------------------
   struct Vertex2D;
   struct Vertex3D;
+
+  //-------------------------
+  //  Image.hpp
+  //-------------------------
+  class Image;
+
+  //-------------------------
+  //  Format.hpp
+  //-------------------------
+  enum class Format;
+
+  //-------------------------
+  //  Scissor.hpp
+  //-------------------------
+  struct Scissor;
+
+  //-------------------------
+  //  Viewport.hpp
+  //-------------------------
+  struct Viewport;
+
+  //-------------------------
+  //  BlendState.hpp
+  //-------------------------
+  class BlendState;
+
+  //-------------------------
+  //  DepthStencilState.hpp
+  //-------------------------
+  class DepthStencilState;
+
+  //-------------------------
+  //  RasterizerState.hpp
+  //-------------------------
+  class RasterizerState;
+
+  //-------------------------
+  //  SamplerState.hpp
+  //-------------------------
+  class SamplerState;
+
+  //-------------------------
+  //  Texture.hpp
+  //-------------------------
+  class Texture;
+  class RenderTexture;
+  class DepthStencilTexture;
+
+  //-------------------------
+  //  Shader.hpp
+  //-------------------------
+  class VertexShader;
+  class HullShader;
+  class DomainShader;
+  class GeometryShader;
+  class PixelShader;
+  class ComputeShader;
 }

@@ -64,6 +64,15 @@
     <Filter Include="Src\RefrenceCount">
       <UniqueIdentifier>{f2fdf1a3-e810-4c35-93ea-4dd0f23f7c7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Device">
+      <UniqueIdentifier>{b008b2c5-5fcf-4715-afaf-0f6671a72b49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\DeviceContext">
+      <UniqueIdentifier>{734694a4-d6ad-4bf4-87c3-2ffefcfdd523}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\SwapChain">
+      <UniqueIdentifier>{8f45d957-3ce0-45e8-81c9-0111f17c0491}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -197,6 +206,39 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp">
       <Filter>Src\RefrenceCount</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Device\IDevice.hpp">
+      <Filter>Src\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\DeviceContext\IDeviceContext.hpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\SwapChain\ISwapChain.hpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Viewport.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Scissor.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Shader.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Image.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\BlendState.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\DepthStencilState.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\RasterizerState.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\SamplerState.hpp">
+      <Filter>Include\vdl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

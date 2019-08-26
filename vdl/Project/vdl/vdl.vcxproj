@@ -21,13 +21,16 @@
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl.hpp" />
     <ClInclude Include="..\..\Include\vdl\Angle.hpp" />
+    <ClInclude Include="..\..\Include\vdl\BlendState.hpp" />
     <ClInclude Include="..\..\Include\vdl\Button.hpp" />
     <ClInclude Include="..\..\Include\vdl\Camera.hpp" />
     <ClInclude Include="..\..\Include\vdl\Color.hpp" />
     <ClInclude Include="..\..\Include\vdl\Constants.hpp" />
+    <ClInclude Include="..\..\Include\vdl\DepthStencilState.hpp" />
     <ClInclude Include="..\..\Include\vdl\Format.hpp" />
     <ClInclude Include="..\..\Include\vdl\Fwd.hpp" />
     <ClInclude Include="..\..\Include\vdl\ID.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Image.hpp" />
     <ClInclude Include="..\..\Include\vdl\Macro.hpp" />
     <ClInclude Include="..\..\Include\vdl\Math.hpp" />
     <ClInclude Include="..\..\Include\vdl\MathConstants.hpp" />
@@ -35,7 +38,11 @@
     <ClInclude Include="..\..\Include\vdl\MeshData.hpp" />
     <ClInclude Include="..\..\Include\vdl\Model.hpp" />
     <ClInclude Include="..\..\Include\vdl\Quaternion.hpp" />
+    <ClInclude Include="..\..\Include\vdl\RasterizerState.hpp" />
+    <ClInclude Include="..\..\Include\vdl\SamplerState.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Scissor.hpp" />
     <ClInclude Include="..\..\Include\vdl\Serialize.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Shader.hpp" />
     <ClInclude Include="..\..\Include\vdl\Singleton.hpp" />
     <ClInclude Include="..\..\Include\vdl\Texture.hpp" />
     <ClInclude Include="..\..\Include\vdl\Type2.hpp" />
@@ -43,8 +50,11 @@
     <ClInclude Include="..\..\Include\vdl\Type4.hpp" />
     <ClInclude Include="..\..\Include\vdl\Types.hpp" />
     <ClInclude Include="..\..\Include\vdl\Vertex.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Viewport.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\IBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Constants\Constants.hpp" />
+    <ClInclude Include="..\..\Src\vdl\DeviceContext\IDeviceContext.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Device\IDevice.hpp" />
     <ClInclude Include="..\..\Src\vdl\Engine.hpp" />
     <ClInclude Include="..\..\Src\vdl\GUI\IGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Gamepad\IGamepad.hpp" />
@@ -59,6 +69,7 @@
     <ClInclude Include="..\..\Src\vdl\ShaderManager\IShaderManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\IShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SoundManager\ISoundManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\SwapChain\ISwapChain.hpp" />
     <ClInclude Include="..\..\Src\vdl\System\ISystem.hpp" />
     <ClInclude Include="..\..\Src\vdl\TextureManager\ITextureManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Texture\ITexture.hpp" />

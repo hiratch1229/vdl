@@ -3,6 +3,7 @@
 
 #include "../ThirdParty/cereal/cereal.hpp"
 #include "../ThirdParty/cereal/archives/binary.hpp"
+#include "../ThirdParty/cereal/types/vector.hpp"
 
 #define CEREAL_SERIALIZE(...)\
 template<class Archive>\

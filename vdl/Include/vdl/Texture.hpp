@@ -1,6 +1,7 @@
 #pragma once
-#include "Color.hpp"
 #include "ID.hpp"
+#include "Color.hpp"
+#include "Format.hpp"
 
 namespace vdl
 {
@@ -29,5 +30,25 @@ namespace vdl
     Texture(const Texture& _Texture);
 
     Texture& operator=(const Texture& _Texture);
+  };
+
+  class RenderTexture : public Texture
+  {
+  public:
+    RenderTexture() = default;
+
+    RenderTexture(const uint2& _TextureSize, Format _Format);
+
+    void Clear(const ColorF& _Color = Palette::Black);
+  };
+
+  class DepthStencilTexture : public Texture
+  {
+  public:
+    DepthStencilTexture() = default;
+
+    DepthStencilTexture(const uint2& _TextureSize, Format _Format);
+
+    void Clear(float _Depth = 1.0f, uint _Stencil = 0);
   };
 }
