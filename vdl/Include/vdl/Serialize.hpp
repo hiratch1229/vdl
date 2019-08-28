@@ -1,9 +1,17 @@
 #pragma once
-#include "Fwd.hpp"
+#include "Type2.hpp"
+#include "Type3.hpp"
+#include "Type3.hpp"
+#include "Quaternion.hpp"
+#include "Matrix.hpp"
+#include "Angle.hpp"
+#include "Angle.hpp"
+#include "Vertex.hpp"
 
 #include "../ThirdParty/cereal/cereal.hpp"
 #include "../ThirdParty/cereal/archives/binary.hpp"
 #include "../ThirdParty/cereal/types/vector.hpp"
+#include "../ThirdParty/cereal/types/string.hpp"
 
 #define CEREAL_SERIALIZE(...)\
 template<class Archive>\

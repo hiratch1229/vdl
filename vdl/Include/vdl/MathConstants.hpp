@@ -6,10 +6,10 @@ namespace vdl::math
   constexpr float kPI = 3.1415926535897932385f;
 
   //  2π
-  constexpr float kTwoPI = PI * 2.0f;
+  constexpr float kTwoPI = kPI * 2.0f;
 
   //  1/2π
-  constexpr float kHalfPI = PI * 0.5f;
+  constexpr float kHalfPI = kPI * 0.5f;
 
   //  ラジアン(Radian)を度数法(Degree)に変換
   constexpr float ToDegree(float _Radian)

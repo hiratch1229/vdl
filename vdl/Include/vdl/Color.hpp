@@ -17,10 +17,10 @@ namespace vdl
     {
       struct
       {
-        uint32_t R : 8; //  赤
-        uint32_t G : 8; //  緑
-        uint32_t B : 8; //  赤
-        uint32_t A : 8; //  不透明度
+        uint8_t R; //  赤
+        uint8_t G; //  緑
+        uint8_t B; //  赤
+        uint8_t A; //  不透明度
       };
       uint32_t Bit;
     };

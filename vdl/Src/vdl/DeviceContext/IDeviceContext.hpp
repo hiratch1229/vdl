@@ -22,26 +22,38 @@ public:
   //  TODO:マルチレンダーターゲット
   virtual void SetRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStenilTexture) = 0;
 
+  virtual void VSSetShader(const vdl::VertexShader& _VertexShader) = 0;
+
   virtual void VSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
 
   virtual void VSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
+
+  virtual void HSSetShader(const vdl::HullShader& _VertexShader) = 0;
 
   virtual void HSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
 
   virtual void HSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
 
+  virtual void DSSetShader(const vdl::DomainShader& _DomainShader) = 0;
+
   virtual void DSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
 
   virtual void DSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
+
+  virtual void GSSetShader(const vdl::GeometryShader& _GeometryShader) = 0;
 
   virtual void GSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
 
   virtual void GSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
 
+  virtual void PSSetShader(const vdl::PixelShader& _PixelShader) = 0;
+
   virtual void PSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
 
   virtual void PSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
 
+  //virtual void CSSetShader(const vdl::ComputeShader& _ComputeShader) = 0;
+  
   //virtual void CSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
 
   //virtual void CSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;

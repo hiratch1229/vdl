@@ -13,8 +13,9 @@ namespace vdl
     std::vector<Color> Buffer_;
   public:
     int Stride()const noexcept { return Size_.x * sizeof(Color); }
-    uint BufferSize()const noexcept { return Buffer_.size(); }
+    uint BufferSize()const noexcept { return static_cast<vdl::uint>(Buffer_.size()); }
     uint2 GetSize()const noexcept { return Size_; }
+    bool isEmpty()const noexcept { return Buffer_.empty(); }
     Color* Buffer() { return Buffer_.data(); }
     void Resize(const uint2& _Size) { Size_ = _Size; Buffer_.resize(Size_.x * Size_.y); }
   public:

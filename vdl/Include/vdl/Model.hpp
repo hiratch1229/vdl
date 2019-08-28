@@ -36,7 +36,7 @@ namespace vdl
     SkinnedMesh(const StaticMeshData& _MeshData);
 
     //  スキンメッシュデータから作成
-    SkinnedMesh(const SkinnedMesh& _MeshData);
+    SkinnedMesh(const SkinnedMeshData& _MeshData);
   };
 
   class Model

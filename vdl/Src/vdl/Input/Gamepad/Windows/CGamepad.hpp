@@ -74,11 +74,11 @@ private:
   //  作成したデバイス数
   vdl::uint CreateDeviceNum_;
 private:
-  bool isWithinRange(int _Index)const
+  bool isWithinRange(vdl::uint _Index)const
   {
     return (0 <= _Index && _Index < Constants::kMaxController && Status_[_Index].isConnect);
   }
-  bool isWithinRange(int _Number, int _Index)const
+  bool isWithinRange(vdl::uint _Number, vdl::uint _Index)const
   {
     return (0 <= _Index && _Index < Constants::kMaxController && Status_[_Index].isConnect && 0 <= _Number && _Number < Status_[_Index].ButtonNum);
   }
@@ -93,37 +93,37 @@ public:
 
   void Update()override;
 
-  bool Press(int _Number, int _Index)const override
+  bool Press(vdl::uint _Number, vdl::uint _Index)const override
   {
     return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Press() : false;
   }
 
-  bool Pressed(int _Number, int _Index)const override
+  bool Pressed(vdl::uint _Number, vdl::uint _Index)const override
   {
     return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Pressed() : false;
   }
 
-  bool Released(int _Number, int _Index)const override
+  bool Released(vdl::uint _Number, vdl::uint _Index)const override
   {
     return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Released() : false;
   }
 
-  bool Release(int _Number, int _Index)const override
+  bool Release(vdl::uint _Number, vdl::uint _Index)const override
   {
     return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Release() : false;
   }
 
-  bool isConnect(int _Index)const override
+  bool isConnect(vdl::uint _Index)const override
   {
     return isWithinRange(_Index) ? Status_[_Index].isConnect : false;
   }
 
-  int GetButtonNum(int _Index)const override
+  int GetButtonNum(vdl::uint _Index)const override
   {
     return isWithinRange(_Index) ? Status_[_Index].ButtonNum : 0;
   }
 
-  bool AnyButtonPress(int _Index)const override
+  bool AnyButtonPress(vdl::uint _Index)const override
   {
     if (!(isWithinRange(_Index))) return false;
 
@@ -139,7 +139,7 @@ public:
     return false;
   }
 
-  bool AnyButtonPressed(int _Index)const override
+  bool AnyButtonPressed(vdl::uint _Index)const override
   {
     if (!(isWithinRange(_Index))) return false;
 
@@ -155,7 +155,7 @@ public:
     return false;
   }
 
-  bool AnyButtonReleased(int _Index)const override
+  bool AnyButtonReleased(vdl::uint _Index)const override
   {
     if (!(isWithinRange(_Index))) return false;
 
@@ -171,20 +171,20 @@ public:
     return false;
   }
 
-  vdl::input::Button GetButton(int _Index, int _Number)const
+  vdl::input::Button GetButton(vdl::uint _Index, vdl::uint _Number)const
   {
     return isWithinRange(_Index) ? vdl::input::Button(vdl::input::InputDevice::eGamepad, _Number, _Index) : vdl::input::Button();
   }
 
-  vdl::float2 GetLeftStick(int _Index, float _DeadZone)const override;
+  vdl::float2 GetLeftStick(vdl::uint _Index, float _DeadZone)const override;
 
-  vdl::float2 GetRightStick(int _Index, float _DeadZone)const override;
+  vdl::float2 GetRightStick(vdl::uint _Index, float _DeadZone)const override;
 
-  float GetLeftTrigger(int _Index, float _DeadZone)const override;
+  float GetLeftTrigger(vdl::uint _Index, float _DeadZone)const override;
 
-  float GetRightTrigger(int _Index, float _DeadZone)const override;
+  float GetRightTrigger(vdl::uint _Index, float _DeadZone)const override;
 
-  void SetVibration(int _Index, float _Speed)const override;
+  void SetVibration(vdl::uint _Index, float _Speed)const override;
 
-  void StopVibration(int _Index)const override;
+  void StopVibration(vdl::uint _Index)const override;
 };

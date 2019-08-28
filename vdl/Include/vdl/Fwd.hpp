@@ -95,6 +95,19 @@ namespace vdl
   class DepthStencilTexture;
 
   //-------------------------
+  //  MeshData.hpp
+  //-------------------------
+  struct StaticMeshData;
+  struct SkinnedMeshData;
+
+  //-------------------------
+  //  Model.hpp
+  //-------------------------
+  class StaticMesh;
+  class SkinnedMesh;
+  class Model;
+
+  //-------------------------
   //  Shader.hpp
   //-------------------------
   class VertexShader;

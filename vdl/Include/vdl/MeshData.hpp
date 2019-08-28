@@ -11,42 +11,51 @@
 
 namespace vdl
 {
+  struct Property
+  {
+    Texture Texture;
+    ColorF Color;
+  };
+
+  struct Material
+  {
+    Property Diffuse;
+    uint IndexStart = 0;
+    uint IndexCount = 0;
+  };
+
   struct StaticMeshData
   {
-    struct Material
-    {
-      struct Property
-      {
-        Texture Texture;
-        ColorF Color;
-      };
-      Property Diffuse;
-      uint IndexStart = 0;
-      uint IndexCount = 0;
-    };
-
+    std::string Name;
     std::vector<Vertex3D> Vertices;
     std::vector<IndexType> Indices;
     std::vector<Material> Materials;
     Matrix GlobalTransform = Matrix::Identity();
   };
 
+  struct Bone
+  {
+    Matrix Offset;
+    Matrix Pose;
+  };
+
+  struct Skeletal
+  {
+    std::unordered_map<std::string, Bone> Bones;
+  };
+
+  struct Animation
+  {
+    std::vector<Skeletal> Skeletals;
+  };
+
   struct SkinnedMeshData : public StaticMeshData
   {
-    struct Animation
-    {
-      struct Skeletal
-      {
-        struct Bone
-        {
-          Matrix Offset;
-          Matrix Pose;
-        };
-        std::unordered_map<std::string, Bone> Bones;
-      };
-      std::vector<Skeletal> Skeletals;
-    };
-
     std::vector<Animation> Animations;
+  public:
+    SkinnedMeshData() = default;
+
+    SkinnedMeshData(const StaticMeshData& _StaticMeshData)
+      : StaticMeshData(_StaticMeshData) {}
   };
 }

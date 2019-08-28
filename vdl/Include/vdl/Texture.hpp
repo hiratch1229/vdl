@@ -1,6 +1,7 @@
 #pragma once
 #include "ID.hpp"
 #include "Color.hpp"
+#include "Image.hpp"
 #include "Format.hpp"
 
 namespace vdl
@@ -26,6 +27,8 @@ namespace vdl
 
     //  Fî•ñ‚©‚çì¬
     Texture(const ColorF& _Color);
+
+    Texture(const Image& _Image);
 
     Texture(const Texture& _Texture);
 

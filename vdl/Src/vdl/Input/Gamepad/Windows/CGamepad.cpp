@@ -54,14 +54,14 @@ void CGamepad::Initialize()
 
   //  É{É^ÉìÇÃêîÇï€ë∂
   {
-    for (int i = 0; i < XInputNum_; ++i)
+    for (vdl::uint i = 0; i < XInputNum_; ++i)
     {
       Status_[i].ButtonNum = Constants::kXInputButtonNum;
       Status_[i].InputStatus = new InputState[Constants::kXInputButtonNum];
     }
 
     JOYCAPS JoyCaps;
-    for (int i = XInputNum_; i < ControllerNum_; ++i)
+    for (vdl::uint i = XInputNum_; i < ControllerNum_; ++i)
     {
       joyGetDevCaps(JoyIDList_[i - XInputNum_], &JoyCaps, sizeof(JoyCaps));
 
@@ -75,7 +75,7 @@ void CGamepad::Initialize()
 
 CGamepad::~CGamepad()
 {
-  for (int i = 0; i < DirectInputNum_; ++i)
+  for (vdl::uint i = 0; i < DirectInputNum_; ++i)
   {
     if (pDirectInputDatas_[i].pJoyStick)
     {
@@ -83,7 +83,7 @@ CGamepad::~CGamepad()
     }
   }
 
-  for (int i = 0; i < ControllerNum_; ++i)
+  for (vdl::uint i = 0; i < ControllerNum_; ++i)
   {
     delete[] Status_[i].InputStatus;
   }
@@ -91,7 +91,7 @@ CGamepad::~CGamepad()
 
 void CGamepad::Update()
 {
-  auto XInputUpdate = [&](int _Index)
+  auto XInputUpdate = [&](vdl::uint _Index)
   {
     Status& Status = Status_[_Index];
 
@@ -107,7 +107,7 @@ void CGamepad::Update()
     Status.RightTrigger = pXInput_->GetRightTrigger(_Index, 0.0f);
   };
 
-  auto DirectInputUpdate = [&](int _Index)->void
+  auto DirectInputUpdate = [&](vdl::uint _Index)->void
   {
     Status& Status = Status_[_Index];
 
@@ -165,18 +165,18 @@ void CGamepad::Update()
       break;
     }
 
-    for (int j = 0; j < kPovDirectionNum; ++j)
+    for (vdl::uint j = 0; j < kPovDirectionNum; ++j)
     {
       Status.InputStatus[j].Update(isInput[j]);
     }
 
-    for (int j = kPovDirectionNum; j < Status.ButtonNum; ++j)
+    for (vdl::uint j = kPovDirectionNum; j < Status.ButtonNum; ++j)
     {
       Status.InputStatus[j].Update((State.rgbButtons[j - kPovDirectionNum] & 0x80) != 0);
     }
   };
 
-  for (int i = 0; i < ControllerNum_; ++i)
+  for (vdl::uint i = 0; i < ControllerNum_; ++i)
   {
     if (i < XInputNum_)
     {
@@ -189,7 +189,7 @@ void CGamepad::Update()
   }
 }
 
-vdl::float2 CGamepad::GetLeftStick(int _Index, float _DeadZone)const
+vdl::float2 CGamepad::GetLeftStick(vdl::uint _Index, float _DeadZone)const
 {
   if (!isWithinRange(_Index))
   {
@@ -204,7 +204,7 @@ vdl::float2 CGamepad::GetLeftStick(int _Index, float _DeadZone)const
   return Value;
 }
 
-vdl::float2 CGamepad::GetRightStick(int _Index, float _DeadZone)const
+vdl::float2 CGamepad::GetRightStick(vdl::uint _Index, float _DeadZone)const
 {
   if (!isWithinRange(_Index))
   {
@@ -219,7 +219,7 @@ vdl::float2 CGamepad::GetRightStick(int _Index, float _DeadZone)const
   return Value;
 }
 
-float CGamepad::GetLeftTrigger(int _Index, float _DeadZone)const
+float CGamepad::GetLeftTrigger(vdl::uint _Index, float _DeadZone)const
 {
   if (!isWithinRange(_Index))
   {
@@ -233,7 +233,7 @@ float CGamepad::GetLeftTrigger(int _Index, float _DeadZone)const
   return Value;
 }
 
-float CGamepad::GetRightTrigger(int _Index, float _DeadZone)const
+float CGamepad::GetRightTrigger(vdl::uint _Index, float _DeadZone)const
 {
   if (!isWithinRange(_Index))
   {
@@ -247,7 +247,7 @@ float CGamepad::GetRightTrigger(int _Index, float _DeadZone)const
   return Value;
 }
 
-void CGamepad::SetVibration(int _Index, float _Speed)const
+void CGamepad::SetVibration(vdl::uint _Index, float _Speed)const
 {
   if (!isWithinRange(_Index))
   {
@@ -264,7 +264,7 @@ void CGamepad::SetVibration(int _Index, float _Speed)const
   //if (pImpl_->pEffects_[DirectInputIndex]) pImpl_->pEffects_[DirectInputIndex]->Start(1, 0);
 }
 
-void CGamepad::StopVibration(int _Index)const
+void CGamepad::StopVibration(vdl::uint _Index)const
 {
   if (!isWithinRange(_Index))
   {
@@ -290,7 +290,7 @@ void CGamepad::CreateDirectInputDevice(const GUID& GuidProductFromDirectInput)
   ++DeviceNum_;
 
   //  XInputîªï 
-  for (int i = 0, Size = XInputList_.size(); i < Size; ++i)
+  for (vdl::uint i = 0, Size = static_cast<vdl::uint>(XInputList_.size()); i < Size; ++i)
   {
     //  XInputÇ≈Ç†ÇÈ
     if (static_cast<long>(XInputList_[i]) == GuidProductFromDirectInput.Data1)

@@ -1,5 +1,6 @@
 #pragma once
 #include <vdl/Types.hpp>
+#include <vdl/Macro.hpp>
 
 #include <vector>
 
@@ -10,7 +11,7 @@ class ReferenceCount
   vdl::uint Count_ = 0;
 public:
   void AddRef() { if (Ptr_) { ++Count_; } }
-  void Release() { if (Count_ > 0 && --Count_ == 0) { hdx::Macro::SafeDelete(Ptr_); } }
+  void Release() { if (Count_ > 0 && --Count_ == 0) { vdl::macro::SafeDelete(Ptr_); } }
 private:
   void Swap(ReferenceCount& _Other)
   {
@@ -18,7 +19,7 @@ private:
     Ptr_ = _Other.Ptr_;
     _Other.Ptr_ = TempPtr;
 
-    hdx::uint TempCount = Count_;
+    vdl::uint TempCount = Count_;
     Count_ = _Other.Count_;
     _Other.Count_ = TempCount;
   }
@@ -110,9 +111,9 @@ public:
 
   ID Add(Type _Obj)
   {
-    hdx::uint Index = 0;
+    vdl::uint Index = 0;
     {
-      const hdx::uint Size = ReferenceCounts_.size();
+      const vdl::uint Size = static_cast<vdl::uint>(ReferenceCounts_.size());
       for (; Index < Size; ++Index)
       {
         if (!ReferenceCounts_[Index])
