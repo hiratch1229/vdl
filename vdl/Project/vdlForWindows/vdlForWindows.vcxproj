@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\GUI\Windows\CGUI.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.cpp" />
@@ -32,6 +33,7 @@
     <ClCompile Include="..\..\Src\vdl\Window\Windows\CWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Src\vdl\GUI\Windows\CGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.hpp" />

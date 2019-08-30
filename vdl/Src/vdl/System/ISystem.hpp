@@ -12,4 +12,6 @@ public:
   virtual void Initialize() = 0;
 
   virtual bool Update() = 0;
+
+  virtual float GetDeltaTime() = 0;
 };

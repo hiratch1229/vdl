@@ -9,6 +9,8 @@ public:
 
   virtual ~IKeyboard() = default;
 
+  virtual void Initialize() = 0;
+
   virtual void Update() = 0;
 
   virtual bool Press(int _Number)const = 0;

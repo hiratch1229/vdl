@@ -11,6 +11,8 @@ public:
 
   virtual ~IXInput() = default;
 
+  virtual void Initialize() = 0;
+
   virtual void Update() = 0;
 
   virtual bool Press(int _Number, int _Index)const = 0;

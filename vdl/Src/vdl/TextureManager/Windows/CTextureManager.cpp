@@ -4,15 +4,16 @@
 
 #include <vdl/Image.hpp>
 
+#include <vdl/Engine.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/Constants/Constants.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
 #include <filesystem>
 
-void CTextureManager::Initialize(IDevice* _pDevice)
+void CTextureManager::Initialize()
 {
-  pDevice_ = _pDevice;
+  pDevice_ = Engine::Get<IDevice>();
 }
 
 ID CTextureManager::Load(const char* _FilePath, bool _isSerialize)

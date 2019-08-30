@@ -113,7 +113,7 @@ public:
   {
     vdl::uint Index = 0;
     {
-      const vdl::uint Size = static_cast<vdl::uint>(ReferenceCounts_.size());
+      const size_t Size = ReferenceCounts_.size();
       for (; Index < Size; ++Index)
       {
         if (!ReferenceCounts_[Index])

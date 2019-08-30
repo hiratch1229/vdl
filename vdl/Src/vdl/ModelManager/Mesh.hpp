@@ -11,8 +11,8 @@
 struct Mesh
 {
   std::string Name;
-  std::unique_ptr<IBuffer> VertexBuffer;
-  std::unique_ptr<IBuffer> IndexBuffer;
+  std::unique_ptr<IBuffer> pVertexBuffer;
+  std::unique_ptr<IBuffer> pIndexBuffer;
   std::vector<vdl::Material> Materials;
   std::vector<vdl::Animation> Animations;
   vdl::Matrix GlobalTransform;

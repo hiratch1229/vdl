@@ -32,10 +32,4 @@ public:
   virtual void SetPos(vdl::int2 _Pos) = 0;
 
   virtual void SetWheel(vdl::int2 _Wheel) = 0;
-
-  virtual bool AnyButtonPress()const = 0;
-
-  virtual bool AnyButtonPressed()const = 0;
-
-  virtual bool AnyButtonReleased()const = 0;
 };

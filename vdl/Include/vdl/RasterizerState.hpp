@@ -5,29 +5,40 @@ namespace vdl
 {
   enum class FillMode : uint8_t
   {
-    Wireframe = 2,
-    Solid = 3
+    eWireframe = 2,
+    eSolid = 3
   };
 
   enum class CullMode : uint8_t
   {
-    None = 1,
-    Front = 2,
-    Back = 3
+    eNone = 1,
+    eFront = 2,
+    eBack = 3
   };
 
-  class RasterizerState
+  struct RasterizerState
   {
+  private:
     enum class PreDefined : uint8_t
     {
-      SolidCullNone,
-      SolidCullFront,
-      SolidCullBack,
-      WireframeCullNone,
-      WireframeCullFront,
-      WireframeCullBack,
+      eSolidCullNone,
+      eSolidCullFront,
+      eSolidCullBack,
+      eWireframeCullNone,
+      eWireframeCullFront,
+      eWireframeCullBack,
+
       Num
     };
+  public:
+    static constexpr PreDefined kSolidCullNone = PreDefined::eSolidCullNone;
+    static constexpr PreDefined kSolidCullFront = PreDefined::eSolidCullFront;
+    static constexpr PreDefined kSolidCullBack = PreDefined::eSolidCullBack;
+    static constexpr PreDefined kWireframeCullNone = PreDefined::eWireframeCullNone;
+    static constexpr PreDefined kWireframeCullFront = PreDefined::eWireframeCullFront;
+    static constexpr PreDefined kWireframeCullBack = PreDefined::eWireframeCullBack;
+    static constexpr PreDefined kDefault2D = PreDefined::eSolidCullNone;
+    static constexpr PreDefined kDefault3D = PreDefined::eSolidCullBack;
   public:
     using DataType = uint64_t;
   public:
@@ -36,64 +47,46 @@ namespace vdl
     {
       struct
       {
-        FillMode FillMode_ : 2;
-        CullMode CullMode_ : 2;
-        bool FrontCounterClockwise_ : 1;
-        int DepthBias_;
-        bool ScissorEnable_ : 1;
-        bool AntialiasedLineAnable_ : 1;
+        FillMode Filling : 2;
+        CullMode Culling : 2;
+        bool FrontCounterClockwise : 1;
+        int DepthBias;
+        bool ScissorEnable : 1;
+        bool AntialiasedLineAnable : 1;
       };
-      DataType DataType_;
+      DataType Data;
     };
 #pragma warning(default:4201)
   public:
-    constexpr RasterizerState(FillMode _FillMode = FillMode::Solid,
-      CullMode _CullMode = CullMode::Back,
+    bool operator==(const RasterizerState& _RasterizerState)const noexcept { return Data == _RasterizerState.Data; }
+    bool operator!=(const RasterizerState& _RasterizerState)const noexcept { return !((*this) == _RasterizerState); }
+  public:
+    constexpr RasterizerState(FillMode _FillMode = FillMode::eSolid,
+      CullMode _CullMode = CullMode::eBack,
       bool _FrontCounterClockwise = false,
-      UINT _DepthBias = 0,
+      int _DepthBias = 0,
       bool _ScissorEnable = false,
       bool _AntialiasedLineEnable = false)
-      : FillMode_(_FillMode),
-      CullMode_(_CullMode),
-      FrontCounterClockwise_(_FrontCounterClockwise),
-      DepthBias_(_DepthBias),
-      ScissorEnable_(_ScissorEnable),
-      AntialiasedLineAnable_(_AntialiasedLineEnable)
-    {
+      : Filling(_FillMode),
+      Culling(_CullMode),
+      FrontCounterClockwise(_FrontCounterClockwise),
+      DepthBias(_DepthBias),
+      ScissorEnable(_ScissorEnable),
+      AntialiasedLineAnable(_AntialiasedLineEnable) {}
 
-    }
-  public:
     RasterizerState(PreDefined _PreDefined)
     {
-      static constexpr RasterizerState PreDefineds[static_cast<UINT>(PreDefined::Num)] =
+      static constexpr RasterizerState PreDefineds[static_cast<uint>(PreDefined::Num)] =
       {
-        { FillMode::Solid, CullMode::None },
-        { FillMode::Solid, CullMode::Front },
-        { FillMode::Solid, CullMode::Back },
-        { FillMode::Wireframe, CullMode::None },
-        { FillMode::Wireframe, CullMode::Front },
-        { FillMode::Wireframe, CullMode::Back },
+        { FillMode::eSolid, CullMode::eNone },
+        { FillMode::eSolid, CullMode::eFront },
+        { FillMode::eSolid, CullMode::eBack },
+        { FillMode::eWireframe, CullMode::eNone },
+        { FillMode::eWireframe, CullMode::eFront },
+        { FillMode::eWireframe, CullMode::eBack },
       };
 
-      *this = PreDefineds[static_cast<UINT>(_PreDefined)];
+      *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
-  public:
-    bool operator==(const RasterizerState& _RasterizerState)const
-    {
-      return DataType_ == _RasterizerState.DataType_;
-    }
-    bool operator!=(const RasterizerState& _RasterizerState)const
-    {
-      return !((*this) == _RasterizerState);
-    }
-  public:
-    static constexpr PreDefined SolidCullNone = PreDefined::SolidCullNone;
-    static constexpr PreDefined SolidCullFront = PreDefined::SolidCullFront;
-    static constexpr PreDefined SolidCullBack = PreDefined::SolidCullBack;
-    static constexpr PreDefined WireframeCullNone = PreDefined::WireframeCullNone;
-    static constexpr PreDefined WireframeCullFront = PreDefined::WireframeCullFront;
-    static constexpr PreDefined WireframeCullBack = PreDefined::WireframeCullBack;
-    static constexpr PreDefined Default2D = PreDefined::SolidCullNone;
-    static constexpr PreDefined Default3D = PreDefined::SolidCullBack;
   };
 }

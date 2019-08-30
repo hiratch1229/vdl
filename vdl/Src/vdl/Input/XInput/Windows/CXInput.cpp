@@ -5,6 +5,11 @@
 #include <Windows.h>
 #include <Xinput.h>
 
+void CXInput::Initialize()
+{
+
+}
+
 void CXInput::Update()
 {
   static constexpr int kXInputButtonsCode[] = { XINPUT_GAMEPAD_DPAD_UP, XINPUT_GAMEPAD_DPAD_DOWN, XINPUT_GAMEPAD_DPAD_LEFT, XINPUT_GAMEPAD_DPAD_RIGHT,

@@ -2,12 +2,26 @@
 #include <vdl/Fwd.hpp>
 #include <vdl/Types.hpp>
 
+#include <vdl/Buffer/IBuffer.hpp>
+
 class IDeviceContext
 {
 public:
+  static IDeviceContext* Create();
+
   IDeviceContext() = default;
 
   virtual ~IDeviceContext() = default;
+  
+  virtual void Initialize() = 0;
+
+  virtual void SetInputLayout(vdl::InputLayout _InputLayout) = 0;
+
+  virtual void SetVertexBuffer(const IBuffer* _pVertexBuffer) = 0;
+
+  virtual void SetIndexBuffer(const IBuffer* _pIndexBuffer) = 0;
+
+  virtual void SetInstanceBuffer(const IBuffer* _pInstanceBuffer) = 0;
 
   virtual void SetScissor(const vdl::Scissor& _Scissor) = 0;
 
@@ -24,33 +38,33 @@ public:
 
   virtual void VSSetShader(const vdl::VertexShader& _VertexShader) = 0;
 
-  virtual void VSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
+  virtual void VSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::SamplerState _Samplers[]) = 0;
 
-  virtual void VSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
+  virtual void VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
 
   virtual void HSSetShader(const vdl::HullShader& _VertexShader) = 0;
 
-  virtual void HSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
+  virtual void HSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::SamplerState _Samplers[]) = 0;
 
-  virtual void HSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
+  virtual void HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
 
   virtual void DSSetShader(const vdl::DomainShader& _DomainShader) = 0;
 
-  virtual void DSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
+  virtual void DSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::SamplerState _Samplers[]) = 0;
 
-  virtual void DSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
+  virtual void DSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
 
   virtual void GSSetShader(const vdl::GeometryShader& _GeometryShader) = 0;
 
-  virtual void GSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
+  virtual void GSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::SamplerState _Samplers[]) = 0;
 
-  virtual void GSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
+  virtual void GSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
 
   virtual void PSSetShader(const vdl::PixelShader& _PixelShader) = 0;
 
-  virtual void PSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
+  virtual void PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[]) = 0;
 
-  virtual void PSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
+  virtual void PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture _Textures[]) = 0;
 
   //virtual void CSSetShader(const vdl::ComputeShader& _ComputeShader) = 0;
   

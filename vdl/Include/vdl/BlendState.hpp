@@ -5,49 +5,59 @@ namespace vdl
 {
   enum class Blend : uint8_t
   {
-    Zero = 1,
-    One = 2,
-    SrcColor = 3,
-    InvSrcColor = 4,
-    SrcAlpha = 5,
-    InvSrcAlpha = 6,
-    DestAlpha = 7,
-    InvDestAlpha = 8,
-    DestColor = 9,
-    InvDestColor = 10,
-    SrcAlphaSat = 11,
-    BlendFactor = 14,
-    InvBlendFactor = 15,
-    Src1Color = 16,
-    InvSrc1Color = 17,
-    Src1Alpha = 18,
-    InvSrc1Alpha = 19
+    eZero = 1,
+    eOne = 2,
+    eSrcColor = 3,
+    eInvSrcColor = 4,
+    eSrcAlpha = 5,
+    eInvSrcAlpha = 6,
+    eDestAlpha = 7,
+    eInvDestAlpha = 8,
+    eDestColor = 9,
+    eInvDestColor = 10,
+    eSrcAlphaSat = 11,
+    eBlendFactor = 14,
+    eInvBlendFactor = 15,
+    eSrc1Color = 16,
+    eInvSrc1Color = 17,
+    eSrc1Alpha = 18,
+    eInvSrc1Alpha = 19
   };
 
-  enum class BlendOp : uint8_t
+  enum class BlendOperation : uint8_t
   {
-    Add = 1,
-    Subtract = 2,
-    RevSubtract = 3,
-    Min = 4,
-    Max = 5
+    eAdd = 1,
+    eSubtract = 2,
+    eRevSubtract = 3,
+    eMin = 4,
+    eMax = 5
   };
 
-  class BlendState
+  struct BlendState
   {
+  private:
     enum class PreDefined : uint8_t
     {
-      Alpha,
-      Add,
-      Subtract,
-      Replace,
-      Multiply,
-      Lighten,
-      Draken,
-      Screen,
+      eAlpha,
+      eAdd,
+      eSubtract,
+      eReplace,
+      eMultiply,
+      eLighten,
+      eDraken,
+      eScreen,
 
-      Num
+      eNum
     };
+  public:
+    static constexpr PreDefined kDefault = PreDefined::eAlpha;
+    static constexpr PreDefined kAdd = PreDefined::eAdd;
+    static constexpr PreDefined kSubtract = PreDefined::eSubtract;
+    static constexpr PreDefined kReplace = PreDefined::eReplace;
+    static constexpr PreDefined kMultiply = PreDefined::eMultiply;
+    static constexpr PreDefined kLighten = PreDefined::eLighten;
+    static constexpr PreDefined kDraken = PreDefined::eDraken;
+    static constexpr PreDefined kScreen = PreDefined::eScreen;
   public:
     using DataType = uint32_t;
   public:
@@ -56,69 +66,54 @@ namespace vdl
     {
       struct
       {
-        bool AlphaToCoverageEnable_ : 3;
-        bool BlendEnable_ : 3;
-        Blend SrcBlend_ : 5;
-        Blend DestBlend_ : 5;
-        BlendOp BlendOp_ : 3;
-        Blend SrcBlendAlpha_ : 5;
-        Blend DestBlnedAlpha_ : 5;
-        BlendOp BlendOpAlpha_ : 3;
+        bool AlphaToCoverageEnable : 3;
+        bool BlendEnable : 3;
+        Blend SrcBlend : 5;
+        Blend DestBlend : 5;
+        BlendOperation BlendOp : 3;
+        Blend SrcBlendAlpha : 5;
+        Blend DestBlnedAlpha : 5;
+        BlendOperation BlendOpAlpha : 3;
       };
-      DataType DataType_;
+      DataType Data;
     };
 #pragma warning(default:4201)
   public:
+    bool operator==(const BlendState& _BlendState)const noexcept { return Data == _BlendState.Data; }
+    bool operator!=(const BlendState& _BlendState)const noexcept { return !((*this) == _BlendState); }
+  public:
     constexpr BlendState(bool _AlphaToCoverageEnable = false,
       bool _BlendEnable = false,
-      Blend _SrcBlend = Blend::One,
-      Blend _DestBlend = Blend::Zero,
-      BlendOp _BlendOp = BlendOp::Add,
-      Blend _SrcBlendAlpha = Blend::One,
-      Blend _DestBlnedAlpha = Blend::Zero,
-      BlendOp _BlendOpAlpha = BlendOp::Add)
-      : AlphaToCoverageEnable_(_AlphaToCoverageEnable),
-      BlendEnable_(_BlendEnable),
-      SrcBlend_(_SrcBlend),
-      DestBlend_(_DestBlend),
-      BlendOp_(_BlendOp),
-      SrcBlendAlpha_(_SrcBlendAlpha),
-      DestBlnedAlpha_(_DestBlnedAlpha),
-      BlendOpAlpha_(_BlendOpAlpha) { }
-  public:
+      Blend _SrcBlend = Blend::eOne,
+      Blend _DestBlend = Blend::eZero,
+      BlendOperation _BlendOp = BlendOperation::eAdd,
+      Blend _SrcBlendAlpha = Blend::eOne,
+      Blend _DestBlnedAlpha = Blend::eZero,
+      BlendOperation _BlendOpAlpha = BlendOperation::eAdd)
+      : AlphaToCoverageEnable(_AlphaToCoverageEnable),
+      BlendEnable(_BlendEnable),
+      SrcBlend(_SrcBlend),
+      DestBlend(_DestBlend),
+      BlendOp(_BlendOp),
+      SrcBlendAlpha(_SrcBlendAlpha),
+      DestBlnedAlpha(_DestBlnedAlpha),
+      BlendOpAlpha(_BlendOpAlpha) {}
+
     BlendState(PreDefined _PreDefined)
     {
-      static constexpr BlendState PreDefineds[static_cast<UINT>(PreDefined::Num)] =
+      static constexpr BlendState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
-        { false, true, Blend::SrcAlpha, Blend::InvSrcAlpha, BlendOp::Add, Blend::One, Blend::InvSrcAlpha, BlendOp::Add },
-        { false, true, Blend::SrcAlpha, Blend::One, BlendOp::Add, Blend::Zero, Blend::One, BlendOp::Add },
-        { false, true, Blend::SrcAlpha, Blend::One, BlendOp::Subtract, Blend::Zero, Blend::One, BlendOp::Add },
-        { false, true, Blend::SrcAlpha, Blend::Zero, BlendOp::Add, Blend::One, Blend::Zero, BlendOp::Add },
-        { false, true, Blend::Zero, Blend::SrcColor, BlendOp::Add, Blend::DestAlpha, Blend::Zero, BlendOp::Add },
-        { false, true, Blend::One, Blend::One, BlendOp::Max, Blend::One, Blend::One, BlendOp::Max },
-        { false, true, Blend::One, Blend::One, BlendOp::Min, Blend::One, Blend::One, BlendOp::Min },
-        { false, true, Blend::SrcAlpha, Blend::InvSrcColor, BlendOp::Add, Blend::One, Blend::InvSrcAlpha, BlendOp::Add }
+        { false, true, Blend::eSrcAlpha, Blend::eInvSrcAlpha, BlendOperation::eAdd, Blend::eOne, Blend::eInvSrcAlpha, BlendOperation::eAdd },
+        { false, true, Blend::eSrcAlpha, Blend::eOne, BlendOperation::eAdd, Blend::eZero, Blend::eOne, BlendOperation::eAdd },
+        { false, true, Blend::eSrcAlpha, Blend::eOne, BlendOperation::eSubtract, Blend::eZero, Blend::eOne, BlendOperation::eAdd },
+        { false, true, Blend::eSrcAlpha, Blend::eZero, BlendOperation::eAdd, Blend::eOne, Blend::eZero, BlendOperation::eAdd },
+        { false, true, Blend::eZero, Blend::eSrcColor, BlendOperation::eAdd, Blend::eDestAlpha, Blend::eZero, BlendOperation::eAdd },
+        { false, true, Blend::eOne, Blend::eOne, BlendOperation::eMax, Blend::eOne, Blend::eOne, BlendOperation::eMax },
+        { false, true, Blend::eOne, Blend::eOne, BlendOperation::eMin, Blend::eOne, Blend::eOne, BlendOperation::eMin },
+        { false, true, Blend::eSrcAlpha, Blend::eInvSrcColor, BlendOperation::eAdd, Blend::eOne, Blend::eInvSrcAlpha, BlendOperation::eAdd }
       };
 
-      *this = PreDefineds[static_cast<UINT>(_PreDefined)];
+      *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
-  public:
-    bool operator==(const BlendState& _BlendState)const
-    {
-      return DataType_ == _BlendState.DataType_;
-    }
-    bool operator!=(const BlendState& _BlendState)const
-    {
-      return !((*this) == _BlendState);
-    }
-  public:
-    static constexpr PreDefined Default = PreDefined::Alpha;
-    static constexpr PreDefined Add = PreDefined::Add;
-    static constexpr PreDefined Subtract = PreDefined::Subtract;
-    static constexpr PreDefined Replace = PreDefined::Replace;
-    static constexpr PreDefined Multiply = PreDefined::Multiply;
-    static constexpr PreDefined Lighten = PreDefined::Lighten;
-    static constexpr PreDefined Draken = PreDefined::Draken;
-    static constexpr PreDefined Screen = PreDefined::Screen;
   };
 }

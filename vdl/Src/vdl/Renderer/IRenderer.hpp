@@ -8,4 +8,6 @@ public:
   IRenderer() = default;
 
   virtual ~IRenderer() = default;
+
+  virtual void Initialize() = 0;
 };

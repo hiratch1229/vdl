@@ -1,5 +1,6 @@
 #pragma once
 #include "ID.hpp"
+#include "InputLayout.hpp"
 
 namespace vdl
 {
@@ -16,7 +17,9 @@ namespace vdl
 
     ~VertexShader();
 
-    VertexShader(const char* _FilePath, const char* _EntryPoint);
+    VertexShader(const char* _FilePath, InputLayout _InputLayout, const char* _EntryPoint = "main");
+
+    VertexShader(const char* _Source, uint _DataSize, InputLayout _InputLayout, const char* _EntryPoint = "main");
 
     VertexShader& operator=(const VertexShader& _VertexShader);
   };
@@ -34,7 +37,9 @@ namespace vdl
 
     ~HullShader();
 
-    HullShader(const char* _FilePath, const char* _EntryPoint);
+    HullShader(const char* _FilePath, const char* _EntryPoint = "main");
+    
+    HullShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     HullShader& operator=(const HullShader& _HullShader);
   };
@@ -52,7 +57,9 @@ namespace vdl
 
     ~DomainShader();
 
-    DomainShader(const char* _FilePath, const char* _EntryPoint);
+    DomainShader(const char* _FilePath, const char* _EntryPoint = "main");
+
+    DomainShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     DomainShader& operator=(const DomainShader& _DomainShader);
   };
@@ -70,7 +77,9 @@ namespace vdl
 
     ~GeometryShader();
 
-    GeometryShader(const char* _FilePath, const char* _EntryPoint);
+    GeometryShader(const char* _FilePath, const char* _EntryPoint = "main");
+
+    GeometryShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     GeometryShader& operator=(const GeometryShader& _GeometryShader);
   };
@@ -88,7 +97,9 @@ namespace vdl
 
     ~PixelShader();
 
-    PixelShader(const char* _FilePath, const char* _EntryPoint);
+    PixelShader(const char* _FilePath, const char* _EntryPoint = "main");
+
+    PixelShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     PixelShader& operator=(const PixelShader& _PixelShader);
   };
@@ -106,7 +117,9 @@ namespace vdl
 
     ~ComputeShader();
 
-    ComputeShader(const char* _FilePath, const char* _EntryPoint);
+    ComputeShader(const char* _FilePath, const char* _EntryPoint = "main");
+
+    ComputeShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     ComputeShader& operator=(const ComputeShader& _ComputeShader);
   };

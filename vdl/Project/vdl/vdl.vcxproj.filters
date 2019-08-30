@@ -240,6 +240,21 @@
     <ClInclude Include="..\..\Include\vdl\SamplerState.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\GraphicsState.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Mouse.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\InputLayout.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Platform.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\GUI.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -247,6 +262,51 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Input\Button.cpp">
       <Filter>Src\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp">
+      <Filter>Src\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\GUI\GUIFactory.cpp">
+      <Filter>Src\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Input\Gamepad\GamepadFactory.cpp">
+      <Filter>Src\Input\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Input\Keyboard\KeyboardFactory.cpp">
+      <Filter>Src\Input\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Input\Mouse\MouseFactory.cpp">
+      <Filter>Src\Input\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Input\XInput\XInputFactory.cpp">
+      <Filter>Src\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ModelManager\ModelManagerFactory.cpp">
+      <Filter>Src\ModelManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Renderer\RendererFactory.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ShaderManager\ShaderManagerFactory.cpp">
+      <Filter>Src\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\SoundManager\SoundManagerFactory.cpp">
+      <Filter>Src\SoundManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\SwapChain\SwapChainFactory.cpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\System\SystemFactory.cpp">
+      <Filter>Src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\TextureManager\TextureManagerFactory.cpp">
+      <Filter>Src\TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp">
+      <Filter>Src\Window</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

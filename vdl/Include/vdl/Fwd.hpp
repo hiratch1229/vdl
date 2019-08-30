@@ -70,17 +70,22 @@ namespace vdl
   //-------------------------
   //  BlendState.hpp
   //-------------------------
-  class BlendState;
+  struct BlendState;
 
   //-------------------------
   //  DepthStencilState.hpp
   //-------------------------
-  class DepthStencilState;
+  struct DepthStencilState;
 
   //-------------------------
   //  RasterizerState.hpp
   //-------------------------
-  class RasterizerState;
+  struct RasterizerState;
+
+  //-------------------------
+  //  GraphicsState.hpp
+  //-------------------------
+  struct GraphicsState;
 
   //-------------------------
   //  SamplerState.hpp
@@ -106,6 +111,11 @@ namespace vdl
   class StaticMesh;
   class SkinnedMesh;
   class Model;
+
+  //-------------------------
+  //  InputLayout.hpp
+  //-------------------------
+  enum class InputLayout;
 
   //-------------------------
   //  Shader.hpp

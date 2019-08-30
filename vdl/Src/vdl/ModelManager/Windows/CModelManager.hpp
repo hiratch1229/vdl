@@ -3,6 +3,8 @@
 
 #include <vdl/ReferenceCount/ReferenceCount.hpp>
 
+class IDevice;
+
 class CModelManager : public IModelManager
 {
   IDevice* pDevice_;
@@ -11,11 +13,15 @@ private:
 public:
   CModelManager() = default;
 
-  void Initialize(IDevice* _pDevice)override;
+  void Initialize()override;
 
   ID Load(const vdl::SkinnedMeshData& _MeshData)override;
 
   std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize)override;
+
+  void AddRef(const ID& _ID)override { Meshes_.Get(_ID).AddRef(); }
+
+  void Release(const ID& _ID)override { Meshes_.Get(_ID).Release(); }
 
   Mesh* GetMesh(const ID& _ID)override { return Meshes_.Get(_ID).Get(); }
 };

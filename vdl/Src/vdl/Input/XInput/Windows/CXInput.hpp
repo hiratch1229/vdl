@@ -39,6 +39,8 @@ private:
 public:
   CXInput() = default;
 
+  void Initialize()override;
+
   void Update()override;
 
   bool Press(int _Number, int _Index)const override

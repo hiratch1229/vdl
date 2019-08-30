@@ -18,6 +18,16 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\vdl\Renderer\CRenderer.hpp" />
+    <ClInclude Include="..\..\Src\vdl\ShaderManager\CShaderManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\System\CSystem.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\Renderer\CRenderer.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ShaderManager\CShaderManager.cpp" />
+    <ClCompile Include="..\..\Src\vdl\System\CSystem.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{20E03538-D187-4873-A9C6-65C22F615095}</ProjectGuid>

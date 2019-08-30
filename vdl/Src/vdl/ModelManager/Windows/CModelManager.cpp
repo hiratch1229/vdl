@@ -2,6 +2,7 @@
 
 #include <vdl/Model.hpp>
 
+#include <vdl/Engine.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/Constants/Constants.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
@@ -11,19 +12,19 @@
 
 #include <filesystem>
 
-void CModelManager::Initialize(IDevice* _pDevice)
+void CModelManager::Initialize()
 {
-  pDevice_ = _pDevice;
+  pDevice_ = Engine::Get<IDevice>();
 }
 
 ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
 {
   Mesh* pMesh = new Mesh;
   {
-    IBuffer* pVertexBuffer = pMesh->VertexBuffer.get();
+    IBuffer* pVertexBuffer = pMesh->pVertexBuffer.get();
     pDevice_->CreateVertexBuffer(&pVertexBuffer, const_cast<vdl::Vertex3D*>(_MeshData.Vertices.data()), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)), true);
 
-    IBuffer* pIndexBuffer = pMesh->IndexBuffer.get();
+    IBuffer* pIndexBuffer = pMesh->pIndexBuffer.get();
     pDevice_->CreateIndexBuffer(&pIndexBuffer, const_cast<vdl::IndexType*>(_MeshData.Indices.data()), sizeof(vdl::IndexType), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::Vertex3D)));
 
     pMesh->Name = _MeshData.Name;

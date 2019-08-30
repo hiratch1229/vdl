@@ -75,46 +75,4 @@ public:
   {
     Wheel_ = _Wheel;
   }
-
-  bool AnyButtonPress()const override
-  {
-    for (int i = 0; i < kButtonNum; ++i)
-    {
-      if (Press(i))
-      {
-        return true;
-      }
-    }
-
-    //  ‰½‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
-
-  bool AnyButtonPressed()const override
-  {
-    for (int i = 0; i < kButtonNum; ++i)
-    {
-      if (Pressed(i))
-      {
-        return true;
-      }
-    }
-
-    //  ‰½‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
-
-  bool AnyButtonReleased()const override
-  {
-    for (int i = 0; i < kButtonNum; ++i)
-    {
-      if (Released(i))
-      {
-        return true;
-      }
-    }
-
-    //  ‰½‚à—£‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
 };

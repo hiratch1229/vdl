@@ -2,6 +2,9 @@
 
 #include "System/ISystem.hpp"
 #include "Window/IWindow.hpp"
+#include "Device/IDevice.hpp"
+#include "DeviceContext/IDeviceContext.hpp"
+#include "SwapChain/ISwapChain.hpp"
 #include "Input/Keyboard/IKeyboard.hpp"
 #include "Input/Mouse/IMouse.hpp"
 #include "Input/XInput/IXInput.hpp"

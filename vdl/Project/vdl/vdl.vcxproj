@@ -29,14 +29,19 @@
     <ClInclude Include="..\..\Include\vdl\DepthStencilState.hpp" />
     <ClInclude Include="..\..\Include\vdl\Format.hpp" />
     <ClInclude Include="..\..\Include\vdl\Fwd.hpp" />
+    <ClInclude Include="..\..\Include\vdl\GraphicsState.hpp" />
+    <ClInclude Include="..\..\Include\vdl\GUI.hpp" />
     <ClInclude Include="..\..\Include\vdl\ID.hpp" />
     <ClInclude Include="..\..\Include\vdl\Image.hpp" />
+    <ClInclude Include="..\..\Include\vdl\InputLayout.hpp" />
     <ClInclude Include="..\..\Include\vdl\Macro.hpp" />
     <ClInclude Include="..\..\Include\vdl\Math.hpp" />
     <ClInclude Include="..\..\Include\vdl\MathConstants.hpp" />
     <ClInclude Include="..\..\Include\vdl\Matrix.hpp" />
     <ClInclude Include="..\..\Include\vdl\MeshData.hpp" />
     <ClInclude Include="..\..\Include\vdl\Model.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Mouse.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Platform.hpp" />
     <ClInclude Include="..\..\Include\vdl\Quaternion.hpp" />
     <ClInclude Include="..\..\Include\vdl\RasterizerState.hpp" />
     <ClInclude Include="..\..\Include\vdl\SamplerState.hpp" />
@@ -76,8 +81,23 @@
     <ClInclude Include="..\..\Src\vdl\Window\IWindow.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Engine.cpp" />
+    <ClCompile Include="..\..\Src\vdl\GUI\GUIFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Button.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Input\Gamepad\GamepadFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Input\Keyboard\KeyboardFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Input\Mouse\MouseFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Input\XInput\XInputFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ModelManager\ModelManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Renderer\RendererFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ShaderManager\ShaderManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\SoundManager\SoundManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\SwapChain\SwapChainFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\System\SystemFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\TextureManager\TextureManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

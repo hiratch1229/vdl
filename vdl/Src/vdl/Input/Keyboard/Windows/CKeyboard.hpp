@@ -17,6 +17,8 @@ private:
 public:
   CKeyboard() = default;
 
+  void Initialize()override;
+
   void Update()override;
 
   bool Press(int _Number)const override

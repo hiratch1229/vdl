@@ -5,42 +5,47 @@ namespace vdl
 {
   enum class ComparisonFunc : uint8_t
   {
-    Never = 1,
-    Less = 2,
-    Equal = 3,
-    LessEqual = 4,
-    Greater = 5,
-    NotEqual = 6,
-    GreaterEqual = 7,
-    Always = 8
+    eNever = 1,
+    eLess = 2,
+    eEqual = 3,
+    eLessEqual = 4,
+    eGreater = 5,
+    eNotEqual = 6,
+    eGreaterEqual = 7,
+    eAlways = 8
   };
 
-  enum class DepthWriteMask : uint8_t
+  enum class WriteMask : uint8_t
   {
-    Zero = 0,
-    All = 1
+    eZero = 0,
+    eAll = 1
   };
 
   enum class StencilOp : uint8_t
   {
-    Keep = 1,
-    Zero = 2,
-    Rreplace = 3,
-    IncrSat = 4,
-    DecrSat = 5,
-    Invert = 6,
-    Incr = 7,
-    Decr = 8
+    eKeep = 1,
+    eZero = 2,
+    eRreplace = 3,
+    eIncrSat = 4,
+    eDecrSat = 5,
+    eInvert = 6,
+    eIncr = 7,
+    eDecr = 8
   };
 
-  class DepthStencilOpDesc
+  struct DepthStencilOpDesc
   {
+  private:
     enum class PreDefined : uint8_t
     {
-      DefaultFront,
-      DefaultBack,
-      Num
+      eDefaultFront,
+      eDefaultBack,
+
+      eNum
     };
+  public:
+    static constexpr PreDefined kDefaultFront = PreDefined::eDefaultFront;
+    static constexpr PreDefined kDefaultBack = PreDefined::eDefaultBack;
   public:
     using DataType = uint16_t;
   public:
@@ -49,59 +54,51 @@ namespace vdl
     {
       struct
       {
-        StencilOp FailOp_ : 4;
-        StencilOp DepthFailOp_ : 4;
-        StencilOp PassOp_ : 4;
-        ComparisonFunc Func_ : 4;
+        StencilOp FailOp : 4;
+        StencilOp DepthFailOp : 4;
+        StencilOp PassOp : 4;
+        ComparisonFunc Func : 4;
       };
-      DataType DataType_;
+      DataType Data;
     };
 #pragma warning(default:4201)
+    bool operator==(const DepthStencilOpDesc& _DepthStencilOpDesc)const noexcept { return Data == _DepthStencilOpDesc.Data; }
+    bool operator!=(const DepthStencilOpDesc& _DepthStencilOpDesc)const noexcept { return !((*this) == _DepthStencilOpDesc); }
   public:
     constexpr DepthStencilOpDesc(StencilOp _FailOp,
       StencilOp _DepthFailOp,
       StencilOp _PassOp,
       ComparisonFunc _Func)
-      : FailOp_(_FailOp),
-      DepthFailOp_(_DepthFailOp),
-      PassOp_(_PassOp),
-      Func_(_Func)
-    {
+      : FailOp(_FailOp),
+      DepthFailOp(_DepthFailOp),
+      PassOp(_PassOp),
+      Func(_Func) {}
 
-    }
-  public:
     DepthStencilOpDesc(PreDefined _PreDefined)
     {
-      static constexpr DepthStencilOpDesc PreDefineds[static_cast<UINT>(PreDefined::Num)] =
+      static constexpr DepthStencilOpDesc PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
-        { StencilOp::Keep, StencilOp::Incr, StencilOp::Keep, ComparisonFunc::Always },
-        { StencilOp::Keep, StencilOp::Decr, StencilOp::Keep, ComparisonFunc::Always }
+        { StencilOp::eKeep, StencilOp::eIncr, StencilOp::eKeep, ComparisonFunc::eAlways },
+        { StencilOp::eKeep, StencilOp::eDecr, StencilOp::eKeep, ComparisonFunc::eAlways }
       };
 
-      *this = PreDefineds[static_cast<UINT>(_PreDefined)];
+      *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
-  public:
-    bool operator==(const DepthStencilOpDesc& _DepthStencilOpDesc)const
-    {
-      return DataType_ == _DepthStencilOpDesc.DataType_;
-    }
-    bool operator!=(const DepthStencilOpDesc& _DepthStencilOpDesc)const
-    {
-      return !((*this) == _DepthStencilOpDesc);
-    }
-  public:
-    static constexpr PreDefined DefaultFront = PreDefined::DefaultFront;
-    static constexpr PreDefined DefaultBack = PreDefined::DefaultBack;
   };
 
-  class DepthStencilState
+  struct DepthStencilState
   {
-    enum class PreDefined : UINT
+  private:
+    enum class PreDefined : uint8_t
     {
-      Default2D,
-      Default3D,
-      Num
+      eDefault2D,
+      eDefault3D,
+      
+      eNum
     };
+  public:
+    static constexpr PreDefined kDefault2D = PreDefined::eDefault2D;
+    static constexpr PreDefined kDefault3D = PreDefined::eDefault3D;
   public:
     using DataType = uint64_t;
   public:
@@ -110,54 +107,42 @@ namespace vdl
     {
       struct
       {
-        bool DepthEnable_ : 2;
-        DepthWriteMask DepthWriteMask_ : 2;
-        ComparisonFunc DepthFunc_ : 4;
-        bool StencilEnable_ : 2;
-        DepthStencilOpDesc FrontFace_;
-        DepthStencilOpDesc BackFace_;
+        bool DepthEnable : 2;
+        WriteMask DepthWriteMask : 2;
+        ComparisonFunc DepthFunc : 4;
+        bool StencilEnable : 2;
+        DepthStencilOpDesc FrontFace;
+        DepthStencilOpDesc BackFace;
       };
-      DataType DataType_;
+      DataType Data;
     };
 #pragma warning(default:4201)
   public:
-    constexpr DepthStencilState(bool _DepthEnable = true,
-      DepthWriteMask _DepthWriteMask = DepthWriteMask::All,
-      ComparisonFunc _DepthFunc = ComparisonFunc::Less,
-      bool _StencilEnable = false,
-      const DepthStencilOpDesc& _FrontFace = DepthStencilOpDesc::DefaultFront,
-      const DepthStencilOpDesc& _BackFace = DepthStencilOpDesc::DefaultBack)
-      : DepthEnable_(_DepthEnable),
-      DepthWriteMask_(_DepthWriteMask),
-      DepthFunc_(_DepthFunc),
-      StencilEnable_(_StencilEnable),
-      FrontFace_(_FrontFace),
-      BackFace_(_BackFace)
-    {
-
-    }
+    bool operator==(const DepthStencilState& _DepthStencilState)const noexcept { return Data == _DepthStencilState.Data; }
+    bool operator!=(const DepthStencilState& _DepthStencilState)const noexcept { return !((*this) == _DepthStencilState); }
   public:
+    constexpr DepthStencilState(bool _DepthEnable = true,
+      WriteMask _DepthWriteMask = WriteMask::eAll,
+      ComparisonFunc _DepthFunc = ComparisonFunc::eLess,
+      bool _StencilEnable = false,
+      const DepthStencilOpDesc& _FrontFace = DepthStencilOpDesc::kDefaultFront,
+      const DepthStencilOpDesc& _BackFace = DepthStencilOpDesc::kDefaultBack)
+      : DepthEnable(_DepthEnable),
+      DepthWriteMask(_DepthWriteMask),
+      DepthFunc(_DepthFunc),
+      StencilEnable(_StencilEnable),
+      FrontFace(_FrontFace),
+      BackFace(_BackFace){}
+
     DepthStencilState(PreDefined _PreDefined)
     {
-      static const DepthStencilState PreDefineds[static_cast<UINT>(PreDefined::Num)] =
+      static const DepthStencilState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
-        { false, DepthWriteMask::Zero, ComparisonFunc::Always },
-        { true, DepthWriteMask::All, ComparisonFunc::Less }
+        { false, WriteMask::eZero, ComparisonFunc::eAlways },
+        { true, WriteMask::eAll, ComparisonFunc::eLess }
       };
 
-      *this = PreDefineds[static_cast<UINT>(_PreDefined)];
+      *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
-  public:
-    bool operator==(const DepthStencilState& _DepthStencilState)const
-    {
-      return DataType_ == _DepthStencilState.DataType_;
-    }
-    bool operator!=(const DepthStencilState& _DepthStencilState)const
-    {
-      return !((*this) == _DepthStencilState);
-    }
-  public:
-    static constexpr PreDefined Default2D = PreDefined::Default2D;
-    static constexpr PreDefined Default3D = PreDefined::Default3D;
   };
 }
