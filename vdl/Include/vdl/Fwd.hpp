@@ -90,7 +90,7 @@ namespace vdl
   //-------------------------
   //  SamplerState.hpp
   //-------------------------
-  class SamplerState;
+  struct SamplerState;
 
   //-------------------------
   //  Texture.hpp
@@ -113,9 +113,15 @@ namespace vdl
   class Model;
 
   //-------------------------
-  //  InputLayout.hpp
+  //  ConstantBuffer.hpp
   //-------------------------
-  enum class InputLayout;
+  namespace detail { class ConstantBufferData; }
+  template<class T> class ConstantBuffer;
+
+  //-------------------------
+  //  RenderType.hpp
+  //-------------------------
+  enum class RenderType;
 
   //-------------------------
   //  Shader.hpp

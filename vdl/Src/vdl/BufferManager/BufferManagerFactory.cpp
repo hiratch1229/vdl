@@ -1,4 +1,4 @@
-#include "IDevice.hpp"
+#include "IBufferManager.hpp"
 
 #include <vdl/Platform.hpp>
 
@@ -10,7 +10,7 @@
 
 #endif
 
-IDevice* IDevice::Create()
+IBufferManager* IBufferManager::Create()
 {
-  return new CDevice;
+  return new CBufferManager;
 }

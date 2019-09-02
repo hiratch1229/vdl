@@ -12,6 +12,7 @@ class IGamepad;
 class ISoundManager;
 class ITextureManager;
 class IModelManager;
+class IBufferManager;
 class IShaderManager;
 class IRenderer;
 class IGUI;
@@ -50,6 +51,7 @@ private:
   Component<ISoundManager> pSoundManager_;
   Component<ITextureManager> pTextureManager_;
   Component<IModelManager> pModelManager_;
+  Component<IBufferManager> pBufferManager_;
   Component<IShaderManager> pShaderManager_;
   Component<IRenderer> pRenderer_;
   Component<IGUI> pGUI_;
@@ -70,6 +72,7 @@ public:
   template<> [[nodiscard]] static ISoundManager* Get() { return pEngine->pSoundManager_.Get(); }
   template<> [[nodiscard]] static ITextureManager* Get() { return pEngine->pTextureManager_.Get(); }
   template<> [[nodiscard]] static IModelManager* Get() { return pEngine->pModelManager_.Get(); }
+  template<> [[nodiscard]] static IBufferManager* Get() { return pEngine->pBufferManager_.Get(); }
   template<> [[nodiscard]] static IShaderManager* Get() { return pEngine->pShaderManager_.Get(); }
   template<> [[nodiscard]] static IRenderer* Get() { return pEngine->pRenderer_.Get(); }
   template<> [[nodiscard]] static IGUI* Get() { return pEngine->pGUI_.Get(); }

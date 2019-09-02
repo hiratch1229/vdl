@@ -22,7 +22,7 @@ ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
   Mesh* pMesh = new Mesh;
   {
     IBuffer* pVertexBuffer = pMesh->pVertexBuffer.get();
-    pDevice_->CreateVertexBuffer(&pVertexBuffer, const_cast<vdl::Vertex3D*>(_MeshData.Vertices.data()), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)), true);
+    pDevice_->CreateVertexBuffer(&pVertexBuffer, const_cast<vdl::Vertex3D*>(_MeshData.Vertices.data()), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)));
 
     IBuffer* pIndexBuffer = pMesh->pIndexBuffer.get();
     pDevice_->CreateIndexBuffer(&pIndexBuffer, const_cast<vdl::IndexType*>(_MeshData.Indices.data()), sizeof(vdl::IndexType), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::Vertex3D)));

@@ -3,6 +3,8 @@
 
 #include <vdl/Input/InputState.hpp>
 
+#include <mutex>
+
 class IKeyboard;
 
 class CMouse : public IMouse
@@ -18,10 +20,14 @@ private:
   vdl::int2 Pos_;
   //  移動量
   vdl::int2 Delta_;
-  //  ホイール移動量
-  vdl::int2 Wheel_;
+  //  現在のホイールの移動量
+  vdl::int2 Scroll_;
+  //  ホイールの移動量の蓄積
+  vdl::int2 AccumulationScroll_;
   //  画面解像度
   vdl::float2 DpiScale_;
+  //  スクロールの排他制御
+  std::mutex ScrollMutex_;
 private:
   bool isWithinRange(int _Number)const
   {
@@ -66,13 +72,10 @@ public:
 
   vdl::int2 GetWheel()const override
   {
-    return Wheel_;
+    return Scroll_;
   }
 
   void SetPos(vdl::int2 _Pos)override;
 
-  void SetWheel(vdl::int2 _Wheel)override
-  {
-    Wheel_ = _Wheel;
-  }
+  void Scroll(vdl::int2 _Scroll)override;
 };

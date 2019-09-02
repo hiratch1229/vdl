@@ -73,6 +73,12 @@
     <Filter Include="Src\SwapChain">
       <UniqueIdentifier>{8f45d957-3ce0-45e8-81c9-0111f17c0491}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\ConstantBuffer">
+      <UniqueIdentifier>{8d7368ea-56a3-451f-a310-33dbe0a322f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\BufferManager">
+      <UniqueIdentifier>{21f5958c-6773-4923-94ab-41a3bbb95007}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -246,13 +252,37 @@
     <ClInclude Include="..\..\Include\vdl\Mouse.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\InputLayout.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\vdl\Platform.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\vdl\GUI.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\System\CSystem.hpp">
+      <Filter>Src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Renderer\CRenderer.hpp">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\ShaderManager\CShaderManager.hpp">
+      <Filter>Src\ShaderManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\System.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\ConstantBuffer.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\BufferManager\IBufferManager.hpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\UnorderedAccessBuffer.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\BufferManager\CBufferManager.hpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\RenderType.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
   </ItemGroup>
@@ -307,6 +337,24 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp">
       <Filter>Src\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\System\CSystem.cpp">
+      <Filter>Src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Renderer\CRenderer.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ShaderManager\CShaderManager.cpp">
+      <Filter>Src\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp">
+      <Filter>Src\ConstantBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\BufferManager\CBufferManager.cpp">
+      <Filter>Src\BufferManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

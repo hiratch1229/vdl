@@ -1,5 +1,5 @@
 #pragma once
-#include <vdl/InputLayout.hpp>
+#include <vdl/RenderType.hpp>
 
 enum class ShaderType
 {
@@ -23,5 +23,5 @@ struct IShader
 
 struct IVertexShader : public IShader
 {
-  virtual vdl::InputLayout GetInputLayout()const = 0;
+  virtual vdl::RenderType GetRenderType()const = 0;
 };

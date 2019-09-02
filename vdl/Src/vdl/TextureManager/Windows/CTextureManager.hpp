@@ -8,7 +8,6 @@ class IDevice;
 class CTextureManager : public ITextureManager
 {
   IDevice* pDevice_;
-private:
   ReferenceCounts<ITexture> Textures_;
 public:
   void Initialize()override;

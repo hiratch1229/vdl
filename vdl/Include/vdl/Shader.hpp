@@ -1,6 +1,6 @@
 #pragma once
 #include "ID.hpp"
-#include "InputLayout.hpp"
+#include "RenderType.hpp"
 
 namespace vdl
 {
@@ -17,9 +17,9 @@ namespace vdl
 
     ~VertexShader();
 
-    VertexShader(const char* _FilePath, InputLayout _InputLayout, const char* _EntryPoint = "main");
+    VertexShader(const char* _FilePath, RenderType _RenderType, const char* _EntryPoint = "main");
 
-    VertexShader(const char* _Source, uint _DataSize, InputLayout _InputLayout, const char* _EntryPoint = "main");
+    VertexShader(const char* _Source, uint _DataSize, RenderType _RenderType, const char* _EntryPoint = "main");
 
     VertexShader& operator=(const VertexShader& _VertexShader);
   };

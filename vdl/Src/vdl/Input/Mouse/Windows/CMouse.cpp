@@ -34,7 +34,14 @@ void CMouse::Update()
     //  座標を保存
     Pos_ = CursorPos;
 
-    Wheel_ = 0;
+    //  ホイールの更新
+    {
+      std::lock_guard Lock(ScrollMutex_);
+
+      Scroll_ = AccumulationScroll_;
+
+      AccumulationScroll_ = 0;
+    }
   }
 }
 
@@ -44,4 +51,11 @@ void CMouse::SetPos(vdl::int2 _Pos)
 
   //  ウィンドウの中心にカーソルをセット
   ::SetCursorPos(Pos_.x, Pos_.y);
+}
+
+void CMouse::Scroll(vdl::int2 _Scroll)
+{
+  std::lock_guard Lock(ScrollMutex_);
+
+  AccumulationScroll_ += _Scroll;
 }

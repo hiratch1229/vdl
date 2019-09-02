@@ -17,4 +17,6 @@ struct IBuffer
   virtual ~IBuffer() = default;
 
   virtual BufferType GetType()const = 0;
+
+  virtual void* GetData() = 0;
 };

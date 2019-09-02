@@ -25,6 +25,7 @@
     <ClInclude Include="..\..\Include\vdl\Button.hpp" />
     <ClInclude Include="..\..\Include\vdl\Camera.hpp" />
     <ClInclude Include="..\..\Include\vdl\Color.hpp" />
+    <ClInclude Include="..\..\Include\vdl\ConstantBuffer.hpp" />
     <ClInclude Include="..\..\Include\vdl\Constants.hpp" />
     <ClInclude Include="..\..\Include\vdl\DepthStencilState.hpp" />
     <ClInclude Include="..\..\Include\vdl\Format.hpp" />
@@ -33,7 +34,7 @@
     <ClInclude Include="..\..\Include\vdl\GUI.hpp" />
     <ClInclude Include="..\..\Include\vdl\ID.hpp" />
     <ClInclude Include="..\..\Include\vdl\Image.hpp" />
-    <ClInclude Include="..\..\Include\vdl\InputLayout.hpp" />
+    <ClInclude Include="..\..\Include\vdl\RenderType.hpp" />
     <ClInclude Include="..\..\Include\vdl\Macro.hpp" />
     <ClInclude Include="..\..\Include\vdl\Math.hpp" />
     <ClInclude Include="..\..\Include\vdl\MathConstants.hpp" />
@@ -49,13 +50,17 @@
     <ClInclude Include="..\..\Include\vdl\Serialize.hpp" />
     <ClInclude Include="..\..\Include\vdl\Shader.hpp" />
     <ClInclude Include="..\..\Include\vdl\Singleton.hpp" />
+    <ClInclude Include="..\..\Include\vdl\System.hpp" />
     <ClInclude Include="..\..\Include\vdl\Texture.hpp" />
     <ClInclude Include="..\..\Include\vdl\Type2.hpp" />
     <ClInclude Include="..\..\Include\vdl\Type3.hpp" />
     <ClInclude Include="..\..\Include\vdl\Type4.hpp" />
     <ClInclude Include="..\..\Include\vdl\Types.hpp" />
+    <ClInclude Include="..\..\Include\vdl\UnorderedAccessBuffer.hpp" />
     <ClInclude Include="..\..\Include\vdl\Vertex.hpp" />
     <ClInclude Include="..\..\Include\vdl\Viewport.hpp" />
+    <ClInclude Include="..\..\Src\vdl\BufferManager\CBufferManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\BufferManager\IBufferManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\IBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Constants\Constants.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\IDeviceContext.hpp" />
@@ -70,17 +75,23 @@
     <ClInclude Include="..\..\Src\vdl\ModelManager\IModelManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Mesh.hpp" />
     <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Renderer\CRenderer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Renderer\IRenderer.hpp" />
+    <ClInclude Include="..\..\Src\vdl\ShaderManager\CShaderManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ShaderManager\IShaderManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\IShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SoundManager\ISoundManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\ISwapChain.hpp" />
+    <ClInclude Include="..\..\Src\vdl\System\CSystem.hpp" />
     <ClInclude Include="..\..\Src\vdl\System\ISystem.hpp" />
     <ClInclude Include="..\..\Src\vdl\TextureManager\ITextureManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Texture\ITexture.hpp" />
     <ClInclude Include="..\..\Src\vdl\Window\IWindow.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\BufferManager\CBufferManager.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Engine.cpp" />
@@ -91,10 +102,13 @@
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\MouseFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\XInput\XInputFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\ModelManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Renderer\CRenderer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Renderer\RendererFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ShaderManager\CShaderManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\ShaderManager\ShaderManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\SoundManager\SoundManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\SwapChain\SwapChainFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\System\CSystem.cpp" />
     <ClCompile Include="..\..\Src\vdl\System\SystemFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\TextureManager\TextureManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp" />

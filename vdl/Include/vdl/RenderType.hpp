@@ -2,7 +2,7 @@
 
 namespace vdl
 {
-  enum class InputLayout
+  enum class RenderType
   {
     eNone,
     e2D,

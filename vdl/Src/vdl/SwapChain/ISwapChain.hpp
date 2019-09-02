@@ -14,4 +14,8 @@ public:
   virtual void ScreenClear() = 0;
 
   virtual void Present() = 0;
+
+  virtual void ChangeWindowMode() = 0;
+
+  virtual void ScreenShot() = 0;
 };

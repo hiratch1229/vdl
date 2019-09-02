@@ -8,7 +8,6 @@ class IDevice;
 class CShaderManager : public IShaderManager
 {
   IDevice* pDevice_;
-private:
   ReferenceCounts<IShader> Shaders_;
 public:
   CShaderManager() = default;

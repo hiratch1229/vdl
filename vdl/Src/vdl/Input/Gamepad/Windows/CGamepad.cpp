@@ -45,7 +45,7 @@ void CGamepad::Initialize()
   HRESULT hr = S_OK;
 
   //  DirectInput‚ğì¬
-  hr = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(pDirectInput_.GetAddressOf()), NULL);
+  hr = ::DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(pDirectInput_.GetAddressOf()), NULL);
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   //  Joystick‚ğì¬

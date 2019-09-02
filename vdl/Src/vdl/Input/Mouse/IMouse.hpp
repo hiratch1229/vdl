@@ -31,5 +31,5 @@ public:
 
   virtual void SetPos(vdl::int2 _Pos) = 0;
 
-  virtual void SetWheel(vdl::int2 _Wheel) = 0;
+  virtual void Scroll(vdl::int2 _Scroll) = 0;
 };

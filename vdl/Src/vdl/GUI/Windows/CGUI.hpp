@@ -3,6 +3,7 @@
 
 #include <vdl/GraphicsState.hpp>
 #include <vdl/SamplerState.hpp>
+#include <vdl/ConstantBuffer.hpp>
 #include <vdl/Shader.hpp>
 #include <vdl/Texture.hpp>
 #include <vdl/Scissor.hpp>
@@ -21,6 +22,12 @@ class IMouse;
 
 class CGUI : public IGUI
 {
+  struct ConstantBufferData
+  {
+    vdl::float2 Scale;
+    vdl::float2 Translate;
+  };
+private:
   ISystem* pSystem_;
   IDevice* pDevice_;
   IDeviceContext* pDeviceContext_;
@@ -30,9 +37,10 @@ class CGUI : public IGUI
 private:
   vdl::VertexShader VertexShader_;
   vdl::PixelShader PixelShader_;
-  vdl::Texture Font_;
   vdl::GraphicsState GraphicsState_;
+  vdl::Texture Font_;
   vdl::SamplerState SamplerState_;
+  vdl::ConstantBuffer<ConstantBufferData> ConstantBuffer_;
   vdl::Scissor Scissor_;
   vdl::Viewport Viewport_;
 private:

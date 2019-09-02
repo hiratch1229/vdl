@@ -8,13 +8,13 @@
 
 class CWindow : public IWindow
 {
-
-private:
   HWND hWnd_;
   vdl::uint2 WindowSize_ = Constants::kDefaultWindowSize;
   const char* WindowName_ = Constants::kDefaultWindowName;
 public:
   CWindow() = default;
+
+  ~CWindow();
 
   void Initialize()override;
 

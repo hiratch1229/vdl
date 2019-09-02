@@ -50,51 +50,51 @@ namespace vdl::input
   bool Press(const Button& _Button);
 
   //  1‚Â‚Å‚à‰Ÿ‚³‚ê‚Ä‚¢‚é‚È‚çtrue‚ğ•Ô‚·
+  inline bool PressOr() { return false; }
   template<class Head, class... Tail>
   inline bool PressOr(Head&& _Head, Tail&&... _Tail) { return Press(_Head) ? true : PressOr(std::forward<Tail>(_Tail)...); }
-  inline bool PressOr() { return false; }
 
   //  ‘S‚Ä‰Ÿ‚³‚ê‚Ä‚¢‚é‚È‚çtrue‚ğ•Ô‚·
+  inline bool PressAnd() { return true; }
   template<class Head, class... Tail>
   inline bool PressAnd(Head&& _Head, Tail&&... _Tail) { return Press(_Head) ? PressAnd(std::forward<Tail>(_Tail)...) : false; }
-  inline bool PressAnd() { return false; }
 
   //  ‰Ÿ‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
   bool Pressed(const Button& _Button);
 
   //  1‚Â‚Å‚à‰Ÿ‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
+  inline bool PressedOr() { return false; }
   template<class Head, class... Tail>
   inline bool PressedOr(Head&& _Head, Tail&&... _Tail) { return Pressed(_Head) ? true : PressedOr(std::forward<Tail>(_Tail)...); }
-  inline bool PressedOr() { return false; }
 
   //  ‘S‚Ä‰Ÿ‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
+  inline bool PressedAnd() { return true; }
   template<class Head, class... Tail>
   inline bool PressedAnd(Head&& _Head, Tail&&... _Tail) { return Pressed(_Head) ? PressedAnd(std::forward<Tail>(_Tail)...) : false; }
-  inline bool PressedAnd() { return false; }
 
   //  —£‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
   bool Released(const Button& _Button);
 
   //  1‚Â‚Å‚à—£‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
+  inline bool ReleasedOr() { return false; }
   template<class Head, class... Tail>
   inline bool ReleasedOr(Head&& _Head, Tail&&... _Tail) { return Released(_Head) ? true : ReleasedOr(std::forward<Tail>(_Tail)...); }
-  inline bool ReleasedOr() { return false; }
 
   //  ‘S‚Ä—£‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
+  inline bool ReleasedAnd() { return true; }
   template<class Head, class... Tail>
   inline bool ReleasedAnd(Head&& _Head, Tail&&... _Tail) { return Released(_Head) ? ReleasedAnd(std::forward<Tail>(_Tail)...) : false; }
-  inline bool ReleasedAnd() { return false; }
 
   //  ‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢‚È‚çtrue‚ğ•Ô‚·
   bool Release(const Button& _Button);
 
   //  1‚Â‚Å‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢‚È‚çtrue‚ğ•Ô‚·
+  inline bool ReleaseOr() { return false; }
   template<class Head, class... Tail>
   inline bool ReleaseOr(Head&& _Head, Tail&&... _Tail) { return Release(_Head) ? true : ReleaseOr(std::forward<Tail>(_Tail)...); }
-  inline bool ReleaseOr() { return false; }
 
   //  ‘S‚Ä‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢‚È‚çtrue‚ğ•Ô‚·
+  inline bool ReleaseAnd() { return true; }
   template<class Head, class... Tail>
   inline bool ReleaseAnd(Head&& _Head, Tail&&... _Tail) { return Release(_Head) ? ReleaseAnd(std::forward<Tail>(_Tail)...) : false; }
-  inline bool ReleaseAnd() { return false; }
 }

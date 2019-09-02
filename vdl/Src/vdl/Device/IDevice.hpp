@@ -25,6 +25,8 @@ public:
   
   virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, void* _Indices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
 
+  virtual void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize) = 0;
+
   virtual void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image) = 0;
 
   virtual void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::Format _Format) = 0;

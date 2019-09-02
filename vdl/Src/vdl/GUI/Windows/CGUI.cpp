@@ -11,7 +11,8 @@
 #include <vdl/Mouse.hpp>
 #include <vdl/Scissor.hpp>
 #include <vdl/Math.hpp>
-#include <ThirdParty/ImGui/imgui.h>
+#include <vdl/Texture.hpp>
+#include <vdl/GUI.hpp>
 
 namespace
 {
@@ -642,7 +643,7 @@ void CGUI::Initialize()
 
   //  シェーダーの作成
   {
-    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(::strlen(kVertexShader)), vdl::InputLayout::eGUI);
+    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(::strlen(kVertexShader)), vdl::RenderType::eGUI);
     PixelShader_ = vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(::strlen(kPixelShader)));
   }
 
@@ -738,7 +739,7 @@ void CGUI::Draw()
 
   // Create or resize the vertex/index buffers
   {
-    if (const size_t VertexSize = pDrawData->TotalVtxCount * sizeof(ImDrawVert);
+    if (const vdl::uint VertexSize = static_cast<vdl::uint>(pDrawData->TotalVtxCount * sizeof(ImDrawVert));
       VertexBufferSize_ < VertexSize)
     {
       pVertexBuffers_[1] = std::move(pVertexBuffers_[0]);
@@ -746,7 +747,7 @@ void CGUI::Draw()
       IBuffer* pVertexBuffer = pVertexBuffers_[0].get();
       pDevice_->CreateVertexBuffer(&pVertexBuffer, sizeof(ImDrawVert), VertexBufferSize_ = VertexSize);
     }
-    if (const size_t IndexSize = pDrawData->TotalIdxCount * sizeof(ImDrawIdx);
+    if (const vdl::uint IndexSize = static_cast<vdl::uint>(pDrawData->TotalIdxCount * sizeof(ImDrawIdx));
       IndexBufferSize_ < IndexSize)
     {
       pIndexBuffers_[1] = std::move(pIndexBuffers_[0]);
@@ -775,18 +776,21 @@ void CGUI::Draw()
       }
     }
 
-    pDevice_->WriteMemory(pVertexBuffers_[0].get(), VertexDatas.data(), VertexDatas.size() * sizeof(ImDrawVert));
-    pDevice_->WriteMemory(pIndexBuffers_[0].get(), IndexDatas.data(), IndexDatas.size() * sizeof(ImDrawIdx));
+    pDevice_->WriteMemory(pVertexBuffers_[0].get(), VertexDatas.data(), static_cast<vdl::uint>(VertexDatas.size() * sizeof(ImDrawVert)));
+    pDevice_->WriteMemory(pIndexBuffers_[0].get(), IndexDatas.data(), static_cast<vdl::uint>(IndexDatas.size() * sizeof(ImDrawIdx)));
   }
 
   // Will project scissor/clipping rectangles into framebuffer space
   const ImVec2 ClipOffset = pDrawData->DisplayPos;         // (0,0) unless using multi-viewports
   const ImVec2 ClipScale = pDrawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
 
-  ConstatBufferData_.Scale = { 2.0f / ClipOffset.x, -2.0f / ClipOffset.y };
-  ConstatBufferData_.Translate = { -1.0f - ClipOffset.x * ConstatBufferData_.Scale.x, 1.0f - ClipOffset.y * ConstatBufferData_.Scale.y };
+  ConstantBufferData& ConstantBufferData = ConstantBuffer_.GetData();
+  {
+    ConstantBufferData.Scale = { 2.0f / ClipOffset.x, -2.0f / ClipOffset.y };
+    ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
+  }
 
-  pDeviceContext_->SetInputLayout(vdl::InputLayout::eGUI);
+  pDeviceContext_->SetInputLayout(vdl::RenderType::eGUI);
 
   pDeviceContext_->SetVertexBuffer(pVertexBuffers_[0].get());
 
@@ -803,11 +807,11 @@ void CGUI::Draw()
 
   pDeviceContext_->SetRasterizerState(GraphicsState_.RasterizerState);
 
-  pDeviceContext_->SetRenderTexture();
+  pDeviceContext_->SetRenderTexture(vdl::RenderTexture(), vdl::DepthStencilTexture());
 
   pDeviceContext_->VSSetShader(VertexShader_);
 
-  pDeviceContext_->VSSetConstantBuffers();
+  pDeviceContext_->VSSetConstantBuffers(0, 1, &ConstantBuffer_.GetDetail());
 
   pDeviceContext_->PSSetShader(PixelShader_);
 
@@ -848,10 +852,10 @@ void CGUI::Draw()
 
         // Apply scissor/clipping rectangle
         {
-          Scissor_.LeftTop.x = ClipRect.x;
-          Scissor_.LeftTop.y = ClipRect.y;
-          Scissor_.Size.x = ClipRect.z - ClipRect.x;
-          Scissor_.Size.y = ClipRect.w - ClipRect.y;
+          Scissor_.LeftTop.x = static_cast<vdl::uint>(ClipRect.x);
+          Scissor_.LeftTop.y = static_cast<vdl::uint>(ClipRect.y);
+          Scissor_.Size.x = static_cast<vdl::uint>(ClipRect.z - ClipRect.x);
+          Scissor_.Size.y = static_cast<vdl::uint>(ClipRect.w - ClipRect.y);
         }
 
         pDeviceContext_->SetScissor(Scissor_);

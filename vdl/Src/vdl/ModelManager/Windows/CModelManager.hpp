@@ -8,7 +8,6 @@ class IDevice;
 class CModelManager : public IModelManager
 {
   IDevice* pDevice_;
-private:
   ReferenceCounts<Mesh> Meshes_;
 public:
   CModelManager() = default;

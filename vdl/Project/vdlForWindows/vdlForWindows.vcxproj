@@ -24,6 +24,7 @@
     <ClCompile Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\XInput\Windows\CXInput.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Main\Windows\WinMain.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.cpp" />
@@ -43,6 +44,7 @@
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\MeshData.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Resource\Windows\Resource.hpp" />
     <ClInclude Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\TextureManager\Windows\CTextureManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\TextureManager\Windows\TextureLoader\TextureLoader.hpp" />
@@ -131,10 +133,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>libfbxsdk-md_d.lib;GLTFSDK_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>libfbxsdk-md_d.lib;GLTFSDK_d.lib;ImGui_d.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\Src\ThirdParty\FBXSDK;..\..\Src\ThirdParty\glTFSDK</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\Src\ThirdParty\FBXSDK;..\..\Src\ThirdParty\glTFSDK;..\..\Src\ThirdParty\ImGui</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
