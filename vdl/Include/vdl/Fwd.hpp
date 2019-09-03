@@ -100,6 +100,12 @@ namespace vdl
   class DepthStencilTexture;
 
   //-------------------------
+  //  MotionData.hpp
+  //-------------------------
+  struct MotionData;
+  struct MotionBlendData;
+
+  //-------------------------
   //  MeshData.hpp
   //-------------------------
   struct StaticMeshData;

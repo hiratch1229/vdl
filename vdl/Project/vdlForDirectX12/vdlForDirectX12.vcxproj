@@ -18,6 +18,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.cpp" />
+    <ClCompile Include="..\..\Src\vdl\DeviceContext\DirectX12\CDeviceContext.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Device\DirectX12\CDevice.cpp" />
+    <ClCompile Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\DeviceContext\DirectX12\CDeviceContext.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Device\DirectX12\CDevice.hpp" />
+    <ClInclude Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{3B070C61-8FE8-497D-8D72-5568849B2437}</ProjectGuid>
@@ -93,11 +105,16 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

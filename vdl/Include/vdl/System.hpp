@@ -15,7 +15,7 @@ namespace vdl::System
 
       eScreenShot = 1 << 2,
 
-      eAll = eExit | eChangeWindowMode | eScreenShot,
+      eAll = ~0u,
     };
   }
 

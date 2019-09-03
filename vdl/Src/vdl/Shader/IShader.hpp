@@ -1,7 +1,10 @@
 #pragma once
 #include <vdl/RenderType.hpp>
+#include <vdl/Types.hpp>
 
-enum class ShaderType
+#include <vector>
+
+enum class ShaderType : vdl::uint8_t
 {
   eVertexShader,
   eHullShader,
@@ -19,6 +22,8 @@ struct IShader
   virtual ~IShader() = default;
 
   virtual ShaderType GetType()const = 0;
+
+  virtual const std::vector<vdl::uint>& GetUsedConstantBufferRegisters()const = 0;
 };
 
 struct IVertexShader : public IShader

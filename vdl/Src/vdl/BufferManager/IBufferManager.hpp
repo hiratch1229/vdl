@@ -1,5 +1,6 @@
 #pragma once
 #include <vdl/ID.hpp>
+#include <vdl/ConstantBuffer.hpp>
 
 #include <vdl/Buffer/IBuffer.hpp>
 
@@ -15,6 +16,8 @@ public:
   virtual void Initialize() = 0;
 
   virtual ID CreateConstantBuffer(vdl::uint _BufferSize) = 0;
+
+  virtual vdl::detail::ConstantBufferData CloneConstantBuffer(const vdl::detail::ConstantBufferData& _ConstantBufferData) = 0;
 
   virtual void AddRef(const ID& _ID) = 0;
 

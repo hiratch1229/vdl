@@ -17,12 +17,12 @@ public:
   ID LoadFromFile(const char* _FilePath, const char* _EntryPoint, ShaderType _Type)override;
 
   //  頂点シェーダー用
-  ID LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::InputLayout _InputLayout)override;
+  ID LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::RenderType _InputLayout)override;
 
   ID LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, ShaderType _Type)override;
 
   //  頂点シェーダー用
-  ID LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout)override;
+  ID LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::RenderType _InputLayout)override;
 
   void AddRef(const ID& _ID)override { Shaders_.Get(_ID).AddRef(); }
 

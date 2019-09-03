@@ -4,5 +4,45 @@
     <Filter Include="Src">
       <UniqueIdentifier>{2e5babb1-5e88-4d83-9313-1213d264674e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\BufferManager">
+      <UniqueIdentifier>{1712e215-83b3-43ba-a15e-83147c181e8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Device">
+      <UniqueIdentifier>{32043da6-8301-48ee-a80b-3cec068bfdc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\DeviceContext">
+      <UniqueIdentifier>{1d7c98a7-cfd9-4bc5-afa7-7362ebc6c9e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\SwapChain">
+      <UniqueIdentifier>{026c8490-6459-4bee-9905-cb59f3f05857}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.cpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Device\DirectX12\CDevice.cpp">
+      <Filter>Src\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\DeviceContext\DirectX12\CDeviceContext.cpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.cpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.hpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Device\DirectX12\CDevice.hpp">
+      <Filter>Src\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\DeviceContext\DirectX12\CDeviceContext.hpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.hpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

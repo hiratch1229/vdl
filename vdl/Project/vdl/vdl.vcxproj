@@ -34,6 +34,7 @@
     <ClInclude Include="..\..\Include\vdl\GUI.hpp" />
     <ClInclude Include="..\..\Include\vdl\ID.hpp" />
     <ClInclude Include="..\..\Include\vdl\Image.hpp" />
+    <ClInclude Include="..\..\Include\vdl\MotionData.hpp" />
     <ClInclude Include="..\..\Include\vdl\RenderType.hpp" />
     <ClInclude Include="..\..\Include\vdl\Macro.hpp" />
     <ClInclude Include="..\..\Include\vdl\Math.hpp" />
@@ -59,7 +60,6 @@
     <ClInclude Include="..\..\Include\vdl\UnorderedAccessBuffer.hpp" />
     <ClInclude Include="..\..\Include\vdl\Vertex.hpp" />
     <ClInclude Include="..\..\Include\vdl\Viewport.hpp" />
-    <ClInclude Include="..\..\Src\vdl\BufferManager\CBufferManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\BufferManager\IBufferManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\IBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Constants\Constants.hpp" />
@@ -90,7 +90,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp" />
-    <ClCompile Include="..\..\Src\vdl\BufferManager\CBufferManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />

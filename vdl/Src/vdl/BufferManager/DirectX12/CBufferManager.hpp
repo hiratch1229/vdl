@@ -1,5 +1,5 @@
 #pragma once
-#include "IBufferManager.hpp"
+#include "../IBufferManager.hpp"
 
 #include <vdl/ReferenceCount/ReferenceCount.hpp>
 
