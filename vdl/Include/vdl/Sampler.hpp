@@ -41,7 +41,7 @@ namespace vdl
     eWhite,
   };
 
-  struct SamplerState
+  struct Sampler
   {
   private:
     enum class PreDefined : uint8_t
@@ -73,10 +73,10 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
-    bool operator==(const SamplerState& _SamplerState)const noexcept { return Data == _SamplerState.Data; }
-    bool operator!=(const SamplerState& _SamplerState)const noexcept { return !((*this) == _SamplerState); }
+    bool operator==(const Sampler& _Sampler)const noexcept { return Data == _Sampler.Data; }
+    bool operator!=(const Sampler& _Sampler)const noexcept { return !((*this) == _Sampler); }
   public:
-    constexpr SamplerState(AddressMode _AddressModeU = AddressMode::eClamp,
+    constexpr Sampler(AddressMode _AddressModeU = AddressMode::eClamp,
       AddressMode _AddressModeV = AddressMode::eClamp,
       AddressMode _AddressModeW = AddressMode::eClamp,
       SamplerFilter _Filter = SamplerFilter::eMinMagMipLinear,
@@ -89,9 +89,9 @@ namespace vdl
       MaxAnisotropy(_MaxAnisotropy),
       Color(_BorderColor) {}
 
-    SamplerState(PreDefined _PreDefined)
+    Sampler(PreDefined _PreDefined)
     {
-      static constexpr SamplerState PreDefineds[static_cast<UINT>(PreDefined::eNum)] =
+      static constexpr Sampler PreDefineds[static_cast<UINT>(PreDefined::eNum)] =
       {
         { AddressMode::eWrap, AddressMode::eWrap, AddressMode::eWrap, SamplerFilter::eMinMagMipLinear },
         { AddressMode::eWrap, AddressMode::eWrap, AddressMode::eWrap, SamplerFilter::eAnisotropic }

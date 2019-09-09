@@ -1,5 +1,5 @@
 #pragma once
-#include <vdl/RenderType.hpp>
+#include <vdl/InputLayout.hpp>
 #include <vdl/Types.hpp>
 
 #include <vector>
@@ -28,5 +28,5 @@ struct IShader
 
 struct IVertexShader : public IShader
 {
-  virtual vdl::RenderType GetRenderType()const = 0;
+  virtual vdl::InputLayout GetInputLayout()const = 0;
 };

@@ -2,7 +2,7 @@
 #include "../IGUI.hpp"
 
 #include <vdl/GraphicsState.hpp>
-#include <vdl/SamplerState.hpp>
+#include <vdl/Sampler.hpp>
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/Shader.hpp>
 #include <vdl/Texture.hpp>
@@ -39,7 +39,7 @@ private:
   vdl::PixelShader PixelShader_;
   vdl::GraphicsState GraphicsState_;
   vdl::Texture Font_;
-  vdl::SamplerState SamplerState_;
+  vdl::Sampler Sampler_;
   vdl::ConstantBuffer<ConstantBufferData> ConstantBuffer_;
   vdl::Scissor Scissor_;
   vdl::Viewport Viewport_;

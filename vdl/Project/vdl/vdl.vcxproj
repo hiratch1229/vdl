@@ -34,8 +34,8 @@
     <ClInclude Include="..\..\Include\vdl\GUI.hpp" />
     <ClInclude Include="..\..\Include\vdl\ID.hpp" />
     <ClInclude Include="..\..\Include\vdl\Image.hpp" />
+    <ClInclude Include="..\..\Include\vdl\InputLayout.hpp" />
     <ClInclude Include="..\..\Include\vdl\MotionData.hpp" />
-    <ClInclude Include="..\..\Include\vdl\RenderType.hpp" />
     <ClInclude Include="..\..\Include\vdl\Macro.hpp" />
     <ClInclude Include="..\..\Include\vdl\Math.hpp" />
     <ClInclude Include="..\..\Include\vdl\MathConstants.hpp" />
@@ -45,8 +45,9 @@
     <ClInclude Include="..\..\Include\vdl\Mouse.hpp" />
     <ClInclude Include="..\..\Include\vdl\Platform.hpp" />
     <ClInclude Include="..\..\Include\vdl\Quaternion.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Random.hpp" />
     <ClInclude Include="..\..\Include\vdl\RasterizerState.hpp" />
-    <ClInclude Include="..\..\Include\vdl\SamplerState.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Sampler.hpp" />
     <ClInclude Include="..\..\Include\vdl\Scissor.hpp" />
     <ClInclude Include="..\..\Include\vdl\Serialize.hpp" />
     <ClInclude Include="..\..\Include\vdl\Shader.hpp" />

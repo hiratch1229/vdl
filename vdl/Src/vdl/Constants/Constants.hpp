@@ -1,10 +1,13 @@
 #pragma once
 #include <vdl/Constants.hpp>
 
+#include <vdl/Type2.hpp>
 #include <vdl/Format.hpp>
 
 namespace Constants
 {
+  constexpr vdl::uint kMaxBoneNum = vdl::Constants::kMaxBoneNum;
+  
   constexpr vdl::uint kMaxBoneInfluence = vdl::Constants::kMaxBoneInfluence;
 
   constexpr vdl::uint kMaxController = vdl::Constants::kMaxController;
@@ -12,6 +15,10 @@ namespace Constants
   constexpr vdl::uint kMaxCharacterNum = vdl::Constants::kMaxCharacterNum;
 
   constexpr vdl::uint kXInputButtonNum = 14;
+
+  constexpr vdl::uint kMax2DBatchNum = 1000;
+
+  constexpr vdl::uint kMax3DBatchNum = 32;
 
   constexpr const char* kClassName = "vdl";
 

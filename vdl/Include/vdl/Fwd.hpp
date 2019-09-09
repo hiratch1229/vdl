@@ -1,4 +1,5 @@
 #pragma once
+#include "Types.hpp"
 
 namespace vdl
 {
@@ -88,9 +89,9 @@ namespace vdl
   struct GraphicsState;
 
   //-------------------------
-  //  SamplerState.hpp
+  //  Sampler.hpp
   //-------------------------
-  struct SamplerState;
+  struct Sampler;
 
   //-------------------------
   //  Texture.hpp
@@ -125,9 +126,9 @@ namespace vdl
   template<class T> class ConstantBuffer;
 
   //-------------------------
-  //  RenderType.hpp
+  //  InputLayout.hpp
   //-------------------------
-  enum class RenderType;
+  enum class InputLayout : uint8_t;
 
   //-------------------------
   //  Shader.hpp

@@ -243,9 +243,6 @@
     <ClInclude Include="..\..\Include\vdl\RasterizerState.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\SamplerState.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\vdl\GraphicsState.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
@@ -279,10 +276,16 @@
     <ClInclude Include="..\..\Include\vdl\UnorderedAccessBuffer.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\RenderType.hpp">
+    <ClInclude Include="..\..\Include\vdl\MotionData.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\MotionData.hpp">
+    <ClInclude Include="..\..\Include\vdl\Sampler.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\InputLayout.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Random.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
   </ItemGroup>

@@ -39,7 +39,7 @@ ID CShaderManager::LoadFromFile(const char* _FilePath, const char* _EntryPoint, 
   return LoadFromMemory(Data.data(), static_cast<vdl::uint>(Data.size()), _EntryPoint, _Type);
 }
 
-ID CShaderManager::LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::RenderType _InputLayout)
+ID CShaderManager::LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::InputLayout _InputLayout)
 {
   std::string Data = std::move(LoadShaderFile(_FilePath));
 
@@ -54,7 +54,7 @@ ID CShaderManager::LoadFromMemory(const char* _Source, vdl::uint _DataSize, cons
   return Shaders_.Add(pShader);
 }
 
-ID CShaderManager::LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::RenderType _InputLayout)
+ID CShaderManager::LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout)
 {
   IVertexShader* pVertexShader;
   pDevice_->LoadShader(&pVertexShader, _Source, _DataSize, _EntryPoint, _InputLayout);

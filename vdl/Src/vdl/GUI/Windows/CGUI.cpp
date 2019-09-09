@@ -643,7 +643,7 @@ void CGUI::Initialize()
 
   //  シェーダーの作成
   {
-    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(::strlen(kVertexShader)), vdl::RenderType::eGUI);
+    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(::strlen(kVertexShader)), vdl::InputLayout::eGUI);
     PixelShader_ = vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(::strlen(kPixelShader)));
   }
 
@@ -662,13 +662,17 @@ void CGUI::Initialize()
     Font_ = Image;
   }
 
+  //  サンプラーの作成
+  {
+    Sampler_ = vdl::Sampler(vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::SamplerFilter::eMinMagMipLinear, 0, vdl::BorderColor::eTransparent);
+  }
+
   //  ステートの設定
   {
     GraphicsState_.BlendState = vdl::BlendState(false, true, vdl::Blend::eSrcAlpha, vdl::Blend::eInvSrcAlpha, vdl::BlendOperation::eAdd, vdl::Blend::eInvSrcAlpha, vdl::Blend::eZero, vdl::BlendOperation::eAdd);
     vdl::DepthStencilOpDesc DepthStencilOpDesc(vdl::StencilOp::eKeep, vdl::StencilOp::eKeep, vdl::StencilOp::eKeep, vdl::ComparisonFunc::eAlways);
     GraphicsState_.DepthSteniclState = vdl::DepthStencilState(false, vdl::WriteMask::eAll, vdl::ComparisonFunc::eAlways, false, DepthStencilOpDesc, DepthStencilOpDesc);
     GraphicsState_.RasterizerState = vdl::RasterizerState(vdl::FillMode::eSolid, vdl::CullMode::eNone, false, 0, true, false);
-    SamplerState_ = vdl::SamplerState(vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::SamplerFilter::eMinMagMipLinear, 0, vdl::BorderColor::eTransparent);
     Viewport_ = { 0.0f, 0.0f };
   }
 }
@@ -790,7 +794,7 @@ void CGUI::Draw()
     ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
   }
 
-  pDeviceContext_->SetInputLayout(vdl::RenderType::eGUI);
+  pDeviceContext_->SetInputLayout(vdl::InputLayout::eGUI);
 
   pDeviceContext_->SetVertexBuffer(pVertexBuffers_[0].get());
 
@@ -815,7 +819,7 @@ void CGUI::Draw()
 
   pDeviceContext_->PSSetShader(PixelShader_);
 
-  pDeviceContext_->PSSetSamplers(0, 1, &SamplerState_);
+  pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
 
   pDeviceContext_->PSSetTextures(0, 1, &Font_);
 
