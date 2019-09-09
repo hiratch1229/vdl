@@ -13,6 +13,8 @@ enum class ShaderType : vdl::uint8_t
   ePixelShader,
 
   eComputeShader,
+
+  eGraphicsNum = ePixelShader + 1,
 };
 
 struct IShader

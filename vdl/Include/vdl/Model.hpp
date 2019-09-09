@@ -9,7 +9,8 @@ namespace vdl
   protected:
     ID ID_;
   public:
-    const ID& GetID()const { return ID_; }
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   public:
     [[nodiscard]] constexpr bool operator==(const StaticMesh& _Mesh)const noexcept { return ID_ == _Mesh.ID_; }
     [[nodiscard]] constexpr bool operator!=(const StaticMesh& _Mesh)const noexcept { return ID_ != _Mesh.ID_; }

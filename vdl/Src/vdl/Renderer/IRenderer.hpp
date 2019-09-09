@@ -28,15 +28,33 @@ public:
 
   virtual void Initialize() = 0;
 
-  virtual void SetGraphicsState(const vdl::GraphicsState& _GraphicsState, RenderType _RenderType) = 0;
+  virtual void SetScissor(const vdl::Scissor& _Scissor, RenderType _RenderType) = 0;
 
-  virtual void SetGraphicsSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Sampler[], ShaderType _Type, RenderType _RenderType) = 0;
+  virtual void SetViewport(const vdl::Viewport& _Viewport, RenderType _RenderType) = 0;
 
-  virtual void SetGraphicsTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[], ShaderType _Type, RenderType _RenderType) = 0;
+  virtual void SetBlendState(const vdl::BlendState& _BlendState, RenderType _RenderType) = 0;
 
-  virtual void SetGraphicsConstantBuffers(vdl::uint _StartSlot, vdl::uint _BufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[], ShaderType _Type, RenderType _RenderType) = 0;
+  virtual void SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState, RenderType _RenderType) = 0;
 
-  virtual void SetGraphicsShaders(const vdl::VertexShader& _VertexShader, const vdl::HullShader& _HullShader, const vdl::DomainShader& _DomainShader, const vdl::GeometryShader& _GeometryShader, const vdl::PixelShader& _PixelShader, RenderType _RenderType) = 0;
+  virtual void SetRasterizerState(const vdl::RasterizerState& _RasterizerState, RenderType _RenderType) = 0;
+
+  virtual void SetRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStenilTexture, RenderType _RenderType) = 0;
+
+  virtual void SetVertexShader(const vdl::VertexShader& _VertexShader, RenderType _RenderType) = 0;
+
+  virtual void SetHullShader(const vdl::HullShader& _HullShader, RenderType _RenderType) = 0;
+
+  virtual void SetDomainShader(const vdl::DomainShader& _DomainShader, RenderType _RenderType) = 0;
+
+  virtual void SetGeometryShader(const vdl::GeometryShader& _GeometryShader, RenderType _RenderType) = 0;
+
+  virtual void SetPixelShader(const vdl::PixelShader& _PixelShader, RenderType _RenderType) = 0;
+
+  virtual void SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Sampler[], ShaderType _ShaderType, RenderType _RenderType) = 0;
+
+  virtual void SetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[], ShaderType _ShaderType, RenderType _RenderType) = 0;
+
+  virtual void SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _BufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[], ShaderType _ShaderType, RenderType _RenderType) = 0;
 
   virtual void Draw(const vdl::Texture& _Texture, const vdl::float2& _DstLeftTop, const vdl::float2& _DstSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::ColorF& _Color) = 0;
 

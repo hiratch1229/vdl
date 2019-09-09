@@ -8,11 +8,11 @@ public:
 
   void CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _Stride, vdl::uint _BufferSize)override;
 
-  void CreateVertexBuffer(IBuffer** _ppVertexBuffer, void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)override;
+  void CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)override;
 
   void CreateIndexBuffer(IBuffer** _ppIndexBuffer, vdl::uint _Stride, vdl::uint _BufferSize)override;
 
-  void CreateIndexBuffer(IBuffer** _ppIndexBuffer, void* _Indices, vdl::uint _Stride, vdl::uint _BufferSize)override;
+  void CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, vdl::uint _Stride, vdl::uint _BufferSize)override;
 
   void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize)override;
 
@@ -24,7 +24,7 @@ public:
 
   void LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, ShaderType _Type)override;
 
-  void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::RenderType _Type)override;
+  void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _Type)override;
 
-  void WriteMemory(IBuffer* _pSrcBuffer, void* _pDstBuffer, vdl::uint _BufferSize)const override;
+  void WriteMemory(IBuffer* _pDstBuffer, void* _pSrcBuffer, vdl::uint _BufferSize)const override;
 };

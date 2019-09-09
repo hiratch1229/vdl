@@ -9,6 +9,7 @@ namespace vdl
     ID ID_;
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ ==std::nullopt; }
   public:
     [[nodiscard]] constexpr bool operator==(const VertexShader& _VertexShader)const noexcept { return ID_ == _VertexShader.ID_; }
     [[nodiscard]] constexpr bool operator!=(const VertexShader& _VertexShader)const noexcept { return ID_ != _VertexShader.ID_; }
@@ -29,6 +30,7 @@ namespace vdl
     ID ID_;
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   public:
     [[nodiscard]] constexpr bool operator==(const HullShader& _HullShader)const noexcept { return ID_ == _HullShader.ID_; }
     [[nodiscard]] constexpr bool operator!=(const HullShader& _HullShader)const noexcept { return ID_ != _HullShader.ID_; }
@@ -49,6 +51,7 @@ namespace vdl
     ID ID_;
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   public:
     [[nodiscard]] constexpr bool operator==(const DomainShader& _DomainShader)const noexcept { return ID_ == _DomainShader.ID_; }
     [[nodiscard]] constexpr bool operator!=(const DomainShader& _DomainShader)const noexcept { return ID_ != _DomainShader.ID_; }
@@ -69,6 +72,7 @@ namespace vdl
     ID ID_;
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   public:
     [[nodiscard]] constexpr bool operator==(const GeometryShader& _GeometryShader)const noexcept { return ID_ == _GeometryShader.ID_; }
     [[nodiscard]] constexpr bool operator!=(const GeometryShader& _GeometryShader)const noexcept { return ID_ != _GeometryShader.ID_; }
@@ -89,6 +93,7 @@ namespace vdl
     ID ID_;
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   public:
     [[nodiscard]] constexpr bool operator==(const PixelShader& _PixelShader)const noexcept { return ID_ == _PixelShader.ID_; }
     [[nodiscard]] constexpr bool operator!=(const PixelShader& _PixelShader)const noexcept { return ID_ != _PixelShader.ID_; }
@@ -109,6 +114,7 @@ namespace vdl
     ID ID_;
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   public:
     [[nodiscard]] constexpr bool operator==(const ComputeShader& _ComputeShader)const noexcept { return ID_ == _ComputeShader.ID_; }
     [[nodiscard]] constexpr bool operator!=(const ComputeShader& _ComputeShader)const noexcept { return ID_ != _ComputeShader.ID_; }

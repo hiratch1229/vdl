@@ -15,13 +15,15 @@ public:
 
   virtual void Initialize() = 0;
 
-  virtual void SetInputLayout(vdl::InputLayout _InputLayout) = 0;
-
   virtual void SetVertexBuffer(const IBuffer* _pVertexBuffer) = 0;
+
+  virtual void SetInstanceBuffer(const IBuffer* _pInstanceBuffer) = 0;
 
   virtual void SetIndexBuffer(const IBuffer* _pIndexBuffer) = 0;
 
-  virtual void SetInstanceBuffer(const IBuffer* _pInstanceBuffer) = 0;
+  virtual void SetInputLayout(vdl::InputLayout _InputLayout) = 0;
+
+  virtual void SetTopology(vdl::Topology _Topology) = 0;
 
   virtual void SetScissor(const vdl::Scissor& _Scissor) = 0;
 
@@ -70,9 +72,9 @@ public:
 
   virtual void PSSetShader(const vdl::PixelShader& _PixelShader) = 0;
 
-  virtual void PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::Sampler _Samplers[]) = 0;
+  virtual void PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[]) = 0;
 
-  virtual void PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture _Textures[]) = 0;
+  virtual void PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
   
   virtual void PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[]) = 0;
 

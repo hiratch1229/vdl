@@ -288,6 +288,9 @@
     <ClInclude Include="..\..\Include\vdl\Random.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Topology.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">

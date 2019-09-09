@@ -1,5 +1,6 @@
 #pragma once
 #include <vdl/Type2.hpp>
+#include <vdl/Matrix.hpp>
 
 class IWindow
 {

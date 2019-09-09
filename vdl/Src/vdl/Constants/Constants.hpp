@@ -16,7 +16,7 @@ namespace Constants
 
   constexpr vdl::uint kXInputButtonNum = 14;
 
-  constexpr vdl::uint kMax2DBatchNum = 1000;
+  constexpr vdl::uint kMax2DBatchNum = 256;
 
   constexpr vdl::uint kMax3DBatchNum = 32;
 

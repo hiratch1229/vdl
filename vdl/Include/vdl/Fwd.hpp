@@ -131,6 +131,11 @@ namespace vdl
   enum class InputLayout : uint8_t;
 
   //-------------------------
+  //  Topology.hpp
+  //-------------------------
+  enum class Topology : uint8_t;
+
+  //-------------------------
   //  Shader.hpp
   //-------------------------
   class VertexShader;

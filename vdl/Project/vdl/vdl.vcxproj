@@ -54,6 +54,7 @@
     <ClInclude Include="..\..\Include\vdl\Singleton.hpp" />
     <ClInclude Include="..\..\Include\vdl\System.hpp" />
     <ClInclude Include="..\..\Include\vdl\Texture.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Topology.hpp" />
     <ClInclude Include="..\..\Include\vdl\Type2.hpp" />
     <ClInclude Include="..\..\Include\vdl\Type3.hpp" />
     <ClInclude Include="..\..\Include\vdl\Type4.hpp" />
@@ -189,7 +190,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -13,6 +13,7 @@
 #include <vdl/Math.hpp>
 #include <vdl/Texture.hpp>
 #include <vdl/GUI.hpp>
+#include <vdl/Topology.hpp>
 
 namespace
 {
@@ -794,33 +795,27 @@ void CGUI::Draw()
     ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
   }
 
-  pDeviceContext_->SetInputLayout(vdl::InputLayout::eGUI);
+  Viewport_.Size = { pDrawData->DisplaySize.x, pDrawData->DisplaySize.y };
 
   pDeviceContext_->SetVertexBuffer(pVertexBuffers_[0].get());
-
-  pDeviceContext_->SetIndexBuffer(pIndexBuffers_[0].get());
-
   pDeviceContext_->SetInstanceBuffer(nullptr);
+  pDeviceContext_->SetIndexBuffer(pIndexBuffers_[0].get());
+  pDeviceContext_->SetInputLayout(vdl::InputLayout::eGUI);
+  pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
 
-  Viewport_.Size = { pDrawData->DisplaySize.x, pDrawData->DisplaySize.y };
   pDeviceContext_->SetViewport(Viewport_);
 
   pDeviceContext_->SetBlendState(GraphicsState_.BlendState);
-
   pDeviceContext_->SetDepthStencilState(GraphicsState_.DepthSteniclState);
-
   pDeviceContext_->SetRasterizerState(GraphicsState_.RasterizerState);
-
+   
   pDeviceContext_->SetRenderTexture(vdl::RenderTexture(), vdl::DepthStencilTexture());
 
   pDeviceContext_->VSSetShader(VertexShader_);
-
   pDeviceContext_->VSSetConstantBuffers(0, 1, &ConstantBuffer_.GetDetail());
 
   pDeviceContext_->PSSetShader(PixelShader_);
-
   pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
-
   pDeviceContext_->PSSetTextures(0, 1, &Font_);
 
   pDeviceContext_->HSSetShader(vdl::HullShader());

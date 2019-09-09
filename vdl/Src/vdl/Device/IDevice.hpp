@@ -19,11 +19,11 @@ public:
 
   virtual void CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
 
-  virtual void CreateVertexBuffer(IBuffer** _ppVertexBuffer, void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  virtual void CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
 
   virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
 
-  virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, void* _Indices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
 
   virtual void CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
 
@@ -39,5 +39,5 @@ public:
 
   virtual void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _Type) = 0;
 
-  virtual void WriteMemory(IBuffer* _pSrcBuffer, void* _pDstBuffer, vdl::uint _BufferSize)const = 0;
+  virtual void WriteMemory(IBuffer* _pDstBuffer, void* _pSrcBuffer, vdl::uint _BufferSize)const = 0;
 };

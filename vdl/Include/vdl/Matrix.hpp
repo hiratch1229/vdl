@@ -85,8 +85,6 @@ namespace vdl
 
     [[nodiscard]] constexpr float3 Back()const noexcept { return { -_31,-_32, -_33 }; }
 
-    [[nodiscard]] constexpr float3 Translation()const noexcept { return { _41, _42, _43 }; }
-
     [[nodiscard]] Matrix Inverse()const { return DirectX::XMMatrixInverse(nullptr, *this); }
 
     [[nodiscard]] Matrix Transpose()const { return DirectX::XMMatrixTranspose(*this); }
