@@ -1,6 +1,8 @@
 #pragma once
 #include "Types.hpp"
 
+#include <vector>
+
 namespace vdl
 {
   //  ƒ‚[ƒVƒ‡ƒ“î•ñ
@@ -36,4 +38,6 @@ namespace vdl
       return *this;
     }
   };
+
+  using MotionBlendDatas = std::vector<MotionBlendData>;
 }

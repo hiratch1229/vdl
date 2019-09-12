@@ -52,7 +52,7 @@ void CXInput::Update()
   }
 }
 
-vdl::float2 CXInput::GetLeftStick(int _Index, float _DeadZone)const
+vdl::float2 CXInput::GetLeftStick(vdl::uint _Index, float _DeadZone)const
 {
   if (!isWithinRange(_Index))
   {
@@ -61,13 +61,13 @@ vdl::float2 CXInput::GetLeftStick(int _Index, float _DeadZone)const
 
   vdl::float2 Value = Status_[_Index].LeftStick;
 
-  if (vdl::math::GetAbsoluteValue(Value.x) < _DeadZone) Value.x = 0.0f;
-  if (vdl::math::GetAbsoluteValue(Value.y) < _DeadZone) Value.y = 0.0f;
+  if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone) Value.x = 0.0f;
+  if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone) Value.y = 0.0f;
 
   return Value;
 }
 
-vdl::float2 CXInput::GetRightStick(int _Index, float _DeadZone)const
+vdl::float2 CXInput::GetRightStick(vdl::uint _Index, float _DeadZone)const
 {
   if (!isWithinRange(_Index))
   {
@@ -76,13 +76,13 @@ vdl::float2 CXInput::GetRightStick(int _Index, float _DeadZone)const
 
   vdl::float2 Value = Status_[_Index].RightStick;
 
-  if (vdl::math::GetAbsoluteValue(Value.x) < _DeadZone) Value.x = 0.0f;
-  if (vdl::math::GetAbsoluteValue(Value.y) < _DeadZone) Value.y = 0.0f;
+  if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone) Value.x = 0.0f;
+  if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone) Value.y = 0.0f;
 
   return Value;
 }
 
-float CXInput::GetLeftTrigger(int _Index, float _DeadZone)const
+float CXInput::GetLeftTrigger(vdl::uint _Index, float _DeadZone)const
 {
   if (!isWithinRange(_Index))
   {
@@ -96,7 +96,7 @@ float CXInput::GetLeftTrigger(int _Index, float _DeadZone)const
   return Value;
 }
 
-float CXInput::GetRightTrigger(int _Index, float _DeadZone)const
+float CXInput::GetRightTrigger(vdl::uint _Index, float _DeadZone)const
 {
   if (!isWithinRange(_Index))
   {
@@ -110,7 +110,7 @@ float CXInput::GetRightTrigger(int _Index, float _DeadZone)const
   return Value;
 }
 
-void CXInput::SetVibration(int _Index, float _Speed)const
+void CXInput::SetVibration(vdl::uint _Index, float _Speed)const
 {
   static constexpr WORD kMaxSpeed = 65535;
 
@@ -121,7 +121,7 @@ void CXInput::SetVibration(int _Index, float _Speed)const
   ::XInputSetState(_Index, &Vibration);
 }
 
-void CXInput::StopVibration(int _Index)const
+void CXInput::StopVibration(vdl::uint _Index)const
 {
   XINPUT_VIBRATION Vibration{ 0, 0 };
 

@@ -1,15 +1,9 @@
 #pragma once
 #include "IRenderer.hpp"
 
-#include <vdl/Buffer/IBuffer.hpp>
+#include "RendererCommand/RendererCommand.hpp"
 
-#include <vdl/Scissor.hpp>
-#include <vdl/Viewport.hpp>
-#include <vdl/GraphicsState.hpp>
-#include <vdl/Texture.hpp>
-#include <vdl/Sampler.hpp>
-#include <vdl/ConstantBuffer.hpp>
-#include <vdl/Shader.hpp>
+#include <vdl/Buffer/IBuffer.hpp>
 
 #include <assert.h>
 
@@ -18,6 +12,7 @@ class IDeviceContext;
 
 class CRenderer : public IRenderer
 {
+  static constexpr vdl::uint kInputLayputTypes = static_cast<vdl::uint>(vdl::InputLayout::e3D) + 1;
   static constexpr vdl::uint kRenderTypes = static_cast<vdl::uint>(RenderType::eNum);
   static constexpr vdl::uint kShaderTypes = static_cast<vdl::uint>(ShaderType::eGraphicsNum);
   static constexpr vdl::Vertex2D kRectangle[] = {
@@ -41,7 +36,7 @@ private:
   };
   using Samplers = std::vector<vdl::Sampler>;
   using Textures = std::vector<vdl::Texture>;
-  using ConstantBuffers = std::vector<vdl::detail::ConstantBufferData>;
+  using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
   struct Instance2D
   {
     vdl::Matrix NDCTransform;
@@ -63,16 +58,17 @@ private:
   std::unique_ptr<IBuffer> pInstanceBuffer3D_;
   std::vector<Instance3D> Instances3D_;
 private:
-  vdl::Scissor Scissors_[kRenderTypes];
-  vdl::Viewport Viewports_[kRenderTypes];
+  vdl::Scissor Scissor_;
+  vdl::Viewport Viewport_;
+  OutputManager OutputManager_;
   vdl::GraphicsState GraphicsStates_[kRenderTypes];
-  OutputManager OutputManagers_[kRenderTypes];
   Shaders Shaders_[kRenderTypes];
   Samplers Samplers_[kRenderTypes][kShaderTypes];
   Textures Textures_[kRenderTypes][kShaderTypes];
   ConstantBuffers ConstantBuffers_[kRenderTypes][kShaderTypes];
 private:
-  void SetState(RenderType _RenderType);
+  void SetGraphicsStateAndOutputManager(vdl::InputLayout _InputLayout);
+  void SetRenderState(RenderType _Type);
   void FlushSprite();
   void FlushStaticMesh();
   void FlushSkinnedMesh();
@@ -81,88 +77,83 @@ public:
 
   void Initialize()override;
 
-  void SetScissor(const vdl::Scissor& _Scissor, RenderType _RenderType)override
+  void SetScissor(const vdl::Scissor& _Scissor)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
-
-    Scissors_[static_cast<vdl::uint>(_RenderType)] = _Scissor;
+    Scissor_ = _Scissor;
   }
 
-  void SetViewport(const vdl::Viewport& _Viewport, RenderType _RenderType)override
+  void SetViewport(const vdl::Viewport& _Viewport)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
-
-    Viewports_[static_cast<vdl::uint>(_RenderType)] = _Viewport;
+    Viewport_ = _Viewport;
   }
 
-  void SetBlendState(const vdl::BlendState& _BlendState, RenderType _RenderType)override
+  void SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
-
-    GraphicsStates_[static_cast<vdl::uint>(_RenderType)].BlendState = _BlendState;
+    Flush();
+    OutputManager_ = { _RenderTexture, _DepthStencilTexture };
   }
 
-  void SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState, RenderType _RenderType)override
+  void SetBlendState(const vdl::BlendState& _BlendState, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
 
-    GraphicsStates_[static_cast<vdl::uint>(_RenderType)].DepthSteniclState = _DepthStencilState;
+    GraphicsStates_[static_cast<vdl::uint>(_Type)].BlendState = _BlendState;
   }
 
-  void SetRasterizerState(const vdl::RasterizerState& _RasterizerState, RenderType _RenderType)override
+  void SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
 
-    GraphicsStates_[static_cast<vdl::uint>(_RenderType)].RasterizerState = _RasterizerState;
+    GraphicsStates_[static_cast<vdl::uint>(_Type)].DepthSteniclState = _DepthStencilState;
   }
 
-  void SetRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStenilTexture, RenderType _RenderType)override
+  void SetRasterizerState(const vdl::RasterizerState& _RasterizerState, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
 
-    OutputManagers_[static_cast<vdl::uint>(_RenderType)] = { _RenderTexture, _DepthStenilTexture };
+    GraphicsStates_[static_cast<vdl::uint>(_Type)].RasterizerState = _RasterizerState;
   }
 
-  void SetVertexShader(const vdl::VertexShader& _VertexShader, RenderType _RenderType)override
+  void SetVertexShader(const vdl::VertexShader& _VertexShader, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
 
-    Shaders_[static_cast<vdl::uint>(_RenderType)].VertexShader = _VertexShader;
+    Shaders_[static_cast<vdl::uint>(_Type)].VertexShader = _VertexShader;
   }
 
-  void SetHullShader(const vdl::HullShader& _HullShader, RenderType _RenderType)override
+  void SetHullShader(const vdl::HullShader& _HullShader, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
 
-    Shaders_[static_cast<vdl::uint>(_RenderType)].HullShader = _HullShader;
+    Shaders_[static_cast<vdl::uint>(_Type)].HullShader = _HullShader;
   }
 
-  void SetDomainShader(const vdl::DomainShader& _DomainShader, RenderType _RenderType)override
+  void SetDomainShader(const vdl::DomainShader& _DomainShader, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
 
-    Shaders_[static_cast<vdl::uint>(_RenderType)].DomainShader = _DomainShader;
+    Shaders_[static_cast<vdl::uint>(_Type)].DomainShader = _DomainShader;
   }
 
-  void SetGeometryShader(const vdl::GeometryShader& _GeometryShader, RenderType _RenderType)override
+  void SetGeometryShader(const vdl::GeometryShader& _GeometryShader, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
 
-    Shaders_[static_cast<vdl::uint>(_RenderType)].GeometryShader = _GeometryShader;
+    Shaders_[static_cast<vdl::uint>(_Type)].GeometryShader = _GeometryShader;
   }
 
-  void SetPixelShader(const vdl::PixelShader& _PixelShader, RenderType _RenderType)override
+  void SetPixelShader(const vdl::PixelShader& _PixelShader, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
 
-    Shaders_[static_cast<vdl::uint>(_RenderType)].PixelShader = _PixelShader;
+    Shaders_[static_cast<vdl::uint>(_Type)].PixelShader = _PixelShader;
   }
 
-  void SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Sampler[], ShaderType _ShaderType, RenderType _RenderType)override
+  void SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Sampler[], ShaderType _Stage, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes && static_cast<vdl::uint>(_ShaderType) < kShaderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes && static_cast<vdl::uint>(_Stage) < kShaderTypes);
 
-    Samplers& Samplers = Samplers_[static_cast<vdl::uint>(_RenderType)][static_cast<vdl::uint>(_ShaderType)];
+    Samplers& Samplers = Samplers_[static_cast<vdl::uint>(_Type)][static_cast<vdl::uint>(_Stage)];
 
     if (const vdl::uint RequiredSize = _StartSlot + _SamplerNum; Samplers.size())
     {
@@ -172,11 +163,11 @@ public:
     ::memcpy(&Samplers[_StartSlot], _Sampler, _SamplerNum * sizeof(vdl::Sampler));
   }
 
-  void SetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[], ShaderType _ShaderType, RenderType _RenderType)override
+  void SetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[], ShaderType _Stage, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes && static_cast<vdl::uint>(_ShaderType) < kShaderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes && static_cast<vdl::uint>(_Stage) < kShaderTypes);
 
-    Textures& Textures = Textures_[static_cast<vdl::uint>(_RenderType)][static_cast<vdl::uint>(_ShaderType)];
+    Textures& Textures = Textures_[static_cast<vdl::uint>(_Type)][static_cast<vdl::uint>(_Stage)];
 
     if (const vdl::uint RequiredSize = _StartSlot + _TextureNum; Textures.size())
     {
@@ -186,18 +177,18 @@ public:
     ::memcpy(&Textures[_StartSlot], _Textures, _TextureNum * sizeof(vdl::Texture));
   }
 
-  void SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _BufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[], ShaderType _ShaderType, RenderType _RenderType)override
+  void SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _BufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[], ShaderType _Stage, RenderType _Type)override
   {
-    assert(static_cast<vdl::uint>(_RenderType) < kRenderTypes && static_cast<vdl::uint>(_ShaderType) < kShaderTypes);
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes && static_cast<vdl::uint>(_Stage) < kShaderTypes);
 
-    ConstantBuffers& ConstantBuffers = ConstantBuffers_[static_cast<vdl::uint>(_RenderType)][static_cast<vdl::uint>(_ShaderType)];
+    ConstantBuffers& ConstantBuffers = ConstantBuffers_[static_cast<vdl::uint>(_Type)][static_cast<vdl::uint>(_Stage)];
 
     if (const vdl::uint RequiredSize = _StartSlot + _BufferNum; ConstantBuffers.size())
     {
       ConstantBuffers.resize(RequiredSize);
     }
 
-    ::memcpy(&ConstantBuffers[_StartSlot], _ConstantBuffers, _BufferNum * sizeof(vdl::detail::ConstantBufferData));
+    ::memcpy(&ConstantBuffers[_StartSlot], _ConstantBuffers, _BufferNum * sizeof(vdl::Detail::ConstantBufferData));
   }
 
   void Draw(const vdl::Texture& _Texture, const vdl::float2& _DstLeftTop, const vdl::float2& _DstSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::ColorF& _Color)override;
@@ -206,5 +197,16 @@ public:
 
   void Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const std::vector<vdl::MotionBlendData>& _MotionBlendDatas, const vdl::ColorF& _Color)override;
 
+  void Clear(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)override
+  {
+
+  }
+
+  void Clear(const vdl::DepthStencilTexture& _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil)override
+  {
+
+  }
+
   void Flush()override;
 };
+

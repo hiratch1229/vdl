@@ -55,7 +55,7 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, v
 
 }
 
-void CDevice::WriteMemory(IBuffer* _pDstBuffer, void* _pSrcBuffer, vdl::uint _BufferSize)const
+void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const
 {
 
 }

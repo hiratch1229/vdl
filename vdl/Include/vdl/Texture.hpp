@@ -11,28 +11,32 @@ namespace vdl
   protected:
     ID ID_;
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-    [[nodiscard]] uint2 GetSize()const;
-  public:
-    [[nodiscard]] constexpr bool operator==(const Texture& _Texture)const noexcept { return ID_ == _Texture.ID_; }
-    [[nodiscard]] constexpr bool operator!=(const Texture& _Texture)const noexcept { return ID_ != _Texture.ID_; }
-  public:
     Texture() = default;
 
-    virtual ~Texture();
-
     //  ファイルから作成
-    Texture(const char* _FilePath);
+    Texture(const char* _FilePath, bool _isSerialize = true);
+
+    //  データから作成
+    Texture(const Image& _Image);
 
     //  色情報から作成
     Texture(const ColorF& _Color);
 
-    Texture(const Image& _Image);
-
     Texture(const Texture& _Texture);
 
     Texture& operator=(const Texture& _Texture);
+
+    virtual ~Texture();
+  public:
+    [[nodiscard]] constexpr bool operator==(const Texture& _Texture)const noexcept { return ID_ == _Texture.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const Texture& _Texture)const noexcept { return ID_ != _Texture.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
+
+    [[nodiscard]] uint2 GetSize()const;
   };
 
   class RenderTexture : public Texture
@@ -41,8 +45,6 @@ namespace vdl
     RenderTexture() = default;
 
     RenderTexture(const uint2& _TextureSize, Format _Format);
-
-    void Clear(const ColorF& _Color = Palette::Black);
   };
 
   class DepthStencilTexture : public Texture
@@ -51,7 +53,5 @@ namespace vdl
     DepthStencilTexture() = default;
 
     DepthStencilTexture(const uint2& _TextureSize, Format _Format);
-
-    void Clear(float _Depth = 1.0f, uint _Stencil = 0);
   };
 }

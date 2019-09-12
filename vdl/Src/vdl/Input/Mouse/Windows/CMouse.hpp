@@ -10,7 +10,7 @@ class IKeyboard;
 class CMouse : public IMouse
 {
   //  使用ボタン数
-  static constexpr int kButtonNum = 5;
+  static constexpr vdl::uint kButtonNum = 5;
 private:
   IKeyboard* pKeyboard_;
 private:
@@ -29,9 +29,9 @@ private:
   //  スクロールの排他制御
   std::mutex ScrollMutex_;
 private:
-  bool isWithinRange(int _Number)const
+  bool isWithinRange(vdl::uint _Code)const
   {
-    return (0 <= _Number && _Number < kButtonNum);
+    return (0 <= _Code && _Code < kButtonNum);
   }
 public:
   CMouse() = default;
@@ -40,24 +40,24 @@ public:
 
   void Update()override;
 
-  bool Press(int _Number)const override
+  bool Press(vdl::uint _Code)const override
   {
-    return isWithinRange(_Number) ? InputStatus_[_Number].Press() : false;
+    return isWithinRange(_Code) ? InputStatus_[_Code].Press() : false;
   }
 
-  bool Pressed(int _Number)const override
+  bool Pressed(vdl::uint _Code)const override
   {
-    return isWithinRange(_Number) ? InputStatus_[_Number].Pressed() : false;
+    return isWithinRange(_Code) ? InputStatus_[_Code].Pressed() : false;
   }
 
-  bool Released(int _Number)const override
+  bool Released(vdl::uint _Code)const override
   {
-    return isWithinRange(_Number) ? InputStatus_[_Number].Released() : false;
+    return isWithinRange(_Code) ? InputStatus_[_Code].Released() : false;
   }
 
-  bool Release(int _Number)const override
+  bool Release(vdl::uint _Code)const override
   {
-    return isWithinRange(_Number) ? InputStatus_[_Number].Release() : false;
+    return isWithinRange(_Code) ? InputStatus_[_Code].Release() : false;
   }
 
   vdl::int2 GetPos()const override
@@ -75,7 +75,7 @@ public:
     return Scroll_;
   }
 
-  void SetPos(vdl::int2 _Pos)override;
+  void SetPos(const vdl::int2& _Pos)override;
 
-  void Scroll(vdl::int2 _Scroll)override;
+  void Scroll(const vdl::int2& _Scroll)override;
 };

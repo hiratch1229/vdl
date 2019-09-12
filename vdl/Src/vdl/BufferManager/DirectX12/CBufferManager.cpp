@@ -8,10 +8,15 @@ void CBufferManager::Initialize()
   pDevice_ = Engine::Get<IDevice>();
 }
 
-ID CBufferManager::CreateConstantBuffer(vdl::uint _BufferSize)
+vdl::ID CBufferManager::CreateConstantBuffer(vdl::uint _BufferSize)
 {
   IBuffer* pBuffer;
   pDevice_->CreateConstantBuffer(&pBuffer, _BufferSize);
 
   return Buffers_.Add(pBuffer);
+}
+
+vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBufferData)
+{
+
 }

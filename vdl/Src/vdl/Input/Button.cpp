@@ -8,9 +8,9 @@
 
 #include <assert.h>
 
-namespace vdl::input
+namespace vdl::Input
 {
-  bool Press(const Button& _Button)
+  bool isPress(const Button& _Button)
   {
     switch (_Button.GetInputDevice())
     {
@@ -19,16 +19,16 @@ namespace vdl::input
     case InputDevice::eMouse:
       return Engine::Get<IMouse>()->Press(_Button.GetCode());
     case InputDevice::eXInput:
-      return Engine::Get<IXInput>()->Press(_Button.GetCode(), _Button.GetIndex());
+      return Engine::Get<IXInput>()->Press(_Button.GetIndex(), _Button.GetCode());
     case InputDevice::eGamepad:
-      return Engine::Get<IGamepad>()->Press(_Button.GetCode(), _Button.GetIndex());
+      return Engine::Get<IGamepad>()->Press(_Button.GetIndex(), _Button.GetCode());
     default: assert(false);
     }
 
     return false;
   }
 
-  bool Pressed(const Button& _Button)
+  bool isPressed(const Button& _Button)
   {
     switch (_Button.GetInputDevice())
     {
@@ -37,16 +37,16 @@ namespace vdl::input
     case InputDevice::eMouse:
       return Engine::Get<IMouse>()->Pressed(_Button.GetCode());
     case InputDevice::eXInput:
-      return Engine::Get<IXInput>()->Pressed(_Button.GetCode(), _Button.GetIndex());
+      return Engine::Get<IXInput>()->Pressed(_Button.GetIndex(), _Button.GetCode());
     case InputDevice::eGamepad:
-      return Engine::Get<IGamepad>()->Pressed(_Button.GetCode(), _Button.GetIndex());
+      return Engine::Get<IGamepad>()->Pressed(_Button.GetIndex(), _Button.GetCode());
     default: assert(false);
     }
 
     return false;
   }
 
-  bool Released(const Button& _Button)
+  bool isReleased(const Button& _Button)
   {
     switch (_Button.GetInputDevice())
     {
@@ -55,16 +55,16 @@ namespace vdl::input
     case InputDevice::eMouse:
       return Engine::Get<IMouse>()->Released(_Button.GetCode());
     case InputDevice::eXInput:
-      return Engine::Get<IXInput>()->Released(_Button.GetCode(), _Button.GetIndex());
+      return Engine::Get<IXInput>()->Released(_Button.GetIndex(), _Button.GetCode());
     case InputDevice::eGamepad:
-      return Engine::Get<IGamepad>()->Released(_Button.GetCode(), _Button.GetIndex());
+      return Engine::Get<IGamepad>()->Released(_Button.GetIndex(), _Button.GetCode());
     default: assert(false);
     }
 
     return false;
   }
 
-  bool Release(const Button& _Button)
+  bool isRelease(const Button& _Button)
   {
     switch (_Button.GetInputDevice())
     {
@@ -73,9 +73,9 @@ namespace vdl::input
     case InputDevice::eMouse:
       return Engine::Get<IMouse>()->Release(_Button.GetCode());
     case InputDevice::eXInput:
-      return Engine::Get<IXInput>()->Release(_Button.GetCode(), _Button.GetIndex());
+      return Engine::Get<IXInput>()->Release(_Button.GetIndex(), _Button.GetCode());
     case InputDevice::eGamepad:
-      return Engine::Get<IGamepad>()->Release(_Button.GetCode(), _Button.GetIndex());
+      return Engine::Get<IGamepad>()->Release(_Button.GetIndex(), _Button.GetCode());
     default: assert(false);
     }
 

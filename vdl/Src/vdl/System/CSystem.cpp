@@ -80,9 +80,6 @@ bool CSystem::Update()
 
   //  デフォルトの機能の処理
   {
-    //  有効なもの以外を削除
-    DefaultActionFlags_ &= ValidDefaultActions_;
-
     if (DefaultActionFlags_ & vdl::System::DefalutAction::eExit)
     {
       return false;

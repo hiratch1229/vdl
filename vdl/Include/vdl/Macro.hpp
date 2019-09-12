@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 
-namespace vdl::macro
+namespace vdl::Macro
 {
   //  ƒ|ƒCƒ“ƒ^‰ð•ú
   template<class T>

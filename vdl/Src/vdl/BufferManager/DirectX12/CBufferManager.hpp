@@ -14,11 +14,13 @@ public:
 
   void Initialize()override;
 
-  ID CreateConstantBuffer(vdl::uint _BufferSize)override;
+  vdl::ID CreateConstantBuffer(vdl::uint _BufferSize)override;
 
-  void AddRef(const ID& _ID)override { Buffers_.Get(_ID).AddRef(); }
-
-  void Release(const ID& _ID) override { Buffers_.Get(_ID).Release(); }
+  vdl::Detail::ConstantBufferData CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBufferData)override;
   
-  IBuffer* GetBuffer(const ID& _ID)override { return Buffers_.Get(_ID).Get(); }
+  void AddRef(const vdl::ID& _ID)override { Buffers_.Get(_ID).AddRef(); }
+
+  void Release(const vdl::ID& _ID) override { Buffers_.Get(_ID).Release(); }
+  
+  IBuffer* GetBuffer(const vdl::ID& _ID)override { return Buffers_.Get(_ID).Get(); }
 };

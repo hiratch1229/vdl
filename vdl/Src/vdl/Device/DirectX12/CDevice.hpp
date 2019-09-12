@@ -26,5 +26,5 @@ public:
 
   void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _Type)override;
 
-  void WriteMemory(IBuffer* _pDstBuffer, void* _pSrcBuffer, vdl::uint _BufferSize)const override;
+  void WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const override;
 };

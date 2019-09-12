@@ -1,6 +1,6 @@
 #pragma once
 
-namespace vdl::math
+namespace vdl::Math
 {
   //  ƒÎ
   constexpr float kPI = 3.1415926535897932385f;

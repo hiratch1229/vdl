@@ -16,7 +16,7 @@ void CTextureManager::Initialize()
   pDevice_ = Engine::Get<IDevice>();
 }
 
-ID CTextureManager::Load(const char* _FilePath, bool _isSerialize)
+vdl::ID CTextureManager::Load(const char* _FilePath, bool _isSerialize)
 {
   std::filesystem::path BinaryFilePath = std::filesystem::path(std::string(Constants::kBinaryFileDirectory) + std::string(_FilePath)).concat(Constants::kBinaryFileFormat);
   std::filesystem::path BinaryFileDirectory = BinaryFilePath.remove_filename();
@@ -51,7 +51,7 @@ ID CTextureManager::Load(const char* _FilePath, bool _isSerialize)
   return Load(Image);
 }
 
-ID CTextureManager::Load(const vdl::Image& _Image)
+vdl::ID CTextureManager::Load(const vdl::Image& _Image)
 {
   ITexture* pTexture;
   pDevice_->CreateTexture(&pTexture, _Image);
@@ -59,7 +59,7 @@ ID CTextureManager::Load(const vdl::Image& _Image)
   return Textures_.Add(pTexture);
 }
 
-ID CTextureManager::CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::Format _Format)
+vdl::ID CTextureManager::CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::Format _Format)
 {
   ITexture* pRenderTexture;
   pDevice_->CreateRenderTexture(&pRenderTexture, _TextureSize, _Format);
@@ -67,7 +67,7 @@ ID CTextureManager::CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::For
   return Textures_.Add(pRenderTexture);
 }
 
-ID CTextureManager::CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::Format _Format)
+vdl::ID CTextureManager::CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::Format _Format)
 {
   ITexture* pDepthStencilTexture;
   pDevice_->CreateDepthStecilTexture(&pDepthStencilTexture, _TextureSize, _Format);

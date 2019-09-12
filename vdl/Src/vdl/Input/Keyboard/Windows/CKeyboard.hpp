@@ -6,13 +6,13 @@
 class CKeyboard : public IKeyboard
 {
   //  使用キー数
-  static constexpr int kKeyNum = 256;
+  static constexpr vdl::uint kKeyNum = 256;
 private:
   InputState InputStatus_[kKeyNum];
 private:
-  bool isWithinRange(int _Number)const
+  bool isWithinRange(vdl::uint _Code)const
   {
-    return (0 <= _Number && _Number < kKeyNum);
+    return (0 <= _Code && _Code < kKeyNum);
   }
 public:
   CKeyboard() = default;
@@ -21,65 +21,23 @@ public:
 
   void Update()override;
 
-  bool Press(int _Number)const override
+  bool Press(vdl::uint _Code)const override
   {
-    return isWithinRange(_Number) ? InputStatus_[_Number].Press() : false;
+    return isWithinRange(_Code) ? InputStatus_[_Code].Press() : false;
   }
 
-  bool Pressed(int _Number)const override
+  bool Pressed(vdl::uint _Code)const override
   {
-    return isWithinRange(_Number) ? InputStatus_[_Number].Pressed() : false;
+    return isWithinRange(_Code) ? InputStatus_[_Code].Pressed() : false;
   }
 
-  bool Released(int _Number)const override
+  bool Released(vdl::uint _Code)const override
   {
-    return isWithinRange(_Number) ? InputStatus_[_Number].Released() : false;
+    return isWithinRange(_Code) ? InputStatus_[_Code].Released() : false;
   }
 
-  bool Release(int _Number)const override
+  bool Release(vdl::uint _Code)const override
   {
-    return isWithinRange(_Number) ? InputStatus_[_Number].Release() : false;
-  }
-
-  bool AnyKeyPress()const override
-  {
-    for (int i = 0; i < kKeyNum; ++i)
-    {
-      if (Press(i))
-      {
-        return true;
-      }
-    }
-
-    //  何も押されていない
-    return false;
-  }
-
-  bool AnyKeyPressed()const override
-  {
-    for (int i = 0; i < kKeyNum; ++i)
-    {
-      if (Pressed(i))
-      {
-        return true;
-      }
-    }
-
-    //  何も押されていない
-    return false;
-  }
-
-  bool AnyKeyReleased()const override
-  {
-    for (int i = 0; i < kKeyNum; ++i)
-    {
-      if (Released(i))
-      {
-        return true;
-      }
-    }
-
-    //  何も離されていない
-    return false;
+    return isWithinRange(_Code) ? InputStatus_[_Code].Release() : false;
   }
 };

@@ -45,15 +45,15 @@ void CMouse::Update()
   }
 }
 
-void CMouse::SetPos(vdl::int2 _Pos)
+void CMouse::SetPos(const vdl::int2& _Pos)
 {
   Pos_ = _Pos;
 
-  //  ウィンドウの中心にカーソルをセット
+  //  カーソルをセット
   ::SetCursorPos(Pos_.x, Pos_.y);
 }
 
-void CMouse::Scroll(vdl::int2 _Scroll)
+void CMouse::Scroll(const vdl::int2& _Scroll)
 {
   std::lock_guard Lock(ScrollMutex_);
 

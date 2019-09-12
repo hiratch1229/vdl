@@ -3,7 +3,7 @@
 
 #include <utility>
 
-namespace vdl::input
+namespace vdl::Input
 {
   enum class InputDevice : uint8_t
   {
@@ -30,71 +30,72 @@ namespace vdl::input
       uint32_t ID_;
     };
   public:
+    Button()noexcept
+      : InputDevice_(InputDevice::eNone) {}
+
+    constexpr Button(InputDevice _InputDevice, uint8_t _Code, uint8_t _Index = 0)noexcept
+      : InputDevice_(_InputDevice), Code_(_Code), Index_(_Index) {}
+  public:
+    [[nodiscard]] constexpr bool operator==(const Button& _Button)const noexcept { return ID_ == _Button.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const Button& _Button)const noexcept { return ID_ != _Button.ID_; }
+  public:
     [[nodiscard]] constexpr InputDevice GetInputDevice()const noexcept { return InputDevice_; }
 
     [[nodiscard]] constexpr uint8_t GetCode()const noexcept { return Code_; }
 
     [[nodiscard]] constexpr uint8_t GetIndex()const noexcept { return Index_; }
-  public:
-    [[nodiscard]] constexpr bool operator==(const Button& _Button)const noexcept { return ID_ == _Button.ID_; }
-
-    [[nodiscard]] constexpr bool operator!=(const Button& _Button)const noexcept { return !(*this == _Button); }
-  public:
-    Button() = default;
-
-    constexpr Button(InputDevice _InputDevice, uint8_t _Code, uint8_t _Index = 0)noexcept
-      : InputDevice_(_InputDevice), Code_(_Code), Index_(_Index) {}
   };
 
   //  ‰Ÿ‚³‚ê‚Ä‚¢‚é‚È‚çtrue‚ğ•Ô‚·
-  bool Press(const Button& _Button);
+  [[nodiscard]] bool isPress(const Button& _Button);
 
   //  1‚Â‚Å‚à‰Ÿ‚³‚ê‚Ä‚¢‚é‚È‚çtrue‚ğ•Ô‚·
-  inline bool PressOr() { return false; }
+  [[nodiscard]] inline bool isPressOr() { return false; }
   template<class Head, class... Tail>
-  inline bool PressOr(Head&& _Head, Tail&&... _Tail) { return Press(_Head) ? true : PressOr(std::forward<Tail>(_Tail)...); }
+  [[nodiscard]] inline bool isPressOr(Head&& _Head, Tail&&... _Tail) { return isPress(_Head) ? true : isPressOr(std::forward<Tail>(_Tail)...); }
 
   //  ‘S‚Ä‰Ÿ‚³‚ê‚Ä‚¢‚é‚È‚çtrue‚ğ•Ô‚·
-  inline bool PressAnd() { return true; }
+  [[nodiscard]] inline bool isPressAnd() { return true; }
   template<class Head, class... Tail>
-  inline bool PressAnd(Head&& _Head, Tail&&... _Tail) { return Press(_Head) ? PressAnd(std::forward<Tail>(_Tail)...) : false; }
+  [[nodiscard]] inline bool isPressAnd(Head&& _Head, Tail&&... _Tail) { return isPress(_Head) ? isPressAnd(std::forward<Tail>(_Tail)...) : false; }
 
   //  ‰Ÿ‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
-  bool Pressed(const Button& _Button);
+  [[nodiscard]] bool isPressed(const Button& _Button);
 
   //  1‚Â‚Å‚à‰Ÿ‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
-  inline bool PressedOr() { return false; }
+  [[nodiscard]] inline bool isPressedOr() { return false; }
   template<class Head, class... Tail>
-  inline bool PressedOr(Head&& _Head, Tail&&... _Tail) { return Pressed(_Head) ? true : PressedOr(std::forward<Tail>(_Tail)...); }
+  [[nodiscard]] inline bool isPressedOr(Head&& _Head, Tail&&... _Tail) { return isPressed(_Head) ? true : isPressedOr(std::forward<Tail>(_Tail)...); }
 
   //  ‘S‚Ä‰Ÿ‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
-  inline bool PressedAnd() { return true; }
+  [[nodiscard]] inline bool isPressedAnd() { return true; }
   template<class Head, class... Tail>
-  inline bool PressedAnd(Head&& _Head, Tail&&... _Tail) { return Pressed(_Head) ? PressedAnd(std::forward<Tail>(_Tail)...) : false; }
+  [[nodiscard]] inline bool isPressedAnd(Head&& _Head, Tail&&... _Tail) { return isPressed(_Head) ? isPressedAnd(std::forward<Tail>(_Tail)...) : false; }
 
   //  —£‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
-  bool Released(const Button& _Button);
+  [[nodiscard]] bool isReleased(const Button& _Button);
 
   //  1‚Â‚Å‚à—£‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
-  inline bool ReleasedOr() { return false; }
+  [[nodiscard]] inline bool isReleasedOr() { return false; }
   template<class Head, class... Tail>
-  inline bool ReleasedOr(Head&& _Head, Tail&&... _Tail) { return Released(_Head) ? true : ReleasedOr(std::forward<Tail>(_Tail)...); }
+  [[nodiscard]] inline bool isReleasedOr(Head&& _Head, Tail&&... _Tail) { return isReleased(_Head) ? true : isReleasedOr(std::forward<Tail>(_Tail)...); }
 
   //  ‘S‚Ä—£‚³‚ê‚½uŠÔ‚È‚çtrue‚ğ•Ô‚·
-  inline bool ReleasedAnd() { return true; }
+  [[nodiscard]] inline bool isReleasedAnd() { return true; }
   template<class Head, class... Tail>
-  inline bool ReleasedAnd(Head&& _Head, Tail&&... _Tail) { return Released(_Head) ? ReleasedAnd(std::forward<Tail>(_Tail)...) : false; }
+  [[nodiscard]] inline bool isReleasedAnd(Head&& _Head, Tail&&... _Tail) { return isReleased(_Head) ? isReleasedAnd(std::forward<Tail>(_Tail)...) : false; }
 
   //  ‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢‚È‚çtrue‚ğ•Ô‚·
-  bool Release(const Button& _Button);
+  [[nodiscard]] bool isRelease(const Button& _Button);
 
   //  1‚Â‚Å‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢‚È‚çtrue‚ğ•Ô‚·
-  inline bool ReleaseOr() { return false; }
+  [[nodiscard]] inline bool isReleaseOr() { return false; }
   template<class Head, class... Tail>
-  inline bool ReleaseOr(Head&& _Head, Tail&&... _Tail) { return Release(_Head) ? true : ReleaseOr(std::forward<Tail>(_Tail)...); }
+  [[nodiscard]] inline bool isReleaseOr(Head&& _Head, Tail&&... _Tail) { return isRelease(_Head) ? true : isReleaseOr(std::forward<Tail>(_Tail)...); }
 
   //  ‘S‚Ä‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢‚È‚çtrue‚ğ•Ô‚·
-  inline bool ReleaseAnd() { return true; }
+  [[nodiscard]] inline bool isReleaseAnd() { return true; }
   template<class Head, class... Tail>
-  inline bool ReleaseAnd(Head&& _Head, Tail&&... _Tail) { return Release(_Head) ? ReleaseAnd(std::forward<Tail>(_Tail)...) : false; }
+  [[nodiscard]] inline bool isReleaseAnd(Head&& _Head, Tail&&... _Tail) { return isRelease(_Head) ? isReleaseAnd(std::forward<Tail>(_Tail)...) : false; }
 }

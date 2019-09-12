@@ -12,7 +12,7 @@ public:
 
   virtual void Initialize() = 0;
 
-  virtual bool Update() = 0;
+  [[nodiscard]] virtual bool Update() = 0;
 
   virtual void EnableDefaultActions(vdl::uint _DefaultActionFlags) = 0;
 
@@ -22,7 +22,7 @@ public:
 
   virtual void SetMaxFramerate(vdl::uint _MaxFramerate) = 0;
 
-  virtual float GetDeltaTime() = 0;
+  [[nodiscard]] virtual float GetDeltaTime() = 0;
 
   virtual void Pause() = 0;
 

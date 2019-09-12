@@ -8,8 +8,6 @@
 
 namespace vdl
 {
-  //  カラー
-  //  R,G,B,A それぞれ0~255で色を表現します
   struct Color
   {
 #pragma warning(disable:4201)
@@ -17,10 +15,14 @@ namespace vdl
     {
       struct
       {
-        uint8_t R; //  赤
-        uint8_t G; //  緑
-        uint8_t B; //  赤
-        uint8_t A; //  不透明度
+        //  赤
+        uint8_t Red;
+        //  緑
+        uint8_t Green;
+        //  青
+        uint8_t Blue;
+        //  不透明度
+        uint8_t Alpha;
       };
       uint32_t Bit;
     };
@@ -28,135 +30,79 @@ namespace vdl
   public:
     Color() = default;
 
-    //  コピーコンストラクタ
-    //  _Color:コピーする色
-    constexpr Color(const Color& _Color)noexcept : R(_Color.R), G(_Color.G), B(_Color.B), A(_Color.A) {}
-    //  色を変換してコピー
-    //  _Color:コピーする色
+    constexpr Color(uint8_t _Red, uint8_t _Green, uint8_t _Blue, uint8_t _Alpha = 255u)noexcept
+      : Red(_Red), Green(_Green), Blue(_Blue), Alpha(_Alpha) {}
+
+    constexpr Color(uint8_t _RGB, uint8_t _Alpha = 255u)noexcept
+      : Red(_RGB), Green(_RGB), Blue(_RGB), Alpha(_Alpha) {}
+
+    constexpr Color(const Color& _RGB, uint8_t _Alpha)noexcept
+      : Red(_RGB.Red), Green(_RGB.Green), Blue(_RGB.Blue), Alpha(_Alpha) {}
+
+    constexpr Color(const Color& _Color)noexcept
+      : Bit(_Color.Bit) {}
+
     constexpr Color(const ColorF& _Color)noexcept;
-    //  色を作成
-    //  _R:赤
-    //  _G:緑
-    //  _B:青
-    //  _A:不透明度
-    constexpr Color(uint32_t _R, uint32_t _G, uint32_t _B, uint32_t _A = 255u)noexcept : R(_R), G(_G), B(_B), A(_A) {}
-    //  色を作成
-    //  _RGB:赤,緑,青
-    //  _A:不透明度
-    constexpr Color(uint32_t _RGB, uint32_t _A = 255u)noexcept : R(_RGB), G(_RGB), B(_RGB), A(_A) {}
-    //  色を作成
-    //  _RGB:赤,緑,青
-    //  _A:不透明度
-    constexpr Color(const Color& _RGB, uint32_t _A)noexcept : R(_RGB.R), G(_RGB.G), B(_RGB.B), A(_A) {}
-  public:
-    //  色を代入
-    //  _Color:代入する色
-    Color& operator =(const Color& _Color)noexcept
+
+    Color& operator=(const Color& _Color)noexcept
     {
-      R = _Color.R;
-      G = _Color.G;
-      B = _Color.B;
-      A = _Color.A;
+      Bit = _Color.Bit;
 
       return *this;
     }
-    //  色が等しいかを判断
-    //  _Color:比較対象の色
-    //  (true:等しい,false:等しくない)
-    constexpr bool operator ==(const Color& _Color)const noexcept
-    {
-      return (R == _Color.R && G == _Color.G && B == _Color.B && A == _Color.A);
-    }
-    //  色が等しいかを判断
-    //  _Color:比較対象の色
-    //  (true:等しくない,false:等しい)
-    constexpr bool operator !=(const Color& _Color)const noexcept
-    {
-      return !(*this == _Color);
-    }
+  public:
+    [[nodiscard]] constexpr bool operator ==(const Color& _Color)const noexcept { return Bit == _Color.Bit; }
+
+    [[nodiscard]] constexpr bool operator !=(const Color& _Color)const noexcept { return Bit != _Color.Bit; }
   };
 
-  //  カラー
-  //  R,G,B,A それぞれ0~1で色を表現します
   struct ColorF
   {
-    float R;  //  赤
-    float G;  //  緑
-    float B;  //  赤
-    float A;  //  不透明度
+    //  赤
+    float Red;
+    //  緑
+    float Green;
+    //  青
+    float Blue;
+    //  不透明度
+    float Alpha;
   public:
     ColorF() = default;
 
-    //  コピーコンストラクタ
-    //  _Color:コピーする色
-    constexpr ColorF(const ColorF& _Color)noexcept : R(_Color.R), G(_Color.G), B(_Color.B), A(_Color.A) {}
-    //  色を変換してコピー
-    //  _Color:コピーする色
-    constexpr ColorF(const Color& _Color)noexcept : R(_Color.R / 255.0f), G(_Color.G / 255.0f), B(_Color.B / 255.0f), A(_Color.A / 255.0f) {}
-    //  色を作成
-    //  _R:赤
-    //  _G:緑
-    //  _B:青
-    //  _A:不透明度
-    constexpr ColorF(float _R, float _G, float _B, float _A = 1.0f)noexcept : R(_R), G(_G), B(_B), A(_A) {}
-    //  色を作成
-    //  _RGB:赤,緑,青
-    //  _A:不透明度
-    constexpr ColorF(float _RGB, float _A = 1.0f)noexcept : R(_RGB), G(_RGB), B(_RGB), A(_A) {}
-    //  色を作成
-    //  _RGB:赤,緑,青
-    //  _A:不透明度
-    constexpr ColorF(const ColorF& _RGB, float _A)noexcept : R(_RGB.R), G(_RGB.G), B(_RGB.B), A(_A) {}
-  public:
-    //  色を変換して代入
-    //  _Color:代入する色
+    constexpr ColorF(float _Red, float _Green, float _Blue, float _Alpha = 1.0f)noexcept
+      : Red(_Red), Green(_Green), Blue(_Blue), Alpha(_Alpha) {}
+
+    constexpr ColorF(float _RGB, float _Alpha = 1.0f)noexcept
+      : Red(_RGB), Green(_RGB), Blue(_RGB), Alpha(_Alpha) {}
+
+    constexpr ColorF(const ColorF& _RGB, float _Alpha)noexcept
+      : Red(_RGB.Red), Green(_RGB.Green), Blue(_RGB.Blue), Alpha(_Alpha) {}
+
+    constexpr ColorF(const ColorF& _Color)noexcept
+      : Red(_Color.Red), Green(_Color.Green), Blue(_Color.Blue), Alpha(_Color.Alpha) {}
+
+    constexpr ColorF(const Color& _Color)noexcept;
+
     ColorF& operator =(const ColorF& _Color)noexcept
     {
-      R = _Color.R;
-      G = _Color.G;
-      B = _Color.B;
-      A = _Color.A;
+      Red = _Color.Red;
+      Green = _Color.Green;
+      Blue = _Color.Blue;
+      Alpha = _Color.Alpha;
 
       return *this;
-    }
-    //  色が等しいかを判断
-    //  _Color:比較対象の色
-    //  (true:等しい,false:等しくない)
-    constexpr bool operator ==(const ColorF& _Color)const noexcept
-    {
-      return (R == _Color.R && G == _Color.G && B == _Color.B && A == _Color.A);
-    }
-    //  色が等しいかを判断
-    //  _Color:比較対象の色
-    //  (true:等しくない,false:等しい)
-    constexpr bool operator !=(const ColorF& _Color)const noexcept
-    {
-      return !(*this == _Color);
     }
   public:
-    constexpr ColorF operator*(const ColorF& _Color)const
-    {
-      return { R * _Color.R, G * _Color.G, B * _Color.B, A * _Color.A };
-    }
+    [[nodiscard]] constexpr bool operator ==(const ColorF& _Color)const noexcept { return Red == _Color.Red && Green == _Color.Green && Blue == _Color.Blue && Alpha == _Color.Alpha; }
 
-    ColorF& operator*=(const ColorF& _Color)
-    {
-      R *= _Color.R;
-      B *= _Color.B;
-      G *= _Color.G;
-      A *= _Color.A;
-
-      return *this;
-    }
+    [[nodiscard]] constexpr bool operator !=(const ColorF& _Color)const noexcept { return Red != _Color.Red || Green != _Color.Green || Blue != _Color.Blue || Alpha != _Color.Alpha; }
   };
 
-  //  色を変換してコピー
-  //  _Color:コピーする色
   inline constexpr Color::Color(const ColorF& _Color)noexcept
-    : R(static_cast<uint8_t>(_Color.R * 255.0f)), G(static_cast<uint8_t>(_Color.G * 255.0f)), B(static_cast<uint8_t>(_Color.B * 255.0f)), A(static_cast<uint8_t>(_Color.A * 255.0f))
-  {
+    : Red(static_cast<uint8_t>(_Color.Red * 255.0f)), Green(static_cast<uint8_t>(_Color.Green * 255.0f)), Blue(static_cast<uint8_t>(_Color.Blue * 255.0f)), Alpha(static_cast<uint8_t>(_Color.Alpha * 255.0f)) {}
 
-  }
+  inline constexpr ColorF::ColorF(const Color& _Color)noexcept
+    : Red(_Color.Red / 255.0f), Green(_Color.Green / 255.0f), Blue(_Color.Blue / 255.0f), Alpha(_Color.Alpha / 255.0f) {}
 
   //  原色カラー140色
   namespace Palette
@@ -591,18 +537,18 @@ namespace std
 {
   [[nodiscard]] inline string to_string(const vdl::ColorF& _Color)
   {
-    return to_string(_Color.R) + "," + to_string(_Color.G) + "," + to_string(_Color.B) + "," + to_string(_Color.A);
+    return to_string(_Color.Red) + "," + to_string(_Color.Green) + "," + to_string(_Color.Blue) + "," + to_string(_Color.Alpha);
   }
 
   [[nodiscard]] inline wstring to_wstring(const vdl::ColorF& _Color)
   {
-    return to_wstring(_Color.R) + L"," + to_wstring(_Color.G) + L"," + to_wstring(_Color.B) + L"," + to_wstring(_Color.A);
+    return to_wstring(_Color.Red) + L"," + to_wstring(_Color.Green) + L"," + to_wstring(_Color.Blue) + L"," + to_wstring(_Color.Alpha);
   }
 
   template <class CharType>
   inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::ColorF& _Color)
   {
-    return _OStream << _Color.R << CharType(',') << _Color.G << CharType(',') << _Color.B << CharType(',') << _Color.A;
+    return _OStream << _Color.Red << static_cast<CharType>(',') << _Color.Green << static_cast<CharType>(',') << _Color.Blue << static_cast<CharType>(',') << _Color.Alpha;
   }
 
   template <class CharType>
@@ -610,6 +556,6 @@ namespace std
   {
     CharType Temp;
 
-    return _IStream >> _Color.R >> Temp >> _Color.G >> Temp >> _Color.B >> Temp >> _Color.A;
+    return _IStream >> _Color.Red >> Temp >> _Color.Green >> Temp >> _Color.Blue >> Temp >> _Color.Alpha;
   }
 }

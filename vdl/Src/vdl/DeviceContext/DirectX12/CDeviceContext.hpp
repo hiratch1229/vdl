@@ -6,12 +6,12 @@ class CDeviceContext : public IDeviceContext
 public:
   void Initialize()override;
 
-  void SetInputLayout(vdl::RenderType _RenderType)override
+  void SetVertexBuffer(const IBuffer* _pVertexBuffer)override
   {
 
   }
 
-  void SetVertexBuffer(const IBuffer* _pVertexBuffer)override
+  void SetInstanceBuffer(const IBuffer* _pInstanceBuffer)override
   {
 
   }
@@ -21,7 +21,12 @@ public:
 
   }
 
-  void SetInstanceBuffer(const IBuffer* _pInstanceBuffer)override
+  void SetInputLayout(vdl::InputLayout _InputLayout)override
+  {
+
+  }
+
+  void SetTopology(vdl::Topology _Topology)override
   {
 
   }
@@ -32,6 +37,11 @@ public:
   }
 
   void SetViewport(const vdl::Viewport& _Viewport)override
+  {
+
+  }
+
+  void SetRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStenilTexture)override
   {
 
   }
@@ -51,17 +61,12 @@ public:
 
   }
 
-  void SetRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStenilTexture)override
-  {
-
-  }
-
   void VSSetShader(const vdl::VertexShader& _VertexShader)override
   {
 
   }
 
-  void VSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::SamplerState _Samplers[])override
+  void VSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override
   {
 
   }
@@ -71,9 +76,9 @@ public:
 
   }
 
-  void VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[])override
+  void VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])override
   {
-  
+
   }
 
   void HSSetShader(const vdl::HullShader& _VertexShader)override
@@ -81,7 +86,7 @@ public:
 
   }
 
-  void HSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::SamplerState _Samplers[])override
+  void HSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override
   {
 
   }
@@ -91,7 +96,7 @@ public:
 
   }
 
-  void HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[])override
+  void HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])override
   {
 
   }
@@ -101,7 +106,7 @@ public:
 
   }
 
-  void DSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::SamplerState _Samplers[])override
+  void DSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override
   {
 
   }
@@ -111,7 +116,7 @@ public:
 
   }
 
-  void DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[])override
+  void DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])override
   {
 
   }
@@ -121,7 +126,7 @@ public:
 
   }
 
-  void GSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::SamplerState _Samplers[])override
+  void GSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override
   {
 
   }
@@ -131,7 +136,7 @@ public:
 
   }
 
-  void GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[])override
+  void GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])override
   {
 
   }
@@ -141,17 +146,17 @@ public:
 
   }
 
-  void PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::SamplerState _Samplers[])override
+  void PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override
   {
 
   }
 
-  void PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture _Textures[])override
+  void PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])override
   {
 
   }
 
-  void PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[])override
+  void PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])override
   {
 
   }

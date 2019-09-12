@@ -78,9 +78,9 @@ private:
   {
     return (0 <= _Index && _Index < Constants::kMaxController && Status_[_Index].isConnect);
   }
-  bool isWithinRange(vdl::uint _Number, vdl::uint _Index)const
+  bool isWithinRange(vdl::uint _Index, vdl::uint _Code)const
   {
-    return (0 <= _Index && _Index < Constants::kMaxController && Status_[_Index].isConnect && 0 <= _Number && _Number < Status_[_Index].ButtonNum);
+    return (0 <= _Index && _Index < Constants::kMaxController && Status_[_Index].isConnect && 0 <= _Code && _Code < Status_[_Index].ButtonNum);
   }
 public:
   void CreateDirectInputDevice(const GUID& GuidProductFromDirectInput);
@@ -93,24 +93,24 @@ public:
 
   void Update()override;
 
-  bool Press(vdl::uint _Number, vdl::uint _Index)const override
+  bool Press(vdl::uint _Index, vdl::uint _Code)const override
   {
-    return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Press() : false;
+    return isWithinRange(_Index, _Code) ? Status_[_Index].InputStatus[_Code].Press() : false;
   }
 
-  bool Pressed(vdl::uint _Number, vdl::uint _Index)const override
+  bool Pressed(vdl::uint _Index, vdl::uint _Code)const override
   {
-    return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Pressed() : false;
+    return isWithinRange(_Index, _Code) ? Status_[_Index].InputStatus[_Code].Pressed() : false;
   }
 
-  bool Released(vdl::uint _Number, vdl::uint _Index)const override
+  bool Released(vdl::uint _Index, vdl::uint _Code)const override
   {
-    return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Released() : false;
+    return isWithinRange(_Index, _Code) ? Status_[_Index].InputStatus[_Code].Released() : false;
   }
 
-  bool Release(vdl::uint _Number, vdl::uint _Index)const override
+  bool Release(vdl::uint _Index, vdl::uint _Code)const override
   {
-    return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Release() : false;
+    return isWithinRange(_Index, _Code) ? Status_[_Index].InputStatus[_Code].Release() : false;
   }
 
   bool isConnect(vdl::uint _Index)const override
@@ -118,62 +118,9 @@ public:
     return isWithinRange(_Index) ? Status_[_Index].isConnect : false;
   }
 
-  int GetButtonNum(vdl::uint _Index)const override
+  vdl::uint GetButtonNum(vdl::uint _Index)const override
   {
     return isWithinRange(_Index) ? Status_[_Index].ButtonNum : 0;
-  }
-
-  bool AnyButtonPress(vdl::uint _Index)const override
-  {
-    if (!(isWithinRange(_Index))) return false;
-
-    for (int i = 0; i < kButtonNum; ++i)
-    {
-      if (Press(i, _Index))
-      {
-        return true;
-      }
-    }
-
-    //  ‰½‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
-
-  bool AnyButtonPressed(vdl::uint _Index)const override
-  {
-    if (!(isWithinRange(_Index))) return false;
-
-    for (int i = 0; i < kButtonNum; ++i)
-    {
-      if (Pressed(i, _Index))
-      {
-        return true;
-      }
-    }
-
-    //  ‰½‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
-
-  bool AnyButtonReleased(vdl::uint _Index)const override
-  {
-    if (!(isWithinRange(_Index))) return false;
-
-    for (int i = 0; i < kButtonNum; ++i)
-    {
-      if (Released(i, _Index))
-      {
-        return true;
-      }
-    }
-
-    //  ‰½‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
-
-  vdl::input::Button GetButton(vdl::uint _Index, vdl::uint _Number)const
-  {
-    return isWithinRange(_Index) ? vdl::input::Button(vdl::input::InputDevice::eGamepad, _Number, _Index) : vdl::input::Button();
   }
 
   vdl::float2 GetLeftStick(vdl::uint _Index, float _DeadZone)const override;

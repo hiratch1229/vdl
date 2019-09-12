@@ -122,7 +122,7 @@ namespace vdl
   //-------------------------
   //  ConstantBuffer.hpp
   //-------------------------
-  namespace detail { class ConstantBufferData; }
+  namespace Detail { class ConstantBufferData; }
   template<class T> class ConstantBuffer;
 
   //-------------------------

@@ -29,14 +29,14 @@ public:
 
   virtual void SetViewport(const vdl::Viewport& _Viewport) = 0;
 
+  //  TODO:マルチレンダーターゲット
+  virtual void SetRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStenilTexture) = 0;
+
   virtual void SetBlendState(const vdl::BlendState& _BlendState) = 0;
 
   virtual void SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState) = 0;
 
   virtual void SetRasterizerState(const vdl::RasterizerState& _RasterizerState) = 0;
-
-  //  TODO:マルチレンダーターゲット
-  virtual void SetRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStenilTexture) = 0;
 
   virtual void VSSetShader(const vdl::VertexShader& _VertexShader) = 0;
 
@@ -44,7 +44,7 @@ public:
 
   virtual void VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
 
-  virtual void VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[]) = 0;
+  virtual void VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) = 0;
 
   virtual void HSSetShader(const vdl::HullShader& _VertexShader) = 0;
 
@@ -52,7 +52,7 @@ public:
 
   virtual void HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
   
-  virtual void HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[]) = 0;
+  virtual void HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) = 0;
 
   virtual void DSSetShader(const vdl::DomainShader& _DomainShader) = 0;
 
@@ -60,7 +60,7 @@ public:
 
   virtual void DSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
   
-  virtual void DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[]) = 0;
+  virtual void DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) = 0;
 
   virtual void GSSetShader(const vdl::GeometryShader& _GeometryShader) = 0;
 
@@ -68,7 +68,7 @@ public:
 
   virtual void GSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
   
-  virtual void GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[]) = 0;
+  virtual void GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) = 0;
 
   virtual void PSSetShader(const vdl::PixelShader& _PixelShader) = 0;
 
@@ -76,7 +76,7 @@ public:
 
   virtual void PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
   
-  virtual void PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[]) = 0;
+  virtual void PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) = 0;
 
   //virtual void CSSetShader(const vdl::ComputeShader& _ComputeShader) = 0;
 

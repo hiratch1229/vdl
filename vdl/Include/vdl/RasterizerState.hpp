@@ -58,21 +58,10 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
-    bool operator==(const RasterizerState& _RasterizerState)const noexcept { return Data == _RasterizerState.Data; }
-    bool operator!=(const RasterizerState& _RasterizerState)const noexcept { return !((*this) == _RasterizerState); }
-  public:
-    constexpr RasterizerState(FillMode _FillMode = FillMode::eSolid,
-      CullMode _CullMode = CullMode::eBack,
-      bool _FrontCounterClockwise = false,
-      int _DepthBias = 0,
-      bool _ScissorEnable = false,
-      bool _AntialiasedLineEnable = false)
-      : Filling(_FillMode),
-      Culling(_CullMode),
-      FrontCounterClockwise(_FrontCounterClockwise),
-      DepthBias(_DepthBias),
-      ScissorEnable(_ScissorEnable),
-      AntialiasedLineAnable(_AntialiasedLineEnable) {}
+    constexpr RasterizerState(FillMode _FillMode = FillMode::eSolid, CullMode _CullMode = CullMode::eBack, bool _FrontCounterClockwise = false,
+      int _DepthBias = 0, bool _ScissorEnable = false, bool _AntialiasedLineEnable = false)
+      : Filling(_FillMode), Culling(_CullMode), FrontCounterClockwise(_FrontCounterClockwise),
+      DepthBias(_DepthBias), ScissorEnable(_ScissorEnable), AntialiasedLineAnable(_AntialiasedLineEnable) {}
 
     RasterizerState(PreDefined _PreDefined)
     {
@@ -88,5 +77,9 @@ namespace vdl
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
+  public:
+    [[nodiscard]] constexpr bool operator==(const RasterizerState& _RasterizerState)const noexcept { return Data == _RasterizerState.Data; }
+
+    [[nodiscard]] constexpr bool operator!=(const RasterizerState& _RasterizerState)const noexcept { return Data != _RasterizerState.Data; }
   };
 }

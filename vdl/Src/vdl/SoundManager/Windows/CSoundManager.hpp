@@ -22,9 +22,9 @@ public:
 
   void Initialize()override;
 
-  ID Load(const char* _FilePath)override;
+  vdl::ID Load(const char* _FilePath)override;
 
-  void AddRef(const ID& _ID)override { Datas_.Get(_ID).AddRef(); }
+  void AddRef(const vdl::ID& _ID)override { Datas_.Get(_ID).AddRef(); }
 
-  void Release(const ID& _ID)override { Datas_.Get(_ID).Release(); }
+  void Release(const vdl::ID& _ID)override { Datas_.Get(_ID).Release(); }
 };

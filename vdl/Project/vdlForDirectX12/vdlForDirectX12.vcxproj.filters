@@ -16,6 +16,12 @@
     <Filter Include="Src\SwapChain">
       <UniqueIdentifier>{026c8490-6459-4bee-9905-cb59f3f05857}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Buffer">
+      <UniqueIdentifier>{e457e18e-2699-45db-a126-1e8e9a4d106a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Shader">
+      <UniqueIdentifier>{2d3e5f8a-37c6-4530-bf51-d5f27ce6fb5e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.cpp">
@@ -43,6 +49,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.hpp">
       <Filter>Src\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Buffer\DirectX12\CBuffer.hpp">
+      <Filter>Src\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Shader\DirectX12\CShader.hpp">
+      <Filter>Src\Shader</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

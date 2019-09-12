@@ -3,4 +3,7 @@
 
 #include <optional>
 
-using ID = std::optional<vdl::uint>;
+namespace vdl
+{
+  using ID = std::optional<uint>;
+}

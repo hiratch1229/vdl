@@ -73,21 +73,10 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
-    bool operator==(const Sampler& _Sampler)const noexcept { return Data == _Sampler.Data; }
-    bool operator!=(const Sampler& _Sampler)const noexcept { return !((*this) == _Sampler); }
-  public:
-    constexpr Sampler(AddressMode _AddressModeU = AddressMode::eClamp,
-      AddressMode _AddressModeV = AddressMode::eClamp,
-      AddressMode _AddressModeW = AddressMode::eClamp,
-      SamplerFilter _Filter = SamplerFilter::eMinMagMipLinear,
-      uint8_t _MaxAnisotropy = 16,
-      BorderColor _BorderColor = BorderColor::eBlack)
-      : Filter(_Filter),
-      AddressModeU(_AddressModeU),
-      AddressModeV(_AddressModeV),
-      AddressModeW(_AddressModeW),
-      MaxAnisotropy(_MaxAnisotropy),
-      Color(_BorderColor) {}
+    constexpr Sampler(AddressMode _AddressModeU = AddressMode::eClamp, AddressMode _AddressModeV = AddressMode::eClamp, AddressMode _AddressModeW = AddressMode::eClamp,
+      SamplerFilter _Filter = SamplerFilter::eMinMagMipLinear, uint8_t _MaxAnisotropy = 16, BorderColor _BorderColor = BorderColor::eBlack)
+      : Filter(_Filter), AddressModeU(_AddressModeU), AddressModeV(_AddressModeV),
+      AddressModeW(_AddressModeW), MaxAnisotropy(_MaxAnisotropy), Color(_BorderColor) {}
 
     Sampler(PreDefined _PreDefined)
     {
@@ -99,5 +88,9 @@ namespace vdl
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
+  public:
+    [[nodiscard]] constexpr bool operator==(const Sampler& _Sampler)const noexcept { return Data == _Sampler.Data; }
+
+    [[nodiscard]] constexpr bool operator!=(const Sampler& _Sampler)const noexcept { return Data != _Sampler.Data; }
   };
 }

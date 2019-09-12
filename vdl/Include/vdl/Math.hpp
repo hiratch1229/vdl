@@ -1,13 +1,7 @@
 #pragma once
-#include "Type2.hpp"
 #include <float.h>
 
-namespace vdl
-{
-  class Radian;
-}
-
-namespace vdl::math
+namespace vdl::Math
 {
   //  _Num0‚Æ_Num1‚ğ_Epsilon‚ÌŒë·‚ğl—¶‚µ‚½”äŠr
   inline constexpr bool isEqual(float _V0, float _V1, float _Epsilon = FLT_EPSILON)

@@ -17,7 +17,7 @@ void CModelManager::Initialize()
   pDevice_ = Engine::Get<IDevice>();
 }
 
-ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
+vdl::ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
 {
   Mesh* pMesh = new Mesh;
   {

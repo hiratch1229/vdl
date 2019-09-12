@@ -79,25 +79,10 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
-    bool operator==(const BlendState& _BlendState)const noexcept { return Data == _BlendState.Data; }
-    bool operator!=(const BlendState& _BlendState)const noexcept { return !((*this) == _BlendState); }
-  public:
-    constexpr BlendState(bool _AlphaToCoverageEnable = false,
-      bool _BlendEnable = false,
-      Blend _SrcBlend = Blend::eOne,
-      Blend _DestBlend = Blend::eZero,
-      BlendOperation _BlendOp = BlendOperation::eAdd,
-      Blend _SrcBlendAlpha = Blend::eOne,
-      Blend _DestBlnedAlpha = Blend::eZero,
-      BlendOperation _BlendOpAlpha = BlendOperation::eAdd)
-      : AlphaToCoverageEnable(_AlphaToCoverageEnable),
-      BlendEnable(_BlendEnable),
-      SrcBlend(_SrcBlend),
-      DestBlend(_DestBlend),
-      BlendOp(_BlendOp),
-      SrcBlendAlpha(_SrcBlendAlpha),
-      DestBlnedAlpha(_DestBlnedAlpha),
-      BlendOpAlpha(_BlendOpAlpha) {}
+    constexpr BlendState(bool _AlphaToCoverageEnable = false, bool _BlendEnable = false, Blend _SrcBlend = Blend::eOne, Blend _DestBlend = Blend::eZero,
+      BlendOperation _BlendOp = BlendOperation::eAdd, Blend _SrcBlendAlpha = Blend::eOne, Blend _DestBlnedAlpha = Blend::eZero, BlendOperation _BlendOpAlpha = BlendOperation::eAdd)
+      : AlphaToCoverageEnable(_AlphaToCoverageEnable), BlendEnable(_BlendEnable), SrcBlend(_SrcBlend), DestBlend(_DestBlend),
+      BlendOp(_BlendOp), SrcBlendAlpha(_SrcBlendAlpha), DestBlnedAlpha(_DestBlnedAlpha), BlendOpAlpha(_BlendOpAlpha) {}
 
     BlendState(PreDefined _PreDefined)
     {
@@ -115,5 +100,9 @@ namespace vdl
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
+  public:
+    [[nodiscard]] constexpr bool operator==(const BlendState& _BlendState)const noexcept { return Data == _BlendState.Data; }
+
+    [[nodiscard]] constexpr bool operator!=(const BlendState& _BlendState)const noexcept { return Data != _BlendState.Data; }
   };
 }

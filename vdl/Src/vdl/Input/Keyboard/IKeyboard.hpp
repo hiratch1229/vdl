@@ -1,4 +1,5 @@
 #pragma once
+#include <vdl/Types.hpp>
 
 class IKeyboard
 {
@@ -13,17 +14,11 @@ public:
 
   virtual void Update() = 0;
 
-  virtual bool Press(int _Number)const = 0;
+  [[nodiscard]] virtual bool Press(vdl::uint _Code)const = 0;
 
-  virtual bool Pressed(int _Number)const = 0;
+  [[nodiscard]] virtual bool Pressed(vdl::uint _Code)const = 0;
 
-  virtual bool Released(int _Number)const = 0;
+  [[nodiscard]] virtual bool Released(vdl::uint _Code)const = 0;
 
-  virtual bool Release(int _Number)const = 0;
-
-  virtual bool AnyKeyPress()const = 0;
-
-  virtual bool AnyKeyPressed()const = 0;
-
-  virtual bool AnyKeyReleased()const = 0;
+  [[nodiscard]] virtual bool Release(vdl::uint _Code)const = 0;
 };

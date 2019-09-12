@@ -3,10 +3,10 @@
 #include <vdl/Engine.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 
-namespace vdl::detail
+namespace vdl::Detail
 {
-  ConstantBufferData::ConstantBufferData(uint _Size)
-    : ID_(Engine::Get<IBufferManager>()->CreateConstantBuffer(_Size))
+  ConstantBufferData::ConstantBufferData(uint _BufferSize)
+    : ID_(Engine::Get<IBufferManager>()->CreateConstantBuffer(_BufferSize))
   {
   }
 

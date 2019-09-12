@@ -710,11 +710,11 @@ void CGUI::Update()
 
   // Update OS mouse position
   {
-    io.MouseDown[0] = pMouse_->Press(vdl::input::mouse::eLeft);
-    io.MouseDown[1] = pMouse_->Press(vdl::input::mouse::eRight);
-    io.MouseDown[2] = pMouse_->Press(vdl::input::mouse::eMiddle);
-    io.MouseDown[3] = pMouse_->Press(vdl::input::mouse::eX1);
-    io.MouseDown[4] = pMouse_->Press(vdl::input::mouse::eX2);
+    io.MouseDown[0] = pMouse_->Press(vdl::Input::Mouse::Buttons::eLeft);
+    io.MouseDown[1] = pMouse_->Press(vdl::Input::Mouse::Buttons::eRight);
+    io.MouseDown[2] = pMouse_->Press(vdl::Input::Mouse::Buttons::eMiddle);
+    io.MouseDown[3] = pMouse_->Press(vdl::Input::Mouse::Buttons::eX1);
+    io.MouseDown[4] = pMouse_->Press(vdl::Input::Mouse::Buttons::eX2);
 
     const vdl::int2& Wheel = pMouse_->GetWheel();
     io.MouseWheel += Wheel.y;
@@ -804,13 +804,12 @@ void CGUI::Draw()
   pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
 
   pDeviceContext_->SetViewport(Viewport_);
+  pDeviceContext_->SetRenderTexture(vdl::RenderTexture(), vdl::DepthStencilTexture());
 
   pDeviceContext_->SetBlendState(GraphicsState_.BlendState);
   pDeviceContext_->SetDepthStencilState(GraphicsState_.DepthSteniclState);
   pDeviceContext_->SetRasterizerState(GraphicsState_.RasterizerState);
    
-  pDeviceContext_->SetRenderTexture(vdl::RenderTexture(), vdl::DepthStencilTexture());
-
   pDeviceContext_->VSSetShader(VertexShader_);
   pDeviceContext_->VSSetConstantBuffers(0, 1, &ConstantBuffer_.GetDetail());
 
@@ -846,8 +845,8 @@ void CGUI::Draw()
 
       if (ClipRect.x < FrameBufferSize.x && ClipRect.y < FrameBufferSize.y && ClipRect.z >= 0.0f && ClipRect.w >= 0.0f)
       {
-        ClipRect.x = vdl::math::Max(ClipRect.x, 0.0f);
-        ClipRect.y = vdl::math::Max(ClipRect.y, 0.0f);
+        ClipRect.x = vdl::Math::Max(ClipRect.x, 0.0f);
+        ClipRect.y = vdl::Math::Max(ClipRect.y, 0.0f);
 
         // Apply scissor/clipping rectangle
         {

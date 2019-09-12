@@ -16,7 +16,7 @@ struct IBuffer
 
   virtual ~IBuffer() = default;
 
-  virtual BufferType GetType()const = 0;
+  [[nodiscard]] virtual BufferType GetType()const = 0;
 
-  virtual void* GetData() = 0;
+  [[nodiscard]] virtual void* GetData() = 0;
 };

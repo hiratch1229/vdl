@@ -26,8 +26,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Buffer\DirectX12\CBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\DirectX12\CDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\DirectX12\CDevice.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Shader\DirectX12\CShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

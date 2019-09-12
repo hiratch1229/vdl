@@ -1,6 +1,6 @@
 #pragma once
 #include "ID.hpp"
-#include "InputLayout.hpp"
+#include "Fwd.hpp"
 
 namespace vdl
 {
@@ -8,125 +8,151 @@ namespace vdl
   {
     ID ID_;
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ ==std::nullopt; }
-  public:
-    [[nodiscard]] constexpr bool operator==(const VertexShader& _VertexShader)const noexcept { return ID_ == _VertexShader.ID_; }
-    [[nodiscard]] constexpr bool operator!=(const VertexShader& _VertexShader)const noexcept { return ID_ != _VertexShader.ID_; }
-  public:
     VertexShader() = default;
-
-    ~VertexShader();
 
     VertexShader(const char* _FilePath, InputLayout _InputLayout, const char* _EntryPoint = "main");
 
     VertexShader(const char* _Source, uint _DataSize, InputLayout _InputLayout, const char* _EntryPoint = "main");
 
+    VertexShader(const VertexShader& _VertexShader);
+
     VertexShader& operator=(const VertexShader& _VertexShader);
+
+    ~VertexShader();
+  public:
+    [[nodiscard]] constexpr bool operator==(const VertexShader& _VertexShader)const noexcept { return ID_ == _VertexShader.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const VertexShader& _VertexShader)const noexcept { return ID_ != _VertexShader.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ ==std::nullopt; }
+
+    [[nodiscard]] InputLayout GetInputLayout()const;
   };
 
   class HullShader
   {
     ID ID_;
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-  public:
-    [[nodiscard]] constexpr bool operator==(const HullShader& _HullShader)const noexcept { return ID_ == _HullShader.ID_; }
-    [[nodiscard]] constexpr bool operator!=(const HullShader& _HullShader)const noexcept { return ID_ != _HullShader.ID_; }
-  public:
     HullShader() = default;
-
-    ~HullShader();
 
     HullShader(const char* _FilePath, const char* _EntryPoint = "main");
     
     HullShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
+    HullShader(const HullShader& _HullShader);
+
     HullShader& operator=(const HullShader& _HullShader);
+
+    ~HullShader();
+  public:
+    [[nodiscard]] constexpr bool operator==(const HullShader& _HullShader)const noexcept { return ID_ == _HullShader.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const HullShader& _HullShader)const noexcept { return ID_ != _HullShader.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
   class DomainShader
   {
     ID ID_;
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-  public:
-    [[nodiscard]] constexpr bool operator==(const DomainShader& _DomainShader)const noexcept { return ID_ == _DomainShader.ID_; }
-    [[nodiscard]] constexpr bool operator!=(const DomainShader& _DomainShader)const noexcept { return ID_ != _DomainShader.ID_; }
-  public:
     DomainShader() = default;
-
-    ~DomainShader();
 
     DomainShader(const char* _FilePath, const char* _EntryPoint = "main");
 
     DomainShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
+    DomainShader(const DomainShader& _DomainShader);
+
     DomainShader& operator=(const DomainShader& _DomainShader);
+
+    ~DomainShader();
+  public:
+    [[nodiscard]] constexpr bool operator==(const DomainShader& _DomainShader)const noexcept { return ID_ == _DomainShader.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const DomainShader& _DomainShader)const noexcept { return ID_ != _DomainShader.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
   class GeometryShader
   {
     ID ID_;
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-  public:
-    [[nodiscard]] constexpr bool operator==(const GeometryShader& _GeometryShader)const noexcept { return ID_ == _GeometryShader.ID_; }
-    [[nodiscard]] constexpr bool operator!=(const GeometryShader& _GeometryShader)const noexcept { return ID_ != _GeometryShader.ID_; }
-  public:
     GeometryShader() = default;
-
-    ~GeometryShader();
 
     GeometryShader(const char* _FilePath, const char* _EntryPoint = "main");
 
     GeometryShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
+    GeometryShader(const GeometryShader& _GeometryShader);
+
     GeometryShader& operator=(const GeometryShader& _GeometryShader);
+
+    ~GeometryShader();
+  public:
+    [[nodiscard]] constexpr bool operator==(const GeometryShader& _GeometryShader)const noexcept { return ID_ == _GeometryShader.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const GeometryShader& _GeometryShader)const noexcept { return ID_ != _GeometryShader.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
   class PixelShader
   {
     ID ID_;
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-  public:
-    [[nodiscard]] constexpr bool operator==(const PixelShader& _PixelShader)const noexcept { return ID_ == _PixelShader.ID_; }
-    [[nodiscard]] constexpr bool operator!=(const PixelShader& _PixelShader)const noexcept { return ID_ != _PixelShader.ID_; }
-  public:
     PixelShader() = default;
-
-    ~PixelShader();
-
+    
     PixelShader(const char* _FilePath, const char* _EntryPoint = "main");
 
     PixelShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
+    PixelShader(const PixelShader& _PixelShader);
+
     PixelShader& operator=(const PixelShader& _PixelShader);
+
+    ~PixelShader();
+  public:
+    [[nodiscard]] constexpr bool operator==(const PixelShader& _PixelShader)const noexcept { return ID_ == _PixelShader.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const PixelShader& _PixelShader)const noexcept { return ID_ != _PixelShader.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
   class ComputeShader
   {
     ID ID_;
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-  public:
-    [[nodiscard]] constexpr bool operator==(const ComputeShader& _ComputeShader)const noexcept { return ID_ == _ComputeShader.ID_; }
-    [[nodiscard]] constexpr bool operator!=(const ComputeShader& _ComputeShader)const noexcept { return ID_ != _ComputeShader.ID_; }
-  public:
     ComputeShader() = default;
-
-    ~ComputeShader();
 
     ComputeShader(const char* _FilePath, const char* _EntryPoint = "main");
 
     ComputeShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
+    ComputeShader(const ComputeShader& _ComputeShader);
+
     ComputeShader& operator=(const ComputeShader& _ComputeShader);
+
+    ~ComputeShader();
+  public:
+    [[nodiscard]] constexpr bool operator==(const ComputeShader& _ComputeShader)const noexcept { return ID_ == _ComputeShader.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const ComputeShader& _ComputeShader)const noexcept { return ID_ != _ComputeShader.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 }

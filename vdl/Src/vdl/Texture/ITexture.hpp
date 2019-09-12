@@ -1,4 +1,5 @@
 #pragma once
+#include <vdl/Type2.hpp>
 
 enum class TextureType
 {
@@ -14,5 +15,7 @@ struct ITexture
 
   virtual ~ITexture() = default;
 
-  virtual TextureType GetType()const = 0;
+  [[nodiscard]] virtual TextureType GetType()const = 0;
+
+  [[nodiscard]] virtual vdl::uint2 GetSize()const = 0;
 };

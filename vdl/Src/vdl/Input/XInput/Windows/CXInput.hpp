@@ -28,13 +28,13 @@ private:
 private:
   Status Status_[Constants::kMaxController];
 private:
-  bool isWithinRange(int _Index)const
+  bool isWithinRange(vdl::uint _Index)const
   {
     return (Status_[_Index].isConnect && 0 <= _Index && _Index < Constants::kMaxController);
   }
-  bool isWithinRange(int _Number, int _Index)const
+  bool isWithinRange(vdl::uint _Index, vdl::uint _Code)const
   {
-    return (Status_[_Index].isConnect && 0 <= _Number && _Number < Constants::kXInputButtonNum && 0 <= _Index && _Index < Constants::kMaxController);
+    return (Status_[_Index].isConnect && 0 <= _Code && _Code < Constants::kXInputButtonNum && 0 <= _Index && _Index < Constants::kMaxController);
   }
 public:
   CXInput() = default;
@@ -43,88 +43,40 @@ public:
 
   void Update()override;
 
-  bool Press(int _Number, int _Index)const override
+  bool Press(vdl::uint _Index, vdl::uint _Code)const override
   {
-    return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Press() : false;
+    return isWithinRange(_Index, _Code) ? Status_[_Index].InputStatus[_Code].Press() : false;
   }
 
-  bool Pressed(int _Number, int _Index)const override
+  bool Pressed(vdl::uint _Index, vdl::uint _Code)const override
   {
-    return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Pressed() : false;
+    return isWithinRange(_Index, _Code) ? Status_[_Index].InputStatus[_Code].Pressed() : false;
   }
 
-  bool Released(int _Number, int _Index)const override
+  bool Released(vdl::uint _Index, vdl::uint _Code)const override
   {
-    return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Released() : false;
+    return isWithinRange(_Index, _Code) ? Status_[_Index].InputStatus[_Code].Released() : false;
   }
 
-  bool Release(int _Number, int _Index)const override
+  bool Release(vdl::uint _Index, vdl::uint _Code)const override
   {
-    return isWithinRange(_Number, _Index) ? Status_[_Index].InputStatus[_Number].Release() : false;
+    return isWithinRange(_Index, _Code) ? Status_[_Index].InputStatus[_Code].Release() : false;
   }
 
-  bool isConnect(int _Index)const override
+  bool isConnect(vdl::uint _Index)const override
   {
     return isWithinRange(_Index) ? Status_[_Index].isConnect : false;
   }
 
-  bool AnyButtonPress(int _Index)const override
-  {
-    if (!(isWithinRange(_Index))) return false;
+  vdl::float2 GetLeftStick(vdl::uint _Index, float _DeadZone)const override;
 
-    for (int i = 0; i < Constants::kXInputButtonNum; ++i)
-    {
-      if (Press(i, _Index))
-      {
-        return true;
-      }
-    }
+  vdl::float2 GetRightStick(vdl::uint _Index, float _DeadZone)const override;
 
-    //  ‰½‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
+  float GetLeftTrigger(vdl::uint _Index, float _DeadZone)const override;
 
-  bool AnyButtonPressed(int _Index)const override
-  {
-    if (!(isWithinRange(_Index))) return false;
+  float GetRightTrigger(vdl::uint _Index, float _DeadZone)const override;
 
-    for (int i = 0; i < Constants::kXInputButtonNum; ++i)
-    {
-      if (Pressed(i, _Index))
-      {
-        return true;
-      }
-    }
+  void SetVibration(vdl::uint _Index, float _Speed)const override;
 
-    //  ‰½‚à‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
-
-  bool AnyButtonReleased(int _Index)const override
-  {
-    if (!(isWithinRange(_Index))) return false;
-
-    for (int i = 0; i < Constants::kXInputButtonNum; ++i)
-    {
-      if (Released(i, _Index))
-      {
-        return true;
-      }
-    }
-
-    //  ‰½‚à—£‚³‚ê‚Ä‚¢‚È‚¢
-    return false;
-  }
-
-  vdl::float2 GetLeftStick(int _Index, float _DeadZone)const override;
-
-  vdl::float2 GetRightStick(int _Index, float _DeadZone)const override;
-
-  float GetLeftTrigger(int _Index, float _DeadZone)const override;
-
-  float GetRightTrigger(int _Index, float _DeadZone)const override;
-
-  void SetVibration(int _Index, float _Speed)const override;
-
-  void StopVibration(int _Index)const override;
+  void StopVibration(vdl::uint _Index)const override;
 };

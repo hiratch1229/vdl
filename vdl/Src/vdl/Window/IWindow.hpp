@@ -15,7 +15,7 @@ public:
 
   virtual void Show(bool _isShow) = 0;
 
-  virtual void* GetHandle()const = 0;
+  [[nodiscard]] virtual void* GetHandle()const = 0;
 
-  virtual vdl::uint2 GetWindowSize()const = 0;
+  [[nodiscard]] virtual vdl::uint2 GetWindowSize()const = 0;
 };

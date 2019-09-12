@@ -15,13 +15,13 @@ public:
 
   virtual void Initialize() = 0;
 
-  virtual ID Load(const vdl::SkinnedMeshData& _MeshData) = 0;
+  [[nodiscard]] virtual vdl::ID Load(const vdl::SkinnedMeshData& _MeshData) = 0;
 
-  virtual std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize) = 0;
+  [[nodiscard]] virtual std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize) = 0;
 
-  virtual void AddRef(const ID& _ID) = 0;
+  virtual void AddRef(const vdl::ID& _ID) = 0;
 
-  virtual void Release(const ID& _ID) = 0;
+  virtual void Release(const vdl::ID& _ID) = 0;
 
-  virtual Mesh* GetMesh(const ID& _ID) = 0;
+  [[nodiscard]] virtual Mesh* GetMesh(const vdl::ID& _ID) = 0;
 };

@@ -48,7 +48,7 @@ public:
 
   void DisableDefaultActions(vdl::uint _DefaultActionFlags)override { ValidDefaultActions_ &= ~_DefaultActionFlags; }
 
-  void ReportDefaultActions(vdl::uint _DefaultActionFlags)override { DefaultActionFlags_ |= _DefaultActionFlags; }
+  void ReportDefaultActions(vdl::uint _DefaultActionFlags)override { DefaultActionFlags_ |= (ValidDefaultActions_ & _DefaultActionFlags); }
 
   void SetMaxFramerate(vdl::uint _MaxFramerate)override { FrameInterval_ = (_MaxFramerate == 0 ? 0.0 : 1.0 / _MaxFramerate) * MilliSecondsPerFrequency_; }
 

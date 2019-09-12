@@ -75,12 +75,12 @@ vdl::Image TextureLoader::GetImage(IWICBitmapDecoder* _pDecoder)const
     hr = pConverter->Initialize(pFrame.Get(), GUID_WICPixelFormat32bppRGBA, WICBitmapDitherTypeErrorDiffusion, nullptr, 0, WICBitmapPaletteTypeCustom);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
-    hr = pConverter->CopyPixels(0, Image.Stride(), Image.BufferSize(), &Image.Buffer()->R);
+    hr = pConverter->CopyPixels(0, Image.Stride(), Image.BufferSize(), &Image.Buffer()->Red);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
   else
   {
-    hr = pFrame->CopyPixels(0, Image.Stride(), Image.BufferSize(), &Image.Buffer()->R);
+    hr = pFrame->CopyPixels(0, Image.Stride(), Image.BufferSize(), &Image.Buffer()->Red);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 

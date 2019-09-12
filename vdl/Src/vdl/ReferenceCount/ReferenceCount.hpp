@@ -11,7 +11,7 @@ class ReferenceCount
   vdl::uint Count_ = 0;
 public:
   void AddRef() { if (Ptr_) { ++Count_; } }
-  void Release() { if (Count_ > 0 && --Count_ == 0) { vdl::macro::SafeDelete(Ptr_); } }
+  void Release() { if (Count_ > 0 && --Count_ == 0) { vdl::Macro::SafeDelete(Ptr_); } }
 private:
   void Swap(ReferenceCount& _Other)
   {
@@ -103,13 +103,13 @@ class ReferenceCounts
 private:
   std::vector<Type> ReferenceCounts_;
 public:
-  Type& Get(ID _ID) { return ReferenceCounts_[*_ID]; }
+  Type& Get(vdl::ID _ID) { return ReferenceCounts_[*_ID]; }
 public:
   ReferenceCounts() = default;
 
   ~ReferenceCounts() = default;
 
-  ID Add(Type _Obj)
+  vdl::ID Add(Type _Obj)
   {
     vdl::uint Index = 0;
     {

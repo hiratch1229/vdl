@@ -62,17 +62,9 @@ namespace vdl
       DataType Data;
     };
 #pragma warning(default:4201)
-    bool operator==(const DepthStencilOpDesc& _DepthStencilOpDesc)const noexcept { return Data == _DepthStencilOpDesc.Data; }
-    bool operator!=(const DepthStencilOpDesc& _DepthStencilOpDesc)const noexcept { return !((*this) == _DepthStencilOpDesc); }
   public:
-    constexpr DepthStencilOpDesc(StencilOp _FailOp,
-      StencilOp _DepthFailOp,
-      StencilOp _PassOp,
-      ComparisonFunc _Func)
-      : FailOp(_FailOp),
-      DepthFailOp(_DepthFailOp),
-      PassOp(_PassOp),
-      Func(_Func) {}
+    constexpr DepthStencilOpDesc(StencilOp _FailOp, StencilOp _DepthFailOp, StencilOp _PassOp, ComparisonFunc _Func)
+      : FailOp(_FailOp), DepthFailOp(_DepthFailOp), PassOp(_PassOp), Func(_Func) {}
 
     DepthStencilOpDesc(PreDefined _PreDefined)
     {
@@ -84,6 +76,9 @@ namespace vdl
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
+    [[nodiscard]] constexpr bool operator==(const DepthStencilOpDesc& _DepthStencilOpDesc)const noexcept { return Data == _DepthStencilOpDesc.Data; }
+
+    [[nodiscard]] constexpr bool operator!=(const DepthStencilOpDesc& _DepthStencilOpDesc)const noexcept { return Data != _DepthStencilOpDesc.Data;; }
   };
 
   struct DepthStencilState
@@ -93,7 +88,7 @@ namespace vdl
     {
       eDefault2D,
       eDefault3D,
-      
+
       eNum
     };
   public:
@@ -118,21 +113,10 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
-    bool operator==(const DepthStencilState& _DepthStencilState)const noexcept { return Data == _DepthStencilState.Data; }
-    bool operator!=(const DepthStencilState& _DepthStencilState)const noexcept { return !((*this) == _DepthStencilState); }
-  public:
-    constexpr DepthStencilState(bool _DepthEnable = true,
-      WriteMask _DepthWriteMask = WriteMask::eAll,
-      ComparisonFunc _DepthFunc = ComparisonFunc::eLess,
-      bool _StencilEnable = false,
-      const DepthStencilOpDesc& _FrontFace = DepthStencilOpDesc::kDefaultFront,
-      const DepthStencilOpDesc& _BackFace = DepthStencilOpDesc::kDefaultBack)
-      : DepthEnable(_DepthEnable),
-      DepthWriteMask(_DepthWriteMask),
-      DepthFunc(_DepthFunc),
-      StencilEnable(_StencilEnable),
-      FrontFace(_FrontFace),
-      BackFace(_BackFace){}
+    constexpr DepthStencilState(bool _DepthEnable = true, WriteMask _DepthWriteMask = WriteMask::eAll, ComparisonFunc _DepthFunc = ComparisonFunc::eLess,
+      bool _StencilEnable = false, const DepthStencilOpDesc& _FrontFace = DepthStencilOpDesc::kDefaultFront, const DepthStencilOpDesc& _BackFace = DepthStencilOpDesc::kDefaultBack)
+      : DepthEnable(_DepthEnable), DepthWriteMask(_DepthWriteMask), DepthFunc(_DepthFunc),
+      StencilEnable(_StencilEnable), FrontFace(_FrontFace), BackFace(_BackFace) {}
 
     DepthStencilState(PreDefined _PreDefined)
     {
@@ -144,5 +128,9 @@ namespace vdl
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
+  public:
+    [[nodiscard]] constexpr bool operator==(const DepthStencilState& _DepthStencilState)const noexcept { return Data == _DepthStencilState.Data; }
+
+    [[nodiscard]] constexpr bool operator!=(const DepthStencilState& _DepthStencilState)const noexcept { return Data != _DepthStencilState.Data; }
   };
 }

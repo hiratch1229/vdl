@@ -1,4 +1,5 @@
 #pragma once
+
 using UINT = unsigned int;
 
 namespace vdl

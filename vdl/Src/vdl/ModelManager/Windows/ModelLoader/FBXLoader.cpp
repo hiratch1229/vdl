@@ -184,10 +184,10 @@ void FBXLoader::FetchMaterials(fbxsdk::FbxMesh* _pMesh, Materials* _pMaterials, 
         const fbxsdk::FbxDouble3 Color = Property.Get<fbxsdk::FbxDouble3>();
         const double f = Factor.Get<fbxsdk::FbxDouble>();
 
-        _pProperty->Color.R = static_cast<float>(Color[0] * f);
-        _pProperty->Color.G = static_cast<float>(Color[1] * f);
-        _pProperty->Color.B = static_cast<float>(Color[2] * f);
-        _pProperty->Color.A = 1.0f;
+        _pProperty->Color.Red = static_cast<float>(Color[0] * f);
+        _pProperty->Color.Green = static_cast<float>(Color[1] * f);
+        _pProperty->Color.Blue = static_cast<float>(Color[2] * f);
+        _pProperty->Color.Alpha = 1.0f;
       }
 
       if (Property.IsValid())

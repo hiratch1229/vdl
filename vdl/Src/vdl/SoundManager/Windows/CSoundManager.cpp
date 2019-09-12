@@ -11,7 +11,7 @@ void CSoundManager::Initialize()
   hWnd_ = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());
 }
 
-ID CSoundManager::Load(const char* _FilePath)
+vdl::ID CSoundManager::Load(const char* _FilePath)
 {
   //  エラーチェック用
   HRESULT hr = S_OK;

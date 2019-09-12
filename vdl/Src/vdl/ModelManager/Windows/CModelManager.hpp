@@ -14,13 +14,13 @@ public:
 
   void Initialize()override;
 
-  ID Load(const vdl::SkinnedMeshData& _MeshData)override;
+  vdl::ID Load(const vdl::SkinnedMeshData& _MeshData)override;
 
   std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize)override;
 
-  void AddRef(const ID& _ID)override { Meshes_.Get(_ID).AddRef(); }
+  void AddRef(const vdl::ID& _ID)override { Meshes_.Get(_ID).AddRef(); }
 
-  void Release(const ID& _ID)override { Meshes_.Get(_ID).Release(); }
+  void Release(const vdl::ID& _ID)override { Meshes_.Get(_ID).Release(); }
 
-  Mesh* GetMesh(const ID& _ID)override { return Meshes_.Get(_ID).Get(); }
+  Mesh* GetMesh(const vdl::ID& _ID)override { return Meshes_.Get(_ID).Get(); }
 };

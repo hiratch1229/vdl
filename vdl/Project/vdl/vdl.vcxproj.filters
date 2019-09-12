@@ -79,6 +79,12 @@
     <Filter Include="Src\BufferManager">
       <UniqueIdentifier>{21f5958c-6773-4923-94ab-41a3bbb95007}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Renderer\RendererCommand">
+      <UniqueIdentifier>{4fb7279a-721c-4d2b-ae4a-3d8fc9c76ae9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Model">
+      <UniqueIdentifier>{f0a97c9e-6df9-4fec-8760-9528628b69ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -291,6 +297,33 @@
     <ClInclude Include="..\..\Include\vdl\Topology.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.hpp">
+      <Filter>Src\Renderer\RendererCommand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Renderer.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Gamepad.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\XInput.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Keyboard.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Window.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\RendererTexure.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\RendererStaticMesh.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\RendererSkinnedMesh.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -358,6 +391,36 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp">
       <Filter>Src\BufferManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.cpp">
+      <Filter>Src\Renderer\RendererCommand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Input\Mouse\Mouse.cpp">
+      <Filter>Src\Input\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Shader\Shader.cpp">
+      <Filter>Src\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\System\System.cpp">
+      <Filter>Src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Texture\Texture.cpp">
+      <Filter>Src\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Model\Model.cpp">
+      <Filter>Src\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Window\Window.cpp">
+      <Filter>Src\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Input\XInput\XInput.cpp">
+      <Filter>Src\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Input\Gamepad\Gamepad.cpp">
+      <Filter>Src\Input\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Renderer\Renderer.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

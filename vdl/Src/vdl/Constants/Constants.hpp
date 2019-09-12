@@ -14,6 +14,18 @@ namespace Constants
 
   constexpr vdl::uint kMaxCharacterNum = vdl::Constants::kMaxCharacterNum;
 
+  constexpr const char* kDefaultTextureVertexShaderFilePath = vdl::Constants::kDefaultTextureVertexShaderFilePath;
+
+  constexpr const char* kDefaultTexturePixelShaderFilePath = vdl::Constants::kDefaultTexturePixelShaderFilePath;
+
+  constexpr const char* kDefaultStaticMeshVertexShaderFilePath = vdl::Constants::kDefaultStaticMeshVertexShaderFilePath;
+
+  constexpr const char* kDefaultStaticMeshPixelShaderFilePath = vdl::Constants::kDefaultStaticMeshPixelShaderFilePath;
+
+  constexpr const char* kDefaultSkinnedMeshVertexShaderFilePath = vdl::Constants::kDefaultSkinnedMeshVertexShaderFilePath;
+
+  constexpr const char* kDefaultSkinnedMeshPixelShaderFilePath = vdl::Constants::kDefaultSkinnedMeshPixelShaderFilePath;
+  
   constexpr vdl::uint kXInputButtonNum = 14;
 
   constexpr vdl::uint kMax2DBatchNum = 256;

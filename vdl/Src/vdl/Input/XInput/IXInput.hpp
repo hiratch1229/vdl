@@ -15,31 +15,25 @@ public:
 
   virtual void Update() = 0;
 
-  virtual bool Press(int _Number, int _Index)const = 0;
+  [[nodiscard]] virtual bool Press(vdl::uint _Index, vdl::uint _Code)const = 0;
 
-  virtual bool Pressed(int _Number, int _Index)const = 0;
+  [[nodiscard]] virtual bool Pressed(vdl::uint _Index, vdl::uint _Code)const = 0;
 
-  virtual bool Released(int _Number, int _Index)const = 0;
+  [[nodiscard]] virtual bool Released(vdl::uint _Index, vdl::uint _Code)const = 0;
 
-  virtual bool Release(int _Number, int _Index)const = 0;
+  [[nodiscard]] virtual bool Release(vdl::uint _Index, vdl::uint _Code)const = 0;
 
-  virtual bool isConnect(int _Index)const = 0;
+  [[nodiscard]] virtual bool isConnect(vdl::uint _Index)const = 0;
 
-  virtual bool AnyButtonPress(int _Index)const = 0;
+  [[nodiscard]] virtual vdl::float2 GetLeftStick(vdl::uint _Index, float _DeadZone)const = 0;
 
-  virtual bool AnyButtonPressed(int _Index)const = 0;
+  [[nodiscard]] virtual vdl::float2 GetRightStick(vdl::uint _Index, float _DeadZone)const = 0;
 
-  virtual bool AnyButtonReleased(int _Index)const = 0;
+  [[nodiscard]] virtual float GetLeftTrigger(vdl::uint _Index, float _DeadZone)const = 0;
 
-  virtual vdl::float2 GetLeftStick(int _Index, float _DeadZone)const = 0;
+  [[nodiscard]] virtual float GetRightTrigger(vdl::uint _Index, float _DeadZone)const = 0;
 
-  virtual vdl::float2 GetRightStick(int _Index, float _DeadZone)const = 0;
+  virtual void SetVibration(vdl::uint _Index, float _Speed)const = 0;
 
-  virtual float GetLeftTrigger(int _Index, float _DeadZone)const = 0;
-
-  virtual float GetRightTrigger(int _Index, float _DeadZone)const = 0;
-
-  virtual void SetVibration(int _Index, float _Speed)const = 0;
-
-  virtual void StopVibration(int _Index)const = 0;
+  virtual void StopVibration(vdl::uint _Index)const = 0;
 };
