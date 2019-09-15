@@ -85,6 +85,15 @@
     <Filter Include="Src\Model">
       <UniqueIdentifier>{f0a97c9e-6df9-4fec-8760-9528628b69ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Collision2D">
+      <UniqueIdentifier>{953cb359-0249-4203-a406-b253214d15ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Collision3D">
+      <UniqueIdentifier>{38b543fb-4aba-413d-b004-74391346657b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\MeshData">
+      <UniqueIdentifier>{11ac7080-e54d-4588-89a9-7b9a25f1ec32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -324,6 +333,24 @@
     <ClInclude Include="..\..\Include\vdl\RendererSkinnedMesh.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Collision2D.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Collision3D.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Circle.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Box.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Capsule.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Sphere.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -421,6 +448,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Renderer\Renderer.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Collision2D\Collision2D.cpp">
+      <Filter>Src\Collision2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp">
+      <Filter>Src\MeshData</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

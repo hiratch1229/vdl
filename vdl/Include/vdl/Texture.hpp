@@ -20,7 +20,7 @@ namespace vdl
     Texture(const Image& _Image);
 
     //  Fî•ñ‚©‚çì¬
-    Texture(const ColorF& _Color);
+    Texture(const Color& _Color);
 
     Texture(const Texture& _Texture);
 

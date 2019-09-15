@@ -20,6 +20,10 @@ namespace vdl
   public:
     operator DirectX::XMVECTOR()const noexcept { return { x, y, z, w }; }
   public:
+    [[nodiscard]] constexpr bool operator==(const Quaternion& _q)const noexcept { return x == _q.x && y == _q.y && z == _q.z && w == _q.w; }
+
+    [[nodiscard]] constexpr bool operator!=(const Quaternion& _q)const noexcept { return x != _q.x || y != _q.y || z != _q.z || w != _q.w; }
+    
     [[nodiscard]] Quaternion operator*(const Quaternion& _q)const { return DirectX::XMQuaternionMultiply(*this, _q); }
 
     Quaternion& operator=(const Quaternion& _q)noexcept

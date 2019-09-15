@@ -15,7 +15,7 @@ namespace vdl
     ID_ = Engine::Get<ITextureManager>()->Load(_Image);
   }
 
-  Texture::Texture(const ColorF& _Color)
+  Texture::Texture(const Color& _Color)
   {
     Image Image;
     {

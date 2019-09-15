@@ -22,8 +22,13 @@
     <ClInclude Include="..\..\Include\vdl.hpp" />
     <ClInclude Include="..\..\Include\vdl\Angle.hpp" />
     <ClInclude Include="..\..\Include\vdl\BlendState.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Box.hpp" />
     <ClInclude Include="..\..\Include\vdl\Button.hpp" />
     <ClInclude Include="..\..\Include\vdl\Camera.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Capsule.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Circle.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Collision2D.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Collision3D.hpp" />
     <ClInclude Include="..\..\Include\vdl\Color.hpp" />
     <ClInclude Include="..\..\Include\vdl\ConstantBuffer.hpp" />
     <ClInclude Include="..\..\Include\vdl\Constants.hpp" />
@@ -58,6 +63,7 @@
     <ClInclude Include="..\..\Include\vdl\Serialize.hpp" />
     <ClInclude Include="..\..\Include\vdl\Shader.hpp" />
     <ClInclude Include="..\..\Include\vdl\Singleton.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Sphere.hpp" />
     <ClInclude Include="..\..\Include\vdl\System.hpp" />
     <ClInclude Include="..\..\Include\vdl\Texture.hpp" />
     <ClInclude Include="..\..\Include\vdl\Topology.hpp" />
@@ -101,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Collision2D\Collision2D.cpp" />
     <ClCompile Include="..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />
@@ -114,6 +121,7 @@
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\MouseFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\XInput\XInput.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\XInput\XInputFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\ModelManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Model\Model.cpp" />
     <ClCompile Include="..\..\Src\vdl\Renderer\CRenderer.cpp" />

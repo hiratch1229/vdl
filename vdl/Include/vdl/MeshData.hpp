@@ -31,6 +31,11 @@ namespace vdl
     std::vector<IndexType> Indices;
     std::vector<Material> Materials;
     Matrix GlobalTransform = Matrix::Identity();
+  public:
+    static StaticMeshData Rectangle(const Texture& _Diffuse = Palette::White);
+    static StaticMeshData Box(const Texture& _Diffuse = Palette::White);
+    static StaticMeshData Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse = Palette::White);
+    //static StaticMeshData Capsule(uint _SliceCount, uint _StackCount, float _Height, const Texture& _Diffuse = Palette::White);
   };
 
   struct Bone

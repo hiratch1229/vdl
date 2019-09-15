@@ -63,8 +63,8 @@ private:
   OutputManager OutputManager_;
   vdl::GraphicsState GraphicsStates_[kRenderTypes];
   Shaders Shaders_[kRenderTypes];
-  Samplers Samplers_[kRenderTypes][kShaderTypes];
   Textures Textures_[kRenderTypes][kShaderTypes];
+  Samplers Samplers_[kRenderTypes][kShaderTypes];
   ConstantBuffers ConstantBuffers_[kRenderTypes][kShaderTypes];
 private:
   void SetGraphicsStateAndOutputManager(vdl::InputLayout _InputLayout);
@@ -149,20 +149,6 @@ public:
     Shaders_[static_cast<vdl::uint>(_Type)].PixelShader = _PixelShader;
   }
 
-  void SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Sampler[], ShaderType _Stage, RenderType _Type)override
-  {
-    assert(static_cast<vdl::uint>(_Type) < kRenderTypes && static_cast<vdl::uint>(_Stage) < kShaderTypes);
-
-    Samplers& Samplers = Samplers_[static_cast<vdl::uint>(_Type)][static_cast<vdl::uint>(_Stage)];
-
-    if (const vdl::uint RequiredSize = _StartSlot + _SamplerNum; Samplers.size())
-    {
-      Samplers.resize(RequiredSize);
-    }
-
-    ::memcpy(&Samplers[_StartSlot], _Sampler, _SamplerNum * sizeof(vdl::Sampler));
-  }
-
   void SetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[], ShaderType _Stage, RenderType _Type)override
   {
     assert(static_cast<vdl::uint>(_Type) < kRenderTypes && static_cast<vdl::uint>(_Stage) < kShaderTypes);
@@ -175,6 +161,20 @@ public:
     }
 
     ::memcpy(&Textures[_StartSlot], _Textures, _TextureNum * sizeof(vdl::Texture));
+  }
+
+  void SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Sampler[], ShaderType _Stage, RenderType _Type)override
+  {
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes && static_cast<vdl::uint>(_Stage) < kShaderTypes);
+
+    Samplers& Samplers = Samplers_[static_cast<vdl::uint>(_Type)][static_cast<vdl::uint>(_Stage)];
+
+    if (const vdl::uint RequiredSize = _StartSlot + _SamplerNum; Samplers.size())
+    {
+      Samplers.resize(RequiredSize);
+    }
+
+    ::memcpy(&Samplers[_StartSlot], _Sampler, _SamplerNum * sizeof(vdl::Sampler));
   }
 
   void SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _BufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[], ShaderType _Stage, RenderType _Type)override

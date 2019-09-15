@@ -4,18 +4,25 @@
 namespace vdl
 {
   //-------------------------
-  //  Type.hpp
+  //  Type2.hpp
   //-------------------------
   template<class Type> struct Type2;
-  template<class Type> struct Type3;
-  template<class Type> struct Type4;
-
   using int2 = Type2<int>;
   using uint2 = Type2<unsigned int>;
   using float2 = Type2<float>;
+
+  //-------------------------
+  //  Type3.hpp
+  //-------------------------
+  template<class Type> struct Type3;
   using int3 = Type3<int>;
   using uint3 = Type3<unsigned int>;
   using float3 = Type3<float>;
+
+  //-------------------------
+  //  Type4.hpp
+  //-------------------------
+  template<class Type> struct Type4;
   using int4 = Type4<int>;
   using uint4 = Type4<unsigned int>;
   using float4 = Type4<float>;
@@ -49,14 +56,14 @@ namespace vdl
   struct Vertex3D;
 
   //-------------------------
-  //  Image.hpp
+  //  InputLayout.hpp
   //-------------------------
-  class Image;
+  enum class InputLayout : uint8_t;
 
   //-------------------------
-  //  Format.hpp
+  //  Topology.hpp
   //-------------------------
-  enum class Format;
+  enum class Topology : uint8_t;
 
   //-------------------------
   //  Scissor.hpp
@@ -89,9 +96,24 @@ namespace vdl
   struct GraphicsState;
 
   //-------------------------
-  //  Sampler.hpp
+  //  Shader.hpp
   //-------------------------
-  struct Sampler;
+  class VertexShader;
+  class HullShader;
+  class DomainShader;
+  class GeometryShader;
+  class PixelShader;
+  class ComputeShader;
+
+  //-------------------------
+  //  Image.hpp
+  //-------------------------
+  class Image;
+
+  //-------------------------
+  //  Format.hpp
+  //-------------------------
+  enum class Format;
 
   //-------------------------
   //  Texture.hpp
@@ -99,6 +121,17 @@ namespace vdl
   class Texture;
   class RenderTexture;
   class DepthStencilTexture;
+
+  //-------------------------
+  //  Sampler.hpp
+  //-------------------------
+  struct Sampler;
+
+  //-------------------------
+  //  ConstantBuffer.hpp
+  //-------------------------
+  namespace Detail { class ConstantBufferData; }
+  template<class T> class ConstantBuffer;
 
   //-------------------------
   //  MotionData.hpp
@@ -120,28 +153,39 @@ namespace vdl
   class Model;
 
   //-------------------------
-  //  ConstantBuffer.hpp
+  //  Cicle.hpp
   //-------------------------
-  namespace Detail { class ConstantBufferData; }
-  template<class T> class ConstantBuffer;
+  namespace Geometry2D { struct Circle; }
 
   //-------------------------
-  //  InputLayout.hpp
+  //  Box.hpp
   //-------------------------
-  enum class InputLayout : uint8_t;
+  namespace Geometry3D { struct AABB; }
+  namespace Geometry3D { struct OBB; }
+  
+  //-------------------------
+  //  Sphere.hpp
+  //-------------------------
+  namespace Geometry3D { struct Sphere; }
 
   //-------------------------
-  //  Topology.hpp
+  //  Capsule.hpp
   //-------------------------
-  enum class Topology : uint8_t;
+  namespace Geometry3D { struct Capsule; }
 
   //-------------------------
-  //  Shader.hpp
+  //  Button.hpp
   //-------------------------
-  class VertexShader;
-  class HullShader;
-  class DomainShader;
-  class GeometryShader;
-  class PixelShader;
-  class ComputeShader;
+  namespace Input { enum class InputDevice : uint8_t; }
+  namespace Input { class Button; }
+
+  //-------------------------
+  //  XInput.hpp
+  //-------------------------
+  namespace Input { class XInput; }
+
+  //-------------------------
+  //  Gamepad.hpp
+  //-------------------------
+  namespace Input { class Gamepad; }
 }

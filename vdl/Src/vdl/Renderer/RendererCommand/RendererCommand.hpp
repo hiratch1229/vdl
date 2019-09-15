@@ -28,9 +28,9 @@ private:
   std::vector<vdl::DomainShader> DomainShaders_;
   std::vector<vdl::GeometryShader> GeometryShaders_;
   std::vector<vdl::PixelShader> PixelShaders_;
-  std::array<std::vector<vdl::PixelShader>, kShaderTypes> Samplers_;
-  std::array<std::vector<vdl::PixelShader>, kShaderTypes> Textures_;
-  std::array<std::vector<vdl::PixelShader>, kShaderTypes> ConstantBuffers_;
+  std::array<std::vector<vdl::Sampler>, kShaderTypes> Samplers_;
+  std::array<std::vector<vdl::Texture>, kShaderTypes> Textures_;
+  std::array<std::vector<vdl::Detail::ConstantBufferData>, kShaderTypes> ConstantBuffers_;
 public:
   RendererCommandList() = default;
 

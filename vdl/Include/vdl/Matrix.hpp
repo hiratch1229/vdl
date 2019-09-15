@@ -54,6 +54,10 @@ namespace vdl
   public:
     operator DirectX::XMMATRIX()const noexcept { return { _11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44 }; }
   public:
+    [[nodiscard]] constexpr bool operator==(const Matrix& _m)const noexcept { return r[0] == _m.r[0] && r[1] == _m.r[1] && r[2] == _m.r[2] && r[3] == _m.r[3]; }
+
+    [[nodiscard]] constexpr bool operator!=(const Matrix& _m)const noexcept { return r[0] != _m.r[0] || r[1] != _m.r[1] || r[2] != _m.r[2] || r[3] != _m.r[3]; }
+
     [[nodiscard]] Matrix operator*(const Matrix& _m)const { return DirectX::XMMatrixMultiply(*this, _m); }
 
     Matrix& operator=(const Matrix& _m)noexcept

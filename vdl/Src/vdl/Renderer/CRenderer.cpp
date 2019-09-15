@@ -3,6 +3,8 @@
 #include <vdl/Engine.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
+#include <vdl/BufferManager/IBufferManager.hpp>
+#include <vdl/ShaderManager/IShaderManager.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 
