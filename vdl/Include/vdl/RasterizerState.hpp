@@ -5,15 +5,15 @@ namespace vdl
 {
   enum class FillMode : uint8_t
   {
-    eWireframe = 2,
-    eSolid = 3
+    eWireframe,
+    eSolid
   };
 
   enum class CullMode : uint8_t
   {
-    eNone = 1,
-    eFront = 2,
-    eBack = 3
+    eNone,
+    eFront,
+    eBack
   };
 
   struct RasterizerState
@@ -47,7 +47,7 @@ namespace vdl
     {
       struct
       {
-        FillMode Filling : 2;
+        FillMode Filling : 1;
         CullMode Culling : 2;
         bool FrontCounterClockwise : 1;
         int DepthBias;
@@ -82,4 +82,5 @@ namespace vdl
 
     [[nodiscard]] constexpr bool operator!=(const RasterizerState& _RasterizerState)const noexcept { return Data != _RasterizerState.Data; }
   };
+  static_assert(sizeof(RasterizerState) == sizeof(RasterizerState::DataType));
 }

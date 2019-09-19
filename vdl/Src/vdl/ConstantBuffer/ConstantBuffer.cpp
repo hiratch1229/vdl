@@ -46,8 +46,13 @@ namespace vdl::Detail
     return *this;
   }
 
-  void* ConstantBufferData::GetData()
+  void* ConstantBufferData::GetData()const
   {
     return Engine::Get<IBufferManager>()->GetBuffer(ID_)->GetData();
+  }
+
+  uint ConstantBufferData::GetSize()const
+  {
+    return Engine::Get<IBufferManager>()->GetBuffer(ID_)->GetSize();
   }
 }

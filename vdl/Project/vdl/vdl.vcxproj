@@ -126,7 +126,6 @@
     <ClCompile Include="..\..\Src\vdl\Model\Model.cpp" />
     <ClCompile Include="..\..\Src\vdl\Renderer\CRenderer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Renderer\Renderer.cpp" />
-    <ClCompile Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.cpp" />
     <ClCompile Include="..\..\Src\vdl\Renderer\RendererFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\ShaderManager\CShaderManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\ShaderManager\ShaderManagerFactory.cpp" />
@@ -140,6 +139,9 @@
     <ClCompile Include="..\..\Src\vdl\Texture\Texture.cpp" />
     <ClCompile Include="..\..\Src\vdl\Window\Window.cpp" />
     <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

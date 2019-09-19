@@ -25,8 +25,10 @@ namespace vdl
       [[nodiscard]] constexpr bool operator!=(const ConstantBufferData& _ConstantBufferData)const noexcept { return !(*this == _ConstantBufferData); }
     public:
       [[nodiscard]] ID GetID()const noexcept { return ID_; }
-     
-      [[nodiscard]] void* GetData();
+
+      [[nodiscard]] void* GetData()const;
+
+      [[nodiscard]] uint GetSize()const;
     };
   }
 

@@ -77,20 +77,24 @@ public:
 
   void Initialize()override;
 
-  void SetScissor(const vdl::Scissor& _Scissor)override
-  {
-    Scissor_ = _Scissor;
-  }
-
-  void SetViewport(const vdl::Viewport& _Viewport)override
-  {
-    Viewport_ = _Viewport;
-  }
-
   void SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture)override
   {
     Flush();
     OutputManager_ = { _RenderTexture, _DepthStencilTexture };
+  }
+
+  void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type)override
+  {
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
+    
+    Scissor_ = _Scissor;
+  }
+
+  void SetViewport(const vdl::Viewport& _Viewport, RenderType _Type)override
+  {
+    assert(static_cast<vdl::uint>(_Type) < kRenderTypes);
+   
+    Viewport_ = _Viewport;
   }
 
   void SetBlendState(const vdl::BlendState& _BlendState, RenderType _Type)override

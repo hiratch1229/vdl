@@ -419,9 +419,6 @@
     <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp">
       <Filter>Src\BufferManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.cpp">
-      <Filter>Src\Renderer\RendererCommand</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\Mouse.cpp">
       <Filter>Src\Input\Mouse</Filter>
     </ClCompile>
@@ -455,5 +452,10 @@
     <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp">
       <Filter>Src\MeshData</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl">
+      <Filter>Src\Renderer\RendererCommand</Filter>
+    </None>
   </ItemGroup>
 </Project>

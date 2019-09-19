@@ -28,11 +28,11 @@ public:
 
   virtual void Initialize() = 0;
 
-  virtual void SetScissor(const vdl::Scissor& _Scissor) = 0;
-
-  virtual void SetViewport(const vdl::Viewport& _Viewport) = 0;
-
   virtual void SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture) = 0;
+
+  virtual void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type) = 0;
+
+  virtual void SetViewport(const vdl::Viewport& _Viewport, RenderType _Type) = 0;
 
   virtual void SetBlendState(const vdl::BlendState& _BlendState, RenderType _Type) = 0;
 

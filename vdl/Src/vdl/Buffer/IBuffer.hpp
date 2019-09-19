@@ -19,4 +19,6 @@ struct IBuffer
   [[nodiscard]] virtual BufferType GetType()const = 0;
 
   [[nodiscard]] virtual void* GetData() = 0;
+
+  [[nodiscard]] virtual vdl::uint GetSize() = 0;
 };

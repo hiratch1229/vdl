@@ -7,12 +7,18 @@
 namespace Constants
 {
   constexpr vdl::uint kMaxBoneNum = vdl::Constants::kMaxBoneNum;
-  
+
   constexpr vdl::uint kMaxBoneInfluence = vdl::Constants::kMaxBoneInfluence;
 
   constexpr vdl::uint kMaxController = vdl::Constants::kMaxController;
 
   constexpr vdl::uint kMaxCharacterNum = vdl::Constants::kMaxCharacterNum;
+
+  constexpr vdl::uint kMaxSamplerNum = vdl::Constants::kMaxSamplerNum;
+
+  constexpr vdl::uint kMaxTextureNum = vdl::Constants::kMaxTextureNum;
+
+  constexpr vdl::uint kMaxConstantBufferNum = vdl::Constants::kMaxConstantBufferNum;
 
   constexpr const char* kDefaultTextureVertexShaderFilePath = vdl::Constants::kDefaultTextureVertexShaderFilePath;
 
@@ -25,12 +31,16 @@ namespace Constants
   constexpr const char* kDefaultSkinnedMeshVertexShaderFilePath = vdl::Constants::kDefaultSkinnedMeshVertexShaderFilePath;
 
   constexpr const char* kDefaultSkinnedMeshPixelShaderFilePath = vdl::Constants::kDefaultSkinnedMeshPixelShaderFilePath;
-  
+
   constexpr vdl::uint kXInputButtonNum = 14;
 
   constexpr vdl::uint kMax2DBatchNum = 256;
 
   constexpr vdl::uint kMax3DBatchNum = 32;
+
+  constexpr const char* kBinaryFileDirectory = "Bin/";
+
+  constexpr const char* kBinaryFileFormat = ".bin";
 
   constexpr const char* kClassName = "vdl";
 
@@ -43,8 +53,4 @@ namespace Constants
   constexpr vdl::Format kSwapChainFormat = vdl::Format::eR8G8B8A8_Unorm;
 
   constexpr vdl::Format kDepthStencilFormat = vdl::Format::eD24_Unorm_S8_Uint;
-
-  constexpr const char* kBinaryFileDirectory = "Bin/";
-
-  constexpr const char* kBinaryFileFormat = ".bin";
 }
