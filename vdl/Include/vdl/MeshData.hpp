@@ -1,6 +1,5 @@
 #pragma once
 #include "Matrix.hpp"
-#include "Color.hpp"
 #include "Types.hpp"
 #include "Texture.hpp"
 #include "Vertex.hpp"
@@ -11,15 +10,9 @@
 
 namespace vdl
 {
-  struct Property
-  {
-    Texture Texture;
-    ColorF Color;
-  };
-
   struct Material
   {
-    Property Diffuse;
+    Texture Diffuse;
     uint IndexStart = 0;
     uint IndexCount = 0;
   };

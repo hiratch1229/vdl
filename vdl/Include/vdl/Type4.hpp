@@ -118,7 +118,7 @@ namespace vdl
   public:
     [[nodiscard]] constexpr bool operator==(const Type4& _v)const noexcept { return x == _v.x && y == _v.y && z == _v.z && w == _v.w; }
 
-    [[nodiscard]] constexpr bool operator!=(const Type4& _v)const noexcept { return !(*this == _v); }
+    [[nodiscard]] constexpr bool operator!=(const Type4& _v)const noexcept { return x != _v.x || y != _v.y || z != _v.z || w != _v.w; }
 
     [[nodiscard]] constexpr Type4 operator+()const noexcept { return *this; }
 

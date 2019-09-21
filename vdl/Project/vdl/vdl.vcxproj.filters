@@ -351,6 +351,9 @@
     <ClInclude Include="..\..\Include\vdl\Sphere.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Half.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">

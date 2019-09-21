@@ -10,16 +10,6 @@ namespace vdl
 {
   namespace Renderer
   {
-    void SetScissor(const Scissor& _Scissor)
-    {
-      Engine::Get<IRenderer>()->SetScissor(_Scissor);
-    }
-
-    void SetViewport(const Viewport& _Viewport)
-    {
-      Engine::Get<IRenderer>()->SetViewport(_Viewport);
-    }
-
     void SetRenderTextures(const RenderTexture& _RenderTexture, const DepthStencilTexture& _DepthStencilTexture)
     {
       Engine::Get<IRenderer>()->SetRenderTextures(_RenderTexture, _DepthStencilTexture);
@@ -38,6 +28,16 @@ namespace vdl
 
   namespace RendererTexture
   {
+    void SetScissor(const Scissor& _Scissor)
+    {
+      Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eSprite);
+    }
+
+    void SetViewport(const Viewport& _Viewport)
+    {
+      Engine::Get<IRenderer>()->SetViewport(_Viewport, RenderType::eSprite);
+    }
+
     void SetBlendState(const BlendState& _BlendState)
     {
       Engine::Get<IRenderer>()->SetBlendState(_BlendState, RenderType::eSprite);
@@ -53,14 +53,24 @@ namespace vdl
       Engine::Get<IRenderer>()->SetRasterizerState(_RasterizerState, RenderType::eSprite);
     }
 
-    void Draw(const Texture& _Texture, const float2& _DstLeftTop, const float2& _DstSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color)
+    void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color)
     {
-      Engine::Get<IRenderer>()->Draw(_Texture, _DstLeftTop, _DstSize, _SrcLeftPos, _SrcSize, _Angle, _Color);
+      Engine::Get<IRenderer>()->Draw(_Texture, _DestLeftTop, _DestSize, _SrcLeftPos, _SrcSize, _Angle, _Color);
     }
   }
 
   namespace RendererStaticMesh
   {
+    void SetScissor(const Scissor& _Scissor)
+    {
+      Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eStaticMesh);
+    }
+
+    void SetViewport(const Viewport& _Viewport)
+    {
+      Engine::Get<IRenderer>()->SetViewport(_Viewport, RenderType::eStaticMesh);
+    }
+
     void SetBlendState(const BlendState& _BlendState)
     {
       Engine::Get<IRenderer>()->SetBlendState(_BlendState, RenderType::eStaticMesh);
@@ -84,6 +94,16 @@ namespace vdl
 
   namespace RendererSkinnedMesh
   {
+    void SetScissor(const Scissor& _Scissor)
+    {
+      Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eSkinnedMesh);
+    }
+
+    void SetViewport(const Viewport& _Viewport)
+    {
+      Engine::Get<IRenderer>()->SetViewport(_Viewport, RenderType::eSkinnedMesh);
+    }
+
     void SetBlendState(const BlendState& _BlendState)
     {
       Engine::Get<IRenderer>()->SetBlendState(_BlendState, RenderType::eSkinnedMesh);

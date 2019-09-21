@@ -5,6 +5,10 @@
 
 namespace vdl::RendererTexture
 {
+  void SetScissor(const Scissor& _Scissor);
+
+  void SetViewport(const Viewport& _Viewport);
+
   void SetBlendState(const BlendState& _BlendState);
 
   void SetDepthStencilState(const DepthStencilState& _DepthStencilState);
@@ -18,42 +22,42 @@ namespace vdl::RendererTexture
     SetRasterizerState(_GraphicsState.RasterizerState);
   }
 
-  void Draw(const Texture& _Texture, const float2& _DstLeftTop, const float2& _DstSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color = Palette::White);
+  void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color = Palette::White);
 
-  inline void Draw(const Texture& _Texture, const float2& _DstLeftTop, const float2& _DstSize, const float2& _SrcLeftPos, const float2& _SrcSize, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const ColorF& _Color = Palette::White)
   {
-    Draw(_Texture, _DstLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, 0.0f, _Color);
+    Draw(_Texture, _DestLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, 0.0f, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DstLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color = Palette::White)
   {
-    Draw(_Texture, _DstLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, _Angle, _Color);
+    Draw(_Texture, _DestLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, _Angle, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DstLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const ColorF& _Color = Palette::White)
   {
-    Draw(_Texture, _DstLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, _Color);
+    Draw(_Texture, _DestLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DstLeftTop, const float2& _DstSize, const Degree& _Angle, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const Degree& _Angle, const ColorF& _Color = Palette::White)
   {
-    Draw(_Texture, _DstLeftTop, _DstSize, float2(0.0f), _Texture.GetSize(), _Angle, _Color);
+    Draw(_Texture, _DestLeftTop, _DestSize, float2(0.0f), _Texture.GetSize(), _Angle, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DstLeftTop, const float2& _DstSize, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const ColorF& _Color = Palette::White)
   {
-    Draw(_Texture, _DstLeftTop, _DstSize, float2(0.0f), _Texture.GetSize(), _Color);
+    Draw(_Texture, _DestLeftTop, _DestSize, float2(0.0f), _Texture.GetSize(), _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DstLeftTop, const Degree& _Angle, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const Degree& _Angle, const ColorF& _Color = Palette::White)
   {
     const uint2 Size = _Texture.GetSize();
-    Draw(_Texture, _DstLeftTop, Size, float2(0.0f), Size, _Angle, _Color);
+    Draw(_Texture, _DestLeftTop, Size, float2(0.0f), Size, _Angle, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DstLeftTop, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const ColorF& _Color = Palette::White)
   {
     const uint2 Size = _Texture.GetSize();
-    Draw(_Texture, _DstLeftTop, Size, float2(0.0f), Size, _Color);
+    Draw(_Texture, _DestLeftTop, Size, float2(0.0f), Size, _Color);
   }
 }

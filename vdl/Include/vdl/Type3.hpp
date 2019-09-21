@@ -82,7 +82,7 @@ namespace vdl
   public:
     [[nodiscard]] constexpr bool operator==(const Type3& _v)const noexcept { return x == _v.x && y == _v.y && z == _v.z; }
 
-    [[nodiscard]] constexpr bool operator!=(const Type3& _v)const noexcept { return !(*this == _v); }
+    [[nodiscard]] constexpr bool operator!=(const Type3& _v)const noexcept { return x != _v.x || y != _v.y || z != _v.z; }
 
     [[nodiscard]] constexpr Type3 operator+()const noexcept { return *this; }
 

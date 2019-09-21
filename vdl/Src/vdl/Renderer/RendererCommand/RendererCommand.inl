@@ -6,72 +6,74 @@
 #include <algorithm>
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::Initialize(const vdl::uint2& _WindowSize, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
-  const vdl::VertexShader& _VertexShader, const vdl::HullShader& _HullShader, const vdl::DomainShader& _DomainShader, const vdl::GeometryShader& _GeometryShader, const vdl::PixelShader& _PixelShader)
+inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(const vdl::Scissor& _Scissor, const vdl::Viewport& _Viewport, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
+  const vdl::Sampler& _Sampler, const vdl::VertexShader& _VertexShader, const vdl::PixelShader& _PixelShader)
 {
   pBufferManager_ = Engine::Get<IBufferManager>();
 
-  Scissors_.push_back(vdl::Scissor(0, _WindowSize));
-  Viewports_.push_back(vdl::Viewport(0, _WindowSize));
+  Scissors_.push_back(_Scissor);
+  Viewports_.push_back(_Viewport);
   BlendStates_.push_back(_BlendState);
   DepthStencilStates_.push_back(_DepthStencilState);
   RasterizerStates_.push_back(_RasterizerState);
   VertexShaders_.push_back(_VertexShader);
-  HullShaders_.push_back(_HullShader);
-  DomainShaders_.push_back(_DomainShader);
-  GeometryShaders_.push_back(_GeometryShader);
   PixelShaders_.push_back(_PixelShader);
+  HullShaders_.emplace_back(std::move(vdl::HullShader()));
+  DomainShaders_.emplace_back(std::move(vdl::DomainShader()));
+  GeometryShaders_.emplace_back(std::move(vdl::GeometryShader()));
 
   for (auto& Samplers : Samplers_) { Samplers.resize(1); }
   for (auto& TextureIDs : TextureIDs_) { TextureIDs.resize(1); }
   for (auto& ConstantBufferIDs : ConstantBufferIDs_) { ConstantBufferIDs.resize(1); }
 
+  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0][0] = _Sampler;
+
   Reset();
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::Reset()
+inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
 {
   RendererCommands_.clear();
   StateChangeFlags_.Clear();
   Instances_.clear();
 
   Scissors_ = { Scissors_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetScissor, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetScissor, 0);
 
   Viewports_ = { Viewports_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetViewport, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetViewport, 0);
 
   BlendStates_ = { BlendStates_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetBlendState, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetBlendState, 0);
 
   DepthStencilStates_ = { DepthStencilStates_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetDepthStencilState, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetDepthStencilState, 0);
 
   RasterizerStates_ = { RasterizerStates_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetRasterizerState, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetRasterizerState, 0);
 
   VertexShaders_ = { VertexShaders_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetVertexShader, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetVertexShader, 0);
 
   HullShaders_ = { HullShaders_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetHullShader, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetHullShader, 0);
 
   DomainShaders_ = { DomainShaders_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetDomainShader, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetDomainShader, 0);
 
   GeometryShaders_ = { GeometryShaders_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetGeometryShader, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetGeometryShader, 0);
 
   PixelShaders_ = { PixelShaders_.back() };
-  RendererCommands_.emplace_back(RendererCommnadType::eSetPixelShader, 0);
+  RendererCommands_.emplace_back(RendererCommandType::eSetPixelShader, 0);
 
   for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kShaderTypes; ++ShaderTypeCount)
   {
     auto& Samplers = Samplers_[ShaderTypeCount];
 
     Samplers = { Samplers.back() };
-    RendererCommands_.emplace_back(static_cast<RendererCommnadType>(static_cast<vdl::uint>(RendererCommnadType::eSetVertexStageSampler) + ShaderTypeCount), 0);
+    RendererCommands_.emplace_back(static_cast<RendererCommandType>(static_cast<vdl::uint>(RendererCommandType::eSetVertexStageSampler) + ShaderTypeCount), 0);
   }
 
   for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kShaderTypes; ++ShaderTypeCount)
@@ -79,7 +81,7 @@ void RendererCommandList<DisplayObject, InstanceData>::Reset()
     auto& TextureIDs = TextureIDs_[ShaderTypeCount];
 
     TextureIDs = { TextureIDs.back() };
-    RendererCommands_.emplace_back(static_cast<RendererCommnadType>(static_cast<vdl::uint>(RendererCommnadType::eSetVertexStageTexture) + ShaderTypeCount), 0);
+    RendererCommands_.emplace_back(static_cast<RendererCommandType>(static_cast<vdl::uint>(RendererCommandType::eSetVertexStageTexture) + ShaderTypeCount), 0);
   }
 
   for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kShaderTypes; ++ShaderTypeCount)
@@ -87,7 +89,7 @@ void RendererCommandList<DisplayObject, InstanceData>::Reset()
     auto& ConstantBufferIDs = ConstantBufferIDs_[ShaderTypeCount];
 
     ConstantBufferIDs = { ConstantBufferIDs.back() };
-    RendererCommands_.emplace_back(static_cast<RendererCommnadType>(static_cast<vdl::uint>(RendererCommnadType::eSetVertexStageConstantBuffer) + ShaderTypeCount), 0);
+    RendererCommands_.emplace_back(static_cast<RendererCommandType>(static_cast<vdl::uint>(RendererCommandType::eSetVertexStageConstantBuffer) + ShaderTypeCount), 0);
   }
 
   ReservedDisplayObjects_.clear();
@@ -178,151 +180,180 @@ void RendererCommandList<DisplayObject, InstanceData>::Reset()
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData)
+inline void RendererCommandList<DisplayObject, InstanceData>::Flush()
 {
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetScissor))
+  bool canSort = false;
+
+  const size_t CommandNum = RendererCommands_.size();
+  for (size_t CommandCount = 0; CommandCount < CommandNum; ++CommandCount)
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetScissor, static_cast<vdl::uint>(Scissors_.size()));
+    const RendererCommandPair& RendererCommand = RendererCommands_[CommandCount];
+
+    switch (RendererCommand.first)
+    {
+    case RendererCommandType::eDraw:
+
+      break;
+    case RendererCommandType::eSetDepthStencilState:
+    {
+      const vdl::DepthStencilState& DepthStencilState = DepthStencilStates_[RendererCommand.second];
+
+      //  Depth,Stencilどちらかがオンの時にソート可能
+      canSort = DepthStencilState.DepthEnable || DepthStencilState.StencilEnable;
+    }
+    //break;
+    default:
+      break;
+    }
+  }
+}
+
+template<class DisplayObject, class InstanceData>
+inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData)
+{
+  if (StateChangeFlags_.Has(RendererCommandType::eSetScissor))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetScissor, static_cast<vdl::uint>(Scissors_.size()));
     Scissors_.push_back(CurrentScissor_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetViewport))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetViewport))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetViewport, static_cast<vdl::uint>(Viewports_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetViewport, static_cast<vdl::uint>(Viewports_.size()));
     Viewports_.push_back(CurrentViewport_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetBlendState))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetBlendState))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetBlendState, static_cast<vdl::uint>(BlendStates_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetBlendState, static_cast<vdl::uint>(BlendStates_.size()));
     BlendStates_.push_back(CurrentBlendState_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetDepthStencilState))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetDepthStencilState))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetDepthStencilState, static_cast<vdl::uint>(DepthStencilStates_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetDepthStencilState, static_cast<vdl::uint>(DepthStencilStates_.size()));
     DepthStencilStates_.push_back(CurrentDepthStencilState_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetRasterizerState))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetRasterizerState))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetRasterizerState, static_cast<vdl::uint>(RasterizerStates_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetRasterizerState, static_cast<vdl::uint>(RasterizerStates_.size()));
     RasterizerStates_.push_back(CurrentRasterizerState_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetVertexShader))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetVertexShader))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetVertexShader, static_cast<vdl::uint>(VertexShaders_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetVertexShader, static_cast<vdl::uint>(VertexShaders_.size()));
     VertexShaders_.push_back(CurrentVertexShader_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetHullShader))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetHullShader))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetHullShader, static_cast<vdl::uint>(HullShaders_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetHullShader, static_cast<vdl::uint>(HullShaders_.size()));
     HullShaders_.push_back(CurrentHullShader_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetDomainShader))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetDomainShader))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetDomainShader, static_cast<vdl::uint>(DomainShaders_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetDomainShader, static_cast<vdl::uint>(DomainShaders_.size()));
     DomainShaders_.push_back(CurrentDomainShader_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetGeometryShader))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetGeometryShader))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetGeometryShader, static_cast<vdl::uint>(GeometryShaders_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetGeometryShader, static_cast<vdl::uint>(GeometryShaders_.size()));
     GeometryShaders_.push_back(CurrentGeometryShader_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetPixelShader))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetPixelShader))
   {
-    RendererCommands_.emplace_back(RendererCommnadType::eSetPixelShader, static_cast<vdl::uint>(PixelShaders_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetPixelShader, static_cast<vdl::uint>(PixelShaders_.size()));
     PixelShaders_.push_back(CurrentPixelShader_);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetVertexStageSampler))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetVertexStageSampler))
   {
     auto& Sampler = Samplers_[static_cast<vdl::uint>(ShaderType::eVertexShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetVertexStageSampler, static_cast<vdl::uint>(Sampler.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetVertexStageSampler, static_cast<vdl::uint>(Sampler.size()));
     Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eVertexShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetHullStageSampler))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetHullStageSampler))
   {
     auto& Sampler = Samplers_[static_cast<vdl::uint>(ShaderType::eHullShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetHullStageSampler, static_cast<vdl::uint>(Sampler.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetHullStageSampler, static_cast<vdl::uint>(Sampler.size()));
     Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eHullShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetDomainStageSampler))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetDomainStageSampler))
   {
     auto& Sampler = Samplers_[static_cast<vdl::uint>(ShaderType::eDomainShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetDomainStageSampler, static_cast<vdl::uint>(Sampler.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetDomainStageSampler, static_cast<vdl::uint>(Sampler.size()));
     Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eDomainShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetGeometryStageSampler))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetGeometryStageSampler))
   {
     auto& Sampler = Samplers_[static_cast<vdl::uint>(ShaderType::eGeometryShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetGeometryStageSampler, static_cast<vdl::uint>(Sampler.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetGeometryStageSampler, static_cast<vdl::uint>(Sampler.size()));
     Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eGeometryShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetPixelStageSampler))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetPixelStageSampler))
   {
     auto& Sampler = Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetPixelStageSampler, static_cast<vdl::uint>(Sampler.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetPixelStageSampler, static_cast<vdl::uint>(Sampler.size()));
     Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetVertexStageTexture))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetVertexStageTexture))
   {
     auto& TextureIDs = TextureIDs_[static_cast<vdl::uint>(ShaderType::eVertexShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetVertexStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetVertexStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
     TextureIDs.push_back(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eVertexShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetHullStageTexture))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetHullStageTexture))
   {
     auto& TextureIDs = TextureIDs_[static_cast<vdl::uint>(ShaderType::eHullShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetHullStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetHullStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
     TextureIDs.push_back(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eHullShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetDomainStageTexture))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetDomainStageTexture))
   {
     auto& TextureIDs = TextureIDs_[static_cast<vdl::uint>(ShaderType::eDomainShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetDomainStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetDomainStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
     TextureIDs.push_back(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eDomainShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetGeometryStageTexture))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetGeometryStageTexture))
   {
     auto& TextureIDs = TextureIDs_[static_cast<vdl::uint>(ShaderType::eGeometryShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetGeometryStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetGeometryStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
     TextureIDs.push_back(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eGeometryShader)]);
   }
 
-  if (StateChangeFlags_.Has(RendererCommnadType::eSetPixelStageTexture))
+  if (StateChangeFlags_.Has(RendererCommandType::eSetPixelStageTexture))
   {
     auto& TextureIDs = TextureIDs_[static_cast<vdl::uint>(ShaderType::ePixelShader)];
 
-    RendererCommands_.emplace_back(RendererCommnadType::eSetPixelStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eSetPixelStageTexture, static_cast<vdl::uint>(TextureIDs.size()));
     TextureIDs.push_back(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::ePixelShader)]);
   }
 
   //  SetConstantBuffer
   {
-    auto IssueRendererCommandSetConstantBuffer = [this](RendererCommnadType _RendererCommnadType, ShaderType _ShaderType)->void
+    auto IssueRendererCommandSetConstantBuffer = [this](RendererCommandType _RendererCommandType, ShaderType _ShaderType)->void
     {
       auto& CurrentConstantBufferIDs = CurrentConstantBufferIDs_[static_cast<vdl::uint>(_ShaderType)];
       auto& ConstantBufferIDs = ConstantBufferIDs_[static_cast<vdl::uint>(_ShaderType)];
@@ -356,7 +387,7 @@ void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const Displa
             ReservedConstantBuffers_.insert(std::make_pair(ConstantBufferID, std::move(ConstantBuffer)));
             TempConstantBufferIDs[ConstantBufferCount] = ConstantBufferID;
 
-            StateChangeFlags_.Set(_RendererCommnadType);
+            StateChangeFlags_.Set(_RendererCommandType);
           }
 
           ++ConstantBufferCount;
@@ -369,29 +400,29 @@ void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const Displa
           ReservedConstantBuffers_.insert(std::make_pair(ConstantBufferID, std::move(ConstantBuffer)));
           TempConstantBufferIDs[ConstantBufferCount] = ConstantBufferID;
 
-          StateChangeFlags_.Set(_RendererCommnadType);
+          StateChangeFlags_.Set(_RendererCommandType);
 
           ++ConstantBufferCount;
         }
       }
 
-      if (StateChangeFlags_.Has(_RendererCommnadType))
+      if (StateChangeFlags_.Has(_RendererCommandType))
       {
-        RendererCommands_.emplace_back(_RendererCommnadType, static_cast<vdl::uint>(ConstantBufferIDs.size()));
+        RendererCommands_.emplace_back(_RendererCommandType, static_cast<vdl::uint>(ConstantBufferIDs.size()));
         LastConstantBufferIDs = CurrentConstantBufferIDs;
         ConstantBufferIDs.push_back(std::move(TempConstantBufferIDs));
       }
     };
 
-    IssueRendererCommandSetConstantBuffer(RendererCommnadType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader);
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader);
 
-    IssueRendererCommandSetConstantBuffer(RendererCommnadType::eSetHullStageConstantBuffer, ShaderType::eHullShader);
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetHullStageConstantBuffer, ShaderType::eHullShader);
 
-    IssueRendererCommandSetConstantBuffer(RendererCommnadType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader);
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader);
 
-    IssueRendererCommandSetConstantBuffer(RendererCommnadType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader);
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader);
 
-    IssueRendererCommandSetConstantBuffer(RendererCommnadType::eSetPixelStageConstantBuffer, ShaderType::ePixelShader);
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetPixelStageConstantBuffer, ShaderType::ePixelShader);
   }
 
   //  Draw
@@ -403,21 +434,21 @@ void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const Displa
       ReservedDisplayObjects_.insert(std::make_pair(DiplayObjectID, _DisplayObject));
     }
 
-    RendererCommands_.emplace_back(RendererCommnadType::eDraw, static_cast<vdl::uint>(Instances_.size()));
+    RendererCommands_.emplace_back(RendererCommandType::eDraw, static_cast<vdl::uint>(Instances_.size()));
     Instances_.emplace_back(std::move(_InstanceData));
   }
 
   StateChangeFlags_.Clear();
 }
 
-#define SetState(RendererCommnadType, StateName)\
-if (StateChangeFlags_.Has(RendererCommnadType))\
+#define SetState(RendererCommandType, StateName)\
+if (StateChangeFlags_.Has(RendererCommandType))\
 {\
   Current##StateName##_ = _##StateName;\
   \
   if (Current##StateName##_ == StateName##s_.back())\
   {\
-    StateChangeFlags_.Cancel(RendererCommnadType);\
+    StateChangeFlags_.Cancel(RendererCommandType);\
   }\
 }\
 else\
@@ -425,82 +456,82 @@ else\
   if (Current##StateName##_ != _##StateName)\
   {\
     Current##StateName##_ = _##StateName;\
-    StateChangeFlags_.Set(RendererCommnadType);\
+    StateChangeFlags_.Set(RendererCommandType);\
   }\
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushScissor(const vdl::Scissor& _Scissor)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushScissor(const vdl::Scissor& _Scissor)
 {
-  SetState(RendererCommnadType::eSetScissor, Scissor)
+  SetState(RendererCommandType::eSetScissor, Scissor)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushViewport(const vdl::Viewport& _Viewport)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushViewport(const vdl::Viewport& _Viewport)
 {
-  SetState(RendererCommnadType::eSetViewport, Viewport)
+  SetState(RendererCommandType::eSetViewport, Viewport)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushBlendState(const vdl::BlendState& _BlendState)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushBlendState(const vdl::BlendState& _BlendState)
 {
-  SetState(RendererCommnadType::eSetBlendState, BlendState)
+  SetState(RendererCommandType::eSetBlendState, BlendState)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushDepthStencilState(const vdl::DepthStencilState& _DepthStencilState)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushDepthStencilState(const vdl::DepthStencilState& _DepthStencilState)
 {
-  SetState(RendererCommnadType::eSetDepthStencilState, DepthStencilState)
+  SetState(RendererCommandType::eSetDepthStencilState, DepthStencilState)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushRasterizerState(const vdl::RasterizerState& _RasterizerState)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushRasterizerState(const vdl::RasterizerState& _RasterizerState)
 {
-  SetState(RendererCommnadType::eSetRasterizerState, RasterizerState)
+  SetState(RendererCommandType::eSetRasterizerState, RasterizerState)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushVertexShader(const vdl::VertexShader& _VertexShader)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushVertexShader(const vdl::VertexShader& _VertexShader)
 {
-  SetState(RendererCommnadType::eSetVertexShader, VertexShader)
+  SetState(RendererCommandType::eSetVertexShader, VertexShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushHullShader(const vdl::HullShader& _HullShader)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushHullShader(const vdl::HullShader& _HullShader)
 {
-  SetState(RendererCommnadType::eSetHullShader, HullShader)
+  SetState(RendererCommandType::eSetHullShader, HullShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushDomainShader(const vdl::DomainShader& _DomainShader)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushDomainShader(const vdl::DomainShader& _DomainShader)
 {
-  SetState(RendererCommnadType::eSetDomainShader, DomainShader)
+  SetState(RendererCommandType::eSetDomainShader, DomainShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushGeometryShader(const vdl::GeometryShader& _GeometryShader)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushGeometryShader(const vdl::GeometryShader& _GeometryShader)
 {
-  SetState(RendererCommnadType::eSetGeometryShader, GeometryShader)
+  SetState(RendererCommandType::eSetGeometryShader, GeometryShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushPixelShader(const vdl::PixelShader& _PixelShader)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushPixelShader(const vdl::PixelShader& _PixelShader)
 {
-  SetState(RendererCommnadType::eSetPixelShader, PixelShader)
+  SetState(RendererCommandType::eSetPixelShader, PixelShader)
 }
 
 #undef SetState
 
-#define SetSampler(RendererCommnadType, ShaderType)\
+#define SetSampler(RendererCommandType, ShaderType)\
 Samplers& CurrentSamplers = CurrentSamplers_[static_cast<vdl::uint>(ShaderType)];\
 \
 if (CurrentSamplers.size() <= _Slot)\
 {\
   CurrentSamplers.resize(_Slot + 1);\
-  StateChangeFlags_.Set(RendererCommnadType);\
+  StateChangeFlags_.Set(RendererCommandType);\
 }\
 \
-if (StateChangeFlags_.Has(RendererCommnadType))\
+if (StateChangeFlags_.Has(RendererCommandType))\
 {\
   CurrentSamplers[_Slot] = _Sampler;\
   \
@@ -520,50 +551,50 @@ if (StateChangeFlags_.Has(RendererCommnadType))\
     }\
   }\
   \
-  StateChangeFlags_.Cancel(RendererCommnadType);\
+  StateChangeFlags_.Cancel(RendererCommandType);\
 }\
 else\
 {\
   if (CurrentSamplers[_Slot] != _Sampler)\
   {\
     CurrentSamplers[_Slot] = _Sampler;\
-    StateChangeFlags_.Set(RendererCommnadType);\
+    StateChangeFlags_.Set(RendererCommandType);\
   }\
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushVertexStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushVertexStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
 {
-  SetSampler(RendererCommnadType::eSetVertexStageSampler, ShaderType::eVertexShader)
+  SetSampler(RendererCommandType::eSetVertexStageSampler, ShaderType::eVertexShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushHullStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushHullStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
 {
-  SetSampler(RendererCommnadType::eSetHullStageSampler, ShaderType::eHullShader)
+  SetSampler(RendererCommandType::eSetHullStageSampler, ShaderType::eHullShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushDomainStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushDomainStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
 {
-  SetSampler(RendererCommnadType::eSetDomainStageSampler, ShaderType::eDomainShader)
+  SetSampler(RendererCommandType::eSetDomainStageSampler, ShaderType::eDomainShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushGeometryStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushGeometryStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
 {
-  SetSampler(RendererCommnadType::eSetGeometryStageSampler, ShaderType::eGeometryShader)
+  SetSampler(RendererCommandType::eSetGeometryStageSampler, ShaderType::eGeometryShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushPixelStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushPixelStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot)
 {
-  SetSampler(RendererCommnadType::eSetPixelStageSampler, ShaderType::ePixelShader)
+  SetSampler(RendererCommandType::eSetPixelStageSampler, ShaderType::ePixelShader)
 }
 
 #undef SetSampler
 
-#define SetTexture(RendererCommnadType, ShaderType)\
+#define SetTexture(RendererCommandType, ShaderType)\
 const vdl::ID TextureID = _Texture.GetID();\
 \
 if (ReservedTextures_.find(TextureID) == ReservedTextures_.end())\
@@ -575,10 +606,10 @@ TextureIDs& CurrentTextureIDs = CurrentTextureIDs_[static_cast<vdl::uint>(Shader
 if (CurrentTextureIDs.size() <= _Slot)\
 {\
   CurrentTextureIDs.resize(_Slot + 1);\
-  StateChangeFlags_.Set(RendererCommnadType);\
+  StateChangeFlags_.Set(RendererCommandType);\
 }\
 \
-if (StateChangeFlags_.Has(RendererCommnadType))\
+if (StateChangeFlags_.Has(RendererCommandType))\
 {\
   CurrentTextureIDs[_Slot] = TextureID;\
   \
@@ -598,50 +629,50 @@ if (StateChangeFlags_.Has(RendererCommnadType))\
     }\
   }\
   \
-  StateChangeFlags_.Cancel(RendererCommnadType);\
+  StateChangeFlags_.Cancel(RendererCommandType);\
 }\
 else\
 {\
   if (CurrentTextureIDs[_Slot] != TextureID)\
   {\
     CurrentTextureIDs[_Slot] = TextureID;\
-    StateChangeFlags_.Set(RendererCommnadType);\
+    StateChangeFlags_.Set(RendererCommandType);\
   }\
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushVertexStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushVertexStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
 {
-  SetTexture(RendererCommnadType::eSetVertexStageTexture, ShaderType::eVertexShader)
+  SetTexture(RendererCommandType::eSetVertexStageTexture, ShaderType::eVertexShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushHullStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushHullStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
 {
-  SetTexture(RendererCommnadType::eSetHullStageTexture, ShaderType::eHullShader)
+  SetTexture(RendererCommandType::eSetHullStageTexture, ShaderType::eHullShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushDomainStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushDomainStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
 {
-  SetTexture(RendererCommnadType::eSetDomainStageTexture, ShaderType::eDomainShader)
+  SetTexture(RendererCommandType::eSetDomainStageTexture, ShaderType::eDomainShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushGeometryStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushGeometryStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
 {
-  SetTexture(RendererCommnadType::eSetGeometryStageTexture, ShaderType::eGeometryShader)
+  SetTexture(RendererCommandType::eSetGeometryStageTexture, ShaderType::eGeometryShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushPixelStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushPixelStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot)
 {
-  SetTexture(RendererCommnadType::eSetPixelStageTexture, ShaderType::ePixelShader)
+  SetTexture(RendererCommandType::eSetPixelStageTexture, ShaderType::ePixelShader)
 }
 
 #undef SetTexture
 
-#define SetConstantBuffer(RendererCommnadType, ShaderType)\
+#define SetConstantBuffer(RendererCommandType, ShaderType)\
 const vdl::ID ConstantBufferID = _ConstantBuffer.GetID();\
 \
 if (ReservedConstantBuffers_.find(ConstantBufferID) == ReservedConstantBuffers_.end())\
@@ -653,10 +684,10 @@ ConstantBufferIDs& CurrentConstantBufferIDs = CurrentConstantBufferIDs_[static_c
 if (CurrentConstantBufferIDs.size() <= _Slot)\
 {\
   CurrentConstantBufferIDs.resize(_Slot + 1);\
-  StateChangeFlags_.Set(RendererCommnadType);\
+  StateChangeFlags_.Set(RendererCommandType);\
 }\
 \
-if (StateChangeFlags_.Has(RendererCommnadType))\
+if (StateChangeFlags_.Has(RendererCommandType))\
 {\
   CurrentConstantBufferIDs[_Slot] = ConstantBufferID;\
   \
@@ -676,45 +707,45 @@ if (StateChangeFlags_.Has(RendererCommnadType))\
     }\
   }\
   \
-  StateChangeFlags_.Cancel(RendererCommnadType);\
+  StateChangeFlags_.Cancel(RendererCommandType);\
 }\
 else\
 {\
   if (CurrentConstantBufferIDs[_Slot] != ConstantBufferID)\
   {\
     CurrentConstantBufferIDs[_Slot] = ConstantBufferID;\
-    StateChangeFlags_.Set(RendererCommnadType);\
+    StateChangeFlags_.Set(RendererCommandType);\
   }\
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushVertexStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushVertexStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
 {
-  SetConstantBuffer(RendererCommnadType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader)
+  SetConstantBuffer(RendererCommandType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushHullStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushHullStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
 {
-  SetConstantBuffer(RendererCommnadType::eSetHullStageConstantBuffer, ShaderType::eHullShader)
+  SetConstantBuffer(RendererCommandType::eSetHullStageConstantBuffer, ShaderType::eHullShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushDomainStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushDomainStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
 {
-  SetConstantBuffer(RendererCommnadType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader)
+  SetConstantBuffer(RendererCommandType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushGeometryStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushGeometryStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
 {
-  SetConstantBuffer(RendererCommnadType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader)
+  SetConstantBuffer(RendererCommandType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader)
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::PushPixelStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushPixelStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot)
 {
-  SetConstantBuffer(RendererCommnadType::eSetPixelStageConstantBuffer, ShaderType::ePixelShader)
+  SetConstantBuffer(RendererCommandType::eSetPixelStageConstantBuffer, ShaderType::ePixelShader)
 }
 
 #undef SetConstantBuffer

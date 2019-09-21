@@ -27,6 +27,8 @@ namespace vdl
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
 
     [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
+
+    [[nodiscard]] Matrix GetGlobalTransform()const;
   };
 
   class SkinnedMesh : public StaticMesh

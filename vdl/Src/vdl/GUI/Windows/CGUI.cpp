@@ -3,6 +3,7 @@
 #include <vdl/Engine.hpp>
 #include <vdl/System/ISystem.hpp>
 #include <vdl/Window/IWindow.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
@@ -582,6 +583,12 @@ namespace
     {\
       return In.Color * Texture.Sample(Sampler, In.Texcoord);\
     }";
+
+  template<class T>
+  inline ImVec2 Cast(const vdl::Type2<T>& _v)
+  {
+    return { static_cast<float>(_v.x), static_cast<float>(_v.y) };
+  }
 }
 
 void CGUI::Initialize()
@@ -607,6 +614,11 @@ void CGUI::Initialize()
 
     io.Fonts->AddFontDefault();
     io.Fonts->AddFontFromFileTTF("c:/Windows/Fonts/meiryo.ttc", 18.0f, &Config, kGlyphRangesJapanese);
+  }
+
+  //  ウィンドウのサイズを設定
+  {
+    io.DisplaySize = std::move(Cast(Engine::Get<IWindow>()->GetWindowSize()));
   }
 
   //  ImGuiのフラグの設定
@@ -665,14 +677,14 @@ void CGUI::Initialize()
 
   //  サンプラーの作成
   {
-    Sampler_ = vdl::Sampler(vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::SamplerFilter::eMinMagMipLinear, 0, vdl::BorderColor::eTransparent);
+    Sampler_ = vdl::Sampler(vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::FilterType::eMinMagMipLinear, 0, vdl::BorderColorType::eTransparent);
   }
 
   //  ステートの設定
   {
-    GraphicsState_.BlendState = vdl::BlendState(false, true, vdl::Blend::eSrcAlpha, vdl::Blend::eInvSrcAlpha, vdl::BlendOperation::eAdd, vdl::Blend::eInvSrcAlpha, vdl::Blend::eZero, vdl::BlendOperation::eAdd);
-    vdl::DepthStencilOpDesc DepthStencilOpDesc(vdl::StencilOp::eKeep, vdl::StencilOp::eKeep, vdl::StencilOp::eKeep, vdl::ComparisonFunc::eAlways);
-    GraphicsState_.DepthSteniclState = vdl::DepthStencilState(false, vdl::WriteMask::eAll, vdl::ComparisonFunc::eAlways, false, DepthStencilOpDesc, DepthStencilOpDesc);
+    GraphicsState_.BlendState = vdl::BlendState(false, true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd);
+    vdl::DepthStencilOpDesc DepthStencilOpDesc(vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::ComparisonFuncType::eAlways);
+    GraphicsState_.DepthSteniclState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, DepthStencilOpDesc, DepthStencilOpDesc);
     GraphicsState_.RasterizerState = vdl::RasterizerState(vdl::FillMode::eSolid, vdl::CullMode::eNone, false, 0, true, false);
     Viewport_ = { 0.0f, 0.0f };
   }
@@ -687,11 +699,6 @@ void CGUI::Update()
 {
   ImGuiIO& io = ImGui::GetIO();
   IM_ASSERT(io.Fonts->IsBuilt() && "Font atlas not built! It is generally built by the renderer back-end. Missing call to renderer _NewFrame() function? e.g. ImGui_ImplOpenGL3_NewFrame().");
-
-  // Setup display size (every frame to accommodate for window resizing)
-  RECT ClientRect;
-  ::GetClientRect(hWnd_, &ClientRect);
-  io.DisplaySize = ImVec2(static_cast<float>(ClientRect.right - ClientRect.left), static_cast<float>(ClientRect.bottom - ClientRect.top));
 
   // Setup time step
   io.DeltaTime = pSystem_->GetDeltaTime();
@@ -809,7 +816,7 @@ void CGUI::Draw()
   pDeviceContext_->SetBlendState(GraphicsState_.BlendState);
   pDeviceContext_->SetDepthStencilState(GraphicsState_.DepthSteniclState);
   pDeviceContext_->SetRasterizerState(GraphicsState_.RasterizerState);
-   
+
   pDeviceContext_->VSSetShader(VertexShader_);
   pDeviceContext_->VSSetConstantBuffers(0, 1, &ConstantBuffer_.GetDetail());
 

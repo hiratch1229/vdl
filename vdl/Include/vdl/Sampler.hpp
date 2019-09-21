@@ -25,7 +25,7 @@ namespace vdl
     eComparisonAnisotropic,
   };
 
-  enum class AddressMode : uint8_t
+  enum class AddressModeType : uint8_t
   {
     eWrap,
     eMirror,
@@ -63,27 +63,27 @@ namespace vdl
       struct
       {
         FilterType Filter : 5;
-        AddressMode AddressU : 3;
-        AddressMode AddressV : 3;
-        AddressMode AddressW : 3;
-        uint8_t MaxAnisotropy : 8;
+        AddressModeType AddressModeU : 3;
+        AddressModeType AddressModeV : 3;
+        AddressModeType AddressModeW : 3;
         BorderColorType BorderColor : 2;
+        uint8_t MaxAnisotropy;
       };
       DataType Data;
     };
 #pragma warning(default:4201)
   public:
-    constexpr Sampler(AddressMode _AddressU = AddressMode::eClamp, AddressMode _AddressV = AddressMode::eClamp, AddressMode _AddressW = AddressMode::eClamp,
+    constexpr Sampler(AddressModeType _AddressModeU = AddressModeType::eClamp, AddressModeType _AddressModeV = AddressModeType::eClamp, AddressModeType _AddressModeW = AddressModeType::eClamp,
       FilterType _Filter = FilterType::eMinMagMipLinear, uint8_t _MaxAnisotropy = 16, BorderColorType _BorderColor = BorderColorType::eBlack)
-      : Filter(_Filter), AddressU(_AddressU), AddressV(_AddressV),
-      AddressW(_AddressW), MaxAnisotropy(_MaxAnisotropy), BorderColor(_BorderColor) {}
+      : Filter(_Filter), AddressModeU(_AddressModeU), AddressModeV(_AddressModeV),
+      AddressModeW(_AddressModeW), MaxAnisotropy(_MaxAnisotropy), BorderColor(_BorderColor) {}
 
     Sampler(PreDefined _PreDefined)
     {
       static constexpr Sampler PreDefineds[static_cast<UINT>(PreDefined::eNum)] =
       {
-        { AddressMode::eWrap, AddressMode::eWrap, AddressMode::eWrap, FilterType::eMinMagMipLinear },
-        { AddressMode::eWrap, AddressMode::eWrap, AddressMode::eWrap, FilterType::eAnisotropic }
+        { AddressModeType::eWrap, AddressModeType::eWrap, AddressModeType::eWrap, FilterType::eMinMagMipLinear },
+        { AddressModeType::eWrap, AddressModeType::eWrap, AddressModeType::eWrap, FilterType::eAnisotropic }
       };
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];

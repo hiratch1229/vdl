@@ -43,9 +43,6 @@ void CSystem::Initialize()
   Engine::Get<IModelManager>()->Initialize();
   Engine::Get<IBufferManager>()->Initialize();
 
-  pRenderer_->Initialize();
-  pGUI_->Initialize();
-
   //  ü”g”‚ğæ“¾
   {
     LARGE_INTEGER Frequency;
@@ -64,6 +61,9 @@ bool CSystem::Update()
   if (SystemState_ == SystemState::eInitialized)
   {
     Engine::Get<IWindow>()->Show(true);
+
+    pRenderer_->Initialize();
+    pGUI_->Initialize();
 
     SystemState_ = SystemState::eRunning;
   }

@@ -33,7 +33,7 @@ namespace vdl
     eAll
   };
 
-  struct DepthStencilOpDesc
+  struct DepthStencilOpState
   {
   private:
     enum class PreDefined : uint8_t
@@ -54,21 +54,21 @@ namespace vdl
     {
       struct
       {
-        StencilOpType FailOp : 3;
-        StencilOpType DepthFailOp : 3;
-        StencilOpType PassOp : 3;
-        ComparisonFuncType ComparisonFunc : 3;
+        StencilOpType StencilFailOp : 3;
+        StencilOpType StencilDepthFailOp : 3;
+        StencilOpType StencilPassOp : 3;
+        ComparisonFuncType StencilFunc : 3;
       };
       DataType Data;
     };
 #pragma warning(default:4201)
   public:
-    constexpr DepthStencilOpDesc(StencilOpType _FailOp, StencilOpType _DepthFailOp, StencilOpType _PassOp, ComparisonFuncType _ComparisonFunc)
-      : FailOp(_FailOp), DepthFailOp(_DepthFailOp), PassOp(_PassOp), ComparisonFunc(_ComparisonFunc) {}
+    constexpr DepthStencilOpState(StencilOpType _StencilFailOp, StencilOpType _StencilDepthFailOp, StencilOpType _StencilPassOp, ComparisonFuncType _StencilFunc)
+      : StencilFailOp(_StencilFailOp), StencilDepthFailOp(_StencilDepthFailOp), StencilPassOp(_StencilPassOp), StencilFunc(_StencilFunc) {}
 
-    DepthStencilOpDesc(PreDefined _PreDefined)
+    DepthStencilOpState(PreDefined _PreDefined)
     {
-      static constexpr DepthStencilOpDesc PreDefineds[static_cast<uint>(PreDefined::eNum)] =
+      static constexpr DepthStencilOpState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
         { StencilOpType::eKeep, StencilOpType::eIncr, StencilOpType::eKeep, ComparisonFuncType::eAlways },
         { StencilOpType::eKeep, StencilOpType::eDecr, StencilOpType::eKeep, ComparisonFuncType::eAlways }
@@ -76,11 +76,11 @@ namespace vdl
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
-    [[nodiscard]] constexpr bool operator==(const DepthStencilOpDesc& _DepthStencilOpDesc)const noexcept { return Data == _DepthStencilOpDesc.Data; }
+    [[nodiscard]] constexpr bool operator==(const DepthStencilOpState& _DepthStencilOpState)const noexcept { return Data == _DepthStencilOpState.Data; }
 
-    [[nodiscard]] constexpr bool operator!=(const DepthStencilOpDesc& _DepthStencilOpDesc)const noexcept { return Data != _DepthStencilOpDesc.Data;; }
+    [[nodiscard]] constexpr bool operator!=(const DepthStencilOpState& _DepthStencilOpState)const noexcept { return Data != _DepthStencilOpState.Data;; }
   };
-  static_assert(sizeof(DepthStencilOpDesc) == sizeof(DepthStencilOpDesc::DataType));
+  static_assert(sizeof(DepthStencilOpState) == sizeof(DepthStencilOpState::DataType));
 
   struct DepthStencilState
   {
@@ -107,17 +107,21 @@ namespace vdl
         DepthWriteMaskType DepthWriteMask : 1;
         ComparisonFuncType DepthFunc : 3;
         bool StencilEnable : 1;
-        DepthStencilOpDesc FrontFace;
-        DepthStencilOpDesc BackFace;
+        uint8_t StencilReadMask;
+        uint8_t StencilWriteMask;
+        DepthStencilOpState FrontFace;
+        DepthStencilOpState BackFace;
       };
       DataType Data;
     };
 #pragma warning(default:4201)
   public:
     constexpr DepthStencilState(bool _DepthEnable = true, DepthWriteMaskType _DepthWriteMask = DepthWriteMaskType::eAll, ComparisonFuncType _DepthFunc = ComparisonFuncType::eLess,
-      bool _StencilEnable = false, const DepthStencilOpDesc& _FrontFace = DepthStencilOpDesc::kDefaultFront, const DepthStencilOpDesc& _BackFace = DepthStencilOpDesc::kDefaultBack)
+      bool _StencilEnable = false, uint8_t _StencilReadMask = 0xFF, uint8_t _StencilWriteMask = 0xFF,
+      const DepthStencilOpState & _FrontFace = DepthStencilOpState::kDefaultFront, const DepthStencilOpState & _BackFace = DepthStencilOpState::kDefaultBack)
       : DepthEnable(_DepthEnable), DepthWriteMask(_DepthWriteMask), DepthFunc(_DepthFunc),
-      StencilEnable(_StencilEnable), FrontFace(_FrontFace), BackFace(_BackFace) {}
+      StencilEnable(_StencilEnable), StencilReadMask(_StencilReadMask), StencilWriteMask(_StencilWriteMask),
+      FrontFace(_FrontFace), BackFace(_BackFace) {}
 
     DepthStencilState(PreDefined _PreDefined)
     {

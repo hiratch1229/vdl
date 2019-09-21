@@ -4,6 +4,10 @@
 
 namespace vdl::RendererStaticMesh
 {
+  void SetScissor(const Scissor& _Scissor);
+
+  void SetViewport(const Viewport& _Viewport);
+
   void SetBlendState(const BlendState& _BlendState);
 
   void SetDepthStencilState(const DepthStencilState& _DepthStencilState);

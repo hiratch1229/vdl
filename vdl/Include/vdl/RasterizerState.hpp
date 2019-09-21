@@ -3,13 +3,13 @@
 
 namespace vdl
 {
-  enum class FillMode : uint8_t
+  enum class FillModeType : uint8_t
   {
     eWireframe,
     eSolid
   };
 
-  enum class CullMode : uint8_t
+  enum class CullModeType : uint8_t
   {
     eNone,
     eFront,
@@ -47,32 +47,33 @@ namespace vdl
     {
       struct
       {
-        FillMode Filling : 1;
-        CullMode Culling : 2;
+        FillModeType FillMode : 2;
+        CullModeType CullMode : 2;
         bool FrontCounterClockwise : 1;
-        int DepthBias;
+        bool DepthClipEnable : 1;
         bool ScissorEnable : 1;
-        bool AntialiasedLineAnable : 1;
+        bool AntialiasedLineEnable : 1;
+        int DepthBias;
       };
       DataType Data;
     };
 #pragma warning(default:4201)
   public:
-    constexpr RasterizerState(FillMode _FillMode = FillMode::eSolid, CullMode _CullMode = CullMode::eBack, bool _FrontCounterClockwise = false,
-      int _DepthBias = 0, bool _ScissorEnable = false, bool _AntialiasedLineEnable = false)
-      : Filling(_FillMode), Culling(_CullMode), FrontCounterClockwise(_FrontCounterClockwise),
-      DepthBias(_DepthBias), ScissorEnable(_ScissorEnable), AntialiasedLineAnable(_AntialiasedLineEnable) {}
+    constexpr RasterizerState(FillModeType _FillMode = FillModeType::eSolid, CullModeType _CullMode = CullModeType::eBack, bool _FrontCounterClockwise = false,
+      bool _DepthClipEnable = true, int _DepthBias = 0, bool _ScissorEnable = false, bool _AntialiasedLineEnable = false)
+      : FillMode(_FillMode), CullMode(_CullMode), FrontCounterClockwise(_FrontCounterClockwise), DepthClipEnable(_DepthClipEnable),
+      ScissorEnable(_ScissorEnable), AntialiasedLineEnable(_AntialiasedLineEnable), DepthBias(_DepthBias) {}
 
     RasterizerState(PreDefined _PreDefined)
     {
       static constexpr RasterizerState PreDefineds[static_cast<uint>(PreDefined::Num)] =
       {
-        { FillMode::eSolid, CullMode::eNone },
-        { FillMode::eSolid, CullMode::eFront },
-        { FillMode::eSolid, CullMode::eBack },
-        { FillMode::eWireframe, CullMode::eNone },
-        { FillMode::eWireframe, CullMode::eFront },
-        { FillMode::eWireframe, CullMode::eBack },
+        { FillModeType::eSolid, CullModeType::eNone },
+        { FillModeType::eSolid, CullModeType::eFront },
+        { FillModeType::eSolid, CullModeType::eBack },
+        { FillModeType::eWireframe, CullModeType::eNone },
+        { FillModeType::eWireframe, CullModeType::eFront },
+        { FillModeType::eWireframe, CullModeType::eBack },
       };
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];

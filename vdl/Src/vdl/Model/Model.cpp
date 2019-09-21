@@ -43,6 +43,11 @@ namespace vdl
     }
   }
 
+  Matrix StaticMesh::GetGlobalTransform()const
+  {
+    return Engine::Get<IModelManager>()->GetMesh(ID_)->GlobalTransform;
+  }
+
   //--------------------------------------------------
 
   SkinnedMesh::SkinnedMesh(const SkinnedMeshData& _MeshData)

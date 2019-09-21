@@ -104,8 +104,7 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
         vdl::Material& SkinnedMeshMaterial = SkinnedMeshData.Materials[MaterialCount];
         Material& Material = MeshData.Materials[MaterialCount];
 
-        SkinnedMeshMaterial.Diffuse.Texture = Material.Diffuse.Image;
-        SkinnedMeshMaterial.Diffuse.Color = Material.Diffuse.Color;
+        SkinnedMeshMaterial.Diffuse = Material.Diffuse.Image;
 
         SkinnedMeshMaterial.IndexStart = Material.IndexStart;
         SkinnedMeshMaterial.IndexCount = Material.IndexCount;
