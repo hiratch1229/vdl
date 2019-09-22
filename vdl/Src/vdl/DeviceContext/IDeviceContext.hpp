@@ -97,4 +97,6 @@ public:
   virtual void DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount, vdl::uint _FirstIndex, vdl::uint _VertexOffset, vdl::uint _FirstInstance) = 0;
 
   //virtual void Dispatch(vdl::uint _ThreadGropuX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ) = 0;
+
+  virtual void Flush() = 0;
 };
