@@ -1,5 +1,6 @@
 #pragma once
 #include "Types.hpp"
+#include "Constants.hpp"
 
 #include <array>
 
@@ -61,7 +62,7 @@ namespace vdl
       eNum
     };
   public:
-    static constexpr PreDefined kDefault = PreDefined::eAlpha;
+    static constexpr PreDefined kAlpha = PreDefined::eAlpha;
     static constexpr PreDefined kAdd = PreDefined::eAdd;
     static constexpr PreDefined kSubtract = PreDefined::eSubtract;
     static constexpr PreDefined kReplace = PreDefined::eReplace;
@@ -69,6 +70,7 @@ namespace vdl
     static constexpr PreDefined kLighten = PreDefined::eLighten;
     static constexpr PreDefined kDraken = PreDefined::eDraken;
     static constexpr PreDefined kScreen = PreDefined::eScreen;
+    static constexpr PreDefined kDefault = PreDefined::eAlpha;
   public:
     using DataType = uint32_t;
   public:
@@ -120,9 +122,34 @@ namespace vdl
 
   struct BlendState
   {
+  private:
+    enum class PreDefined : uint8_t
+    {
+      eAlpha,
+      eAdd,
+      eSubtract,
+      eReplace,
+      eMultiply,
+      eLighten,
+      eDraken,
+      eScreen,
+
+      eNum
+    };
+  public:
+    static constexpr PreDefined kAlpha = PreDefined::eAlpha;
+    static constexpr PreDefined kAdd = PreDefined::eAdd;
+    static constexpr PreDefined kSubtract = PreDefined::eSubtract;
+    static constexpr PreDefined kReplace = PreDefined::eReplace;
+    static constexpr PreDefined kMultiply = PreDefined::eMultiply;
+    static constexpr PreDefined kLighten = PreDefined::eLighten;
+    static constexpr PreDefined kDraken = PreDefined::eDraken;
+    static constexpr PreDefined kScreen = PreDefined::eScreen;
+    static constexpr PreDefined kDefault = PreDefined::eAlpha;
+  public:
     bool AlphaToCoverageEnable : 1;
     bool IndependentBlendEnable : 1;
-    std::array<RenderTargetBlendState, 8> RenderTarget;
+    std::array<RenderTargetBlendState, Constants::kMaxRenderTextureNum> RenderTarget;
   public:
     constexpr BlendState(bool _AlphaToCoverageEnable = false, bool _IndependentBlendEnable = false,
       const RenderTargetBlendState& _RenderTarget0 = RenderTargetBlendState::kDefault, const RenderTargetBlendState& _RenderTarget1 = RenderTargetBlendState::kDefault,
@@ -131,6 +158,22 @@ namespace vdl
       const RenderTargetBlendState& _RenderTarget6 = RenderTargetBlendState::kDefault, const RenderTargetBlendState& _RenderTarget7 = RenderTargetBlendState::kDefault)
       : AlphaToCoverageEnable(_AlphaToCoverageEnable), IndependentBlendEnable(_IndependentBlendEnable),
       RenderTarget({ _RenderTarget0, _RenderTarget1, _RenderTarget2, _RenderTarget3, _RenderTarget4, _RenderTarget5, _RenderTarget6, _RenderTarget7 }) {}
+
+    BlendState(PreDefined _PreDefined)
+    {
+      static const BlendState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
+      {
+        { false, false, RenderTargetBlendState::kAlpha },
+        { false, false, RenderTargetBlendState::kAdd },
+        { false, false, RenderTargetBlendState::kSubtract },
+        { false, false, RenderTargetBlendState::kReplace },
+        { false, false, RenderTargetBlendState::kMultiply },
+        { false, false, RenderTargetBlendState::kLighten },
+        { false, false, RenderTargetBlendState::kDraken },
+        { false, false, RenderTargetBlendState::kScreen } };
+
+      *this = PreDefineds[static_cast<uint>(_PreDefined)];
+    }
   public:
     [[nodiscard]] constexpr bool operator==(const BlendState& _BlendState)const noexcept { return AlphaToCoverageEnable == _BlendState.AlphaToCoverageEnable && IndependentBlendEnable == _BlendState.IndependentBlendEnable && RenderTarget == _BlendState.RenderTarget; }
 

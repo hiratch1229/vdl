@@ -677,15 +677,15 @@ void CGUI::Initialize()
 
   //  サンプラーの作成
   {
-    Sampler_ = vdl::Sampler(vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::AddressMode::eWrap, vdl::FilterType::eMinMagMipLinear, 0, vdl::BorderColorType::eTransparent);
+    Sampler_ = vdl::Sampler(vdl::AddressModeType::eWrap, vdl::AddressModeType::eWrap, vdl::AddressModeType::eWrap, vdl::FilterType::eMinMagMipLinear, 0, vdl::BorderColorType::eTransparent);
   }
 
   //  ステートの設定
   {
-    GraphicsState_.BlendState = vdl::BlendState(false, true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd);
-    vdl::DepthStencilOpDesc DepthStencilOpDesc(vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::ComparisonFuncType::eAlways);
-    GraphicsState_.DepthSteniclState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, DepthStencilOpDesc, DepthStencilOpDesc);
-    GraphicsState_.RasterizerState = vdl::RasterizerState(vdl::FillMode::eSolid, vdl::CullMode::eNone, false, 0, true, false);
+    GraphicsState_.BlendState = vdl::BlendState(false, false, { true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd });
+    vdl::DepthStencilOpState DepthStencilOpState(vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::ComparisonFuncType::eAlways);
+    GraphicsState_.DepthSteniclState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState);
+    GraphicsState_.RasterizerState = vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, 0, true, false);
     Viewport_ = { 0.0f, 0.0f };
   }
 }

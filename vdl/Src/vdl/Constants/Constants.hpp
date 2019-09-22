@@ -14,6 +14,8 @@ namespace Constants
 
   constexpr vdl::uint kMaxCharacterNum = vdl::Constants::kMaxCharacterNum;
 
+  constexpr vdl::uint kMaxRenderTextureNum = vdl::Constants::kMaxRenderTextureNum;
+
   constexpr vdl::uint kMaxSamplerNum = vdl::Constants::kMaxSamplerNum;
 
   constexpr vdl::uint kMaxTextureNum = vdl::Constants::kMaxTextureNum;
