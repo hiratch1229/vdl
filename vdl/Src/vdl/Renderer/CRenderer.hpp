@@ -63,16 +63,7 @@ public:
 
   void Initialize()override;
 
-  void SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture)override
-  {
-    OutputManager OutputManager{ _RenderTexture, _DepthStencilTexture };
-
-    if (OutputManager_ != OutputManager)
-    {
-      Flush();
-      OutputManager = std::move(OutputManager);
-    }
-  }
+  void SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture)override;
 
   void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type)override
   {

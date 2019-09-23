@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{3867e35a-bc78-4cb7-aed5-1045c5e08bed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Buffer">
+      <UniqueIdentifier>{184010d9-5de5-4674-a76e-04d8ac91e44f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\BufferManager">
+      <UniqueIdentifier>{d2b272c6-9938-4d74-aed0-0ed77dab0720}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Device">
+      <UniqueIdentifier>{fe910d00-6c7e-4a90-b9c3-cd0452bb158f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\DeviceContext">
+      <UniqueIdentifier>{2e5e5eef-def0-46d6-991c-aa9ce8427960}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Shader">
+      <UniqueIdentifier>{207c4b13-500a-4229-8c87-c147e25154d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\SwapChain">
+      <UniqueIdentifier>{f376c5df-0115-4d3a-b5a3-b4b2473a4433}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.hpp">
+      <Filter>Src\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\BufferManager\Vulkan\CBufferManager.hpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Device\Vulkan\CDevice.hpp">
+      <Filter>Src\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\DeviceContext\Vulkan\CDeviceContext.hpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Shader\Vulkan\CShader.hpp">
+      <Filter>Src\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\SwapChain\Vulkan\CSwapChain.hpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\BufferManager\Vulkan\CBufferManager.cpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Device\Vulkan\CDevice.cpp">
+      <Filter>Src\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\DeviceContext\Vulkan\CDeviceContext.cpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Shader\Vulkan\CShader.cpp">
+      <Filter>Src\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\SwapChain\Vulkan\CSwapChain.cpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

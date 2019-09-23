@@ -48,6 +48,17 @@ void CRenderer::Initialize()
   }
 }
 
+void CRenderer::SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture)
+{
+  OutputManager OutputManager{ _RenderTexture, _DepthStencilTexture };
+
+  if (OutputManager_ != OutputManager)
+  {
+    Flush();
+    OutputManager = std::move(OutputManager);
+  }
+}
+
 void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::ColorF& _Color)
 {
   //  •\Ž¦‚³‚ê‚È‚¢‚à‚Ì‚Íœ‚­
@@ -128,6 +139,8 @@ void CRenderer::Flush()
     SkinnedMeshRendererCommandList_.Adjust();
     TextureRendererCommandList_.Adjust();
   }
+
+  pDeviceContext_->SetRenderTexture(OutputManager_.RenderTexture, OutputManager_.DepthStencilTexture);
 
   pDeviceContext_->SetInputLayout(vdl::InputLayout::e3D);
   pDeviceContext_->SetTopology(vdl::Topology::eTriangleStrip);

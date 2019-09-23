@@ -321,7 +321,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
             }
 
             ContinuousDrawCallNum = 0;
-            Instances.clear();
+            //Instances.clear();
           }
 
           LastDisplayObjectID = CurrentDisplayObjectID;
