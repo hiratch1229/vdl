@@ -23,5 +23,5 @@ namespace vdl
     uint BoneIndices[Constants::kMaxBoneInfluence] = {};
   };
 
-  using IndexType = uint16_t;
+  using IndexType = uint32_t;
 }

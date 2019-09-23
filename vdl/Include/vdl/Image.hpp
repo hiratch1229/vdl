@@ -22,7 +22,7 @@ namespace vdl
 
     [[nodiscard]] bool isEmpty()const noexcept { return Buffer_.empty(); }
 
-    [[nodiscard]] Color* Buffer() { return Buffer_.data(); }
+    [[nodiscard]] const Color* Buffer()const { return Buffer_.data(); }
 
     void Resize(const uint2& _Size) { Size_ = _Size; Buffer_.resize(Size_.x * Size_.y); }
   public:

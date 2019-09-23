@@ -48,11 +48,11 @@ namespace vdl::Detail
 
   void* ConstantBufferData::GetData()const
   {
-    return Engine::Get<IBufferManager>()->GetBuffer(ID_)->GetData();
+    return static_cast<IConstantBuffer*>(Engine::Get<IBufferManager>()->GetBuffer(ID_))->GetData();
   }
 
   uint ConstantBufferData::GetSize()const
   {
-    return Engine::Get<IBufferManager>()->GetBuffer(ID_)->GetSize();
+    return static_cast<IConstantBuffer*>(Engine::Get<IBufferManager>()->GetBuffer(ID_))->GetSize();
   }
 }

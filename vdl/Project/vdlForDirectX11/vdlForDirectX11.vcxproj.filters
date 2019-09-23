@@ -22,6 +22,12 @@
     <Filter Include="Src\SwapChain">
       <UniqueIdentifier>{16cccd73-9e3b-466b-b347-e24f9e79edb1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Texture">
+      <UniqueIdentifier>{cd4831d4-2fb0-4f70-8e00-b01aa03d3e72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Format">
+      <UniqueIdentifier>{0e955383-90c0-429e-bde1-cc4fcc80d068}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\Buffer\DirectX11\CBuffer.hpp">
@@ -41,6 +47,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Shader\DirectX11\CShader.hpp">
       <Filter>Src\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Texture\DirectX11\CTexture.hpp">
+      <Filter>Src\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Format\DirectX\Format.hpp">
+      <Filter>Src\Format</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

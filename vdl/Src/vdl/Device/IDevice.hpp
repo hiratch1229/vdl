@@ -21,11 +21,11 @@ public:
 
   virtual void CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
 
-  virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
-
-  virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
-
   virtual void CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+
+  virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, vdl::uint _BufferSize, IndexType _IndexType) = 0;
+
+  virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, vdl::uint _BufferSize, IndexType _IndexType) = 0;
 
   virtual void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize) = 0;
 
@@ -35,9 +35,9 @@ public:
 
   virtual void CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::Format _Format) = 0;
 
+  virtual void WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const = 0;
+
   virtual void LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, ShaderType _Type) = 0;
 
-  virtual void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _Type) = 0;
-
-  virtual void WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const = 0;
+  virtual void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout) = 0;
 };

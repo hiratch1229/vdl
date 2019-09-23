@@ -25,10 +25,12 @@ struct IShader
 
   [[nodiscard]] virtual ShaderType GetType()const = 0;
 
-  [[nodiscard]] virtual const std::vector<vdl::uint>& GetUsedConstantBufferRegisters()const = 0;
+  //[[nodiscard]] virtual const std::vector<vdl::uint>& GetUsedConstantBufferRegisters()const = 0;
 };
 
 struct IVertexShader : public IShader
 {
+  IVertexShader() = default;
+
   [[nodiscard]] virtual vdl::InputLayout GetInputLayout()const = 0;
 };

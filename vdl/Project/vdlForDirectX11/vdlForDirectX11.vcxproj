@@ -23,8 +23,10 @@
     <ClInclude Include="..\..\Src\vdl\Buffer\DirectX11\CBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\DirectX11\CDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\DirectX11\CDevice.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Format\DirectX\Format.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\DirectX11\CShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\DirectX11\CSwapChain.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Texture\DirectX11\CTexture.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX11\CBufferManager.cpp" />

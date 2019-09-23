@@ -57,4 +57,6 @@ namespace Constants
   constexpr vdl::Format kSwapChainFormat = vdl::Format::eR8G8B8A8_Unorm;
 
   constexpr vdl::Format kDepthStencilFormat = vdl::Format::eD24_Unorm_S8_Uint;
+
+  constexpr vdl::Format kTextureFormat = vdl::Format::eR8G8B8A8_Unorm;
 }

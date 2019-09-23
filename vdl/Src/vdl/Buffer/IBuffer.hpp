@@ -10,6 +10,12 @@ enum class BufferType : vdl::uint8_t
   eUnorderedAccessBuffer,
 };
 
+enum class IndexType : vdl::uint8_t
+{
+  eUint16,
+  eUint32,
+};
+
 struct IBuffer
 {
   IBuffer() = default;
@@ -17,6 +23,11 @@ struct IBuffer
   virtual ~IBuffer() = default;
 
   [[nodiscard]] virtual BufferType GetType()const = 0;
+};
+
+struct IConstantBuffer : public IBuffer
+{
+  IConstantBuffer() = default;
 
   [[nodiscard]] virtual void* GetData() = 0;
 
