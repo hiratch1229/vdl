@@ -45,7 +45,7 @@ namespace vdl
     eAll
   };
 
-  struct RenderTargetBlendState
+  struct RenderTextureBlendState
   {
   private:
     enum class PreDefined : uint8_t
@@ -92,14 +92,14 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
-    constexpr RenderTargetBlendState(bool _BlendEnable = false, BlendType _SrcBlend = BlendType::eOne, BlendType _DestBlend = BlendType::eZero, BlendOpType _BlendOp = BlendOpType::eAdd,
+    constexpr RenderTextureBlendState(bool _BlendEnable = false, BlendType _SrcBlend = BlendType::eOne, BlendType _DestBlend = BlendType::eZero, BlendOpType _BlendOp = BlendOpType::eAdd,
       BlendType _SrcBlendAlpha = BlendType::eOne, BlendType _DestBlendAlpha = BlendType::eZero, BlendOpType _BlendOpAlpha = BlendOpType::eAdd, ColorWriteEnableType _RenderTargetWriteMask = ColorWriteEnableType::eAll)
       : BlendEnable(_BlendEnable), SrcBlend(_SrcBlend), DestBlend(_DestBlend), BlendOp(_BlendOp),
       SrcBlendAlpha(_SrcBlendAlpha), DestBlendAlpha(_DestBlendAlpha), BlendOpAlpha(_BlendOpAlpha), RenderTargetWriteMask(_RenderTargetWriteMask) {}
 
-    RenderTargetBlendState(PreDefined _PreDefined)
+    RenderTextureBlendState(PreDefined _PreDefined)
     {
-      static constexpr RenderTargetBlendState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
+      static constexpr RenderTextureBlendState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
         { true, BlendType::eSrcAlpha, BlendType::eInvSrcAlpha, BlendOpType::eAdd, BlendType::eOne, BlendType::eInvSrcAlpha, BlendOpType::eAdd },
         { true, BlendType::eSrcAlpha, BlendType::eOne, BlendOpType::eAdd, BlendType::eZero, BlendType::eOne, BlendOpType::eAdd },
@@ -114,11 +114,11 @@ namespace vdl
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
   public:
-    [[nodiscard]] constexpr bool operator==(const RenderTargetBlendState& _RenderTargetBlendState)const noexcept { return Data == _RenderTargetBlendState.Data; }
+    [[nodiscard]] constexpr bool operator==(const RenderTextureBlendState& _RenderTextureBlendState)const noexcept { return Data == _RenderTextureBlendState.Data; }
 
-    [[nodiscard]] constexpr bool operator!=(const RenderTargetBlendState& _RenderTargetBlendState)const noexcept { return Data != _RenderTargetBlendState.Data; }
+    [[nodiscard]] constexpr bool operator!=(const RenderTextureBlendState& _RenderTextureBlendState)const noexcept { return Data != _RenderTextureBlendState.Data; }
   };
-  static_assert(sizeof(RenderTargetBlendState) == sizeof(RenderTargetBlendState::DataType));
+  static_assert(sizeof(RenderTextureBlendState) == sizeof(RenderTextureBlendState::DataType));
 
   struct BlendState
   {
@@ -149,34 +149,34 @@ namespace vdl
   public:
     bool AlphaToCoverageEnable : 1;
     bool IndependentBlendEnable : 1;
-    std::array<RenderTargetBlendState, Constants::kMaxRenderTextureNum> RenderTarget;
+    std::array<RenderTextureBlendState, Constants::kMaxRenderTextureNum> RenderTexture;
   public:
     constexpr BlendState(bool _AlphaToCoverageEnable = false, bool _IndependentBlendEnable = false,
-      const RenderTargetBlendState& _RenderTarget0 = RenderTargetBlendState::kDefault, const RenderTargetBlendState& _RenderTarget1 = RenderTargetBlendState::kDefault,
-      const RenderTargetBlendState& _RenderTarget2 = RenderTargetBlendState::kDefault, const RenderTargetBlendState& _RenderTarget3 = RenderTargetBlendState::kDefault,
-      const RenderTargetBlendState& _RenderTarget4 = RenderTargetBlendState::kDefault, const RenderTargetBlendState& _RenderTarget5 = RenderTargetBlendState::kDefault,
-      const RenderTargetBlendState& _RenderTarget6 = RenderTargetBlendState::kDefault, const RenderTargetBlendState& _RenderTarget7 = RenderTargetBlendState::kDefault)
+      const RenderTextureBlendState& _RenderTexture0 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture1 = RenderTextureBlendState::kDefault,
+      const RenderTextureBlendState& _RenderTexture2 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture3 = RenderTextureBlendState::kDefault,
+      const RenderTextureBlendState& _RenderTexture4 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture5 = RenderTextureBlendState::kDefault,
+      const RenderTextureBlendState& _RenderTexture6 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture7 = RenderTextureBlendState::kDefault)
       : AlphaToCoverageEnable(_AlphaToCoverageEnable), IndependentBlendEnable(_IndependentBlendEnable),
-      RenderTarget({ _RenderTarget0, _RenderTarget1, _RenderTarget2, _RenderTarget3, _RenderTarget4, _RenderTarget5, _RenderTarget6, _RenderTarget7 }) {}
+      RenderTexture({ _RenderTexture0, _RenderTexture1, _RenderTexture2, _RenderTexture3, _RenderTexture4, _RenderTexture5, _RenderTexture6, _RenderTexture7 }) {}
 
     BlendState(PreDefined _PreDefined)
     {
       static const BlendState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
-        { false, false, RenderTargetBlendState::kAlpha },
-        { false, false, RenderTargetBlendState::kAdd },
-        { false, false, RenderTargetBlendState::kSubtract },
-        { false, false, RenderTargetBlendState::kReplace },
-        { false, false, RenderTargetBlendState::kMultiply },
-        { false, false, RenderTargetBlendState::kLighten },
-        { false, false, RenderTargetBlendState::kDraken },
-        { false, false, RenderTargetBlendState::kScreen } };
+        { false, false, RenderTextureBlendState::kAlpha },
+        { false, false, RenderTextureBlendState::kAdd },
+        { false, false, RenderTextureBlendState::kSubtract },
+        { false, false, RenderTextureBlendState::kReplace },
+        { false, false, RenderTextureBlendState::kMultiply },
+        { false, false, RenderTextureBlendState::kLighten },
+        { false, false, RenderTextureBlendState::kDraken },
+        { false, false, RenderTextureBlendState::kScreen } };
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
   public:
-    [[nodiscard]] constexpr bool operator==(const BlendState& _BlendState)const noexcept { return AlphaToCoverageEnable == _BlendState.AlphaToCoverageEnable && IndependentBlendEnable == _BlendState.IndependentBlendEnable && RenderTarget == _BlendState.RenderTarget; }
+    [[nodiscard]] constexpr bool operator==(const BlendState& _BlendState)const noexcept { return AlphaToCoverageEnable == _BlendState.AlphaToCoverageEnable && IndependentBlendEnable == _BlendState.IndependentBlendEnable && RenderTexture == _BlendState.RenderTexture; }
 
-    [[nodiscard]] constexpr bool operator!=(const BlendState& _BlendState)const noexcept { return AlphaToCoverageEnable != _BlendState.AlphaToCoverageEnable || IndependentBlendEnable != _BlendState.IndependentBlendEnable || RenderTarget != _BlendState.RenderTarget; }
+    [[nodiscard]] constexpr bool operator!=(const BlendState& _BlendState)const noexcept { return AlphaToCoverageEnable != _BlendState.AlphaToCoverageEnable || IndependentBlendEnable != _BlendState.IndependentBlendEnable || RenderTexture != _BlendState.RenderTexture; }
   };
 }

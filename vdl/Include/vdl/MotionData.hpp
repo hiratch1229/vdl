@@ -38,6 +38,4 @@ namespace vdl
       return *this;
     }
   };
-
-  using MotionBlendDatas = std::vector<MotionBlendData>;
 }

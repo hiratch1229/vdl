@@ -60,7 +60,7 @@ public:
 
   virtual void Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _World, const vdl::ColorF& _Color) = 0;
 
-  virtual void Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const std::vector<vdl::MotionBlendData>& _MotionBlendDatas, const vdl::ColorF& _Color) = 0;
+  virtual void Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const vdl::MotionBlendDatas& _MotionBlendDatas, const vdl::ColorF& _Color) = 0;
 
   virtual void Clear(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor) = 0;
 

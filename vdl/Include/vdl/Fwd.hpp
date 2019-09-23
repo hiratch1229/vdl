@@ -1,6 +1,8 @@
 #pragma once
 #include "Types.hpp"
 
+#include <vector>
+
 namespace vdl
 {
   //-------------------------
@@ -78,16 +80,26 @@ namespace vdl
   //-------------------------
   //  BlendState.hpp
   //-------------------------
+  enum class BlendType : uint8_t;
+  enum class BlendOpType : uint8_t;
+  enum class ColorWriteEnableType : uint8_t;
+  struct RenderTextureBlendState;
   struct BlendState;
 
   //-------------------------
   //  DepthStencilState.hpp
   //-------------------------
+  enum class StencilOpType : uint8_t;
+  enum class ComparisonFuncType : uint8_t;
+  enum class DepthWriteMaskType : uint8_t;
+  struct DepthStencilOpState;
   struct DepthStencilState;
 
   //-------------------------
   //  RasterizerState.hpp
   //-------------------------
+  enum class FillModeType : uint8_t;
+  enum class CullModeType : uint8_t;
   struct RasterizerState;
 
   //-------------------------
@@ -138,11 +150,16 @@ namespace vdl
   //-------------------------
   struct MotionData;
   struct MotionBlendData;
+  using MotionBlendDatas = std::vector<MotionBlendData>;
 
   //-------------------------
   //  MeshData.hpp
   //-------------------------
+  struct Material;
   struct StaticMeshData;
+  struct Bone;
+  struct Skeletal;
+  struct Animation;
   struct SkinnedMeshData;
 
   //-------------------------
