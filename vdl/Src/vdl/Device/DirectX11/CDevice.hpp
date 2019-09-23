@@ -2,13 +2,15 @@
 #include "../IDevice.hpp"
 
 #include <d3d11.h>
-#include <dxgi1_6.h>
 #include <wrl.h>
 
 class CDevice : public IDevice
 {
   Microsoft::WRL::ComPtr<ID3D11Device> pDevice_;
   Microsoft::WRL::ComPtr<ID3D11DeviceContext> pImmediateContext_;
+public:
+  ID3D11Device* GetDevice()const { return pDevice_.Get(); }
+  ID3D11DeviceContext* GetImmediateContext()const { return pImmediateContext_.Get(); }
 public:
   void Initialize()override;
 

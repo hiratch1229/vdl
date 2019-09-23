@@ -52,6 +52,12 @@ namespace Constants
 
   constexpr vdl::uint2 kDefaultWindowSize = { 1280, 720 };
 
+  constexpr vdl::ColorF kDefaultScreenClearColor = vdl::Palette::Black;
+
+  constexpr float kDefaultClearDepth = 1.0f;
+
+  constexpr vdl::uint kDefaultClearStencil = 0;
+
   constexpr vdl::uint kBackBufferNum = 3;
 
   constexpr vdl::Format kSwapChainFormat = vdl::Format::eR8G8B8A8_Unorm;

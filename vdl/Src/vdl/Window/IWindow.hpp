@@ -1,6 +1,5 @@
 #pragma once
-#include <vdl/Type2.hpp>
-#include <vdl/Matrix.hpp>
+#include <vdl/Fwd.hpp>
 
 class IWindow
 {
@@ -17,5 +16,7 @@ public:
 
   [[nodiscard]] virtual void* GetHandle()const = 0;
 
-  [[nodiscard]] virtual vdl::uint2 GetWindowSize()const = 0;
+  [[nodiscard]] virtual const vdl::uint2& GetWindowSize()const = 0;
+
+  [[nodiscard]] virtual const vdl::ColorF& GetScreenClearColor()const = 0;
 };

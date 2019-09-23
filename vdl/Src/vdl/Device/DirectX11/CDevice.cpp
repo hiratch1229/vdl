@@ -11,6 +11,7 @@
 #include <vdl/Shader/DirectX11/CShader.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
+#include <dxgi1_6.h>
 #include <d3dcompiler.h>
 #include <assert.h>
 
@@ -37,7 +38,6 @@ void CDevice::Initialize()
   //  エラーチェック用
   HRESULT hr = S_OK;
 
-  //  デバイスフラグ
   vdl::uint CreateDeviceFlag = 0;
   vdl::uint DxgiCreateFactoryFlag = 0;
 #if defined( DEBUG ) || defined( _DEBUG )

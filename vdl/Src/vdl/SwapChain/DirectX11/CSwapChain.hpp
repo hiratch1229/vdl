@@ -1,8 +1,26 @@
 #pragma once
 #include "../ISwapChain.hpp"
 
+#include <vdl/Texture.hpp>
+
+#include <d3d11.h>
+#include <dxgi.h>
+#include <wrl.h>
+
+class IWindow;
+class IDeviceContext;
+
 class CSwapChain : public ISwapChain
 {
+  IWindow* pWindow_;
+  IDeviceContext* pDeviceContext_;
+private:
+  Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain_;
+  Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView_;
+  Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView_;
+private:
+  vdl::RenderTexture RenderTexture_;
+  vdl::DepthStencilTexture DepthStencilTexture_;
 public:
   void Initialize()override;
 
