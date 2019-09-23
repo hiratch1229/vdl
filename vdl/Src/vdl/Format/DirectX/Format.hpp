@@ -1,7 +1,7 @@
 #pragma once
 #include <vdl/Format.hpp>
 
-#include <dxgiformat.h>
+#include <dxgi.h>
 #include <assert.h>
 
 inline constexpr DXGI_FORMAT Cast(vdl::Format _Format)

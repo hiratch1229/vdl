@@ -10,9 +10,14 @@ namespace vdl
 {
   namespace Renderer
   {
-    void SetRenderTextures(const RenderTexture& _RenderTexture, const DepthStencilTexture& _DepthStencilTexture)
+    void SetRenderTexture(const RenderTexture& _RenderTexture, const DepthStencilTexture& _DepthStencilTexture)
     {
-      Engine::Get<IRenderer>()->SetRenderTextures(_RenderTexture, _DepthStencilTexture);
+      Engine::Get<IRenderer>()->SetRenderTextures({ _RenderTexture }, _DepthStencilTexture);
+    }
+
+    void SetRenderTexture(const RenderTextures& _RenderTextures, const DepthStencilTexture& _DepthStencilTexture)
+    {
+      Engine::Get<IRenderer>()->SetRenderTextures(_RenderTextures, _DepthStencilTexture);
     }
 
     void Clear(const RenderTexture& _RenderTexure, const ColorF& _ClearColor)
@@ -30,27 +35,27 @@ namespace vdl
   {
     void SetScissor(const Scissor& _Scissor)
     {
-      Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eSprite);
+      Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eTexture);
     }
 
     void SetViewport(const Viewport& _Viewport)
     {
-      Engine::Get<IRenderer>()->SetViewport(_Viewport, RenderType::eSprite);
+      Engine::Get<IRenderer>()->SetViewport(_Viewport, RenderType::eTexture);
     }
 
     void SetBlendState(const BlendState& _BlendState)
     {
-      Engine::Get<IRenderer>()->SetBlendState(_BlendState, RenderType::eSprite);
+      Engine::Get<IRenderer>()->SetBlendState(_BlendState, RenderType::eTexture);
     }
 
     void SetDepthStencilState(const DepthStencilState& _DepthStencilState)
     {
-      Engine::Get<IRenderer>()->SetDepthStencilState(_DepthStencilState, RenderType::eSprite);
+      Engine::Get<IRenderer>()->SetDepthStencilState(_DepthStencilState, RenderType::eTexture);
     }
 
     void SetRasterizerState(const RasterizerState& _RasterizerState)
     {
-      Engine::Get<IRenderer>()->SetRasterizerState(_RasterizerState, RenderType::eSprite);
+      Engine::Get<IRenderer>()->SetRasterizerState(_RasterizerState, RenderType::eTexture);
     }
 
     void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color)

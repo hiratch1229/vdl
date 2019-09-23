@@ -42,7 +42,7 @@ struct Animation
 
   CEREAL_SERIALIZE(Name, Skeletals)
 };
-using Vertices = std::vector<vdl::Vertex3D>;
+using Vertices = std::vector<vdl::SkinnedMeshVertex>;
 using Indices = std::vector<vdl::IndexType>;
 using Materials = std::vector<Material>;
 using Animations = std::vector<Animation>;

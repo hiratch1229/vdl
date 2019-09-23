@@ -12,10 +12,9 @@ class IDeviceContext;
 
 class CRenderer : public IRenderer
 {
-  static constexpr vdl::uint kInputLayputTypes = static_cast<vdl::uint>(vdl::InputLayout::e3D) + 1;
   static constexpr vdl::uint kRenderTypes = static_cast<vdl::uint>(RenderType::eNum);
   static constexpr vdl::uint kShaderTypes = static_cast<vdl::uint>(ShaderType::eGraphicsNum);
-  static constexpr vdl::Vertex2D kRectangle[] = {
+  static constexpr vdl::TextureVertex kRectangle[] = {
   { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
   { { +0.5f, -0.5f }, { 1.0f, 0.0f } },
   { { -0.5f, +0.5f }, { 0.0f, 1.0f } },
@@ -23,12 +22,12 @@ class CRenderer : public IRenderer
 private:
   struct OutputManager
   {
-    vdl::RenderTexture RenderTexture;
+    vdl::RenderTextures RenderTextures;
     vdl::DepthStencilTexture DepthStencilTexture;
   public:
-    [[nodiscard]] bool operator==(const OutputManager& _OutputManager)const { return RenderTexture == _OutputManager.RenderTexture && DepthStencilTexture == _OutputManager.DepthStencilTexture; }
+    [[nodiscard]] bool operator==(const OutputManager& _OutputManager)const { return RenderTextures == _OutputManager.RenderTextures && DepthStencilTexture == _OutputManager.DepthStencilTexture; }
 
-    [[nodiscard]] bool operator!=(const OutputManager& _OutputManager)const { return RenderTexture != _OutputManager.RenderTexture || DepthStencilTexture != _OutputManager.DepthStencilTexture; }
+    [[nodiscard]] bool operator!=(const OutputManager& _OutputManager)const { return RenderTextures != _OutputManager.RenderTextures || DepthStencilTexture != _OutputManager.DepthStencilTexture; }
   };
   struct TextureInstanceData
   {
@@ -63,7 +62,7 @@ public:
 
   void Initialize()override;
 
-  void SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture)override;
+  void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)override;
 
   void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type)override
   {
@@ -72,7 +71,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushScissor(_Scissor);
       break;
     case RenderType::eStaticMesh:
@@ -92,7 +91,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushViewport(_Viewport);
       break;
     case RenderType::eStaticMesh:
@@ -112,7 +111,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushBlendState(_BlendState);
       break;
     case RenderType::eStaticMesh:
@@ -132,7 +131,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushDepthStencilState(_DepthStencilState);
       break;
     case RenderType::eStaticMesh:
@@ -152,7 +151,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushRasterizerState(_RasterizerState);
       break;
     case RenderType::eStaticMesh:
@@ -172,7 +171,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushVertexShader(_VertexShader);
       break;
     case RenderType::eStaticMesh:
@@ -192,7 +191,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushHullShader(_HullShader);
       break;
     case RenderType::eStaticMesh:
@@ -212,7 +211,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushDomainShader(_DomainShader);
       break;
     case RenderType::eStaticMesh:
@@ -232,7 +231,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushGeometryShader(_GeometryShader);
       break;
     case RenderType::eStaticMesh:
@@ -252,7 +251,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       TextureRendererCommandList_.PushPixelShader(_PixelShader);
       break;
     case RenderType::eStaticMesh:
@@ -299,7 +298,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       SetTexture(&TextureRendererCommandList_);
       break;
     case RenderType::eStaticMesh:
@@ -346,7 +345,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       SetSampler(&TextureRendererCommandList_);
       break;
     case RenderType::eStaticMesh:
@@ -393,7 +392,7 @@ public:
     case RenderType::eNone:
       //  TODO
       break;
-    case RenderType::eSprite:
+    case RenderType::eTexture:
       SetConstantBuffer(&TextureRendererCommandList_);
       break;
     case RenderType::eStaticMesh:

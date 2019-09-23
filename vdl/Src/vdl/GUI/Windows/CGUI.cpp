@@ -18,6 +18,8 @@
 
 namespace
 {
+  constexpr IndexType kIndexType = (sizeof(ImDrawIdx) == 2 ? IndexType::eUint16 : IndexType::eUint32);
+
   constexpr ImWchar kGlyphRangesJapanese[] = {
   0x0020, 0x007E, 0x00A2, 0x00A3, 0x00A7, 0x00A8, 0x00AC, 0x00AC, 0x00B0, 0x00B1, 0x00B4, 0x00B4, 0x00B6, 0x00B6, 0x00D7, 0x00D7,
   0x00F7, 0x00F7, 0x0391, 0x03A1, 0x03A3, 0x03A9, 0x03B1, 0x03C1, 0x03C3, 0x03C9, 0x0401, 0x0401, 0x0410, 0x044F, 0x0451, 0x0451,
@@ -618,7 +620,7 @@ void CGUI::Initialize()
 
   //  ウィンドウのサイズを設定
   {
-    io.DisplaySize = std::move(Cast(Engine::Get<IWindow>()->GetWindowSize()));
+    io.DisplaySize = Cast(Engine::Get<IWindow>()->GetWindowSize());
   }
 
   //  ImGuiのフラグの設定
@@ -765,7 +767,7 @@ void CGUI::Draw()
       pIndexBuffers_[1] = std::move(pIndexBuffers_[0]);
 
       IBuffer* pIndexBuffer = pIndexBuffers_[0].get();
-      pDevice_->CreateIndexBuffer(&pIndexBuffer, sizeof(ImDrawIdx), IndexBufferSize_ = IndexSize);
+      pDevice_->CreateIndexBuffer(&pIndexBuffer, IndexBufferSize_ = IndexSize, kIndexType);
     }
   }
 
@@ -811,7 +813,7 @@ void CGUI::Draw()
   pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
 
   pDeviceContext_->SetViewport(Viewport_);
-  pDeviceContext_->SetRenderTexture(vdl::RenderTexture(), vdl::DepthStencilTexture());
+  pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
 
   pDeviceContext_->SetBlendState(GraphicsState_.BlendState);
   pDeviceContext_->SetDepthStencilState(GraphicsState_.DepthSteniclState);
@@ -824,11 +826,11 @@ void CGUI::Draw()
   pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
   pDeviceContext_->PSSetTextures(0, 1, &Font_);
 
-  pDeviceContext_->HSSetShader(vdl::HullShader());
+  pDeviceContext_->HSSetShader(HullShader_);
 
-  pDeviceContext_->DSSetShader(vdl::DomainShader());
+  pDeviceContext_->DSSetShader(DomainShader_);
 
-  pDeviceContext_->GSSetShader(vdl::GeometryShader());
+  pDeviceContext_->GSSetShader(GeometryShader_);
 
   // Render command lists
   // (Because we merged all buffers into a single one, we maintain our own offset into them)

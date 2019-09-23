@@ -160,7 +160,7 @@ namespace vdl
 
           for (uint j = 0; j <= _SliceCount; ++j)
           {
-            Vertex3D& Vertex = MeshData.Vertices[1 + _SliceCount * i + j];
+            StaticMeshVertex& Vertex = MeshData.Vertices[1 + _SliceCount * i + j];
 
             const Radian Theta = ThetaStep * j;
 

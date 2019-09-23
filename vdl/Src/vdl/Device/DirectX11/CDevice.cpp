@@ -1,15 +1,18 @@
 #include "CDevice.hpp"
 
-#include <vdl/Image.hpp>
-#include <vdl/Macro.hpp>
-
-#include <vdl/Constants/Constants.hpp>
+#include <vdl/Engine.hpp>
+#include <vdl/DeviceContext/DirectX11/CDeviceContext.hpp>
 
 #include <vdl/Format/DirectX/Format.hpp>
 #include <vdl/Buffer/DirectX11/CBuffer.hpp>
 #include <vdl/Texture/DirectX11/CTexture.hpp>
 #include <vdl/Shader/DirectX11/CShader.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
+
+#include <vdl/Constants/Constants.hpp>
+
+#include <vdl/Image.hpp>
+#include <vdl/Macro.hpp>
 
 #include <dxgi1_6.h>
 #include <d3dcompiler.h>
@@ -26,7 +29,7 @@ namespace
 
     HRESULT hr = S_OK;
 
-    Microsoft::WRL::ComPtr<ID3D10Blob> pError;
+    Microsoft::WRL::ComPtr<ID3DBlob> pError;
     hr = ::D3DCompile(_Source, _DataSize, nullptr, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
       _EntryPoint, _Target, CompileFlag, 0, _pCode, pError.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), static_cast<const char*>(pError->GetBufferPointer()));
@@ -35,6 +38,8 @@ namespace
 
 void CDevice::Initialize()
 {
+  pDeviceContext_ = static_cast<CDeviceContext*>(Engine::Get<IDeviceContext>());
+
   //  エラーチェック用
   HRESULT hr = S_OK;
 
@@ -63,7 +68,7 @@ void CDevice::Initialize()
     D3D_FEATURE_LEVEL_9_2,
     D3D_FEATURE_LEVEL_9_1
   };
-  constexpr vdl::uint kFeatureLevelNum = vdl::Macro::ArraySize(kFeatureLevels);
+  constexpr vdl::uint kFeatureLevelNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kFeatureLevels));
 
   Microsoft::WRL::ComPtr<IDXGIFactory7> pFactory;
   {
@@ -433,129 +438,6 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
   (*_ppDepthStecilTexture) = std::move(pDepthStencilTexture);
 }
 
-void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, ShaderType _Type)
-{
-  assert(*_ppShader);
-
-  HRESULT hr = S_OK;
-
-  Microsoft::WRL::ComPtr<ID3D10Blob> pCode;
-  switch (_Type)
-  {
-    //case ShaderType::eVertexShader:
-    //  break;
-  case ShaderType::eHullShader:
-  {
-    CHullShader* pHullShader = new CHullShader;
-
-    constexpr const char* kTarget = "hs_5_0";
-
-    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
-
-    Microsoft::WRL::ComPtr<ID3D11HullShader> pHullShader;
-    {
-      hr = pDevice_->CreateHullShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pHullShader->pHullShader.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-    }
-
-    *_ppShader = std::move(pHullShader);
-  }
-  break;
-  case ShaderType::eDomainShader:
-  {
-    CDomainShader* pDomainShader = new CDomainShader;
-
-    constexpr const char* kTarget = "ds_5_0";
-
-    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
-
-    Microsoft::WRL::ComPtr<ID3D11DomainShader> pDomainShader;
-    {
-      hr = pDevice_->CreateDomainShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pDomainShader->pDomainShader.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-    }
-
-    *_ppShader = std::move(pDomainShader);
-  }
-  break;
-  case ShaderType::eGeometryShader:
-  {
-    CGeometryShader* pGeometryShader = new CGeometryShader;
-
-    constexpr const char* kTarget = "gs_5_0";
-
-    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
-
-    Microsoft::WRL::ComPtr<ID3D11GeometryShader> pGeometryShader;
-    {
-      hr = pDevice_->CreateGeometryShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pGeometryShader->pGeometryShader.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-    }
-
-    *_ppShader = std::move(pGeometryShader);
-  }
-  break;
-  case ShaderType::ePixelShader:
-  {
-    CPixelShader* pPixelShader = new CPixelShader;
-
-    constexpr const char* kTarget = "ps_5_0";
-
-    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
-
-    Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
-    {
-      hr = pDevice_->CreatePixelShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pPixelShader->pPixelShader.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-    }
-
-    *_ppShader = std::move(pPixelShader);
-  }
-  break;
-  case ShaderType::eComputeShader:
-  {
-    CComputeShader* pComputeShader = new CComputeShader;
-
-    constexpr const char* kTarget = "cs_5_0";
-
-    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
-
-    Microsoft::WRL::ComPtr<ID3D11ComputeShader> pComputeShader;
-    {
-      hr = pDevice_->CreateComputeShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pComputeShader->pComputeShader.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-    }
-
-    *_ppShader = std::move(pComputeShader);
-  }
-  break;
-  default: assert(false);
-  }
-}
-
-void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout)
-{
-  assert(*_ppVertexShader);
-
-  CVertexShader* pVertexShader = new CVertexShader;
-  pVertexShader->InputLayout = _InputLayout;
-
-  constexpr const char* kTarget = "vs_5_0";
-
-  HRESULT hr = S_OK;
-
-  Microsoft::WRL::ComPtr<ID3D10Blob> pCode;
-  ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
-
-  Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
-  {
-    hr = pDevice_->CreateVertexShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pVertexShader->pVertexShader.GetAddressOf());
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-  }
-
-  *_ppVertexShader = std::move(pVertexShader);
-}
-
 void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const
 {
   HRESULT hr = S_OK;
@@ -628,5 +510,191 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   }
   break;
   default: assert(false);
+  }
+}
+
+void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, ShaderType _Type)
+{
+  assert(*_ppShader);
+
+  HRESULT hr = S_OK;
+
+  Microsoft::WRL::ComPtr<ID3DBlob> pCode;
+  switch (_Type)
+  {
+    //case ShaderType::eVertexShader:
+    //  break;
+  case ShaderType::eHullShader:
+  {
+    CHullShader* pShader = new CHullShader;
+
+    constexpr const char* kTarget = "hs_5_0";
+
+    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
+
+    Microsoft::WRL::ComPtr<ID3D11HullShader> pHullShader;
+    {
+      hr = pDevice_->CreateHullShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pHullShader.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    }
+
+    *_ppShader = std::move(pShader);
+  }
+  break;
+  case ShaderType::eDomainShader:
+  {
+    CDomainShader* pShader = new CDomainShader;
+
+    constexpr const char* kTarget = "ds_5_0";
+
+    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
+
+    Microsoft::WRL::ComPtr<ID3D11DomainShader> pDomainShader;
+    {
+      hr = pDevice_->CreateDomainShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pDomainShader.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    }
+
+    *_ppShader = std::move(pShader);
+  }
+  break;
+  case ShaderType::eGeometryShader:
+  {
+    CGeometryShader* pShader = new CGeometryShader;
+
+    constexpr const char* kTarget = "gs_5_0";
+
+    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
+
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader> pGeometryShader;
+    {
+      hr = pDevice_->CreateGeometryShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pGeometryShader.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    }
+
+    *_ppShader = std::move(pShader);
+  }
+  break;
+  case ShaderType::ePixelShader:
+  {
+    CPixelShader* pShader = new CPixelShader;
+
+    constexpr const char* kTarget = "ps_5_0";
+
+    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
+
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
+    {
+      hr = pDevice_->CreatePixelShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pPixelShader.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    }
+
+    *_ppShader = std::move(pShader);
+  }
+  break;
+  case ShaderType::eComputeShader:
+  {
+    CComputeShader* pShader = new CComputeShader;
+
+    constexpr const char* kTarget = "cs_5_0";
+
+    ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
+
+    Microsoft::WRL::ComPtr<ID3D11ComputeShader> pComputeShader;
+    {
+      hr = pDevice_->CreateComputeShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pComputeShader.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    }
+
+    *_ppShader = std::move(pShader);
+  }
+  break;
+  default: assert(false);
+  }
+}
+
+void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout)
+{
+  assert(*_ppVertexShader);
+
+  CVertexShader* pShader = new CVertexShader;
+  pShader->InputLayout = _InputLayout;
+
+  constexpr const char* kTarget = "vs_5_0";
+
+  HRESULT hr = S_OK;
+
+  Microsoft::WRL::ComPtr<ID3DBlob> pCode;
+  ::ComplieShader(pCode.GetAddressOf(), kTarget, _Source, _DataSize, _EntryPoint);
+
+  Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
+  {
+    hr = pDevice_->CreateVertexShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pVertexShader.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  }
+
+  *_ppVertexShader = std::move(pShader);
+
+  //  インプットレイアウトの登録
+  if (!pDeviceContext_->isFoundInputLayout(_InputLayout))
+  {
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
+    {
+      std::vector<D3D11_INPUT_ELEMENT_DESC> InputElementDesc;
+
+      switch (_InputLayout)
+      {
+        //case vdl::InputLayout::eNone:
+        //  break;
+      case vdl::InputLayout::eTexture:
+      {
+        InputElementDesc.emplace_back("POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+
+        InputElementDesc.emplace_back("NDC_TRANSFORM", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("NDC_TRANSFORM", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("NDC_TRANSFORM", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("NDC_TRANSFORM", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("TEXCOORD_TRANSFORM", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+      }
+      break;
+      case vdl::InputLayout::eStaticMesh:
+      {
+        InputElementDesc.emplace_back("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+
+        InputElementDesc.emplace_back("WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+      }
+      break;
+      case vdl::InputLayout::eGUI:
+      {
+        InputElementDesc.emplace_back("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+        InputElementDesc.emplace_back("BONES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
+
+        InputElementDesc.emplace_back("WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+        InputElementDesc.emplace_back("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1);
+      }
+      break;
+      default: assert(false);
+      }
+      hr = pDevice_->CreateInputLayout(InputElementDesc.data(), static_cast<vdl::uint>(InputElementDesc.size()), pCode->GetBufferPointer(), pCode->GetBufferSize(), pInputLayout.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    }
+
+    pDeviceContext_->RegisterInputLayout(_InputLayout, std::move(pInputLayout));
   }
 }

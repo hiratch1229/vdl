@@ -9,13 +9,12 @@
 enum class RenderType
 {
   eNone,
-  eSprite,
+  eTexture,
   eStaticMesh,
   eSkinnedMesh,
 
   eNum
 };
-
 
 class IRenderer
 {
@@ -28,7 +27,7 @@ public:
 
   virtual void Initialize() = 0;
 
-  virtual void SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture) = 0;
+  virtual void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture) = 0;
 
   virtual void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type) = 0;
 

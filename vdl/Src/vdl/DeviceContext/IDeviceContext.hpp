@@ -29,8 +29,7 @@ public:
 
   virtual void SetViewport(const vdl::Viewport& _Viewport) = 0;
 
-  //  TODO:マルチレンダーターゲット
-  virtual void SetRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStenilTexture) = 0;
+  virtual void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture) = 0;
 
   virtual void SetBlendState(const vdl::BlendState& _BlendState) = 0;
 

@@ -12,9 +12,32 @@
 
 #include <filesystem>
 
+namespace
+{
+  constexpr IndexType kIndexType = (sizeof(vdl::IndexType) == 2 ? IndexType::eUint16 : IndexType::eUint32);
+}
+
 void CModelManager::Initialize()
 {
   pDevice_ = Engine::Get<IDevice>();
+}
+
+vdl::ID CModelManager::Load(const vdl::StaticMeshData& _MeshData)
+{
+  Mesh* pMesh = new Mesh;
+  {
+    IBuffer* pVertexBuffer = pMesh->pVertexBuffer.get();
+    pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::StaticMeshVertex), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::StaticMeshVertex)));
+
+    IBuffer* pIndexBuffer = pMesh->pIndexBuffer.get();
+    pDevice_->CreateIndexBuffer(&pIndexBuffer, const_cast<vdl::IndexType*>(_MeshData.Indices.data()), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
+
+    pMesh->Name = _MeshData.Name;
+    pMesh->Materials = _MeshData.Materials;
+    pMesh->GlobalTransform = _MeshData.GlobalTransform;
+  }
+
+  return Meshes_.Add(pMesh);
 }
 
 vdl::ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
@@ -22,10 +45,10 @@ vdl::ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
   Mesh* pMesh = new Mesh;
   {
     IBuffer* pVertexBuffer = pMesh->pVertexBuffer.get();
-    pDevice_->CreateVertexBuffer(&pVertexBuffer, const_cast<vdl::Vertex3D*>(_MeshData.Vertices.data()), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)));
+    pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::SkinnedMeshData), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::SkinnedMeshData)));
 
     IBuffer* pIndexBuffer = pMesh->pIndexBuffer.get();
-    pDevice_->CreateIndexBuffer(&pIndexBuffer, const_cast<vdl::IndexType*>(_MeshData.Indices.data()), sizeof(vdl::IndexType), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::Vertex3D)));
+    pDevice_->CreateIndexBuffer(&pIndexBuffer, const_cast<vdl::IndexType*>(_MeshData.Indices.data()), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
 
     pMesh->Name = _MeshData.Name;
     pMesh->Materials = _MeshData.Materials;
@@ -58,11 +81,11 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
     {
       if (FBXLoader::CheckSupportFormat(FileFormat))
       {
-        MeshDatas = std::move(FBXLoader().Load(_FilePath));
+        MeshDatas = FBXLoader().Load(_FilePath);
       }
       else if (glTFLoader::CheckSupportFormat(FileFormat))
       {
-        MeshDatas = std::move(glTFLoader().Load(_FilePath));
+        MeshDatas = glTFLoader().Load(_FilePath);
       }
       else
       {

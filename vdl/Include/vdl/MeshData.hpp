@@ -20,7 +20,7 @@ namespace vdl
   struct StaticMeshData
   {
     std::string Name;
-    std::vector<Vertex3D> Vertices;
+    std::vector<StaticMeshVertex> Vertices;
     std::vector<IndexType> Indices;
     std::vector<Material> Materials;
     Matrix GlobalTransform = Matrix::Identity();
@@ -47,13 +47,15 @@ namespace vdl
     std::vector<Skeletal> Skeletals;
   };
 
-  struct SkinnedMeshData : public StaticMeshData
+  struct SkinnedMeshData 
   {
+    std::string Name;
+    std::vector<SkinnedMeshVertex> Vertices;
+    std::vector<IndexType> Indices;
+    std::vector<Material> Materials;
     std::vector<Animation> Animations;
+    Matrix GlobalTransform = Matrix::Identity();
   public:
     SkinnedMeshData() = default;
-
-    SkinnedMeshData(const StaticMeshData& _StaticMeshData)
-      : StaticMeshData(_StaticMeshData) {}
   };
 }

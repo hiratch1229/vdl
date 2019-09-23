@@ -6,10 +6,11 @@ namespace vdl
   enum class InputLayout : uint8_t
   {
     eNone,
-    e2D,
-    e3D,
+    eTexture,
+    eStaticMesh,
+    eSkinnedMesh,
 
     //  TODO:“à•”—p‚È‚Ì‚Å‰B‚·
-    eGUI,
+    eGUI
   };
 }

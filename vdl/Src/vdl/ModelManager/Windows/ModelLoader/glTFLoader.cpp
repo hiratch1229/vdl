@@ -82,8 +82,7 @@ MeshDatas glTFLoader::Load(const char* _FilePath)const
     {
       FetchMaterial(pResourceReader, Document, GltfMesh, Directory, &MeshData.Materials, TextureLoader);
       FetchVerticesAndIndices(pResourceReader, Document, GltfMesh, &MeshData.Vertices, &MeshData.Indices, &MeshData.Materials);
-
-
+      
       MeshData.Name = GltfMesh.name;
       MeshData.GlobalTransform = Transform * GetMatrixFromNode(Document.nodes.Get(GltfMesh.id));
     }
@@ -207,7 +206,7 @@ void glTFLoader::FetchVerticesAndIndices(const std::unique_ptr<Microsoft::glTF::
         const vdl::uint PolygonNum = VertexNum / 3;
         for (vdl::uint PolygonCount = 0; PolygonCount < PolygonNum; ++PolygonCount)
         {
-          vdl::Vertex3D& Vertex = Vertices[PolygonCount];
+          vdl::SkinnedMeshVertex& Vertex = Vertices[PolygonCount];
 
           if (hasPositions)
           {
@@ -246,18 +245,18 @@ void glTFLoader::FetchVerticesAndIndices(const std::unique_ptr<Microsoft::glTF::
         Indices Indices;
         if (Microsoft::glTF::ComponentType::COMPONENT_UNSIGNED_INT == Accessor.componentType)
         {
-          for (auto& Index : _pResourceReader->ReadBinaryData<vdl::uint32_t>(_Document, Accessor))
-          {
-            Indices.push_back(static_cast<vdl::uint16_t>(Index));
-          }
+          Indices = _pResourceReader->ReadBinaryData<vdl::uint32_t>(_Document, Accessor);
         }
         else
         {
-          Indices = std::move(_pResourceReader->ReadBinaryData<vdl::uint16_t>(_Document, Accessor));
+          for (auto& Index : _pResourceReader->ReadBinaryData<vdl::uint16_t>(_Document, Accessor))
+          {
+            Indices.push_back(static_cast<vdl::uint32_t>(Index));
+          }
         }
 
         _pIndices->insert(_pIndices->end(), Indices.begin(), Indices.end());
-        IndicesNum = static_cast<vdl::uint>(Indices.size());
+        IndicesNum = static_cast<vdl::IndexType>(Indices.size());
       }
 
       //  ÉfÅ[É^ÇÃèÛë‘Çï€ë∂

@@ -3,11 +3,9 @@
 
 namespace vdl::Renderer
 {
-  void SetScissor(const Scissor& _Scissor);
+  void SetRenderTexture(const RenderTexture& _RenderTexture, const DepthStencilTexture& _DepthStencilTexture);
 
-  void SetViewport(const Viewport& _Viewport);
-
-  void SetRenderTextures(const RenderTexture& _RenderTexture, const DepthStencilTexture& _DepthStencilTexture);
+  void SetRenderTextures(const RenderTextures& _RenderTextures, const DepthStencilTexture& _DepthStencilTexture);
 
   void Clear(const RenderTexture& _RenderTexure, const ColorF& _ClearColor = Palette::Black);
 

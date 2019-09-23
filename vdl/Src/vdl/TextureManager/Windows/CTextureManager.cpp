@@ -33,7 +33,7 @@ vdl::ID CTextureManager::Load(const char* _FilePath, bool _isSerialize)
 
   if (Image.isEmpty())
   {
-    Image = std::move(TextureLoader().LoadFromFile(_FilePath));
+    Image = TextureLoader().LoadFromFile(_FilePath);
   }
 
   if (_isSerialize)

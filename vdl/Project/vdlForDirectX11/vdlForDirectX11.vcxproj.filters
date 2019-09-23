@@ -28,6 +28,9 @@
     <Filter Include="Src\Format">
       <UniqueIdentifier>{0e955383-90c0-429e-bde1-cc4fcc80d068}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Topology">
+      <UniqueIdentifier>{34aa320d-cea2-4ad3-b4a5-10e54f67626e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\Buffer\DirectX11\CBuffer.hpp">
@@ -53,6 +56,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Format\DirectX\Format.hpp">
       <Filter>Src\Format</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Topology\DirectX\Topology.hpp">
+      <Filter>Src\Topology</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

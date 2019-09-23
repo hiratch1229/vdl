@@ -742,7 +742,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
 
     RendererCommands_.emplace_back(RendererCommandType::eDraw, static_cast<vdl::uint>(DisplayObjectIDs_.size()));
     DisplayObjectIDs_.push_back(DiplayObjectID);
-    Instances_.emplace_back(std::move(_InstanceData));
+    Instances_.emplace_back(_InstanceData);
   }
 
   StateChangeFlags_.Clear();

@@ -19,8 +19,11 @@ private:
   Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView_;
   Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView_;
 private:
-  vdl::RenderTexture RenderTexture_;
+  vdl::RenderTextures RenderTextures_;
   vdl::DepthStencilTexture DepthStencilTexture_;
+public:
+  ID3D11RenderTargetView* GetRenderTargetView()const { return pRenderTargetView_.Get(); }
+  ID3D11DepthStencilView* GetDepthStencilView()const { return pDepthStencilView_.Get(); }
 public:
   void Initialize()override;
 

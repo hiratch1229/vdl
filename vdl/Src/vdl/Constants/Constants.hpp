@@ -2,6 +2,7 @@
 #include <vdl/Constants.hpp>
 
 #include <vdl/Type2.hpp>
+#include <vdl/Color.hpp>
 #include <vdl/Format.hpp>
 
 namespace Constants

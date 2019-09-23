@@ -80,7 +80,7 @@ MeshDatas FBXLoader::Load(const char* _FilePath)const
   const TextureLoader TexureLoader;
   const std::string Directory = std::filesystem::path(_FilePath).remove_filename().string();
 
-  std::vector<fbxsdk::FbxMesh*> FbxMeshes = std::move(GetFbxMeshes(pScene));
+  std::vector<fbxsdk::FbxMesh*> FbxMeshes = GetFbxMeshes(pScene);
   const vdl::uint FbxMeshNum = static_cast<vdl::uint>(FbxMeshes.size());
   for (vdl::uint FbxMeshCount = 0; FbxMeshCount < FbxMeshNum; ++FbxMeshCount)
   {
@@ -264,7 +264,7 @@ void FBXLoader::FetchVertices(fbxsdk::FbxMesh* _pMesh, Vertices* _pVertices, con
     {
       const int VertexIndex = VertexCount + PolygonCount * 3;
 
-      vdl::Vertex3D& Vertex = (*_pVertices)[VertexIndex];
+      vdl::SkinnedMeshVertex& Vertex = (*_pVertices)[VertexIndex];
 
       const int ControlPointIndex = _pMesh->GetPolygonVertex(PolygonCount, VertexCount);
 

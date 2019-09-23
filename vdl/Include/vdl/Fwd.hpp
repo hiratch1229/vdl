@@ -1,6 +1,8 @@
 #pragma once
 #include "Types.hpp"
+#include "Constants.hpp"
 
+#include <array>
 #include <vector>
 
 namespace vdl
@@ -54,8 +56,9 @@ namespace vdl
   //-------------------------
   //  Vertex.hpp
   //-------------------------
-  struct Vertex2D;
-  struct Vertex3D;
+  struct TextureVertex;
+  struct StaticMeshVertex;
+  struct SkinnedMeshVertex;
 
   //-------------------------
   //  InputLayout.hpp
@@ -132,6 +135,7 @@ namespace vdl
   //-------------------------
   class Texture;
   class RenderTexture;
+  using RenderTextures = std::array<RenderTexture, Constants::kMaxRenderTextureNum>;
   class DepthStencilTexture;
 
   //-------------------------

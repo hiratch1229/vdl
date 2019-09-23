@@ -27,6 +27,7 @@
     <ClInclude Include="..\..\Src\vdl\Shader\DirectX11\CShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\DirectX11\CSwapChain.hpp" />
     <ClInclude Include="..\..\Src\vdl\Texture\DirectX11\CTexture.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Topology\DirectX\Topology.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX11\CBufferManager.cpp" />

@@ -20,7 +20,7 @@ void CRenderer::Initialize()
   //  バッファの作成
   {
     IBuffer* pTextureVertexBuffer = pTextureVertexBuffer_.get();
-    pDevice_->CreateVertexBuffer(&pTextureVertexBuffer, kRectangle, sizeof(vdl::Vertex2D), static_cast<vdl::uint>(sizeof(vdl::Vertex2D) * vdl::Macro::ArraySize(kRectangle)));
+    pDevice_->CreateVertexBuffer(&pTextureVertexBuffer, kRectangle, sizeof(vdl::TextureVertex), static_cast<vdl::uint>(sizeof(vdl::TextureVertex) * vdl::Macro::ArraySize(kRectangle)));
 
     IBuffer* pTextureInstanceBuffer = pTextureInstanceBuffer_.get();
     pDevice_->CreateInstanceBuffer(&pTextureInstanceBuffer, sizeof(TextureInstanceData), sizeof(TextureInstanceData) * Constants::kMaxTextureBatchNum);
@@ -40,17 +40,17 @@ void CRenderer::Initialize()
     const vdl::Viewport Viewport(0, WindowSize);
 
     TextureRendererCommandList_.Initialize(Scissor, Viewport, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault2D, vdl::RasterizerState::kDefault2D,
-      vdl::Sampler::kDefault2D, vdl::VertexShader(Constants::kDefaultTextureVertexShaderFilePath, vdl::InputLayout::e2D), vdl::PixelShader(Constants::kDefaultTexturePixelShaderFilePath));
+      vdl::Sampler::kDefault2D, vdl::VertexShader(Constants::kDefaultTextureVertexShaderFilePath, vdl::InputLayout::eTexture), vdl::PixelShader(Constants::kDefaultTexturePixelShaderFilePath));
     StaticMeshRendererCommandList_.Initialize(Scissor, Viewport, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D,
-      vdl::Sampler::kDefault3D, vdl::VertexShader(Constants::kDefaultStaticMeshVertexShaderFilePath, vdl::InputLayout::e3D), vdl::PixelShader(Constants::kDefaultStaticMeshPixelShaderFilePath));
+      vdl::Sampler::kDefault3D, vdl::VertexShader(Constants::kDefaultStaticMeshVertexShaderFilePath, vdl::InputLayout::eStaticMesh), vdl::PixelShader(Constants::kDefaultStaticMeshPixelShaderFilePath));
     SkinnedMeshRendererCommandList_.Initialize(Scissor, Viewport, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D,
-      vdl::Sampler::kDefault3D, vdl::VertexShader(Constants::kDefaultSkinnedMeshVertexShaderFilePath, vdl::InputLayout::e3D), vdl::PixelShader(Constants::kDefaultSkinnedMeshPixelShaderFilePath));
+      vdl::Sampler::kDefault3D, vdl::VertexShader(Constants::kDefaultSkinnedMeshVertexShaderFilePath, vdl::InputLayout::eSkinnedMesh), vdl::PixelShader(Constants::kDefaultSkinnedMeshPixelShaderFilePath));
   }
 }
 
-void CRenderer::SetRenderTextures(const vdl::RenderTexture& _RenderTexture, const vdl::DepthStencilTexture& _DepthStencilTexture)
+void CRenderer::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)
 {
-  OutputManager OutputManager{ _RenderTexture, _DepthStencilTexture };
+  OutputManager OutputManager{ _RenderTextures, _DepthStencilTexture };
 
   if (OutputManager_ != OutputManager)
   {
@@ -140,15 +140,16 @@ void CRenderer::Flush()
     TextureRendererCommandList_.Adjust();
   }
 
-  pDeviceContext_->SetRenderTexture(OutputManager_.RenderTexture, OutputManager_.DepthStencilTexture);
+  pDeviceContext_->SetRenderTextures(OutputManager_.RenderTextures, OutputManager_.DepthStencilTexture);
 
-  pDeviceContext_->SetInputLayout(vdl::InputLayout::e3D);
+  pDeviceContext_->SetInputLayout(vdl::InputLayout::eStaticMesh);
   pDeviceContext_->SetTopology(vdl::Topology::eTriangleStrip);
   StaticMeshRendererCommandList_.Flush(pDeviceContext_, pStaticMeshInstanceBuffer_.get());
 
+  pDeviceContext_->SetInputLayout(vdl::InputLayout::eSkinnedMesh);
   SkinnedMeshRendererCommandList_.Flush(pDeviceContext_, pSkinnedMeshInstanceBuffer_.get());
 
-  pDeviceContext_->SetInputLayout(vdl::InputLayout::e2D);
+  pDeviceContext_->SetInputLayout(vdl::InputLayout::eTexture);
   pDeviceContext_->SetTopology(vdl::Topology::eTriangleStrip);
   pDeviceContext_->SetVertexBuffer(pTextureVertexBuffer_.get());
   TextureRendererCommandList_.Flush(pDeviceContext_, pTextureInstanceBuffer_.get());

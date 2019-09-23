@@ -4,13 +4,17 @@
 #include <d3d11.h>
 #include <wrl.h>
 
+class CDeviceContext;
+
 class CDevice : public IDevice
 {
+  CDeviceContext* pDeviceContext_;
+private:
   Microsoft::WRL::ComPtr<ID3D11Device> pDevice_;
   Microsoft::WRL::ComPtr<ID3D11DeviceContext> pImmediateContext_;
 public:
-  ID3D11Device* GetDevice()const { return pDevice_.Get(); }
-  ID3D11DeviceContext* GetImmediateContext()const { return pImmediateContext_.Get(); }
+  [[nodiscard]] ID3D11Device* GetDevice()const { return pDevice_.Get(); }
+  [[nodiscard]] ID3D11DeviceContext* GetImmediateContext()const { return pImmediateContext_.Get(); }
 public:
   void Initialize()override;
 

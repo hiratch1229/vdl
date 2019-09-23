@@ -2,13 +2,12 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Window/IWindow.hpp>
-#include <vdl/Device/IDevice.hpp>
+#include <vdl/Device/DirectX11/CDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 
 #include <vdl/Format/DirectX/Format.hpp>
-#include <vdl/Device/DirectX11/CDevice.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
 void CSwapChain::Initialize()
@@ -103,9 +102,9 @@ void CSwapChain::Initialize()
 
 void CSwapChain::ScreenClear()
 {
-  pDeviceContext_->ClearRenderTexture(RenderTexture_, pWindow_->GetScreenClearColor());
+  pDeviceContext_->ClearRenderTexture(RenderTextures_[0], pWindow_->GetScreenClearColor());
   pDeviceContext_->ClearDepthStencilTexture(DepthStencilTexture_, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
-  pDeviceContext_->SetRenderTexture(RenderTexture_, DepthStencilTexture_);
+  pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
 }
 
 void CSwapChain::Present()

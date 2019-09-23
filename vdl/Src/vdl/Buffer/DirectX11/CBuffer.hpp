@@ -38,15 +38,11 @@ public:
 
 struct CConstantBuffer : public IConstantBuffer
 {
-  union
-  {
-    Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
-    void* Buffer;
-  };
+  Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
+  void* Buffer;
   vdl::uint BufferSize;
 public:
-  CConstantBuffer()
-    : pBuffer(nullptr) {}
+  CConstantBuffer() = default;
 
   CConstantBuffer(vdl::uint _BufferSize)
     : Buffer(new char[_BufferSize]), BufferSize(_BufferSize) {}
