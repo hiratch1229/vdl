@@ -36,9 +36,6 @@ private:
   HWND hWnd_;
 private:
   vdl::VertexShader VertexShader_;
-  vdl::HullShader HullShader_;
-  vdl::DomainShader DomainShader_;
-  vdl::GeometryShader GeometryShader_;
   vdl::PixelShader PixelShader_;
   vdl::GraphicsState GraphicsState_;
   vdl::Texture Font_;
@@ -46,8 +43,6 @@ private:
   vdl::ConstantBuffer<ConstantBufferData> ConstantBuffer_;
   vdl::Scissor Scissor_;
   vdl::Viewport Viewport_;
-  vdl::RenderTextures RenderTextures_;
-  vdl::DepthStencilTexture DepthStencilTexture_;
 private:
   std::unique_ptr<IBuffer> pVertexBuffers_[2];
   vdl::uint VertexBufferSize_ = 0;

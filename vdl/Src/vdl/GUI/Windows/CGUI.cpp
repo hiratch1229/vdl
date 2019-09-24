@@ -813,7 +813,7 @@ void CGUI::Draw()
   pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
 
   pDeviceContext_->SetViewport(Viewport_);
-  pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
+  pDeviceContext_->SetRenderTextures({ vdl::RenderTexture() }, vdl::DepthStencilTexture());
 
   pDeviceContext_->SetBlendState(GraphicsState_.BlendState);
   pDeviceContext_->SetDepthStencilState(GraphicsState_.DepthSteniclState);
@@ -826,11 +826,11 @@ void CGUI::Draw()
   pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
   pDeviceContext_->PSSetTextures(0, 1, &Font_);
 
-  pDeviceContext_->HSSetShader(HullShader_);
+  pDeviceContext_->HSSetShader(vdl::HullShader());
 
-  pDeviceContext_->DSSetShader(DomainShader_);
+  pDeviceContext_->DSSetShader(vdl::DomainShader());
 
-  pDeviceContext_->GSSetShader(GeometryShader_);
+  pDeviceContext_->GSSetShader(vdl::GeometryShader());
 
   // Render command lists
   // (Because we merged all buffers into a single one, we maintain our own offset into them)

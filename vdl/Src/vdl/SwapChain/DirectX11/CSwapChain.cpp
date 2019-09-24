@@ -102,9 +102,12 @@ void CSwapChain::Initialize()
 
 void CSwapChain::ScreenClear()
 {
-  pDeviceContext_->ClearRenderTexture(RenderTextures_[0], pWindow_->GetScreenClearColor());
-  pDeviceContext_->ClearDepthStencilTexture(DepthStencilTexture_, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
-  pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
+  const vdl::RenderTexture RenderTexture = vdl::RenderTexture();
+  const vdl::DepthStencilTexture DepthStencilTexture = vdl::DepthStencilTexture();
+
+  pDeviceContext_->ClearRenderTexture(RenderTexture, pWindow_->GetScreenClearColor());
+  pDeviceContext_->ClearDepthStencilTexture(DepthStencilTexture, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
+  pDeviceContext_->SetRenderTextures({ RenderTexture }, DepthStencilTexture);
 }
 
 void CSwapChain::Present()

@@ -45,7 +45,7 @@ public:
 
   virtual void VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) = 0;
 
-  virtual void HSSetShader(const vdl::HullShader& _VertexShader) = 0;
+  virtual void HSSetShader(const vdl::HullShader& _HullShader) = 0;
 
   virtual void HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
 

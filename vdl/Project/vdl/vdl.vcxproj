@@ -39,6 +39,7 @@
     <ClInclude Include="..\..\Include\vdl\GraphicsState.hpp" />
     <ClInclude Include="..\..\Include\vdl\GUI.hpp" />
     <ClInclude Include="..\..\Include\vdl\Half.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Hash.hpp" />
     <ClInclude Include="..\..\Include\vdl\ID.hpp" />
     <ClInclude Include="..\..\Include\vdl\Image.hpp" />
     <ClInclude Include="..\..\Include\vdl\InputLayout.hpp" />

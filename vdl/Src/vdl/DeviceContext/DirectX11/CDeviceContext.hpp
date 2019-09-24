@@ -2,20 +2,39 @@
 #include "../IDeviceContext.hpp"
 
 #include <vdl/InputLayout.hpp>
+#include <vdl/GraphicsState.hpp>
+#include <vdl/Sampler.hpp>
 
 #include <d3d11.h>
 #include <wrl.h>
 
+#include <map>
 #include <unordered_map>
+
+class ITextureManager;
+class IBufferManager;
+class IShaderManager;
 
 class CDeviceContext : public IDeviceContext
 {
+  ITextureManager* pTextureManager_;
+  IBufferManager* pBufferManager_;
+  IShaderManager* pShaderManager_;
+private:
+  ID3D11Device* pDevice_;
   ID3D11DeviceContext* pImmediateContext_;
+  ID3D11RenderTargetView* pSwapChainRenderTargetView_;
+  ID3D11DepthStencilView* pSwapChainDepthStencilView_;
 private:
   std::unordered_map<vdl::InputLayout, Microsoft::WRL::ComPtr<ID3D11InputLayout>> InputLayouts_;
+  std::map<vdl::BlendState, Microsoft::WRL::ComPtr<ID3D11BlendState>> BlendStates_;
+  std::unordered_map<vdl::DepthStencilState, Microsoft::WRL::ComPtr<ID3D11DepthStencilState>> DepthStencilStates_;
+  std::unordered_map<vdl::RasterizerState, Microsoft::WRL::ComPtr<ID3D11RasterizerState>> RasterizerStates_;
+  std::unordered_map<vdl::Sampler, Microsoft::WRL::ComPtr<ID3D11SamplerState>> Samplers_;
 public:
   [[nodiscard]] bool isFoundInputLayout(vdl::InputLayout _InputLayout) { return InputLayouts_.find(_InputLayout) == InputLayouts_.end(); }
-  void RegisterInputLayout(vdl::InputLayout _Key, Microsoft::WRL::ComPtr<ID3D11InputLayout>&& _pInputLayout) { InputLayouts_[_Key] = _pInputLayout; }
+  void RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode);
+  ID3D11SamplerState* GetSamplerState(const vdl::Sampler& _Sampler);
 public:
   CDeviceContext() = default;
 
@@ -51,7 +70,7 @@ public:
 
   void VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])override;
 
-  void HSSetShader(const vdl::HullShader& _VertexShader)override;
+  void HSSetShader(const vdl::HullShader& __HullShader)override;
 
   void HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])override;
 
@@ -91,5 +110,5 @@ public:
 
   void DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount, vdl::uint _FirstIndex, vdl::uint _VertexOffset, vdl::uint _FirstInstance)override;
 
-  void Flush()override;
+  void Flush()override {};
 };
