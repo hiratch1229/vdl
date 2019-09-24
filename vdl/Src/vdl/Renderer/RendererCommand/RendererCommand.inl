@@ -202,8 +202,8 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Adjust()
     vdl::uint StartDrawCallIndex;
     vdl::uint ContinuousDrawCallNum = 0;
 
-    const size_t CommandNum = RendererCommands_.size();
-    for (size_t CommandCount = 0; CommandCount < CommandNum; ++CommandCount)
+    const vdl::uint CommandNum = static_cast<vdl::uint>(RendererCommands_.size());
+    for (vdl::uint CommandCount = 0; CommandCount < CommandNum; ++CommandCount)
     {
       const RendererCommandPair& RendererCommand = RendererCommands_[CommandCount];
       assert(RendererCommand.first != RendererCommandType::eNum);
@@ -254,8 +254,8 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
   //  ソートが終わるまで待機
   std::lock_guard Lock(Mutex_);
 
-  const size_t RendererCommandNum = RendererCommands_.size();
-  for (size_t RendererCommandCount = 0; RendererCommandCount < RendererCommandNum; ++RendererCommandCount)
+  const vdl::uint RendererCommandNum = static_cast<vdl::uint>(RendererCommands_.size());
+  for (vdl::uint RendererCommandCount = 0; RendererCommandCount < RendererCommandNum; ++RendererCommandCount)
   {
     const RendererCommandPair& RendererCommand = RendererCommands_[RendererCommandCount];
 
@@ -293,7 +293,6 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
 
             pDevice_->WriteMemory(_pInstanceBuffer, Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
             _pDeviceContext->SetInstanceBuffer(_pInstanceBuffer);
-            pModelManager_->GetMesh(CurrentDisplayObjectID);
 
             if constexpr (std::is_same<DisplayObject, vdl::Texture>::value)
             {
@@ -308,9 +307,9 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
               _pDeviceContext->SetVertexBuffer(pMesh->pVertexBuffer.get());
               _pDeviceContext->SetIndexBuffer(pMesh->pIndexBuffer.get());
 
-              for (auto& Material : Materials)
+              for (auto& Material : pMesh->Materials)
               {
-                _pDeviceContext->PSSetTextures(0, 1, &Material.Texture);
+                _pDeviceContext->PSSetTextures(0, 1, &Material.Diffuse);
 
                 _pDeviceContext->DrawIndexed(Material.IndexCount, ContinuousDrawCallNum, Material.IndexStart, 0, 0);
               }
@@ -406,105 +405,105 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
     {
       const Samplers& Samplers = GetSamplers(RendererCommand.second, ShaderType::eVertexShader);
 
-      _pDeviceContext->VSSetSamplers(0, Samplers.size(), Samplers.data());
+      _pDeviceContext->VSSetSamplers(0, static_cast<vdl::uint>(Samplers.size()), Samplers.data());
     }
     break;
     case RendererCommandType::eSetHullStageSampler:
     {
       const Samplers& Samplers = GetSamplers(RendererCommand.second, ShaderType::eHullShader);
 
-      _pDeviceContext->HSSetSamplers(0, Samplers.size(), Samplers.data());
+      _pDeviceContext->HSSetSamplers(0, static_cast<vdl::uint>(Samplers.size()), Samplers.data());
     }
     break;
     case RendererCommandType::eSetDomainStageSampler:
     {
       const Samplers& Samplers = GetSamplers(RendererCommand.second, ShaderType::eDomainShader);
 
-      _pDeviceContext->DSSetSamplers(0, Samplers.size(), Samplers.data());
+      _pDeviceContext->DSSetSamplers(0, static_cast<vdl::uint>(Samplers.size()), Samplers.data());
     }
     break;
     case RendererCommandType::eSetGeometryStageSampler:
     {
       const Samplers& Samplers = GetSamplers(RendererCommand.second, ShaderType::eGeometryShader);
 
-      _pDeviceContext->GSSetSamplers(0, Samplers.size(), Samplers.data());
+      _pDeviceContext->GSSetSamplers(0, static_cast<vdl::uint>(Samplers.size()), Samplers.data());
     }
     break;
     case RendererCommandType::eSetPixelStageSampler:
     {
       const Samplers& Samplers = GetSamplers(RendererCommand.second, ShaderType::ePixelShader);
 
-      _pDeviceContext->PSSetSamplers(0, Samplers.size(), Samplers.data());
+      _pDeviceContext->PSSetSamplers(0, static_cast<vdl::uint>(Samplers.size()), Samplers.data());
     }
     break;
     case RendererCommandType::eSetVertexStageTexture:
     {
       const std::vector<vdl::Texture> Textures = std::move(GetTextures(RendererCommand.second, ShaderType::eVertexShader));
 
-      _pDeviceContext->VSSetTextures(0, Textures.size(), Textures.data());
+      _pDeviceContext->VSSetTextures(0, static_cast<vdl::uint>(Textures.size()), Textures.data());
     }
     break;
     case RendererCommandType::eSetHullStageTexture:
     {
       const std::vector<vdl::Texture> Textures = std::move(GetTextures(RendererCommand.second, ShaderType::eHullShader));
 
-      _pDeviceContext->HSSetTextures(0, Textures.size(), Textures.data());
+      _pDeviceContext->HSSetTextures(0, static_cast<vdl::uint>(Textures.size()), Textures.data());
     }
     break;
     case RendererCommandType::eSetDomainStageTexture:
     {
       const std::vector<vdl::Texture> Textures = std::move(GetTextures(RendererCommand.second, ShaderType::eDomainShader));
 
-      _pDeviceContext->DSSetTextures(0, Textures.size(), Textures.data());
+      _pDeviceContext->DSSetTextures(0, static_cast<vdl::uint>(Textures.size()), Textures.data());
     }
     break;
     case RendererCommandType::eSetGeometryStageTexture:
     {
       const std::vector<vdl::Texture> Textures = std::move(GetTextures(RendererCommand.second, ShaderType::eGeometryShader));
 
-      _pDeviceContext->GSSetTextures(0, Textures.size(), Textures.data());
+      _pDeviceContext->GSSetTextures(0, static_cast<vdl::uint>(Textures.size()), Textures.data());
     }
     break;
     case RendererCommandType::eSetPixelStageTexture:
     {
       const std::vector<vdl::Texture> Textures = std::move(GetTextures(RendererCommand.second, ShaderType::ePixelShader));
 
-      _pDeviceContext->PSSetTextures(0, Textures.size(), Textures.data());
+      _pDeviceContext->PSSetTextures(0, static_cast<vdl::uint>(Textures.size()), Textures.data());
     }
     break;
     case RendererCommandType::eSetVertexStageConstantBuffer:
     {
       const std::vector<vdl::Detail::ConstantBufferData> ConstantBuffers = std::move(GetConstantBuffers(RendererCommand.second, ShaderType::eVertexShader));
 
-      _pDeviceContext->VSSetConstantBuffers(0, ConstantBuffers.size(), ConstantBuffers.data());
+      _pDeviceContext->VSSetConstantBuffers(0, static_cast<vdl::uint>(ConstantBuffers.size()), ConstantBuffers.data());
     }
     break;
     case RendererCommandType::eSetHullStageConstantBuffer:
     {
       const std::vector<vdl::Detail::ConstantBufferData> ConstantBuffers = std::move(GetConstantBuffers(RendererCommand.second, ShaderType::eHullShader));
 
-      _pDeviceContext->HSSetConstantBuffers(0, ConstantBuffers.size(), ConstantBuffers.data());
+      _pDeviceContext->HSSetConstantBuffers(0, static_cast<vdl::uint>(ConstantBuffers.size()), ConstantBuffers.data());
     }
     break;
     case RendererCommandType::eSetDomainStageConstantBuffer:
     {
       const std::vector<vdl::Detail::ConstantBufferData> ConstantBuffers = std::move(GetConstantBuffers(RendererCommand.second, ShaderType::eDomainShader));
 
-      _pDeviceContext->DSSetConstantBuffers(0, ConstantBuffers.size(), ConstantBuffers.data());
+      _pDeviceContext->DSSetConstantBuffers(0, static_cast<vdl::uint>(ConstantBuffers.size()), ConstantBuffers.data());
     }
     break;
     case RendererCommandType::eSetGeometryStageConstantBuffer:
     {
       const std::vector<vdl::Detail::ConstantBufferData> ConstantBuffers = std::move(GetConstantBuffers(RendererCommand.second, ShaderType::eGeometryShader));
 
-      _pDeviceContext->GSSetConstantBuffers(0, ConstantBuffers.size(), ConstantBuffers.data());
+      _pDeviceContext->GSSetConstantBuffers(0, static_cast<vdl::uint>(ConstantBuffers.size()), ConstantBuffers.data());
     }
     break;
     case RendererCommandType::eSetPixelStageConstantBuffer:
     {
       const std::vector<vdl::Detail::ConstantBufferData> ConstantBuffers = std::move(GetConstantBuffers(RendererCommand.second, ShaderType::ePixelShader));
 
-      _pDeviceContext->PSSetConstantBuffers(0, ConstantBuffers.size(), ConstantBuffers.data());
+      _pDeviceContext->PSSetConstantBuffers(0, static_cast<vdl::uint>(ConstantBuffers.size()), ConstantBuffers.data());
     }
     break;
     default: assert(false);
@@ -661,11 +660,12 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
   {
     auto IssueRendererCommandSetConstantBuffer = [this](RendererCommandType _RendererCommandType, ShaderType _ShaderType)->void
     {
+      ConstantBufferIDs TempConstantBufferIDs;
       auto& CurrentConstantBufferIDs = CurrentConstantBufferIDs_[static_cast<vdl::uint>(_ShaderType)];
       auto& ConstantBufferIDs = ConstantBufferIDs_[static_cast<vdl::uint>(_ShaderType)];
       auto& LastConstantBufferIDs = LastConstantBufferIDs_[static_cast<vdl::uint>(_ShaderType)];
 
-      std::remove_reference<decltype(CurrentConstantBufferIDs)>::type TempConstantBufferIDs = ConstantBufferIDs.back();
+      TempConstantBufferIDs = ConstantBufferIDs.back();
       {
         const size_t CurrentConstantBufferNum = CurrentConstantBufferIDs.size();
         const size_t LastConstantBufferNum = LastConstantBufferIDs.size();

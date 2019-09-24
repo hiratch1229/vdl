@@ -8,5 +8,5 @@
 
 ISoundManager* ISoundManager::Create()
 {
-  return CSoundManager;
+  return new CSoundManager;
 }

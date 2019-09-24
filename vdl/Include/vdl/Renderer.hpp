@@ -1,6 +1,8 @@
 #pragma once
 #include "Fwd.hpp"
 
+#include "Color.hpp"
+
 namespace vdl::Renderer
 {
   void SetRenderTexture(const RenderTexture& _RenderTexture, const DepthStencilTexture& _DepthStencilTexture);

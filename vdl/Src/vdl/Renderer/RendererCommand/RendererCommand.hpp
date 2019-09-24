@@ -21,7 +21,7 @@
 
 class IDevice;
 class IDeviceContext;
-class IBuffer;
+struct IBuffer;
 class IBufferManager;
 class IModelManager;
 

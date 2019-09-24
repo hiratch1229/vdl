@@ -104,6 +104,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -127,6 +128,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;..\..\Src\ThirdParty\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,6 +139,7 @@
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>..\..\Src\ThirdParty\FBXSDK;..\..\Src\ThirdParty\glTFSDK;..\..\Src\ThirdParty\ImGui</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -198,6 +201,7 @@
     <Lib>
       <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;mfplay.lib;libfbxsdk-md.lib;GLTFSDK.lib;ImGui.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\Src\ThirdParty\FBXSDK;..\..\Src\ThirdParty\glTFSDK;..\..\Src\ThirdParty\ImGui</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

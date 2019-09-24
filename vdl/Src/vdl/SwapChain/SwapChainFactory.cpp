@@ -1,5 +1,7 @@
 #include "ISwapChain.hpp"
 
+#include <vdl/Platform.hpp>
+
 #if defined VDL_EXECUTE_DIRECTX11
 #include "DirectX11/CSwapChain.hpp"
 #elif defined VDL_EXECUTE_DIRECTX12

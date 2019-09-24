@@ -209,7 +209,7 @@ namespace vdl
 
         //  ˆê”Ô‰º‚Ì“_Žü•Ó
         {
-          const uint SouthPoleIndex = VertexNum - 1;
+          const uint SouthPoleIndex = static_cast<uint>(VertexNum) - 1;
           BaseIndex = SouthPoleIndex - RingVertexCount;
 
           const uint StartIndex = _SliceCount * 3 + (_StackCount - 2) * _SliceCount * 6;

@@ -1,8 +1,8 @@
 Debug/
 Release/
-Bin/
-SCREENSHOT/
-*.cso
+DirectX11OnWindows_Debug/
+DirectX11OnWindows_Release/
+Lib/
 *.vcxproj.user
 *.VC.db
 *.VC.VC.opendb
@@ -10,3 +10,5 @@ SCREENSHOT/
 *.aps
 *.vs
 *.fbm
+vdl.lib
+vdl_d.lib
