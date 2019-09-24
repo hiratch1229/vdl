@@ -27,6 +27,12 @@ public:
 
   virtual void Initialize() = 0;
 
+  virtual vdl::Matrix GetView(RenderType _Type)const = 0;
+
+  virtual vdl::Matrix GetProjection(RenderType _Type)const = 0;
+
+  virtual void SetCamera(const vdl::Camera& _Camera, RenderType _Type) = 0;
+
   virtual void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture) = 0;
 
   virtual void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type) = 0;
@@ -48,7 +54,7 @@ public:
   virtual void SetGeometryShader(const vdl::GeometryShader& _GeometryShader, RenderType _Type) = 0;
 
   virtual void SetPixelShader(const vdl::PixelShader& _PixelShader, RenderType _Type) = 0;
-
+  
   virtual void SetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[], ShaderType _Stage, RenderType _Type) = 0;
 
   virtual void SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[], ShaderType _Stage, RenderType _Type) = 0;

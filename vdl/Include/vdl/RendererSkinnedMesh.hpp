@@ -5,6 +5,12 @@
 
 namespace vdl::RendererSkinnedMesh
 {
+  [[nodiscard]] Matrix GetView();
+
+  [[nodiscard]] Matrix GetProjection();
+
+  void SetCamera(const Camera& _Camera);
+
   void SetScissor(const Scissor& _Scissor);
 
   void SetViewport(const Viewport& _Viewport);

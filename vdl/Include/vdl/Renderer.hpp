@@ -2,6 +2,7 @@
 #include "Fwd.hpp"
 
 #include "Color.hpp"
+#include "Viewport.hpp"
 
 namespace vdl::Renderer
 {

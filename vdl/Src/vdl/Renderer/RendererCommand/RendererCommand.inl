@@ -850,7 +850,7 @@ if (StateChangeFlags_.Has(RendererCommandType))\
     return;\
   }\
   \
-  for (size_t SamplerCount = 0; SamplerCount < CurrentSamplerNum; ++SamplerCount)\
+  for (vdl::uint SamplerCount = 0; SamplerCount < static_cast<vdl::uint>(CurrentSamplerNum); ++SamplerCount)\
   {\
     if (CurrentSamplers[SamplerCount] != LastSamplers[SamplerCount])\
     {\

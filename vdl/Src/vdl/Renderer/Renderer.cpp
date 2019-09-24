@@ -66,6 +66,21 @@ namespace vdl
 
   namespace RendererStaticMesh
   {
+    Matrix GetView()
+    {
+      return Engine::Get<IRenderer>()->GetView(RenderType::eStaticMesh);
+    }
+
+    Matrix GetProjection()
+    {
+      return Engine::Get<IRenderer>()->GetProjection(RenderType::eStaticMesh);
+    }
+
+    void SetCamera(const Camera& _Camera)
+    {
+      Engine::Get<IRenderer>()->SetCamera(_Camera, RenderType::eStaticMesh);
+    }
+
     void SetScissor(const Scissor& _Scissor)
     {
       Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eStaticMesh);
@@ -99,6 +114,21 @@ namespace vdl
 
   namespace RendererSkinnedMesh
   {
+    Matrix GetView()
+    {
+      return Engine::Get<IRenderer>()->GetView(RenderType::eSkinnedMesh);
+    }
+
+    Matrix GetProjection()
+    {
+      return Engine::Get<IRenderer>()->GetProjection(RenderType::eSkinnedMesh);
+    }
+
+    void SetCamera(const Camera& _Camera)
+    {
+      Engine::Get<IRenderer>()->SetCamera(_Camera, RenderType::eSkinnedMesh);
+    }
+
     void SetScissor(const Scissor& _Scissor)
     {
       Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eSkinnedMesh);

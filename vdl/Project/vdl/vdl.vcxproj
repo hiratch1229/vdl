@@ -159,7 +159,23 @@
     <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Shader\StaticMesh\StaticMesh.hlsli" />
+    <None Include="..\..\Shader\Texture\Texture.hlsli" />
     <None Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Shader\StaticMesh\StaticMeshPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\Shader\StaticMesh\StaticMeshVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\Shader\Texture\TexturePS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\Shader\Texture\TextureVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -406,6 +422,7 @@
       <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;..\..\Src\ThirdParty\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -428,6 +445,7 @@
       <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;..\..\Src\ThirdParty\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

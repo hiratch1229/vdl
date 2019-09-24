@@ -17,6 +17,9 @@ void CRenderer::Initialize()
   pDevice_ = Engine::Get<IDevice>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
 
+  StaticMeshCameraData_.Camera = SkinnedMeshCameraData_.Camera = vdl::Camera({ 0.0f,0.0f,-10.0f });
+  StaticMeshCameraData_.isChange = SkinnedMeshCameraData_.isChange = true;
+
   //  バッファの作成
   {
     IBuffer* pTextureVertexBuffer = pTextureVertexBuffer_.get();
@@ -45,6 +48,42 @@ void CRenderer::Initialize()
       vdl::Sampler::kDefault3D, vdl::VertexShader(Constants::kDefaultStaticMeshVertexShaderFilePath, vdl::InputLayout::eStaticMesh), vdl::PixelShader(Constants::kDefaultStaticMeshPixelShaderFilePath));
     SkinnedMeshRendererCommandList_.Initialize(Scissor, Viewport, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D,
       vdl::Sampler::kDefault3D, vdl::VertexShader(Constants::kDefaultSkinnedMeshVertexShaderFilePath, vdl::InputLayout::eSkinnedMesh), vdl::PixelShader(Constants::kDefaultSkinnedMeshPixelShaderFilePath));
+  }
+}
+
+vdl::Matrix CRenderer::GetView(RenderType _Type)const
+{
+  const vdl::Camera& Camera = (_Type == RenderType::eStaticMesh ? StaticMeshCameraData_.Camera : SkinnedMeshCameraData_.Camera);
+
+  return DirectX::XMMatrixLookAtLH({ Camera.Position.x, Camera.Position.y, Camera.Position.z, 1.0f },
+    { Camera.Target.x, Camera.Target.y, Camera.Target.z, 1.0f }, { Camera.Up.x, Camera.Up.y, Camera.Up.z, 0.0f });
+}
+
+vdl::Matrix CRenderer::GetProjection(RenderType _Type)const
+{
+  const vdl::Camera& Camera = (_Type == RenderType::eStaticMesh ? StaticMeshCameraData_.Camera : SkinnedMeshCameraData_.Camera);
+  const vdl::Viewport& Viewport = (_Type == RenderType::eStaticMesh ? StaticMeshRendererCommandList_.GetCurrentViewport() : SkinnedMeshRendererCommandList_.GetCurrentViewport());
+
+  if (Camera.isPerspective)
+  {
+    const float Aspect = Viewport.Size.x / Viewport.Size.y;
+    return DirectX::XMMatrixPerspectiveFovLH(vdl::Math::ToRadian(Camera.Fov), Aspect, Camera.Near, Camera.Far);
+  }
+  else
+  {
+    constexpr float kWidth = 16.0f / 2.0f;
+    constexpr float kHeight = 9.0f / 2.0f;
+
+    return DirectX::XMMatrixOrthographicLH(kWidth, kHeight, Camera.Near, Camera.Far);
+  }
+}
+
+void CRenderer::SetCamera(const vdl::Camera& _Camera, RenderType _Type)
+{
+  CameraData& CameraData = (_Type == RenderType::eStaticMesh ? StaticMeshCameraData_ : SkinnedMeshCameraData_);
+  {
+    CameraData.Camera = _Camera;
+    CameraData.isChange = true;
   }
 }
 
@@ -93,6 +132,13 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
     return;
   }
 
+  if (StaticMeshCameraData_.isChange)
+  {
+    StaticMeshCameraData_.isChange = false;
+    StaticMeshCameraData_.ConstantBuffer.GetData().ViewProjection = GetView(RenderType::eStaticMesh) * GetProjection(RenderType::eStaticMesh);
+    StaticMeshRendererCommandList_.PushVertexStageConstantBuffer(StaticMeshCameraData_.ConstantBuffer.GetDetail(), 0);
+  }
+
   StaticMeshInstanceData InstanceData;
   {
     InstanceData.World = std::move(_World * _StaticMesh.GetGlobalTransform());
@@ -109,12 +155,19 @@ void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _W
     return;
   }
 
+  if (SkinnedMeshCameraData_.isChange)
+  {
+    SkinnedMeshCameraData_.isChange = false;
+    SkinnedMeshCameraData_.ConstantBuffer.GetData().ViewProjection = GetView(RenderType::eStaticMesh) * GetProjection(RenderType::eStaticMesh);
+    SkinnedMeshRendererCommandList_.PushVertexStageConstantBuffer(SkinnedMeshCameraData_.ConstantBuffer.GetDetail(), 0);
+  }
+
   SkinnedMeshinstanceData InstanceData;
   {
     InstanceData.World = std::move(_World * _SkinnedMesh.GetGlobalTransform());
     InstanceData.Color = _Color;
   }
-  StaticMeshRendererCommandList_.PushDrawData(_SkinnedMesh, std::move(InstanceData));
+  SkinnedMeshRendererCommandList_.PushDrawData(_SkinnedMesh, std::move(InstanceData));
 }
 
 void CRenderer::Clear(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)

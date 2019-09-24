@@ -94,6 +94,15 @@
     <Filter Include="Src\MeshData">
       <UniqueIdentifier>{11ac7080-e54d-4588-89a9-7b9a25f1ec32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{3ea9fc29-9584-4248-a137-432c4c2d9dde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\StaticMesh">
+      <UniqueIdentifier>{754fd4c1-b1f7-4097-864d-392bf6e01cc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Texture">
+      <UniqueIdentifier>{f5ff36ec-70c2-4898-bab9-4111edda395a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -463,5 +472,25 @@
     <None Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl">
       <Filter>Src\Renderer\RendererCommand</Filter>
     </None>
+    <None Include="..\..\Shader\Texture\Texture.hlsli">
+      <Filter>Shader\Texture</Filter>
+    </None>
+    <None Include="..\..\Shader\StaticMesh\StaticMesh.hlsli">
+      <Filter>Shader\StaticMesh</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
+      <Filter>Shader\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\Texture\TextureVS.hlsl">
+      <Filter>Shader\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\StaticMesh\StaticMeshPS.hlsl">
+      <Filter>Shader\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\StaticMesh\StaticMeshVS.hlsl">
+      <Filter>Shader\StaticMesh</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

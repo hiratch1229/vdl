@@ -19,13 +19,13 @@ namespace vdl::Constants
 
   constexpr uint kMaxConstantBufferNum = 14;
 
-  constexpr const char* kDefaultTextureVertexShaderFilePath = "";
+  constexpr const char* kDefaultTextureVertexShaderFilePath = "Shader/Texture/TextureVS.hlsl";
 
-  constexpr const char* kDefaultTexturePixelShaderFilePath = "";
+  constexpr const char* kDefaultTexturePixelShaderFilePath = "Shader/Texture/TexturePS.hlsl";
 
-  constexpr const char* kDefaultStaticMeshVertexShaderFilePath = "";
+  constexpr const char* kDefaultStaticMeshVertexShaderFilePath = "Shader/StaticMesh/StaticMeshVS.hlsl";
 
-  constexpr const char* kDefaultStaticMeshPixelShaderFilePath = "";
+  constexpr const char* kDefaultStaticMeshPixelShaderFilePath = "Shader/StaticMesh/StaticMeshPS.hlsl";
 
   constexpr const char* kDefaultSkinnedMeshVertexShaderFilePath = "";
 

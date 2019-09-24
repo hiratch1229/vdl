@@ -150,6 +150,11 @@ namespace vdl
   template<class T> class ConstantBuffer;
 
   //-------------------------
+  //  Camera.hpp
+  //-------------------------
+  struct Camera;
+
+  //-------------------------
   //  MotionData.hpp
   //-------------------------
   struct MotionData;

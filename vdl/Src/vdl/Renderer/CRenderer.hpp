@@ -1,9 +1,13 @@
 #pragma once
 #include "IRenderer.hpp"
 
+#include <vdl/Camera.hpp>
+#include <vdl/ConstantBuffer.hpp>
+
 #include "RendererCommand/RendererCommand.hpp"
 
 #include <vdl/Buffer/IBuffer.hpp>
+
 
 #include <assert.h>
 
@@ -45,6 +49,16 @@ private:
   {
     //  TODO
   };
+  struct ConstantBufferData
+  {
+    vdl::Matrix ViewProjection;
+  };
+  struct CameraData
+  {
+    vdl::Camera Camera;
+    vdl::ConstantBuffer<ConstantBufferData> ConstantBuffer;
+    bool isChange;
+  };
 private:
   IDevice* pDevice_;
   IDeviceContext* pDeviceContext_;
@@ -52,6 +66,9 @@ private:
   std::unique_ptr<IBuffer> pTextureInstanceBuffer_;
   std::unique_ptr<IBuffer> pStaticMeshInstanceBuffer_;
   std::unique_ptr<IBuffer> pSkinnedMeshInstanceBuffer_;
+private:
+  CameraData StaticMeshCameraData_;
+  CameraData SkinnedMeshCameraData_;
 private:
   OutputManager OutputManager_;
   RendererCommandList<vdl::Texture, TextureInstanceData> TextureRendererCommandList_;
@@ -61,6 +78,12 @@ public:
   CRenderer() = default;
 
   void Initialize()override;
+
+  vdl::Matrix GetView(RenderType _Type)const override;
+
+  vdl::Matrix GetProjection(RenderType _Type)const override;
+
+  void SetCamera(const vdl::Camera& _Camera, RenderType _Type)override;
 
   void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)override;
 

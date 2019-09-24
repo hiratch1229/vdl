@@ -2,24 +2,28 @@
 #include "Fwd.hpp"
 #include "Type3.hpp"
 #include "Angle.hpp"
+#include "Matrix.hpp"
 
 namespace vdl
 {
   struct Camera
   {
-    //  ˆÊ’u
-    float3 Pos = { 0.0f, 0.0f, -10.0f };
-    //  ’‹“_
-    float3 Target = { 0.0f, 0.0f, 0.0f };
-    //  ã•ûŒü
-    float3 Up = { 0.0f, 1.0f, 0.0f };
-    //  Å‹ß–Ê
-    float Near = 0.1f;
-    //  Å‰“–Ê
-    float Far = 1000.0f;
-    //  ‹–ìŠp
-    Degree Fov = 30.0f;
-    //  true‚Å“§‹“Š‰e
-    bool isPerspective = true;
+    float3 Position;
+    float3 Target;
+    float3 Up;
+    float Near;
+    float Far;
+    Degree Fov;
+    bool isPerspective;
+  public:
+    Camera() = default;
+
+    Camera(const float3& _Position, const float3& _Target = 0.0f, const float3 & _Up = float3::Up(),
+      float _Near = 0.1f, float _Far = 1000.0f, const Degree & _Fov = 30.0f, bool _isPerspective = true)
+      :Position(_Position), Target(_Target), Up(_Up), Near(_Near), Far(_Far), Fov(_Fov), isPerspective(_isPerspective) {}
+  public:
+    [[nodiscard]] bool operator==(const Camera& _Camera)const { return Position == _Camera.Position && Target == _Camera.Target && Up == _Camera.Up && Near == _Camera.Near && Far == _Camera.Far && Fov == _Camera.Fov && isPerspective == _Camera.isPerspective; }
+
+    [[nodiscard]] bool operator!=(const Camera& _Camera)const { return Position != _Camera.Position || Target != _Camera.Target || Up != _Camera.Up || Near != _Camera.Near || Far != _Camera.Far || Fov != _Camera.Fov || isPerspective != _Camera.isPerspective; }
   };
 }
