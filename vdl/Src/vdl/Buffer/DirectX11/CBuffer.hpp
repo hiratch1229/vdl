@@ -1,6 +1,8 @@
 #pragma once
 #include "../IBuffer.hpp"
 
+#include <vdl/Macro.hpp>
+
 #include <d3d11.h>
 #include <wrl.h>
 
@@ -46,6 +48,8 @@ public:
 
   CConstantBuffer(vdl::uint _BufferSize)
     : Buffer(new char[_BufferSize]), BufferSize(_BufferSize) {}
+
+  ~CConstantBuffer() { vdl::Macro::SafeDelete(Buffer); }
 
   BufferType GetType()const override final { return BufferType::eConstantBuffer; }
 

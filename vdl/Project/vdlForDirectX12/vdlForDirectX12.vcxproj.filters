@@ -22,6 +22,18 @@
     <Filter Include="Src\Shader">
       <UniqueIdentifier>{2d3e5f8a-37c6-4530-bf51-d5f27ce6fb5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Format">
+      <UniqueIdentifier>{3ea96745-9e78-4ded-96bc-12f709e0f4fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Viewport">
+      <UniqueIdentifier>{215cb931-c617-4876-bf81-da6a0ace3bf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scissor">
+      <UniqueIdentifier>{cad2f03a-d02b-46d7-97e3-6d01dcac0ac8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Topology">
+      <UniqueIdentifier>{58abaa40-53b7-45cd-87f1-5a931e27e3e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.cpp">
@@ -55,6 +67,15 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Shader\DirectX12\CShader.hpp">
       <Filter>Src\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Format\DirectX\Format.hpp">
+      <Filter>Src\Format</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Scissor\DirectX\Scissor.hpp">
+      <Filter>Src\Scissor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Topology\DirectX\Topology.hpp">
+      <Filter>Src\Topology</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

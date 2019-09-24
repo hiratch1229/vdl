@@ -4,11 +4,11 @@
 #include <vdl/InputLayout.hpp>
 #include <vdl/GraphicsState.hpp>
 #include <vdl/Sampler.hpp>
+#include <vdl/Hash.hpp>
 
 #include <d3d11.h>
 #include <wrl.h>
 
-#include <map>
 #include <unordered_map>
 
 class ITextureManager;
@@ -27,7 +27,7 @@ private:
   ID3D11DepthStencilView* pSwapChainDepthStencilView_;
 private:
   std::unordered_map<vdl::InputLayout, Microsoft::WRL::ComPtr<ID3D11InputLayout>> InputLayouts_;
-  std::map<vdl::BlendState, Microsoft::WRL::ComPtr<ID3D11BlendState>> BlendStates_;
+  std::unordered_map<vdl::BlendState, Microsoft::WRL::ComPtr<ID3D11BlendState>> BlendStates_;
   std::unordered_map<vdl::DepthStencilState, Microsoft::WRL::ComPtr<ID3D11DepthStencilState>> DepthStencilStates_;
   std::unordered_map<vdl::RasterizerState, Microsoft::WRL::ComPtr<ID3D11RasterizerState>> RasterizerStates_;
   std::unordered_map<vdl::Sampler, Microsoft::WRL::ComPtr<ID3D11SamplerState>> Samplers_;

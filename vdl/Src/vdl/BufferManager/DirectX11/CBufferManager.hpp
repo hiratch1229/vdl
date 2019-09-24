@@ -3,11 +3,15 @@
 
 #include <vdl/ReferenceCount/ReferenceCount.hpp>
 
+#include <d3d11.h>
+
 class IDevice;
 
 class CBufferManager : public IBufferManager
 {
   IDevice* pDevice_;
+private:
+  ID3D11Device* pD3D11Device_;
   ReferenceCounts<IBuffer> Buffers_;
 public:
   CBufferManager() = default;

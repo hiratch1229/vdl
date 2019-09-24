@@ -84,4 +84,6 @@ inline constexpr D3D_PRIMITIVE_TOPOLOGY Cast(vdl::Topology _Topology)
     return D3D_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST;
   default: assert(false);
   }
+
+  return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 }

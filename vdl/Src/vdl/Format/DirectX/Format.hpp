@@ -212,4 +212,6 @@ inline constexpr DXGI_FORMAT Cast(vdl::Format _Format)
     return DXGI_FORMAT_B4G4R4A4_UNORM;
   default: assert(false);
   }
+
+  return DXGI_FORMAT_UNKNOWN;
 }

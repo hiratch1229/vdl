@@ -22,7 +22,7 @@ namespace vdl
     public:
       [[nodiscard]] constexpr bool operator==(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ == _ConstantBufferData.ID_; }
 
-      [[nodiscard]] constexpr bool operator!=(const ConstantBufferData& _ConstantBufferData)const noexcept { return !(*this == _ConstantBufferData); }
+      [[nodiscard]] constexpr bool operator!=(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ != _ConstantBufferData.ID_; }
     public:
       [[nodiscard]] ID GetID()const noexcept { return ID_; }
 
