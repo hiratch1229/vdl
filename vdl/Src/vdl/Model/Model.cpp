@@ -92,7 +92,7 @@ namespace vdl
 
   Model::Model(const char* _FilePath, bool _isSerialize)
   {
-    Meshes_ = std::move(Engine::Get<IModelManager>()->Load(_FilePath, _isSerialize));
+    Meshes_ = Engine::Get<IModelManager>()->Load(_FilePath, _isSerialize);
   }
 
   Model::Model(const std::vector<StaticMesh>& _Meshes)

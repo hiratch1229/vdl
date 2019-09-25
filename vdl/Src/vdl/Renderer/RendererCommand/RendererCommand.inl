@@ -123,12 +123,12 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
         {
           if (_ID == TextureID)
           {
-            return false;
+            return true;
           }
         }
       }
 
-      return true;
+      return false;
     }), EraseTextureIDs.end());
 
     for (auto& EraseTextureID : EraseTextureIDs)
@@ -154,7 +154,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
         {
           if (_ID == ConstantBufferID)
           {
-            return false;
+            return true;
           }
         }
       }
@@ -165,7 +165,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
         {
           if (_ID == LastConstantBufferID)
           {
-            return false;
+            return true;
           }
         }
       }
@@ -176,12 +176,12 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
         {
           if (_ID == CurrentConstantBufferID)
           {
-            return false;
+            return true;
           }
         }
       }
 
-      return true;
+      return false;
     }), EraseConstantBufferIDs.end());
 
     for (auto& EraseConstantBufferID : EraseConstantBufferIDs)

@@ -6,6 +6,7 @@
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
+#include <vdl/ModelManager/IModelManager.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 
@@ -20,7 +21,7 @@ void CRenderer::Initialize()
   pStaticMeshCameraData_ = std::make_unique<CameraData>();
   pSkinnedMeshCameraData_ = std::make_unique<CameraData>();
 
-  pStaticMeshCameraData_->Camera = pSkinnedMeshCameraData_->Camera = vdl::Camera({ 0.0f,0.0f,-10.0f });
+  pStaticMeshCameraData_->Camera = pSkinnedMeshCameraData_->Camera = vdl::Camera(vdl::float3(0.0f, 0.0f, -10.0f));
   pStaticMeshCameraData_->isChange = pSkinnedMeshCameraData_->isChange = true;
 
   //  バッファの作成
@@ -143,10 +144,10 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
     pStaticMeshCameraData_->ConstantBuffer.GetData().ViewProjection = GetView(RenderType::eStaticMesh) * GetProjection(RenderType::eStaticMesh);
     StaticMeshRendererCommandList_.PushVertexStageConstantBuffer(pStaticMeshCameraData_->ConstantBuffer.GetDetail(), 0);
   }
-
+  
   StaticMeshInstanceData InstanceData;
   {
-    InstanceData.World = std::move(_World * _StaticMesh.GetGlobalTransform());
+    InstanceData.World = _World * _StaticMesh.GetGlobalTransform();
     InstanceData.Color = _Color;
   }
   StaticMeshRendererCommandList_.PushDrawData(_StaticMesh, std::move(InstanceData));

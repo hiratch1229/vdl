@@ -82,6 +82,7 @@ MeshDatas FBXLoader::Load(const char* _FilePath)const
 
   std::vector<fbxsdk::FbxMesh*> FbxMeshes = GetFbxMeshes(pScene);
   const vdl::uint FbxMeshNum = static_cast<vdl::uint>(FbxMeshes.size());
+  MeshDatas.resize(FbxMeshNum);
   for (vdl::uint FbxMeshCount = 0; FbxMeshCount < FbxMeshNum; ++FbxMeshCount)
   {
     fbxsdk::FbxMesh* pFbxMesh = FbxMeshes[FbxMeshCount];

@@ -31,6 +31,8 @@ vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::D
   vdl::Detail::ConstantBufferData ConstantBuffer(BufferSize);
   assert(Buffers_.Get(ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
 
+  ::memcpy(ConstantBuffer.GetData(), _ConstantBufferData.GetData(), BufferSize);
+
   HRESULT hr = S_OK;
 
   D3D11_BUFFER_DESC BufferDesc;

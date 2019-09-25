@@ -26,11 +26,13 @@ vdl::ID CModelManager::Load(const vdl::StaticMeshData& _MeshData)
 {
   Mesh* pMesh = new Mesh;
   {
-    IBuffer* pVertexBuffer = pMesh->pVertexBuffer.get();
+    IBuffer* pVertexBuffer;
     pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::StaticMeshVertex), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::StaticMeshVertex)));
+    pMesh->pVertexBuffer.reset(pVertexBuffer);
 
-    IBuffer* pIndexBuffer = pMesh->pIndexBuffer.get();
-    pDevice_->CreateIndexBuffer(&pIndexBuffer, const_cast<vdl::IndexType*>(_MeshData.Indices.data()), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
+    IBuffer* pIndexBuffer;
+    pDevice_->CreateIndexBuffer(&pIndexBuffer, _MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
+    pMesh->pIndexBuffer.reset(pIndexBuffer);
 
     pMesh->Name = _MeshData.Name;
     pMesh->Materials = _MeshData.Materials;
@@ -44,11 +46,13 @@ vdl::ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
 {
   Mesh* pMesh = new Mesh;
   {
-    IBuffer* pVertexBuffer = pMesh->pVertexBuffer.get();
-    pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::SkinnedMeshData), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::SkinnedMeshData)));
+    IBuffer* pVertexBuffer;
+    pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::SkinnedMeshVertex), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::SkinnedMeshVertex)));
+    pMesh->pVertexBuffer.reset(pVertexBuffer);
 
-    IBuffer* pIndexBuffer = pMesh->pIndexBuffer.get();
-    pDevice_->CreateIndexBuffer(&pIndexBuffer, const_cast<vdl::IndexType*>(_MeshData.Indices.data()), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
+    IBuffer* pIndexBuffer;
+    pDevice_->CreateIndexBuffer(&pIndexBuffer, _MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
+    pMesh->pIndexBuffer.reset(pIndexBuffer);
 
     pMesh->Name = _MeshData.Name;
     pMesh->Materials = _MeshData.Materials;
@@ -156,7 +160,7 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
       }
     }
 
-    SkinnedMeshes[MeshCount] = std::move(SkinnedMeshData);
+    SkinnedMeshes[MeshCount] =SkinnedMeshData;
   }
 
   return SkinnedMeshes;
