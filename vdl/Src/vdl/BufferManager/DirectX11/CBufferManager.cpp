@@ -29,7 +29,6 @@ vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::D
 {
   const vdl::uint BufferSize = _ConstantBufferData.GetSize();
   vdl::Detail::ConstantBufferData ConstantBuffer(BufferSize);
-
   assert(Buffers_.Get(ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
 
   HRESULT hr = S_OK;

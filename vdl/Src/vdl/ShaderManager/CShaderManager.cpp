@@ -7,26 +7,6 @@
 #include <string>
 #include <fstream>
 
-namespace
-{
-  //  シェーダーファイルのロード
-  std::string LoadShaderFile(const char* _FilePath)
-  {
-    std::string Data;
-    {
-      std::ifstream IStream(_FilePath);
-      _ASSERT_EXPR_A(IStream, (std::string(_FilePath) + "が存在しません。").c_str());
-
-      IStream.seekg(0, std::ios::end);
-      Data.reserve(static_cast<std::string::size_type>(IStream.tellg()));
-      IStream.seekg(0, std::ios::beg);
-      Data.assign(std::istreambuf_iterator<char>(IStream), std::istreambuf_iterator<char>());
-    }
-
-    return Data;
-  }
-}
-
 void CShaderManager::Initialize()
 {
   pDevice_ = Engine::Get<IDevice>();
@@ -34,16 +14,18 @@ void CShaderManager::Initialize()
 
 vdl::ID CShaderManager::LoadFromFile(const char* _FilePath, const char* _EntryPoint, ShaderType _Type)
 {
-  std::string Data = std::move(LoadShaderFile(_FilePath));
+  IShader* pShader;
+  pDevice_->LoadShader(&pShader, _FilePath, _EntryPoint, _Type);
 
-  return LoadFromMemory(Data.data(), static_cast<vdl::uint>(Data.size()), _EntryPoint, _Type);
+  return Shaders_.Add(pShader);
 }
 
 vdl::ID CShaderManager::LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::InputLayout _InputLayout)
 {
-  std::string Data = std::move(LoadShaderFile(_FilePath));
+  IVertexShader* pVertexShader;
+  pDevice_->LoadShader(&pVertexShader, _FilePath, _EntryPoint, _InputLayout);
 
-  return LoadFromMemory(Data.data(), static_cast<vdl::uint>(Data.size()), _EntryPoint, _InputLayout);
+  return Shaders_.Add(pVertexShader);
 }
 
 vdl::ID CShaderManager::LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, ShaderType _Type)

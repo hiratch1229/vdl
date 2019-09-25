@@ -1,7 +1,4 @@
-Debug/
-Release/
-DirectX11OnWindows_Debug/
-DirectX11OnWindows_Release/
+x64/
 Lib/
 *.vcxproj.user
 *.VC.db
@@ -10,5 +7,4 @@ Lib/
 *.aps
 *.vs
 *.fbm
-vdl.lib
-vdl_d.lib
+vdl*.lib

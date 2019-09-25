@@ -16,7 +16,7 @@ namespace vdl
   public:
     [[nodiscard]] uint Stride()const noexcept { return Size_.x * sizeof(Color); }
 
-    [[nodiscard]] uint BufferSize()const noexcept { return static_cast<vdl::uint>(Buffer_.size()); }
+    [[nodiscard]] uint BufferSize()const noexcept { return static_cast<vdl::uint>(Buffer_.size()) * 4; }
 
     [[nodiscard]] uint2 GetSize()const noexcept { return Size_; }
 
@@ -26,7 +26,7 @@ namespace vdl
 
     [[nodiscard]] const Color* Buffer()const { return Buffer_.data(); }
 
-    void Resize(const uint2& _Size) { Size_ = _Size; Buffer_.resize(Size_.x * Size_.y); }
+    void Resize(const uint2& _Size) { Size_ = _Size; Buffer_.resize(static_cast<size_t>(Size_.x * Size_.y)); }
   public:
     CEREAL_SERIALIZE(Size_, Buffer_)
   };

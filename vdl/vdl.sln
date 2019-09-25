@@ -41,7 +41,8 @@ Global
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Debug|x86.Build.0 = Debug|Win32
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Release|x64.ActiveCfg = Release|x64
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Release|x64.Build.0 = Release|x64
-		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Release|x86.ActiveCfg = DirectX11OnWindows_Release|x64
+		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Release|x86.ActiveCfg = Release|Win32
+		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Release|x86.Build.0 = Release|Win32
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.Release|x64.ActiveCfg = Release|x64
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.Release|x64.Build.0 = Release|x64
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.Release|x86.ActiveCfg = Release|Win32
@@ -54,7 +55,8 @@ Global
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX11OnWindows_Debug|x86.ActiveCfg = Debug|Win32
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX11OnWindows_Debug|x86.Build.0 = Debug|Win32
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX11OnWindows_Release|x64.ActiveCfg = Release|x64
-		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX11OnWindows_Release|x86.ActiveCfg = DirectX11OnWindows_Release|x64
+		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX11OnWindows_Release|x86.ActiveCfg = Release|Win32
+		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX11OnWindows_Release|x86.Build.0 = Release|Win32
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.Release|x64.ActiveCfg = Release|x64
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.Release|x64.Build.0 = Release|x64
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.Release|x86.ActiveCfg = Release|Win32
@@ -83,7 +85,8 @@ Global
 		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Debug|x86.Build.0 = Debug|Win32
 		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Release|x64.ActiveCfg = Release|x64
 		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Release|x64.Build.0 = Release|x64
-		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Release|x86.ActiveCfg = DirectX11OnWindows_Release|x64
+		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Release|x86.ActiveCfg = Release|Win32
+		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Release|x86.Build.0 = Release|Win32
 		{C6943C66-0016-4141-9F66-D358272F27BF}.Release|x64.ActiveCfg = Release|x64
 		{C6943C66-0016-4141-9F66-D358272F27BF}.Release|x64.Build.0 = Release|x64
 		{C6943C66-0016-4141-9F66-D358272F27BF}.Release|x86.ActiveCfg = Release|Win32
@@ -96,7 +99,8 @@ Global
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX11OnWindows_Debug|x86.ActiveCfg = Debug|Win32
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX11OnWindows_Debug|x86.Build.0 = Debug|Win32
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX11OnWindows_Release|x64.ActiveCfg = Release|x64
-		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX11OnWindows_Release|x86.ActiveCfg = DirectX11OnWindows_Release|x64
+		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX11OnWindows_Release|x86.ActiveCfg = Release|Win32
+		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX11OnWindows_Release|x86.Build.0 = Release|Win32
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.Release|x64.ActiveCfg = Release|x64
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.Release|x64.Build.0 = Release|x64
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.Release|x86.ActiveCfg = Release|Win32

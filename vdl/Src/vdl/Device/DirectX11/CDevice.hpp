@@ -30,8 +30,6 @@ public:
 
   void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize)override;
 
-  void CreateConstantBuffer(IBuffer** _ppConstantBuffer, const void* _Data, vdl::uint _BufferSize);
-
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)override;
@@ -39,8 +37,12 @@ public:
   void CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)override;
 
   void WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const override;
+  
+  void LoadShader(IShader** _ppShader, const char* _FilePath, const char* _EntryPoint, ShaderType _Type)override;
 
   void LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, ShaderType _Type)override;
+
+  void LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath, const char* _EntryPoint, vdl::InputLayout _InputLayout)override;
 
   void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout)override;
 };

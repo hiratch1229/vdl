@@ -32,6 +32,11 @@ namespace vdl
   using float4 = Type4<float>;
 
   //-------------------------
+  //  Half.hpp
+  //-------------------------
+  class half;
+
+  //-------------------------
   //  Quaternion.hpp
   //-------------------------
   struct Quaternion;

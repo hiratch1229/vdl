@@ -1,8 +1,8 @@
 #include "Texture.hlsli"
 
-VS_OUT main(VS_IN In)
+PS_IN main(VS_IN In)
 {
-  VS_OUT Out;
+  PS_IN Out;
 
   Out.Position = mul(In.Position, In.NDCTransform);
   Out.Color = In.Color;

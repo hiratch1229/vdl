@@ -11,20 +11,20 @@
 
 #include <unordered_map>
 
+class CSwapChain;
 class ITextureManager;
 class IBufferManager;
 class IShaderManager;
 
 class CDeviceContext : public IDeviceContext
 {
+  CSwapChain* pSwapChain_;
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
 private:
-  ID3D11Device* pDevice_;
-  ID3D11DeviceContext* pImmediateContext_;
-  ID3D11RenderTargetView* pSwapChainRenderTargetView_;
-  ID3D11DepthStencilView* pSwapChainDepthStencilView_;
+  ID3D11Device* pD3D11Device_;
+  ID3D11DeviceContext* pD3D11ImmediateContext_;
 private:
   std::unordered_map<vdl::InputLayout, Microsoft::WRL::ComPtr<ID3D11InputLayout>> InputLayouts_;
   std::unordered_map<vdl::BlendState, Microsoft::WRL::ComPtr<ID3D11BlendState>> BlendStates_;
@@ -32,7 +32,7 @@ private:
   std::unordered_map<vdl::RasterizerState, Microsoft::WRL::ComPtr<ID3D11RasterizerState>> RasterizerStates_;
   std::unordered_map<vdl::Sampler, Microsoft::WRL::ComPtr<ID3D11SamplerState>> Samplers_;
 public:
-  [[nodiscard]] bool isFoundInputLayout(vdl::InputLayout _InputLayout) { return InputLayouts_.find(_InputLayout) == InputLayouts_.end(); }
+  [[nodiscard]] bool isFoundInputLayout(vdl::InputLayout _InputLayout) { return InputLayouts_.find(_InputLayout) != InputLayouts_.end(); }
   void RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode);
   ID3D11SamplerState* GetSamplerState(const vdl::Sampler& _Sampler);
 public:

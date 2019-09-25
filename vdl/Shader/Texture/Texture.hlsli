@@ -9,7 +9,7 @@ struct VS_IN
   float4 Color : COLOR;
 };
 
-struct VS_OUT
+struct PS_IN
 {
   float4 Position : SV_POSITION;
   float4 Color : COLOR;

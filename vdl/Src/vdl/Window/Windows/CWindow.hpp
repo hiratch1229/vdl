@@ -16,11 +16,9 @@ class CWindow : public IWindow
 public:
   CWindow() = default;
 
-  ~CWindow();
-
   void Initialize()override;
 
-  void Show(bool _isShow) override;
+  void Show(bool _isShow)override;
 
   void* GetHandle()const override { return hWnd_; }
 

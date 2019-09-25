@@ -13,6 +13,7 @@
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/ModelManager/IModelManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
+#include <Vdl/ShaderManager/IShaderManager.hpp>
 #include <vdl/Renderer/IRenderer.hpp>
 #include <vdl/GUI/IGUI.hpp>
 
@@ -42,6 +43,7 @@ void CSystem::Initialize()
   Engine::Get<ITextureManager>()->Initialize();
   Engine::Get<IModelManager>()->Initialize();
   Engine::Get<IBufferManager>()->Initialize();
+  Engine::Get<IShaderManager>()->Initialize();
 
   //  周波数を取得
   {
@@ -63,16 +65,20 @@ bool CSystem::Update()
     Engine::Get<IWindow>()->Show(true);
 
     pRenderer_->Initialize();
+    //pRenderer_->SetViewport();
+    //pRenderer_->SetScissor();
     pGUI_->Initialize();
 
     SystemState_ = SystemState::eRunning;
   }
+  else
+  {
+    pRenderer_->Flush();
 
-  pRenderer_->Flush();
+    pGUI_->Draw();
 
-  pGUI_->Draw();
-
-  pSwapChain_->Present();
+    pSwapChain_->Present();
+  }
 
   //--------------------------------------------------
   //  ここから次のフレーム
@@ -128,11 +134,13 @@ bool CSystem::Update()
 
   //  入力系の更新
   {
-    pKeyboard_->Update();
-    pMouse_->Update();
-    pXInput_->Update();
-    pGamepad_->Update();
+    pKeyboard_->Update();/*
+    */pMouse_->Update();
+    pXInput_->Update();/*
+    */pGamepad_->Update();
   }
+
+  pGUI_->Update();
 
   return true;
 }

@@ -8,7 +8,7 @@
 
 #include <vdl/Buffer/IBuffer.hpp>
 
-
+#include <memory>
 #include <assert.h>
 
 class IDevice;
@@ -67,8 +67,8 @@ private:
   std::unique_ptr<IBuffer> pStaticMeshInstanceBuffer_;
   std::unique_ptr<IBuffer> pSkinnedMeshInstanceBuffer_;
 private:
-  CameraData StaticMeshCameraData_;
-  CameraData SkinnedMeshCameraData_;
+  std::unique_ptr<CameraData> pStaticMeshCameraData_;
+  std::unique_ptr<CameraData> pSkinnedMeshCameraData_;
 private:
   OutputManager OutputManager_;
   RendererCommandList<vdl::Texture, TextureInstanceData> TextureRendererCommandList_;

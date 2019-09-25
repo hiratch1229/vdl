@@ -36,7 +36,7 @@ namespace vdl::RendererTexture
 
   inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const ColorF& _Color = Palette::White)
   {
-    Draw(_Texture, _DestLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, _Color);
+    Draw(_Texture, _DestLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, 0.0f, _Color);
   }
 
   inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const Degree& _Angle, const ColorF& _Color = Palette::White)
@@ -46,7 +46,7 @@ namespace vdl::RendererTexture
 
   inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const ColorF& _Color = Palette::White)
   {
-    Draw(_Texture, _DestLeftTop, _DestSize, float2(0.0f), _Texture.GetSize(), _Color);
+    Draw(_Texture, _DestLeftTop, _DestSize, float2(0.0f), _Texture.GetSize(), 0.0f, _Color);
   }
 
   inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const Degree& _Angle, const ColorF& _Color = Palette::White)
@@ -58,6 +58,6 @@ namespace vdl::RendererTexture
   inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const ColorF& _Color = Palette::White)
   {
     const uint2 Size = _Texture.GetSize();
-    Draw(_Texture, _DestLeftTop, Size, float2(0.0f), Size, _Color);
+    Draw(_Texture, _DestLeftTop, Size, float2(0.0f), Size, 0.0f, _Color);
   }
 }

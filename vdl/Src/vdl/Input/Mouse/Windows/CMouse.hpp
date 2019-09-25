@@ -3,6 +3,7 @@
 
 #include <vdl/Input/InputState.hpp>
 
+#include <windows.h>
 #include <mutex>
 
 class IKeyboard;
@@ -13,6 +14,7 @@ class CMouse : public IMouse
   static constexpr vdl::uint kButtonNum = 5;
 private:
   IKeyboard* pKeyboard_;
+  HWND hWnd_;
 private:
   //  “ü—Íó‘Ô
   InputState InputStatus_[kButtonNum];

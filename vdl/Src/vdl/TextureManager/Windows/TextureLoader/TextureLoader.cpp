@@ -6,6 +6,10 @@ TextureLoader::TextureLoader()
 {
   HRESULT hr = S_OK;
 
+  //  COMÇÃèâä˙âª
+  hr = ::CoInitialize(nullptr);
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
   hr = ::CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(pFactory_.GetAddressOf()));
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 }
@@ -16,7 +20,7 @@ vdl::Image TextureLoader::LoadFromFile(const char* _FilePath)const
 
   //  charå^Å®wchar_tå^Ç…ïœä∑
   wchar_t wFilePath[256];
-  mbstowcs_s(nullptr, wFilePath, _FilePath, 256);
+  ::mbstowcs_s(nullptr, wFilePath, _FilePath, 256);
 
   Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;
   hr = pFactory_->CreateDecoderFromFilename(wFilePath, 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, pDecoder.GetAddressOf());
@@ -75,12 +79,12 @@ vdl::Image TextureLoader::GetImage(IWICBitmapDecoder* _pDecoder)const
     hr = pConverter->Initialize(pFrame.Get(), GUID_WICPixelFormat32bppRGBA, WICBitmapDitherTypeErrorDiffusion, nullptr, 0, WICBitmapPaletteTypeCustom);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
-    hr = pConverter->CopyPixels(0, Image.Stride(), Image.BufferSize(), &Image.Buffer()->Red);
+    hr = pConverter->CopyPixels(0, Image.Stride(), Image.BufferSize(), reinterpret_cast<BYTE*>(Image.Buffer()));
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
   else
   {
-    hr = pFrame->CopyPixels(0, Image.Stride(), Image.BufferSize(), &Image.Buffer()->Red);
+    hr = pFrame->CopyPixels(0, Image.Stride(), Image.BufferSize(), reinterpret_cast<BYTE*>(Image.Buffer()));
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 

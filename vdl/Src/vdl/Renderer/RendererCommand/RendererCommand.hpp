@@ -95,7 +95,6 @@ private:
   StateChangeFlags StateChangeFlags_;
 
   std::thread Thread_;
-  std::mutex Mutex_;
 
   std::vector<vdl::ID> DisplayObjectIDs_;
   std::vector<InstanceData> Instances_;

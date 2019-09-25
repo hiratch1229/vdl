@@ -8,6 +8,7 @@
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
 #include <vdl/Input/Mouse/IMouse.hpp>
+#include <vdl/BufferManager/IBufferManager.hpp>
 
 #include <vdl/Mouse.hpp>
 #include <vdl/Scissor.hpp>
@@ -547,7 +548,7 @@ namespace
       float4 Color : COLOR;\
     };\
     \
-    sturct PS_IN\
+    struct PS_IN\
     {\
       float4 Position : SV_POSITION;\
       float4 Color : COLOR;\
@@ -571,7 +572,7 @@ namespace
     }";
 
   constexpr const char* kPixelShader =
-    "sturct PS_IN\
+    "struct PS_IN\
     {\
       float4 Position : SV_POSITION; \
       float4 Color : COLOR; \
@@ -598,9 +599,13 @@ void CGUI::Initialize()
   pSystem_ = Engine::Get<ISystem>();
   pDevice_ = Engine::Get<IDevice>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
+  pWindow_ = Engine::Get<IWindow>();
   pKeyboard_ = Engine::Get<IKeyboard>();
   pMouse_ = Engine::Get<IMouse>();
+  pBufferManager_ = Engine::Get<IBufferManager>();
   hWnd_ = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());
+
+  pConstantBuffer_ = std::make_unique<vdl::ConstantBuffer<ConstantBufferData>>();
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -616,11 +621,6 @@ void CGUI::Initialize()
 
     io.Fonts->AddFontDefault();
     io.Fonts->AddFontFromFileTTF("c:/Windows/Fonts/meiryo.ttc", 18.0f, &Config, kGlyphRangesJapanese);
-  }
-
-  //  ウィンドウのサイズを設定
-  {
-    io.DisplaySize = Cast(Engine::Get<IWindow>()->GetWindowSize());
   }
 
   //  ImGuiのフラグの設定
@@ -687,7 +687,7 @@ void CGUI::Initialize()
     GraphicsState_.BlendState = vdl::BlendState(false, false, { true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd });
     vdl::DepthStencilOpState DepthStencilOpState(vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::ComparisonFuncType::eAlways);
     GraphicsState_.DepthSteniclState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState);
-    GraphicsState_.RasterizerState = vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, 0, true, false);
+    GraphicsState_.RasterizerState = vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, false, 0, true);
     Viewport_ = { 0.0f, 0.0f };
   }
 }
@@ -701,6 +701,9 @@ void CGUI::Update()
 {
   ImGuiIO& io = ImGui::GetIO();
   IM_ASSERT(io.Fonts->IsBuilt() && "Font atlas not built! It is generally built by the renderer back-end. Missing call to renderer _NewFrame() function? e.g. ImGui_ImplOpenGL3_NewFrame().");
+
+  // Setup display size (every frame to accommodate for window resizing)
+  io.DisplaySize = Cast(pWindow_->GetWindowSize());
 
   // Setup time step
   io.DeltaTime = pSystem_->GetDeltaTime();
@@ -730,7 +733,7 @@ void CGUI::Update()
     io.MouseWheelH += Wheel.x;
 
     // Set mouse position
-    vdl::float2 Pos = pMouse_->GetPos();
+    const vdl::float2 Pos = pMouse_->GetPos();
     io.MousePos.x = Pos.x;
     io.MousePos.y = Pos.y;
   }
@@ -758,16 +761,18 @@ void CGUI::Draw()
     {
       pVertexBuffers_[1] = std::move(pVertexBuffers_[0]);
 
-      IBuffer* pVertexBuffer = pVertexBuffers_[0].get();
+      IBuffer* pVertexBuffer;
       pDevice_->CreateVertexBuffer(&pVertexBuffer, sizeof(ImDrawVert), VertexBufferSize_ = VertexSize);
+      pVertexBuffers_[0].reset(pVertexBuffer);
     }
     if (const vdl::uint IndexSize = static_cast<vdl::uint>(pDrawData->TotalIdxCount * sizeof(ImDrawIdx));
       IndexBufferSize_ < IndexSize)
     {
       pIndexBuffers_[1] = std::move(pIndexBuffers_[0]);
 
-      IBuffer* pIndexBuffer = pIndexBuffers_[0].get();
+      IBuffer* pIndexBuffer;
       pDevice_->CreateIndexBuffer(&pIndexBuffer, IndexBufferSize_ = IndexSize, kIndexType);
+      pIndexBuffers_[0].reset(pIndexBuffer);
     }
   }
 
@@ -798,9 +803,9 @@ void CGUI::Draw()
   const ImVec2 ClipOffset = pDrawData->DisplayPos;         // (0,0) unless using multi-viewports
   const ImVec2 ClipScale = pDrawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
 
-  ConstantBufferData& ConstantBufferData = ConstantBuffer_.GetData();
+  ConstantBufferData& ConstantBufferData = pConstantBuffer_->GetData();
   {
-    ConstantBufferData.Scale = { 2.0f / ClipOffset.x, -2.0f / ClipOffset.y };
+    ConstantBufferData.Scale = { 2.0f / pDrawData->DisplaySize.x, -2.0f / pDrawData->DisplaySize.y };
     ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
   }
 
@@ -820,7 +825,7 @@ void CGUI::Draw()
   pDeviceContext_->SetRasterizerState(GraphicsState_.RasterizerState);
 
   pDeviceContext_->VSSetShader(VertexShader_);
-  pDeviceContext_->VSSetConstantBuffers(0, 1, &ConstantBuffer_.GetDetail());
+  pDeviceContext_->VSSetConstantBuffers(0, 1, &pBufferManager_->CloneConstantBuffer(pConstantBuffer_->GetDetail()));
 
   pDeviceContext_->PSSetShader(PixelShader_);
   pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);

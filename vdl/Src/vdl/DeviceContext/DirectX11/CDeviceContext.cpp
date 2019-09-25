@@ -295,12 +295,10 @@ void CDeviceContext::Initialize()
   pShaderManager_ = Engine::Get<IShaderManager>();
 
   CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
-  pDevice_ = pDevice->GetDevice();
-  pImmediateContext_ = pDevice->GetImmediateContext();
+  pD3D11Device_ = pDevice->GetDevice();
+  pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
 
-  CSwapChain* pSwapChain = static_cast<CSwapChain*>(Engine::Get<ISwapChain>());
-  pSwapChainRenderTargetView_ = pSwapChain->GetRenderTargetView();
-  pSwapChainDepthStencilView_ = pSwapChain->GetDepthStencilView();
+  pSwapChain_ = static_cast<CSwapChain*>(Engine::Get<ISwapChain>());
 }
 
 void CDeviceContext::SetVertexBuffer(const IBuffer* _pVertexBuffer)
@@ -311,18 +309,23 @@ void CDeviceContext::SetVertexBuffer(const IBuffer* _pVertexBuffer)
 
   const CVertexBuffer* pVertexBuffer = static_cast<const CVertexBuffer*>(_pVertexBuffer);
 
-  pImmediateContext_->IASetVertexBuffers(0, 1, pVertexBuffer->pBuffer.GetAddressOf(), &pVertexBuffer->Stride, &kOffset);
+  pD3D11ImmediateContext_->IASetVertexBuffers(0, 1, pVertexBuffer->pBuffer.GetAddressOf(), &pVertexBuffer->Stride, &kOffset);
 }
 
 void CDeviceContext::SetInstanceBuffer(const IBuffer* _pInstanceBuffer)
 {
+  if (!_pInstanceBuffer)
+  {
+    return;
+  }
+
   assert(_pInstanceBuffer->GetType() == BufferType::eInstanceBuffer);
 
   constexpr vdl::uint kOffset = 0;
 
   const CInstanceBuffer* pInstanceBuffer = static_cast<const CInstanceBuffer*>(_pInstanceBuffer);
 
-  pImmediateContext_->IASetVertexBuffers(1, 1, pInstanceBuffer->pBuffer.GetAddressOf(), &pInstanceBuffer->Stride, &kOffset);
+  pD3D11ImmediateContext_->IASetVertexBuffers(1, 1, pInstanceBuffer->pBuffer.GetAddressOf(), &pInstanceBuffer->Stride, &kOffset);
 }
 
 void CDeviceContext::SetIndexBuffer(const IBuffer* _pIndexBuffer)
@@ -333,29 +336,29 @@ void CDeviceContext::SetIndexBuffer(const IBuffer* _pIndexBuffer)
 
   const CIndexBuffer* pIndexBuffer = static_cast<const CIndexBuffer*>(_pIndexBuffer);
 
-  pImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), (pIndexBuffer->IndexType == IndexType::eUint16 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT), kOffset);
+  pD3D11ImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), (pIndexBuffer->IndexType == IndexType::eUint16 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT), kOffset);
 }
 
 void CDeviceContext::SetInputLayout(vdl::InputLayout _InputLayout)
 {
   assert(isFoundInputLayout(_InputLayout));
 
-  pImmediateContext_->IASetInputLayout(InputLayouts_[_InputLayout].Get());
+  pD3D11ImmediateContext_->IASetInputLayout(InputLayouts_[_InputLayout].Get());
 }
 
 void CDeviceContext::SetTopology(vdl::Topology _Topology)
 {
-  pImmediateContext_->IASetPrimitiveTopology(Cast(_Topology));
+  pD3D11ImmediateContext_->IASetPrimitiveTopology(Cast(_Topology));
 }
 
 void CDeviceContext::SetScissor(const vdl::Scissor& _Scissor)
 {
-  pImmediateContext_->RSSetScissorRects(1, &Cast(_Scissor));
+  pD3D11ImmediateContext_->RSSetScissorRects(1, &Cast(_Scissor));
 }
 
 void CDeviceContext::SetViewport(const vdl::Viewport& _Viewport)
 {
-  pImmediateContext_->RSSetViewports(1, &Cast(_Viewport));
+  pD3D11ImmediateContext_->RSSetViewports(1, &Cast(_Viewport));
 }
 
 void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)
@@ -372,7 +375,7 @@ void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures
   std::vector<ID3D11RenderTargetView*> pRenderTeargetViews;
   ID3D11DepthStencilView* pDepthStencilView;
 
-  pRenderTeargetViews.push_back((_RenderTextures[0] == EmptyRenderTexture ? pSwapChainRenderTargetView_ : GetRenderTargetView(_RenderTextures[0])));
+  pRenderTeargetViews.push_back((_RenderTextures[0] == EmptyRenderTexture ? pSwapChain_->GetRenderTargetView() : GetRenderTargetView(_RenderTextures[0])));
 
   for (vdl::uint RenderTextureCount = 1; RenderTextureCount < Constants::kMaxRenderTextureNum; ++RenderTextureCount)
   {
@@ -383,11 +386,11 @@ void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures
 
     pRenderTeargetViews.push_back(GetRenderTargetView(_RenderTextures[RenderTextureCount]));
   }
-  pDepthStencilView = (_DepthStenilTexture == vdl::DepthStencilTexture() ? pSwapChainDepthStencilView_
+  pDepthStencilView = (_DepthStenilTexture == vdl::DepthStencilTexture() ? pSwapChain_->GetDepthStencilView()
     : static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(_DepthStenilTexture.GetID()))->pDepthStencilView.Get());
 
   assert(!pRenderTeargetViews.empty() && pDepthStencilView);
-  pImmediateContext_->OMSetRenderTargets(static_cast<vdl::uint>(pRenderTeargetViews.size()), pRenderTeargetViews.data(), pDepthStencilView);
+  pD3D11ImmediateContext_->OMSetRenderTargets(static_cast<vdl::uint>(pRenderTeargetViews.size()), pRenderTeargetViews.data(), pDepthStencilView);
 }
 
 void CDeviceContext::SetBlendState(const vdl::BlendState& _BlendState)
@@ -421,14 +424,14 @@ void CDeviceContext::SetBlendState(const vdl::BlendState& _BlendState)
         }
       }
 
-      hr = pDevice_->CreateBlendState(&BlendDesc, pBlendState.GetAddressOf());
+      hr = pD3D11Device_->CreateBlendState(&BlendDesc, pBlendState.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
     BlendStates_.insert(std::make_pair(_BlendState, pBlendState));
   }
 
-  pImmediateContext_->OMSetBlendState(BlendStates_.at(_BlendState).Get(), nullptr, 0xFFFFFFFF);
+  pD3D11ImmediateContext_->OMSetBlendState(BlendStates_.at(_BlendState).Get(), nullptr, 0xFFFFFFFF);
 }
 
 void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState)
@@ -457,14 +460,14 @@ void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState& _DepthSt
         DepthStencilDesc.BackFace.StencilFunc = Cast(_DepthStencilState.BackFace.StencilFunc);
       }
 
-      hr = pDevice_->CreateDepthStencilState(&DepthStencilDesc, pDepthStencilState.GetAddressOf());
+      hr = pD3D11Device_->CreateDepthStencilState(&DepthStencilDesc, pDepthStencilState.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
     DepthStencilStates_.insert(std::make_pair(_DepthStencilState, pDepthStencilState));
   }
 
-  pImmediateContext_->OMSetDepthStencilState(DepthStencilStates_.at(_DepthStencilState).Get(), 1);
+  pD3D11ImmediateContext_->OMSetDepthStencilState(DepthStencilStates_.at(_DepthStencilState).Get(), 1);
 }
 
 void CDeviceContext::SetRasterizerState(const vdl::RasterizerState& _RasterizerState)
@@ -489,21 +492,21 @@ void CDeviceContext::SetRasterizerState(const vdl::RasterizerState& _RasterizerS
         RasterizerDesc.AntialiasedLineEnable = _RasterizerState.AntialiasedLineEnable;
       }
 
-      hr = pDevice_->CreateRasterizerState(&RasterizerDesc, pRasterizerState.GetAddressOf());
+      hr = pD3D11Device_->CreateRasterizerState(&RasterizerDesc, pRasterizerState.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
     RasterizerStates_.insert(std::make_pair(_RasterizerState, pRasterizerState));
   }
 
-  pImmediateContext_->RSSetState(RasterizerStates_.at(_RasterizerState).Get());
+  pD3D11ImmediateContext_->RSSetState(RasterizerStates_.at(_RasterizerState).Get());
 }
 
 void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
 {
   assert(_VertexShader.GetID() != std::nullopt && pShaderManager_->GetShader(_VertexShader.GetID())->GetType() == ShaderType::eVertexShader);
 
-  pImmediateContext_->VSSetShader(static_cast<CVertexShader*>(pShaderManager_->GetShader(_VertexShader.GetID()))->pVertexShader.Get(), nullptr, 0);
+  pD3D11ImmediateContext_->VSSetShader(static_cast<CVertexShader*>(pShaderManager_->GetShader(_VertexShader.GetID()))->pVertexShader.Get(), nullptr, 0);
 }
 
 void CDeviceContext::VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
@@ -518,7 +521,7 @@ void CDeviceContext::VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, 
     }
   }
 
-  pImmediateContext_->VSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->VSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
 }
 
 void CDeviceContext::VSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -531,7 +534,7 @@ void CDeviceContext::VSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, 
     }
   }
 
-  pImmediateContext_->VSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
+  pD3D11ImmediateContext_->VSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
 }
 
 void CDeviceContext::VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])
@@ -547,7 +550,7 @@ void CDeviceContext::VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
     }
   }
 
-  pImmediateContext_->VSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
+  pD3D11ImmediateContext_->VSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
 }
 
 void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
@@ -562,7 +565,7 @@ void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
     pHullShader = static_cast<CHullShader*>(pShaderManager_->GetShader(ID))->pHullShader.Get();
   }
 
-  pImmediateContext_->HSSetShader(pHullShader, nullptr, 0);
+  pD3D11ImmediateContext_->HSSetShader(pHullShader, nullptr, 0);
 }
 
 void CDeviceContext::HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
@@ -577,7 +580,7 @@ void CDeviceContext::HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, 
     }
   }
 
-  pImmediateContext_->HSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->HSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
 }
 
 void CDeviceContext::HSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -590,7 +593,7 @@ void CDeviceContext::HSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, 
     }
   }
 
-  pImmediateContext_->HSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
+  pD3D11ImmediateContext_->HSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
 }
 
 void CDeviceContext::HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])
@@ -606,7 +609,7 @@ void CDeviceContext::HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
     }
   }
 
-  pImmediateContext_->HSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
+  pD3D11ImmediateContext_->HSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
 }
 
 void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
@@ -621,7 +624,7 @@ void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
     pDomainShader = static_cast<CDomainShader*>(pShaderManager_->GetShader(ID))->pDomainShader.Get();
   }
 
-  pImmediateContext_->DSSetShader(pDomainShader, nullptr, 0);
+  pD3D11ImmediateContext_->DSSetShader(pDomainShader, nullptr, 0);
 }
 
 void CDeviceContext::DSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
@@ -636,7 +639,7 @@ void CDeviceContext::DSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, 
     }
   }
 
-  pImmediateContext_->DSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->DSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
 }
 
 void CDeviceContext::DSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -649,7 +652,7 @@ void CDeviceContext::DSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, 
     }
   }
 
-  pImmediateContext_->DSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
+  pD3D11ImmediateContext_->DSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
 }
 
 void CDeviceContext::DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])
@@ -665,7 +668,7 @@ void CDeviceContext::DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
     }
   }
 
-  pImmediateContext_->DSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
+  pD3D11ImmediateContext_->DSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
 }
 
 void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
@@ -680,7 +683,7 @@ void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
     pGeometryShader = static_cast<CGeometryShader*>(pShaderManager_->GetShader(ID))->pGeometryShader.Get();
   }
 
-  pImmediateContext_->GSSetShader(pGeometryShader, nullptr, 0);
+  pD3D11ImmediateContext_->GSSetShader(pGeometryShader, nullptr, 0);
 }
 
 void CDeviceContext::GSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
@@ -695,7 +698,7 @@ void CDeviceContext::GSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, 
     }
   }
 
-  pImmediateContext_->GSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->GSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
 }
 
 void CDeviceContext::GSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -708,7 +711,7 @@ void CDeviceContext::GSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, 
     }
   }
 
-  pImmediateContext_->GSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
+  pD3D11ImmediateContext_->GSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
 }
 
 void CDeviceContext::GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])
@@ -724,14 +727,14 @@ void CDeviceContext::GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
     }
   }
 
-  pImmediateContext_->GSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
+  pD3D11ImmediateContext_->GSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
 }
 
 void CDeviceContext::PSSetShader(const vdl::PixelShader& _PixelShader)
 {
   assert(_PixelShader.GetID() != std::nullopt && pShaderManager_->GetShader(_PixelShader.GetID())->GetType() == ShaderType::ePixelShader);
 
-  pImmediateContext_->PSSetShader(static_cast<CPixelShader*>(pShaderManager_->GetShader(_PixelShader.GetID()))->pPixelShader.Get(), nullptr, 0);
+  pD3D11ImmediateContext_->PSSetShader(static_cast<CPixelShader*>(pShaderManager_->GetShader(_PixelShader.GetID()))->pPixelShader.Get(), nullptr, 0);
 }
 
 void CDeviceContext::PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
@@ -746,7 +749,7 @@ void CDeviceContext::PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, 
     }
   }
 
-  pImmediateContext_->PSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->PSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
 }
 
 void CDeviceContext::PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -759,7 +762,7 @@ void CDeviceContext::PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, 
     }
   }
 
-  pImmediateContext_->PSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
+  pD3D11ImmediateContext_->PSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
 }
 
 void CDeviceContext::PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])
@@ -775,7 +778,7 @@ void CDeviceContext::PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
     }
   }
 
-  pImmediateContext_->PSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
+  pD3D11ImmediateContext_->PSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
 }
 
 void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)
@@ -785,7 +788,7 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
   if (const vdl::ID ID = _RenderTexture.GetID();
     ID == std::nullopt)
   {
-    pRenderTargetView = pSwapChainRenderTargetView_;
+    pRenderTargetView = pSwapChain_->GetRenderTargetView();
   }
   else
   {
@@ -793,7 +796,7 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
     pRenderTargetView = static_cast<CRenderTexture*>(pTextureManager_->GetTexture(ID))->pRenderTargetView.Get();
   }
 
-  pImmediateContext_->ClearRenderTargetView(pRenderTargetView, &_ClearColor.Red);
+  pD3D11ImmediateContext_->ClearRenderTargetView(pRenderTargetView, &_ClearColor.Red);
 }
 
 void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil)
@@ -803,7 +806,7 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   if (const vdl::ID ID = _DepthStencilTexture.GetID();
     ID == std::nullopt)
   {
-    pDepthStencilView = pSwapChainDepthStencilView_;
+    pDepthStencilView = pSwapChain_->GetDepthStencilView();
   }
   else
   {
@@ -811,17 +814,17 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
     pDepthStencilView = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(ID))->pDepthStencilView.Get();
   }
 
-  pImmediateContext_->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, _ClearDepth, _ClearStencil);
+  pD3D11ImmediateContext_->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, _ClearDepth, _ClearStencil);
 }
 
 void CDeviceContext::Draw(vdl::uint _VertexCount, vdl::uint _InstanceCount, vdl::uint _FirstVertex, vdl::uint _FirstInstance)
 {
-  pImmediateContext_->DrawInstanced(_VertexCount, _InstanceCount, _FirstVertex, _FirstInstance);
+  pD3D11ImmediateContext_->DrawInstanced(_VertexCount, _InstanceCount, _FirstVertex, _FirstInstance);
 }
 
 void CDeviceContext::DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount, vdl::uint _FirstIndex, vdl::uint _VertexOffset, vdl::uint _FirstInstance)
 {
-  pImmediateContext_->DrawIndexedInstanced(_IndexCount, _InstanceCount, _FirstIndex, _VertexOffset, _FirstInstance);
+  pD3D11ImmediateContext_->DrawIndexedInstanced(_IndexCount, _InstanceCount, _FirstIndex, _VertexOffset, _FirstInstance);
 }
 
 //--------------------------------------------------
@@ -847,7 +850,8 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode
       InputElementDesc.push_back({ "NDC_TRANSFORM", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
       InputElementDesc.push_back({ "NDC_TRANSFORM", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
       InputElementDesc.push_back({ "NDC_TRANSFORM", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
-      InputElementDesc.push_back({ "TEXCOORD_TRANSFORM", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
+      InputElementDesc.push_back({ "TEXCOORD_SCALE", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
+      InputElementDesc.push_back({ "TEXCOORD_TRANSLATE", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
       InputElementDesc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
     }
     break;
@@ -891,7 +895,7 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode
     default: assert(false);
     }
 
-    hr = pDevice_->CreateInputLayout(InputElementDesc.data(), static_cast<vdl::uint>(InputElementDesc.size()), _pCode->GetBufferPointer(), _pCode->GetBufferSize(), pInputLayout.GetAddressOf());
+    hr = pD3D11Device_->CreateInputLayout(InputElementDesc.data(), static_cast<vdl::uint>(InputElementDesc.size()), _pCode->GetBufferPointer(), _pCode->GetBufferSize(), pInputLayout.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
@@ -920,7 +924,7 @@ ID3D11SamplerState* CDeviceContext::GetSamplerState(const vdl::Sampler& _Sampler
         SamplerDesc.MaxLOD = FLT_MAX;
       }
 
-      hr = pDevice_->CreateSamplerState(&SamplerDesc, pSamplerState.GetAddressOf());
+      hr = pD3D11Device_->CreateSamplerState(&SamplerDesc, pSamplerState.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 

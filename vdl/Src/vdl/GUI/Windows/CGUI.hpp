@@ -17,8 +17,10 @@
 class ISystem;
 class IDevice;
 class IDeviceContext;
+class IWindow;
 class IKeyboard;
 class IMouse;
+class IBufferManager;
 
 class CGUI : public IGUI
 {
@@ -31,8 +33,10 @@ private:
   ISystem* pSystem_;
   IDevice* pDevice_;
   IDeviceContext* pDeviceContext_;
+  IWindow* pWindow_;
   IKeyboard* pKeyboard_;
   IMouse* pMouse_;
+  IBufferManager* pBufferManager_;
   HWND hWnd_;
 private:
   vdl::VertexShader VertexShader_;
@@ -40,7 +44,7 @@ private:
   vdl::GraphicsState GraphicsState_;
   vdl::Texture Font_;
   vdl::Sampler Sampler_;
-  vdl::ConstantBuffer<ConstantBufferData> ConstantBuffer_;
+  std::unique_ptr<vdl::ConstantBuffer<ConstantBufferData>> pConstantBuffer_;
   vdl::Scissor Scissor_;
   vdl::Viewport Viewport_;
 private:

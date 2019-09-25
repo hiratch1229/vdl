@@ -21,21 +21,22 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(const v
   }
   pBufferManager_ = Engine::Get<IBufferManager>();
 
-  Scissors_.push_back(_Scissor);
-  Viewports_.push_back(_Viewport);
-  BlendStates_.push_back(_BlendState);
-  DepthStencilStates_.push_back(_DepthStencilState);
-  RasterizerStates_.push_back(_RasterizerState);
-  VertexShaders_.push_back(_VertexShader);
-  PixelShaders_.push_back(_PixelShader);
-  HullShaders_.emplace_back(std::move(vdl::HullShader()));
-  DomainShaders_.emplace_back(std::move(vdl::DomainShader()));
-  GeometryShaders_.emplace_back(std::move(vdl::GeometryShader()));
+  Scissors_.push_back(CurrentScissor_ = _Scissor);
+  Viewports_.push_back(CurrentViewport_ = _Viewport);
+  BlendStates_.push_back(CurrentBlendState_ = _BlendState);
+  DepthStencilStates_.push_back(CurrentDepthStencilState_ = _DepthStencilState);
+  RasterizerStates_.push_back(CurrentRasterizerState_ = _RasterizerState);
+  VertexShaders_.push_back(CurrentVertexShader_ = _VertexShader);
+  PixelShaders_.push_back(CurrentPixelShader_ = _PixelShader);
+  HullShaders_.emplace_back(vdl::HullShader());
+  DomainShaders_.emplace_back(vdl::DomainShader());
+  GeometryShaders_.emplace_back(vdl::GeometryShader());
 
   for (auto& Samplers : Samplers_) { Samplers.resize(1); }
   for (auto& TextureIDs : TextureIDs_) { TextureIDs.resize(1); }
   for (auto& ConstantBufferIDs : ConstantBufferIDs_) { ConstantBufferIDs.resize(1); }
 
+  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0].resize(1);
   Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0][0] = _Sampler;
 
   Reset();
@@ -44,11 +45,10 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(const v
 template<class DisplayObject, class InstanceData>
 inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
 {
-  std::lock_guard Lock(Mutex_);
-
   RendererCommands_.clear();
   StateChangeFlags_.Clear();
   Instances_.clear();
+  DisplayObjectIDs_.clear();
 
   Scissors_ = { Scissors_.back() };
   RendererCommands_.emplace_back(RendererCommandType::eSetScissor, 0);
@@ -196,8 +196,6 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Adjust()
 {
   Thread_ = std::thread([this]()->void
   {
-    std::lock_guard Lock(Mutex_);
-
     bool canSort = false;
     vdl::uint StartDrawCallIndex;
     vdl::uint ContinuousDrawCallNum = 0;
@@ -252,7 +250,7 @@ template<class DisplayObject, class InstanceData>
 inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceContext* _pDeviceContext, IBuffer* _pInstanceBuffer)
 {
   //  ソートが終わるまで待機
-  std::lock_guard Lock(Mutex_);
+  Thread_.join();
 
   const vdl::uint RendererCommandNum = static_cast<vdl::uint>(RendererCommands_.size());
   for (vdl::uint RendererCommandCount = 0; RendererCommandCount < RendererCommandNum; ++RendererCommandCount)
@@ -263,71 +261,90 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
     {
     case RendererCommandType::eDraw:
     {
-      vdl::ID LastDisplayObjectID;
+      enum class DrawStateType
+      {
+        eContinue,
+        eFlush,
+        eEnd
+      };
+
       std::vector<InstanceData> Instances;
-      vdl::uint StartDrawCallIndex;
+      vdl::uint StartDrawCallIndex = RendererCommandCount;
       vdl::uint ContinuousDrawCallNum = 0;
+      DrawStateType DrawState;
 
       for (; RendererCommandCount < RendererCommandNum; ++RendererCommandCount)
       {
-        bool isFlush = false;
+        DrawState = DrawStateType::eContinue;
+        ++ContinuousDrawCallNum;
 
-        const RendererCommandPair& RendererCommand = RendererCommands_[RendererCommandCount];
-        //  ドローコマンドが終了していた時
-        if (RendererCommand.first != RendererCommandType::eDraw)
+        const vdl::ID CurrentDisplayObjectID = DisplayObjectIDs_[RendererCommands_[RendererCommandCount].second];
+        const vdl::uint NextRendererCommandCount = RendererCommandCount + 1;
+
+        if (NextRendererCommandCount == RendererCommandNum)
         {
-          isFlush = true;
-          --RendererCommandCount;
+          DrawState = DrawStateType::eEnd;
+        }
+        else
+        {
+          const RendererCommandPair& NextRendererCommand = RendererCommands_[NextRendererCommandCount];
+
+          if (NextRendererCommand.first != RendererCommandType::eDraw)
+          {
+            DrawState = DrawStateType::eEnd;
+          }
+          else if (CurrentDisplayObjectID != DisplayObjectIDs_[NextRendererCommand.second])
+          {
+            DrawState = DrawStateType::eFlush;
+          }
         }
 
-        const vdl::ID& CurrentDisplayObjectID = DisplayObjectIDs_[RendererCommand.second];
-        if (isFlush || LastDisplayObjectID != CurrentDisplayObjectID || RendererCommandCount == RendererCommandNum - 1)
+        if (DrawState != DrawStateType::eContinue)
         {
-          if (ContinuousDrawCallNum > 0)
+          Instances.resize(ContinuousDrawCallNum);
+          for (vdl::uint InstanceCount = 0; InstanceCount < ContinuousDrawCallNum; ++InstanceCount)
           {
-            Instances.resize(ContinuousDrawCallNum);
-            for (vdl::uint InstanceCount = 0; InstanceCount < ContinuousDrawCallNum; ++InstanceCount)
-            {
-              Instances[InstanceCount] = std::move(Instances_[RendererCommands_[StartDrawCallIndex + InstanceCount].second]);
-            }
-
-            pDevice_->WriteMemory(_pInstanceBuffer, Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
-            _pDeviceContext->SetInstanceBuffer(_pInstanceBuffer);
-
-            if constexpr (std::is_same<DisplayObject, vdl::Texture>::value)
-            {
-              _pDeviceContext->PSSetTextures(0, 1, &ReservedDisplayObjects_[CurrentDisplayObjectID]);
-
-              _pDeviceContext->Draw(4, ContinuousDrawCallNum, 0, 0);
-            }
-            else if constexpr (std::is_same<DisplayObject, vdl::StaticMesh>::value)
-            {
-              const Mesh* pMesh = pModelManager_->GetMesh(CurrentDisplayObjectID);
-
-              _pDeviceContext->SetVertexBuffer(pMesh->pVertexBuffer.get());
-              _pDeviceContext->SetIndexBuffer(pMesh->pIndexBuffer.get());
-
-              for (auto& Material : pMesh->Materials)
-              {
-                _pDeviceContext->PSSetTextures(0, 1, &Material.Diffuse);
-
-                _pDeviceContext->DrawIndexed(Material.IndexCount, ContinuousDrawCallNum, Material.IndexStart, 0, 0);
-              }
-            }
-            else if constexpr (std::is_same<DisplayObject, vdl::SkinnedMesh>::value)
-            {
-              //  TODO
-            }
-
-            ContinuousDrawCallNum = 0;
-            //Instances.clear();
+            assert(RendererCommands_[StartDrawCallIndex + InstanceCount].first == RendererCommandType::eDraw);
+            Instances[InstanceCount] = std::move(Instances_[RendererCommands_[StartDrawCallIndex + InstanceCount].second]);
           }
 
-          LastDisplayObjectID = CurrentDisplayObjectID;
-          StartDrawCallIndex = RendererCommandCount;
-        }
+          pDevice_->WriteMemory(_pInstanceBuffer, Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
+          _pDeviceContext->SetInstanceBuffer(_pInstanceBuffer);
 
-        ++ContinuousDrawCallNum;
+          if constexpr (std::is_same<DisplayObject, vdl::Texture>::value)
+          {
+            _pDeviceContext->PSSetTextures(0, 1, &ReservedDisplayObjects_[CurrentDisplayObjectID]);
+
+            _pDeviceContext->Draw(4, ContinuousDrawCallNum, 0, 0);
+          }
+          else if constexpr (std::is_same<DisplayObject, vdl::StaticMesh>::value)
+          {
+            const Mesh* pMesh = pModelManager_->GetMesh(CurrentDisplayObjectID);
+
+            _pDeviceContext->SetVertexBuffer(pMesh->pVertexBuffer.get());
+            _pDeviceContext->SetIndexBuffer(pMesh->pIndexBuffer.get());
+
+            for (auto& Material : pMesh->Materials)
+            {
+              _pDeviceContext->PSSetTextures(0, 1, &Material.Diffuse);
+
+              _pDeviceContext->DrawIndexed(Material.IndexCount, ContinuousDrawCallNum, Material.IndexStart, 0, 0);
+            }
+          }
+          else if constexpr (std::is_same<DisplayObject, vdl::SkinnedMesh>::value)
+          {
+            //  TODO
+          }
+
+          if (DrawState == DrawStateType::eEnd)
+          {
+            break;
+          }
+
+          ContinuousDrawCallNum = 0;
+          StartDrawCallIndex = NextRendererCommandCount;
+          //Instances.clear();
+        }
       }
     }
     break;
@@ -514,8 +531,6 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
 template<class DisplayObject, class InstanceData>
 inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData)
 {
-  std::lock_guard Lock(Mutex_);
-
   if (StateChangeFlags_.Has(RendererCommandType::eSetScissor))
   {
     RendererCommands_.emplace_back(RendererCommandType::eSetScissor, static_cast<vdl::uint>(Scissors_.size()));

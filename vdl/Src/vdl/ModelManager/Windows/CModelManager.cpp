@@ -61,8 +61,8 @@ vdl::ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
 
 std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _isSerialize)
 {
-  std::filesystem::path BinaryFilePath = std::filesystem::path(std::string(Constants::kBinaryFileDirectory) + std::string(_FilePath)).concat(Constants::kBinaryFileFormat);
-  std::filesystem::path BinaryFileDirectory = BinaryFilePath.remove_filename();
+  const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
+  const std::filesystem::path BinaryFilePath = (BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).concat(Constants::kBinaryFileFormat);
 
   MeshDatas MeshDatas;
   {

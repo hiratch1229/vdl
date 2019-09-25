@@ -13,6 +13,7 @@
 void CSwapChain::Initialize()
 {
   pWindow_ = Engine::Get<IWindow>();
+  pDeviceContext_ = Engine::Get<IDeviceContext>();
 
   const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
 

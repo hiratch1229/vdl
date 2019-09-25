@@ -21,10 +21,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
   switch (uMsg)
   {
   case WM_DESTROY:
-    PostQuitMessage(0);
+    ::PostQuitMessage(0);
     break;
   case WM_PAINT:
-    ValidateRect(hwnd, NULL);
+    ::ValidateRect(hwnd, NULL);
+    break;
+  case WM_CLOSE:
+    Engine::Get<ISystem>()->EnableDefaultActions(vdl::System::DefalutAction::eExit);
+    Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefalutAction::eExit);
+    Engine::Get<ISystem>()->DisableDefaultActions(vdl::System::DefalutAction::eExit);
     break;
     //  キーを押した時
   case WM_KEYDOWN:
@@ -67,7 +72,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR,
 {
   //  メモリリーク検出
 #if defined(DEBUG) | defined(_DEBUG)
-  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+  ::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
   //  日本語に設定

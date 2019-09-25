@@ -19,15 +19,15 @@ namespace vdl::Constants
 
   constexpr uint kMaxConstantBufferNum = 14;
 
-  constexpr const char* kDefaultTextureVertexShaderFilePath = "Shader/Texture/TextureVS.hlsl";
+  constexpr const char* kDefaultTextureVertexShaderFilePath = "vdl/Shader/Texture/TextureVS.hlsl";
 
-  constexpr const char* kDefaultTexturePixelShaderFilePath = "Shader/Texture/TexturePS.hlsl";
+  constexpr const char* kDefaultTexturePixelShaderFilePath = "vdl/Shader/Texture/TexturePS.hlsl";
 
-  constexpr const char* kDefaultStaticMeshVertexShaderFilePath = "Shader/StaticMesh/StaticMeshVS.hlsl";
+  constexpr const char* kDefaultStaticMeshVertexShaderFilePath = "vdl/Shader/StaticMesh/StaticMeshVS.hlsl";
 
-  constexpr const char* kDefaultStaticMeshPixelShaderFilePath = "Shader/StaticMesh/StaticMeshPS.hlsl";
+  constexpr const char* kDefaultStaticMeshPixelShaderFilePath = "vdl/Shader/StaticMesh/StaticMeshPS.hlsl";
 
-  constexpr const char* kDefaultSkinnedMeshVertexShaderFilePath = "";
+  constexpr const char* kDefaultSkinnedMeshVertexShaderFilePath = "vdl/Shader/SkinnedMesh/SkinnedMeshVS.hlsl";
 
-  constexpr const char* kDefaultSkinnedMeshPixelShaderFilePath = "";
+  constexpr const char* kDefaultSkinnedMeshPixelShaderFilePath = "vdl/Shader/SkinnedMesh/SkinnedMeshPS.hlsl";
 }

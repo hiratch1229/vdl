@@ -42,7 +42,7 @@ namespace vdl
 
       if (_Min > _Max)
       {
-        const int Temp = _Min;
+        const float Temp = _Min;
         _Min = _Max;
         _Max = Temp;
       }

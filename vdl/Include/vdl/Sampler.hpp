@@ -1,5 +1,5 @@
 #pragma once
-#include "Types.hpp"
+#include "Fwd.hpp"
 
 namespace vdl
 {
@@ -55,7 +55,7 @@ namespace vdl
     static constexpr PreDefined kDefault2D = PreDefined::eWrapLinear;
     static constexpr PreDefined kDefault3D = PreDefined::eWrapAnisotropic;
   public:
-    using DataType = uint32_t;
+    using DataType = uint64_t;
   public:
 #pragma warning(disable:4201)
     union
