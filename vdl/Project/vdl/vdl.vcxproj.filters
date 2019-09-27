@@ -106,6 +106,9 @@
     <Filter Include="Shader\SkinnedMesh">
       <UniqueIdentifier>{72d2daf4-d4fd-45ea-a5dd-0ac2762655ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Image">
+      <UniqueIdentifier>{4cc3cea2-7076-4855-98ae-5532569b185b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -469,6 +472,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp">
       <Filter>Src\MeshData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Image\Image.cpp">
+      <Filter>Src\Image</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

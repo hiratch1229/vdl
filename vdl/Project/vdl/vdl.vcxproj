@@ -131,6 +131,7 @@
     <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Engine.cpp" />
     <ClCompile Include="..\..\Src\vdl\GUI\GUIFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Image\Image.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Button.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Gamepad\Gamepad.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Gamepad\GamepadFactory.cpp" />
@@ -338,7 +339,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>

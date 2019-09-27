@@ -694,7 +694,10 @@ void CGUI::Initialize()
 
 CGUI::~CGUI()
 {
-  ImGui::DestroyContext();
+  if (ImGui::GetCurrentContext())
+  {
+    ImGui::DestroyContext();
+  }
 }
 
 void CGUI::Update()

@@ -27,25 +27,28 @@ vdl::ID CTextureManager::Load(const char* _FilePath, bool _isSerialize)
     //  バイナリファイルが存在する場合ファイルから読み込む
     if (std::filesystem::exists(BinaryFilePath))
     {
-      ImportFromBinary(BinaryFilePath.string().c_str(), Image);
+      vdl::CompressionImage CompressionImage;
+      ImportFromBinary(BinaryFilePath.string().c_str(), CompressionImage);
+      Image = CompressionImage;
     }
   }
 
   if (Image.isEmpty())
   {
     Image = TextureLoader().LoadFromFile(_FilePath);
-  }
 
-  if (_isSerialize)
-  {
-    //  フォルダが存在しない場合作成
-    if (!std::filesystem::exists(BinaryFileDirectory))
+    if (_isSerialize)
     {
-      std::filesystem::create_directories(BinaryFileDirectory);
-    }
+      //  フォルダが存在しない場合作成
+      if (!std::filesystem::exists(BinaryFileDirectory))
+      {
+        std::filesystem::create_directories(BinaryFileDirectory);
+      }
 
-    //  バイナリファイルに書き出し
-    ExportToBinary(BinaryFilePath.string().c_str(), Image);
+      //  バイナリファイルに書き出し
+      vdl::CompressionImage CompressionImage = Image;
+      ExportToBinary(BinaryFilePath.string().c_str(), CompressionImage);
+    }
   }
 
   return Load(Image);

@@ -200,7 +200,7 @@ void FBXLoader::FetchMaterials(fbxsdk::FbxMesh* _pMesh, Materials* _pMaterials, 
           if (fbxsdk::FbxFileTexture * pFileTexture = Property.GetSrcObject<fbxsdk::FbxFileTexture>())
           {
             const std::string FileName = (_FileFormat == "fbx" ? _FileDirectory + pFileTexture->GetRelativeFileName() : pFileTexture->GetFileName());
-            _pProperty->Image = _TextureLoader.LoadFromFile(FileName.c_str());
+            _pProperty->CompressionImage = _TextureLoader.LoadFromFile(FileName.c_str());
           }
         }
       }

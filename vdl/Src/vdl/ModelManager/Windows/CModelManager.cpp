@@ -95,18 +95,18 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
       {
         _ASSERT_EXPR_A(false, (FileFormat + "は対応していません。").c_str());
       }
-    }
 
-    if (_isSerialize)
-    {
-      //  フォルダが存在しない場合作成
-      if (!std::filesystem::exists(BinaryFileDirectory))
+      if (_isSerialize)
       {
-        std::filesystem::create_directories(BinaryFileDirectory);
-      }
+        //  フォルダが存在しない場合作成
+        if (!std::filesystem::exists(BinaryFileDirectory))
+        {
+          std::filesystem::create_directories(BinaryFileDirectory);
+        }
 
-      //  バイナリファイルに書き出し
-      ExportToBinary(BinaryFilePath.string().c_str(), MeshDatas);
+        //  バイナリファイルに書き出し
+        ExportToBinary(BinaryFilePath.string().c_str(), MeshDatas);
+      }
     }
   }
 
@@ -131,10 +131,10 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
         vdl::Material& SkinnedMeshMaterial = SkinnedMeshData.Materials[MaterialCount];
         Material& Material = MeshData.Materials[MaterialCount];
 
-        SkinnedMeshMaterial.Diffuse = Material.Diffuse.Image;
+        SkinnedMeshMaterial.Diffuse = vdl::Image(Material.Diffuse.CompressionImage);
 
-        SkinnedMeshMaterial.IndexStart = Material.IndexStart;
-        SkinnedMeshMaterial.IndexCount = Material.IndexCount;
+        SkinnedMeshMaterial.IndexStart = std::move(Material.IndexStart);
+        SkinnedMeshMaterial.IndexCount = std::move(Material.IndexCount);
       }
 
       const size_t AnimationNum = MeshData.Animations.size();
@@ -160,7 +160,7 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
       }
     }
 
-    SkinnedMeshes[MeshCount] =SkinnedMeshData;
+    SkinnedMeshes[MeshCount] = SkinnedMeshData;
   }
 
   return SkinnedMeshes;

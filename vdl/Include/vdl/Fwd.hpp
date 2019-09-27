@@ -129,6 +129,7 @@ namespace vdl
   //  Image.hpp
   //-------------------------
   class Image;
+  class CompressionImage;
 
   //-------------------------
   //  Format.hpp

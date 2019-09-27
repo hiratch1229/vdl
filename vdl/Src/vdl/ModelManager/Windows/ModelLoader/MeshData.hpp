@@ -10,10 +10,10 @@ struct Material
 {
   struct Property
   {
-    vdl::Image Image;
+    vdl::CompressionImage CompressionImage;
     vdl::ColorF Color;
 
-    CEREAL_SERIALIZE(Image, Color)
+    CEREAL_SERIALIZE(CompressionImage, Color)
   };
 
   Property Diffuse;

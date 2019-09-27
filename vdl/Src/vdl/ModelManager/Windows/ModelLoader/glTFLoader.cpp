@@ -82,7 +82,7 @@ MeshDatas glTFLoader::Load(const char* _FilePath)const
     {
       FetchMaterial(pResourceReader, Document, GltfMesh, Directory, &MeshData.Materials, TextureLoader);
       FetchVerticesAndIndices(pResourceReader, Document, GltfMesh, &MeshData.Vertices, &MeshData.Indices, &MeshData.Materials);
-      
+
       MeshData.Name = GltfMesh.name;
       MeshData.GlobalTransform = Transform * GetMatrixFromNode(Document.nodes.Get(GltfMesh.id));
     }
@@ -143,11 +143,11 @@ void glTFLoader::FetchMaterial(const std::unique_ptr<Microsoft::glTF::GLTFResour
       {
         const Microsoft::glTF::BufferView& BufferView = _Document.bufferViews.Get(Image.bufferViewId);
         //_pProperty->Image = _TextureLoader.LoadFromMemory(_pResourceReader->ReadBinaryData<vdl::uint16_t>(_Document, BufferView));
-        _pProperty->Image = _TextureLoader.LoadFromMemory(_pResourceReader->ReadBinaryData<vdl::uint8_t>(_Document, BufferView));
+        _pProperty->CompressionImage = _TextureLoader.LoadFromMemory(_pResourceReader->ReadBinaryData<vdl::uint8_t>(_Document, BufferView));
       }
       else
       {
-        _pProperty->Image = _TextureLoader.LoadFromFile((_Directory + Image.uri).c_str());
+        _pProperty->CompressionImage = _TextureLoader.LoadFromFile((_Directory + Image.uri).c_str());
       }
     }
 
