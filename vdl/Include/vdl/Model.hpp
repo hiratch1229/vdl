@@ -42,8 +42,6 @@ namespace vdl
     SkinnedMesh(const SkinnedMesh& _SkinnedMesh);
 
     SkinnedMesh& operator=(const SkinnedMesh& _SkinnedMesh);
-
-    ~SkinnedMesh();
   public:
     [[nodiscard]] constexpr bool operator==(const SkinnedMesh& _Mesh)const noexcept { return ID_ == _Mesh.ID_; }
 

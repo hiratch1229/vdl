@@ -80,14 +80,6 @@ namespace vdl
     return *this;
   }
 
-  SkinnedMesh::~SkinnedMesh()
-  {
-    if (ID_)
-    {
-      Engine::Get<IModelManager>()->Release(ID_);
-    }
-  }
-
   //--------------------------------------------------
 
   Model::Model(const char* _FilePath, bool _isSerialize)
