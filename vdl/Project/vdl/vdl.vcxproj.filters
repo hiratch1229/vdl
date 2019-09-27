@@ -109,6 +109,9 @@
     <Filter Include="Src\Image">
       <UniqueIdentifier>{4cc3cea2-7076-4855-98ae-5532569b185b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Camera">
+      <UniqueIdentifier>{41e07a2e-2a40-4062-b662-4b2770adc965}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -475,6 +478,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Image\Image.cpp">
       <Filter>Src\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Camera\Camera.cpp">
+      <Filter>Src\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

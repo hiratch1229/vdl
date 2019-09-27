@@ -249,7 +249,7 @@ void FBXLoader::FetchVertices(fbxsdk::FbxMesh* _pMesh, Vertices* _pVertices, con
   assert(_pMesh && _pVertices);
 
   const vdl::uint PolygonNum = _pMesh->GetPolygonCount();
-  _pVertices->resize(PolygonNum * 3);
+  _pVertices->resize(static_cast<size_t>(PolygonNum) * 3);
 
   const bool hasNormal = _pMesh->GetElementNormalCount() > 0;
   const bool hasTangent = _pMesh->GetElementTangentCount() > 0;
@@ -375,7 +375,7 @@ void FBXLoader::FetchIndices(fbxsdk::FbxMesh* _pMesh, Indices* _pIndices, Materi
   assert(_pMesh && _pIndices && _pMaterials);
 
   const vdl::uint PolygonNum = _pMesh->GetPolygonCount();
-  _pIndices->resize(PolygonNum * 3);
+  _pIndices->resize(static_cast<size_t>(PolygonNum) * 3);
 
   const fbxsdk::FbxLayerElementArrayTemplate<int>& MaterialIndices = _pMesh->GetElementMaterial()->GetIndexArray();
   const bool hasMaterial = _pMesh->GetNode()->GetMaterialCount() > 0;
@@ -404,7 +404,7 @@ void FBXLoader::FetchIndices(fbxsdk::FbxMesh* _pMesh, Indices* _pIndices, Materi
 
     for (vdl::uint VertexCount = 0; VertexCount < 3; ++VertexCount)
     {
-      (*_pIndices)[OffsetIndex + VertexCount] = VertexNum++;
+      (*_pIndices)[static_cast<size_t>(OffsetIndex) + VertexCount] = VertexNum++;
     }
     Material.IndexCount += 3;
   }
@@ -435,7 +435,7 @@ void FBXLoader::FetchAnimations(fbxsdk::FbxMesh* _pMesh, Animations* _pAnimation
 
     fbxsdk::FbxTime SamplingStep;
     SamplingStep.SetTime(0, 0, 1, 0, 0, TimeMode);
-    SamplingStep = static_cast<fbxsdk::FbxLongLong>(SamplingStep.Get() * kAnimationSamplingTime);
+    SamplingStep = static_cast<fbxsdk::FbxLongLong>(SamplingStep.Get() * static_cast<double>(kAnimationSamplingTime));
 
     for (fbxsdk::FbxTime CurrentTime = StartTime; CurrentTime < EndTime; CurrentTime += SamplingStep)
     {

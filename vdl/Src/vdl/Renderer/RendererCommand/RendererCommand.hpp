@@ -162,7 +162,7 @@ private:
 public:
   RendererCommandList() = default;
 
-  void Initialize(const vdl::Scissor& _Scissor, const vdl::Viewport& _Viewport, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
+  void Initialize(const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
     const vdl::Sampler& _Sampler, const vdl::VertexShader& _VertexShader, const vdl::PixelShader& _PixelShader);
 
   void Reset();

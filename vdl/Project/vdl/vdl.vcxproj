@@ -125,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Camera\Camera.cpp" />
     <ClCompile Include="..\..\Src\vdl\Collision2D\Collision2D.cpp" />
     <ClCompile Include="..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />

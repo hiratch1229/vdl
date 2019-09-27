@@ -19,6 +19,9 @@
 
 #include <vdl/System.hpp>
 
+#include <vdl/Viewport.hpp>
+#include <vdl/Scissor.hpp>
+
 void CSystem::Initialize()
 {
   pSwapChain_ = Engine::Get<ISwapChain>();
@@ -45,6 +48,9 @@ void CSystem::Initialize()
   Engine::Get<IBufferManager>()->Initialize();
   Engine::Get<IShaderManager>()->Initialize();
 
+  pRenderer_->Initialize();
+  pGUI_->Initialize();
+
   //  é¸îgêîÇéÊìæ
   {
     LARGE_INTEGER Frequency;
@@ -62,12 +68,18 @@ bool CSystem::Update()
 {
   if (SystemState_ == SystemState::eInitialized)
   {
-    Engine::Get<IWindow>()->Show(true);
+    IWindow* pWindow = Engine::Get<IWindow>();
+    pWindow->Show(true);
 
-    pRenderer_->Initialize();
-    //pRenderer_->SetViewport();
-    //pRenderer_->SetScissor();
-    pGUI_->Initialize();
+    const vdl::uint2& WindowSize = pWindow->GetWindowSize();
+    const vdl::Viewport Viewport(0.0f, WindowSize);
+    const vdl::Scissor Scissor(0.0f, WindowSize);
+
+    for (vdl::uint i = 0; i < static_cast<vdl::uint>(RenderType::eNum); ++i)
+    {
+      pRenderer_->SetViewport(Viewport, static_cast<RenderType>(i));
+      pRenderer_->SetScissor(Scissor, static_cast<RenderType>(i));
+    }
 
     SystemState_ = SystemState::eRunning;
   }

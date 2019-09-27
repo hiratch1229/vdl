@@ -11,7 +11,7 @@
 #include <algorithm>
 
 template<class DisplayObject, class InstanceData>
-inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(const vdl::Scissor& _Scissor, const vdl::Viewport& _Viewport, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
+inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
   const vdl::Sampler& _Sampler, const vdl::VertexShader& _VertexShader, const vdl::PixelShader& _PixelShader)
 {
   pDevice_ = Engine::Get<IDevice>();
@@ -21,8 +21,8 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(const v
   }
   pBufferManager_ = Engine::Get<IBufferManager>();
 
-  Scissors_.push_back(CurrentScissor_ = _Scissor);
-  Viewports_.push_back(CurrentViewport_ = _Viewport);
+  Scissors_.push_back(CurrentScissor_ = {});
+  Viewports_.push_back(CurrentViewport_ = {});
   BlendStates_.push_back(CurrentBlendState_ = _BlendState);
   DepthStencilStates_.push_back(CurrentDepthStencilState_ = _DepthStencilState);
   RasterizerStates_.push_back(CurrentRasterizerState_ = _RasterizerState);

@@ -1,7 +1,6 @@
 #include "CRenderer.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
@@ -45,16 +44,11 @@ void CRenderer::Initialize()
 
   //  描画コマンドリストの初期化
   {
-    const vdl::uint2 WindowSize = Engine::Get<IWindow>()->GetWindowSize();
-
-    const vdl::Scissor Scissor(0, WindowSize);
-    const vdl::Viewport Viewport(0, WindowSize);
-
-    TextureRendererCommandList_.Initialize(Scissor, Viewport, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault2D, vdl::RasterizerState::kDefault2D,
+    TextureRendererCommandList_.Initialize(vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault2D, vdl::RasterizerState::kDefault2D,
       vdl::Sampler::kDefault2D, vdl::VertexShader(Constants::kDefaultTextureVertexShaderFilePath, vdl::InputLayout::eTexture), vdl::PixelShader(Constants::kDefaultTexturePixelShaderFilePath));
-    StaticMeshRendererCommandList_.Initialize(Scissor, Viewport, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D,
+    StaticMeshRendererCommandList_.Initialize(vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D,
       vdl::Sampler::kDefault3D, vdl::VertexShader(Constants::kDefaultStaticMeshVertexShaderFilePath, vdl::InputLayout::eStaticMesh), vdl::PixelShader(Constants::kDefaultStaticMeshPixelShaderFilePath));
-    SkinnedMeshRendererCommandList_.Initialize(Scissor, Viewport, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D,
+    SkinnedMeshRendererCommandList_.Initialize(vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D,
       vdl::Sampler::kDefault3D, vdl::VertexShader(Constants::kDefaultSkinnedMeshVertexShaderFilePath, vdl::InputLayout::eSkinnedMesh), vdl::PixelShader(Constants::kDefaultSkinnedMeshPixelShaderFilePath));
   }
 }
@@ -144,7 +138,7 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
     pStaticMeshCameraData_->ConstantBuffer.GetData().ViewProjection = GetView(RenderType::eStaticMesh) * GetProjection(RenderType::eStaticMesh);
     StaticMeshRendererCommandList_.PushVertexStageConstantBuffer(pStaticMeshCameraData_->ConstantBuffer.GetDetail(), 0);
   }
-  
+
   StaticMeshInstanceData InstanceData;
   {
     InstanceData.World = _World * _StaticMesh.GetGlobalTransform();
@@ -202,7 +196,7 @@ void CRenderer::Flush()
   pDeviceContext_->SetRenderTextures(OutputManager_.RenderTextures, OutputManager_.DepthStencilTexture);
 
   pDeviceContext_->SetInputLayout(vdl::InputLayout::eStaticMesh);
-  pDeviceContext_->SetTopology(vdl::Topology::eTriangleStrip);
+  pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
   StaticMeshRendererCommandList_.Flush(pDeviceContext_, pStaticMeshInstanceBuffer_.get());
 
   //pDeviceContext_->SetInputLayout(vdl::InputLayout::eSkinnedMesh);

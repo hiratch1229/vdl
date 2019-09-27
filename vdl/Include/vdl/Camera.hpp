@@ -24,5 +24,9 @@ namespace vdl
     [[nodiscard]] bool operator==(const Camera& _Camera)const { return Position == _Camera.Position && Target == _Camera.Target && Up == _Camera.Up && Near == _Camera.Near && Far == _Camera.Far && Fov == _Camera.Fov && isPerspective == _Camera.isPerspective; }
 
     [[nodiscard]] bool operator!=(const Camera& _Camera)const { return Position != _Camera.Position || Target != _Camera.Target || Up != _Camera.Up || Near != _Camera.Near || Far != _Camera.Far || Fov != _Camera.Fov || isPerspective != _Camera.isPerspective; }
+  public:
+    [[nodiscard]] float3 ViewVector()const { return Target - Position; }
   };
+
+  void FreeCamera(Camera* _pCamera);
 }
