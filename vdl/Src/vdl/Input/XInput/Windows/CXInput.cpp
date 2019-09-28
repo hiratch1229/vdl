@@ -5,11 +5,6 @@
 #include <Windows.h>
 #include <Xinput.h>
 
-void CXInput::Initialize()
-{
-
-}
-
 void CXInput::Update()
 {
   static constexpr int kXInputButtonsCode[] = { XINPUT_GAMEPAD_DPAD_UP, XINPUT_GAMEPAD_DPAD_DOWN, XINPUT_GAMEPAD_DPAD_LEFT, XINPUT_GAMEPAD_DPAD_RIGHT,
@@ -60,9 +55,16 @@ vdl::float2 CXInput::GetLeftStick(vdl::uint _Index, float _DeadZone)const
   }
 
   vdl::float2 Value = Status_[_Index].LeftStick;
-
-  if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone) Value.x = 0.0f;
-  if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone) Value.y = 0.0f;
+  {
+    if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone)
+    {
+      Value.x = 0.0f;
+    }
+    if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone)
+    {
+      Value.y = 0.0f;
+    }
+  }
 
   return Value;
 }
@@ -75,9 +77,16 @@ vdl::float2 CXInput::GetRightStick(vdl::uint _Index, float _DeadZone)const
   }
 
   vdl::float2 Value = Status_[_Index].RightStick;
-
-  if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone) Value.x = 0.0f;
-  if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone) Value.y = 0.0f;
+  {
+    if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone)
+    {
+      Value.x = 0.0f;
+    }
+    if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone)
+    {
+      Value.y = 0.0f;
+    }
+  }
 
   return Value;
 }
@@ -90,8 +99,12 @@ float CXInput::GetLeftTrigger(vdl::uint _Index, float _DeadZone)const
   }
 
   float Value = Status_[_Index].LeftTrigger;
-
-  if (Value < _DeadZone) Value = 0.0f;
+  {
+    if (Value < _DeadZone)
+    {
+      Value = 0.0f;
+    }
+  }
 
   return Value;
 }
@@ -104,8 +117,12 @@ float CXInput::GetRightTrigger(vdl::uint _Index, float _DeadZone)const
   }
 
   float Value = Status_[_Index].RightTrigger;
-
-  if (Value < _DeadZone) Value = 0.0f;
+  {
+    if (Value < _DeadZone)
+    {
+      Value = 0.0f;
+    }
+  }
 
   return Value;
 }

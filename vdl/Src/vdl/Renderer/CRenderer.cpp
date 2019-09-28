@@ -164,7 +164,7 @@ void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _W
 
   SkinnedMeshinstanceData InstanceData;
   {
-    InstanceData.World = std::move(_World * _SkinnedMesh.GetGlobalTransform());
+    InstanceData.World = _World * _SkinnedMesh.GetGlobalTransform();
     InstanceData.Color = _Color;
   }
   SkinnedMeshRendererCommandList_.PushDrawData(_SkinnedMesh, std::move(InstanceData));

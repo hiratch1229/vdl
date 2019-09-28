@@ -18,7 +18,7 @@ private:
 public:
   CKeyboard() = default;
 
-  void Initialize()override;
+  void Initialize()override {}
 
   void Update()override;
 

@@ -12,17 +12,17 @@ namespace vdl
     public:
       ConstantBufferData() = default;
 
-      ConstantBufferData(ConstantBufferData&&) = default;
-
       ConstantBufferData(uint _BufferSize);
 
       ConstantBufferData(const ConstantBufferData& _ConstantBufferData);
+
+      ConstantBufferData(ConstantBufferData&& _ConstantBufferData)noexcept;
 
       ~ConstantBufferData();
     public:
       ConstantBufferData& operator=(const ConstantBufferData& _ConstantBufferData);
       
-      ConstantBufferData& operator=(ConstantBufferData&&) = default;
+      ConstantBufferData& operator=(ConstantBufferData&& _ConstantBufferData)noexcept;
 
       [[nodiscard]] constexpr bool operator==(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ == _ConstantBufferData.ID_; }
 

@@ -5,11 +5,6 @@
 
 #include <Windows.h>
 
-void CKeyboard::Initialize()
-{
-
-}
-
 void CKeyboard::Update()
 {
   if (!isInputAttach_)

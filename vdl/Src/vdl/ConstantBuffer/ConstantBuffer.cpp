@@ -6,8 +6,8 @@
 namespace vdl::Detail
 {
   ConstantBufferData::ConstantBufferData(uint _BufferSize)
-    : ID_(Engine::Get<IBufferManager>()->CreateConstantBuffer(_BufferSize))
   {
+    ID_ = Engine::Get<IBufferManager>()->CreateConstantBuffer(_BufferSize);
   }
 
   ConstantBufferData::ConstantBufferData(const ConstantBufferData& _ConstantBufferData)
@@ -18,12 +18,10 @@ namespace vdl::Detail
     }
   }
 
-  ConstantBufferData::~ConstantBufferData()
+  ConstantBufferData::ConstantBufferData(ConstantBufferData&& _ConstantBufferData)noexcept
   {
-    if (ID_)
-    {
-      Engine::Get<IBufferManager>()->Release(ID_);
-    }
+    ID_ = std::move(_ConstantBufferData.ID_);
+    _ConstantBufferData.ID_ = std::nullopt;
   }
 
   ConstantBufferData& ConstantBufferData::operator=(const ConstantBufferData& _ConstantBufferData)
@@ -44,6 +42,22 @@ namespace vdl::Detail
     }
 
     return *this;
+  }
+
+  ConstantBufferData& ConstantBufferData::operator=(ConstantBufferData&& _ConstantBufferData)noexcept
+  {
+    ID_ = std::move(_ConstantBufferData.ID_);
+    _ConstantBufferData.ID_ = std::nullopt;
+
+    return *this;
+  }
+
+  ConstantBufferData::~ConstantBufferData()
+  {
+    if (ID_)
+    {
+      Engine::Get<IBufferManager>()->Release(ID_);
+    }
   }
 
   void* ConstantBufferData::GetData()const

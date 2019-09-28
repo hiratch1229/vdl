@@ -11,18 +11,20 @@ namespace vdl
   public:
     StaticMesh() = default;
 
-    StaticMesh(StaticMesh&&) = default;
-
     //  静的メッシュデータから作成
     StaticMesh(const StaticMeshData& _MeshData);
 
+    StaticMesh(StaticMeshData&& _MeshData);
+
     StaticMesh(const StaticMesh& _StaticMesh);
 
+    StaticMesh(StaticMesh&& _StaticMesh)noexcept;
+    
     ~StaticMesh();
   public:
     StaticMesh& operator=(const StaticMesh& _StaticMesh);
 
-    StaticMesh& operator=(StaticMesh&&) = default;
+    StaticMesh& operator=(StaticMesh&& _StaticMesh)noexcept;
 
     [[nodiscard]] constexpr bool operator==(const StaticMesh& _Mesh)const noexcept { return ID_ == _Mesh.ID_; }
 
@@ -40,16 +42,18 @@ namespace vdl
   public:
     SkinnedMesh() = default;
 
-    SkinnedMesh(SkinnedMesh&&) = default;
-
     //  スキンメッシュデータから作成
     SkinnedMesh(const SkinnedMeshData& _MeshData);
 
+    SkinnedMesh(SkinnedMeshData&& _MeshData);
+
     SkinnedMesh(const SkinnedMesh& _SkinnedMesh);
+
+    SkinnedMesh(SkinnedMesh&& _SkinnedMesh)noexcept;
   public:
     SkinnedMesh& operator=(const SkinnedMesh& _SkinnedMesh);
 
-    SkinnedMesh& operator=(SkinnedMesh&&) = default;
+    SkinnedMesh& operator=(SkinnedMesh&& _SkinnedMesh)noexcept;
 
     [[nodiscard]] constexpr bool operator==(const SkinnedMesh& _Mesh)const noexcept { return ID_ == _Mesh.ID_; }
 

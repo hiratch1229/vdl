@@ -34,6 +34,12 @@ namespace vdl
     }
   }
 
+  Texture::Texture(Texture&& _Texture)noexcept
+  {
+    ID_ = _Texture.ID_;
+    _Texture.ID_ = std::nullopt;
+  }
+
   Texture& Texture::operator=(const Texture& _Texture)
   {
     if (ID_ != _Texture.ID_)
@@ -47,6 +53,14 @@ namespace vdl
         Engine::Get<ITextureManager>()->AddRef(ID_);
       }
     }
+
+    return *this;
+  }
+
+  Texture& Texture::operator=(Texture&& _Texture)noexcept
+  {
+    ID_ = _Texture.ID_;
+    _Texture.ID_ = std::nullopt;
 
     return *this;
   }

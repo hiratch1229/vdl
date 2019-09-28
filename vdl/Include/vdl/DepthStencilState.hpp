@@ -119,9 +119,6 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
-    constexpr DepthStencilState(const DepthStencilState& _DepthStencilState)noexcept
-      : Data(_DepthStencilState.Data) {}
-
     constexpr DepthStencilState(bool _DepthEnable = true, DepthWriteMaskType _DepthWriteMask = DepthWriteMaskType::eAll, ComparisonFuncType _DepthFunc = ComparisonFuncType::eLess,
       bool _StencilEnable = false, uint8_t _StencilReadMask = 0xFF, uint8_t _StencilWriteMask = 0xFF,
       const DepthStencilOpState & _FrontFace = DepthStencilOpState::kDefaultFront, const DepthStencilOpState & _BackFace = DepthStencilOpState::kDefaultBack)noexcept

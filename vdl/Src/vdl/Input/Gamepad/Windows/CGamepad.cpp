@@ -22,15 +22,24 @@ namespace
 
   inline vdl::float2 GetStick(vdl::float2 _Value, float _DeadZone)
   {
-    if (vdl::Math::GetAbsoluteValue(_Value.x) < _DeadZone) _Value.x = 0.0f;
-    if (vdl::Math::GetAbsoluteValue(_Value.y) < _DeadZone) _Value.y = 0.0f;
+    if (vdl::Math::GetAbsoluteValue(_Value.x) < _DeadZone)
+    {
+      _Value.x = 0.0f;
+    }
+    if (vdl::Math::GetAbsoluteValue(_Value.y) < _DeadZone)
+    {
+      _Value.y = 0.0f;
+    }
 
     return _Value;
   }
 
   inline float GetTrigger(float _Value, float _DeadZone)
   {
-    if (_Value < _DeadZone) _Value = 0.0f;
+    if (_Value < _DeadZone)
+    {
+      _Value = 0.0f;
+    }
 
     return _Value;
   }
@@ -197,9 +206,16 @@ vdl::float2 CGamepad::GetLeftStick(vdl::uint _Index, float _DeadZone)const
   }
 
   vdl::float2 Value = Status_[_Index].LeftStick;
-
-  if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone) Value.x = 0.0f;
-  if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone) Value.y = 0.0f;
+  {
+    if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone)
+    {
+      Value.x = 0.0f;
+    }
+    if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone)
+    {
+      Value.y = 0.0f;
+    }
+  }
 
   return Value;
 }
@@ -212,9 +228,16 @@ vdl::float2 CGamepad::GetRightStick(vdl::uint _Index, float _DeadZone)const
   }
 
   vdl::float2 Value = Status_[_Index].RightStick;
-
-  if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone) Value.x = 0.0f;
-  if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone) Value.y = 0.0f;
+  {
+    if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone)
+    {
+      Value.x = 0.0f;
+    }
+    if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone)
+    {
+      Value.y = 0.0f;
+    }
+  }
 
   return Value;
 }
@@ -227,8 +250,12 @@ float CGamepad::GetLeftTrigger(vdl::uint _Index, float _DeadZone)const
   }
 
   float Value = Status_[_Index].LeftTrigger;
-
-  if (Value < _DeadZone) Value = 0.0f;
+  {
+    if (Value < _DeadZone)
+    {
+      Value = 0.0f;
+    }
+  }
 
   return Value;
 }
@@ -241,8 +268,12 @@ float CGamepad::GetRightTrigger(vdl::uint _Index, float _DeadZone)const
   }
 
   float Value = Status_[_Index].RightTrigger;
-
-  if (Value < _DeadZone) Value = 0.0f;
+  {
+    if (Value < _DeadZone)
+    {
+      Value = 0.0f;
+    }
+  }
 
   return Value;
 }

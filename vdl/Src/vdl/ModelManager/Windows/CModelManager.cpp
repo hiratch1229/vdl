@@ -42,6 +42,26 @@ vdl::ID CModelManager::Load(const vdl::StaticMeshData& _MeshData)
   return Meshes_.Add(pMesh);
 }
 
+vdl::ID CModelManager::Load(vdl::StaticMeshData&& _MeshData)
+{
+  Mesh* pMesh = new Mesh;
+  {
+    IBuffer* pVertexBuffer;
+    pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::StaticMeshVertex), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::StaticMeshVertex)));
+    pMesh->pVertexBuffer.reset(pVertexBuffer);
+
+    IBuffer* pIndexBuffer;
+    pDevice_->CreateIndexBuffer(&pIndexBuffer, _MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
+    pMesh->pIndexBuffer.reset(pIndexBuffer);
+
+    pMesh->Name = std::move(_MeshData.Name);
+    pMesh->Materials = std::move(_MeshData.Materials);
+    pMesh->GlobalTransform = std::move(_MeshData.GlobalTransform);
+  }
+
+  return Meshes_.Add(pMesh);
+}
+
 vdl::ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
 {
   Mesh* pMesh = new Mesh;
@@ -58,6 +78,27 @@ vdl::ID CModelManager::Load(const vdl::SkinnedMeshData& _MeshData)
     pMesh->Materials = _MeshData.Materials;
     pMesh->Animations = _MeshData.Animations;
     pMesh->GlobalTransform = _MeshData.GlobalTransform;
+  }
+
+  return Meshes_.Add(pMesh);
+}
+
+vdl::ID CModelManager::Load(vdl::SkinnedMeshData&& _MeshData)
+{
+  Mesh* pMesh = new Mesh;
+  {
+    IBuffer* pVertexBuffer;
+    pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::SkinnedMeshVertex), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::SkinnedMeshVertex)));
+    pMesh->pVertexBuffer.reset(pVertexBuffer);
+
+    IBuffer* pIndexBuffer;
+    pDevice_->CreateIndexBuffer(&pIndexBuffer, _MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
+    pMesh->pIndexBuffer.reset(pIndexBuffer);
+
+    pMesh->Name = std::move(_MeshData.Name);
+    pMesh->Materials = std::move(_MeshData.Materials);
+    pMesh->Animations = std::move(_MeshData.Animations);
+    pMesh->GlobalTransform = std::move(_MeshData.GlobalTransform);
   }
 
   return Meshes_.Add(pMesh);
@@ -133,8 +174,8 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
 
         SkinnedMeshMaterial.Diffuse = vdl::Image(Material.Diffuse.CompressionImage);
 
-        SkinnedMeshMaterial.IndexStart = std::move(Material.IndexStart);
-        SkinnedMeshMaterial.IndexCount = std::move(Material.IndexCount);
+        SkinnedMeshMaterial.IndexStart = Material.IndexStart;
+        SkinnedMeshMaterial.IndexCount = Material.IndexCount;
       }
 
       const size_t AnimationNum = MeshData.Animations.size();

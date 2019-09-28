@@ -17,7 +17,11 @@ public:
 
   [[nodiscard]] virtual vdl::ID Load(const vdl::StaticMeshData& _MeshData) = 0;
 
+  [[nodiscard]] virtual vdl::ID Load(vdl::StaticMeshData&& _MeshData) = 0;
+
   [[nodiscard]] virtual vdl::ID Load(const vdl::SkinnedMeshData& _MeshData) = 0;
+
+  [[nodiscard]] virtual vdl::ID Load(vdl::SkinnedMeshData&& _MeshData) = 0;
 
   [[nodiscard]] virtual std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize) = 0;
 

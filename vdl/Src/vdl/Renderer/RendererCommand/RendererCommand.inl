@@ -702,7 +702,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
           if (CurrentConstantBufferID != LastConstantBufferID
             || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetSize()) != 0)
           {
-            vdl::Detail::ConstantBufferData ConstantBuffer = std::move(pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer));
+            vdl::Detail::ConstantBufferData ConstantBuffer = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
             const vdl::ID ConstantBufferID = ConstantBuffer.GetID();
 
             ReservedConstantBuffers_.insert(std::make_pair(ConstantBufferID, std::move(ConstantBuffer)));
@@ -715,7 +715,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
         }
         while (ConstantBufferCount < CurrentConstantBufferNum)
         {
-          vdl::Detail::ConstantBufferData ConstantBuffer = std::move(pBufferManager_->CloneConstantBuffer(ReservedConstantBuffers_.at(CurrentConstantBufferIDs[ConstantBufferCount])));
+          vdl::Detail::ConstantBufferData ConstantBuffer = pBufferManager_->CloneConstantBuffer(ReservedConstantBuffers_.at(CurrentConstantBufferIDs[ConstantBufferCount]));
           const vdl::ID ConstantBufferID = ConstantBuffer.GetID();
 
           ReservedConstantBuffers_.insert(std::make_pair(ConstantBufferID, std::move(ConstantBuffer)));
@@ -731,7 +731,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
       {
         RendererCommands_.emplace_back(_RendererCommandType, static_cast<vdl::uint>(ConstantBufferIDs.size()));
         LastConstantBufferIDs = CurrentConstantBufferIDs;
-        ConstantBufferIDs.push_back(std::move(TempConstantBufferIDs));
+        ConstantBufferIDs.emplace_back(std::move(TempConstantBufferIDs));
       }
     };
 

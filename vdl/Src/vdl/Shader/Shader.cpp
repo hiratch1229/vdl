@@ -25,6 +25,12 @@ namespace vdl
     }
   }
 
+  VertexShader::VertexShader(VertexShader&& _VertexShader)noexcept
+  {
+    ID_ = _VertexShader.ID_;
+    _VertexShader.ID_ = std::nullopt;
+  }
+
   VertexShader& VertexShader::operator=(const VertexShader& _VertexShader)
   {
     if (ID_ != _VertexShader.ID_)
@@ -38,6 +44,14 @@ namespace vdl
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
     }
+
+    return *this;
+  }
+  
+  VertexShader& VertexShader::operator=(VertexShader&& _VertexShader)noexcept
+  {
+    ID_ = _VertexShader.ID_;
+    _VertexShader.ID_ = std::nullopt;
 
     return *this;
   }
@@ -77,6 +91,12 @@ namespace vdl
     }
   }
 
+  HullShader::HullShader(HullShader&& _HullShader)noexcept
+  {
+    ID_ = _HullShader.ID_;
+    _HullShader.ID_ = std::nullopt;
+  }
+
   HullShader& HullShader::operator=(const HullShader& _HullShader)
   {
     if (ID_ != _HullShader.ID_)
@@ -90,6 +110,14 @@ namespace vdl
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
     }
+
+    return *this;
+  }
+
+  HullShader& HullShader::operator=(HullShader&& _HullShader)noexcept
+  {
+    ID_ = _HullShader.ID_;
+    _HullShader.ID_ = std::nullopt;
 
     return *this;
   }
@@ -122,6 +150,12 @@ namespace vdl
     }
   }
 
+  DomainShader::DomainShader(DomainShader&& _DomainShader)noexcept
+  {
+    ID_ = _DomainShader.ID_;
+    _DomainShader.ID_ = std::nullopt;
+  }
+
   DomainShader& DomainShader::operator=(const DomainShader& _DomainShader)
   {
     if (ID_ != _DomainShader.ID_)
@@ -135,6 +169,14 @@ namespace vdl
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
     }
+
+    return *this;
+  }
+
+  DomainShader& DomainShader::operator=(DomainShader&& _DomainShader)noexcept
+  {
+    ID_ = _DomainShader.ID_;
+    _DomainShader.ID_ = std::nullopt;
 
     return *this;
   }
@@ -167,6 +209,12 @@ namespace vdl
     }
   }
 
+  GeometryShader::GeometryShader(GeometryShader&& _GeometryShader)noexcept
+  {
+    ID_ = _GeometryShader.ID_;
+    _GeometryShader.ID_ = std::nullopt;
+  }
+
   GeometryShader& GeometryShader::operator=(const GeometryShader& _GeometryShader)
   {
     if (ID_ != _GeometryShader.ID_)
@@ -180,6 +228,14 @@ namespace vdl
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
     }
+
+    return *this;
+  }
+
+  GeometryShader& GeometryShader::operator=(GeometryShader&& _GeometryShader)noexcept
+  {
+    ID_ = _GeometryShader.ID_;
+    _GeometryShader.ID_ = std::nullopt;
 
     return *this;
   }
@@ -212,6 +268,12 @@ namespace vdl
     }
   }
 
+  PixelShader::PixelShader(PixelShader&& _PixelShader)noexcept
+  {
+    ID_ = _PixelShader.ID_;
+    _PixelShader.ID_ = std::nullopt;
+  }
+
   PixelShader& PixelShader::operator=(const PixelShader& _PixelShader)
   {
     if (ID_ != _PixelShader.ID_)
@@ -225,6 +287,14 @@ namespace vdl
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
     }
+
+    return *this;
+  }
+
+  PixelShader& PixelShader::operator=(PixelShader&& _PixelShader)noexcept
+  {
+    ID_ = _PixelShader.ID_;
+    _PixelShader.ID_ = std::nullopt;
 
     return *this;
   }
@@ -257,6 +327,12 @@ namespace vdl
     }
   }
 
+  ComputeShader::ComputeShader(ComputeShader&& _ComputeShader)noexcept
+  {
+    ID_ = _ComputeShader.ID_;
+    _ComputeShader.ID_ = std::nullopt;
+  }
+
   ComputeShader& ComputeShader::operator=(const ComputeShader& _ComputeShader)
   {
     if (ID_ != _ComputeShader.ID_)
@@ -270,6 +346,14 @@ namespace vdl
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
     }
+
+    return *this;
+  }
+
+  ComputeShader& ComputeShader::operator=(ComputeShader&& _ComputeShader)noexcept
+  {
+    ID_ = _ComputeShader.ID_;
+    _ComputeShader.ID_ = std::nullopt;
 
     return *this;
   }
