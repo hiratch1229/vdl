@@ -59,9 +59,8 @@
 #include <vdl/MotionData.hpp>
 #include <vdl/Model.hpp>
 #include <vdl/Renderer.hpp>
-#include <vdl/RendererTexure.hpp>
-#include <vdl/RendererStaticMesh.hpp>
-#include <vdl/RendererSkinnedMesh.hpp>
+#include <vdl/Renderer2D.hpp>
+#include <vdl/Renderer3D.hpp>
 #include <vdl/GUI.hpp>
 
 //--------------------------------------------------

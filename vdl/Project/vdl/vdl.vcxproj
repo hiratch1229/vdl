@@ -73,9 +73,8 @@
     <ClInclude Include="..\..\Include\vdl\Random.hpp" />
     <ClInclude Include="..\..\Include\vdl\RasterizerState.hpp" />
     <ClInclude Include="..\..\Include\vdl\Renderer.hpp" />
-    <ClInclude Include="..\..\Include\vdl\RendererSkinnedMesh.hpp" />
-    <ClInclude Include="..\..\Include\vdl\RendererStaticMesh.hpp" />
-    <ClInclude Include="..\..\Include\vdl\RendererTexure.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Renderer2D.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Renderer3D.hpp" />
     <ClInclude Include="..\..\Include\vdl\Sampler.hpp" />
     <ClInclude Include="..\..\Include\vdl\Scissor.hpp" />
     <ClInclude Include="..\..\Include\vdl\Serialize.hpp" />

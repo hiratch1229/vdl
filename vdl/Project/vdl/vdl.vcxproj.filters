@@ -342,15 +342,6 @@
     <ClInclude Include="..\..\Include\vdl\Window.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\RendererTexure.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\RendererStaticMesh.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\RendererSkinnedMesh.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\vdl\Collision2D.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
@@ -373,6 +364,12 @@
       <Filter>Include\vdl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\vdl\Hash.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Renderer2D.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Renderer3D.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
   </ItemGroup>
