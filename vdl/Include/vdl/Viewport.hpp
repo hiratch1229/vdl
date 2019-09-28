@@ -12,10 +12,10 @@ namespace vdl
   public:
     Viewport() = default;
 
-    Viewport(float _LeftTopX, float _LeftTopY, float _Width, float _Height, float _MinDepth = 0.0f, float _MaxDepth = 1.0f)
+    constexpr Viewport(float _LeftTopX, float _LeftTopY, float _Width, float _Height, float _MinDepth = 0.0f, float _MaxDepth = 1.0f)
       : LeftTop(_LeftTopX, _LeftTopY), Size(_Width, _Height), MinDepth(_MinDepth), MaxDepth(_MaxDepth) {}
 
-    Viewport(const float2& _LeftTop, const float2& _Size, float _MinDepth = 0.0f, float _MaxDepth = 1.0f)
+    constexpr Viewport(const float2& _LeftTop, const float2& _Size, float _MinDepth = 0.0f, float _MaxDepth = 1.0f)
       : LeftTop(_LeftTop), Size(_Size), MinDepth(_MinDepth), MaxDepth(_MaxDepth) {}
   public:
     [[nodiscard]] constexpr bool operator==(const Viewport& _Viewport)const { return LeftTop == _Viewport.LeftTop && Size == _Viewport.Size && MinDepth == _Viewport.MinDepth && MaxDepth == _Viewport.MaxDepth; }

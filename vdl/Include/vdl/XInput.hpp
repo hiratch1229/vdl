@@ -27,6 +27,8 @@ namespace vdl::Input
   private:
     uint8_t Index_;
   public:
+    XInput() = default;
+
     constexpr XInput(uint8_t _Index)noexcept
       : Index_(_Index) {}
   public:

@@ -31,12 +31,6 @@ namespace vdl
   public:
     Matrix() = default;
 
-    Matrix(const DirectX::XMMATRIX& _m)noexcept
-      : _11(_m.r[0].m128_f32[0]), _12(_m.r[0].m128_f32[1]), _13(_m.r[0].m128_f32[2]), _14(_m.r[0].m128_f32[3])
-      , _21(_m.r[1].m128_f32[0]), _22(_m.r[1].m128_f32[1]), _23(_m.r[1].m128_f32[2]), _24(_m.r[1].m128_f32[3])
-      , _31(_m.r[2].m128_f32[0]), _32(_m.r[2].m128_f32[1]), _33(_m.r[2].m128_f32[2]), _34(_m.r[2].m128_f32[3])
-      , _41(_m.r[3].m128_f32[0]), _42(_m.r[3].m128_f32[1]), _43(_m.r[3].m128_f32[2]), _44(_m.r[3].m128_f32[3]) {}
-
     constexpr Matrix(float _m00, float _m01, float _m02, float _m03,
       float _m10, float _m11, float _m12, float _m13,
       float _m20, float _m21, float _m22, float _m23,
@@ -51,6 +45,12 @@ namespace vdl
       , _21(_r1.x), _22(_r1.y), _23(_r1.z), _24(_r1.w)
       , _31(_r2.x), _32(_r2.y), _33(_r2.z), _34(_r2.w)
       , _41(_r3.x), _42(_r3.y), _43(_r3.z), _44(_r3.w) {}
+
+    Matrix(const DirectX::XMMATRIX& _m)noexcept
+      : _11(_m.r[0].m128_f32[0]), _12(_m.r[0].m128_f32[1]), _13(_m.r[0].m128_f32[2]), _14(_m.r[0].m128_f32[3])
+      , _21(_m.r[1].m128_f32[0]), _22(_m.r[1].m128_f32[1]), _23(_m.r[1].m128_f32[2]), _24(_m.r[1].m128_f32[3])
+      , _31(_m.r[2].m128_f32[0]), _32(_m.r[2].m128_f32[1]), _33(_m.r[2].m128_f32[2]), _34(_m.r[2].m128_f32[3])
+      , _41(_m.r[3].m128_f32[0]), _42(_m.r[3].m128_f32[1]), _43(_m.r[3].m128_f32[2]), _44(_m.r[3].m128_f32[3]) {}
   public:
     operator DirectX::XMMATRIX()const noexcept { return { _11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44 }; }
   public:
@@ -59,16 +59,6 @@ namespace vdl
     [[nodiscard]] constexpr bool operator!=(const Matrix& _m)const noexcept { return r[0] != _m.r[0] || r[1] != _m.r[1] || r[2] != _m.r[2] || r[3] != _m.r[3]; }
 
     [[nodiscard]] Matrix operator*(const Matrix& _m)const { return DirectX::XMMatrixMultiply(*this, _m); }
-
-    Matrix& operator=(const Matrix& _m)noexcept
-    {
-      r[0] = _m.r[0];
-      r[1] = _m.r[1];
-      r[2] = _m.r[2];
-      r[3] = _m.r[3];
-
-      return *this;
-    }
 
     Matrix& operator*=(const Matrix& _m)
     {

@@ -10,16 +10,20 @@ namespace vdl
   public:
     VertexShader() = default;
 
+    VertexShader(VertexShader&&) = default;
+
     VertexShader(const char* _FilePath, InputLayout _InputLayout, const char* _EntryPoint = "main");
 
     VertexShader(const char* _Source, uint _DataSize, InputLayout _InputLayout, const char* _EntryPoint = "main");
 
     VertexShader(const VertexShader& _VertexShader);
 
-    VertexShader& operator=(const VertexShader& _VertexShader);
-
     ~VertexShader();
   public:
+    VertexShader& operator=(const VertexShader& _VertexShader);
+
+    VertexShader& operator=(VertexShader&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const VertexShader& _VertexShader)const noexcept { return ID_ == _VertexShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const VertexShader& _VertexShader)const noexcept { return ID_ != _VertexShader.ID_; }
@@ -37,16 +41,20 @@ namespace vdl
   public:
     HullShader() = default;
 
+    HullShader(HullShader&&) = default;
+
     HullShader(const char* _FilePath, const char* _EntryPoint = "main");
     
     HullShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     HullShader(const HullShader& _HullShader);
 
-    HullShader& operator=(const HullShader& _HullShader);
-
     ~HullShader();
   public:
+    HullShader& operator=(const HullShader& _HullShader);
+
+    HullShader& operator=(HullShader&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const HullShader& _HullShader)const noexcept { return ID_ == _HullShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const HullShader& _HullShader)const noexcept { return ID_ != _HullShader.ID_; }
@@ -62,16 +70,20 @@ namespace vdl
   public:
     DomainShader() = default;
 
+    DomainShader(DomainShader&&) = default;
+
     DomainShader(const char* _FilePath, const char* _EntryPoint = "main");
 
     DomainShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     DomainShader(const DomainShader& _DomainShader);
 
-    DomainShader& operator=(const DomainShader& _DomainShader);
-
     ~DomainShader();
   public:
+    DomainShader& operator=(const DomainShader& _DomainShader);
+
+    DomainShader& operator=(DomainShader&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const DomainShader& _DomainShader)const noexcept { return ID_ == _DomainShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const DomainShader& _DomainShader)const noexcept { return ID_ != _DomainShader.ID_; }
@@ -93,10 +105,12 @@ namespace vdl
 
     GeometryShader(const GeometryShader& _GeometryShader);
 
-    GeometryShader& operator=(const GeometryShader& _GeometryShader);
-
     ~GeometryShader();
   public:
+    GeometryShader& operator=(const GeometryShader& _GeometryShader);
+
+    GeometryShader& operator=(GeometryShader&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const GeometryShader& _GeometryShader)const noexcept { return ID_ == _GeometryShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const GeometryShader& _GeometryShader)const noexcept { return ID_ != _GeometryShader.ID_; }
@@ -112,16 +126,20 @@ namespace vdl
   public:
     PixelShader() = default;
     
+    PixelShader(PixelShader&&) = default;
+
     PixelShader(const char* _FilePath, const char* _EntryPoint = "main");
 
     PixelShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     PixelShader(const PixelShader& _PixelShader);
 
-    PixelShader& operator=(const PixelShader& _PixelShader);
-
     ~PixelShader();
   public:
+    PixelShader& operator=(const PixelShader& _PixelShader);
+
+    PixelShader& operator=(PixelShader&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const PixelShader& _PixelShader)const noexcept { return ID_ == _PixelShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const PixelShader& _PixelShader)const noexcept { return ID_ != _PixelShader.ID_; }
@@ -137,16 +155,20 @@ namespace vdl
   public:
     ComputeShader() = default;
 
+    ComputeShader(ComputeShader&&) = default;
+
     ComputeShader(const char* _FilePath, const char* _EntryPoint = "main");
 
     ComputeShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     ComputeShader(const ComputeShader& _ComputeShader);
 
-    ComputeShader& operator=(const ComputeShader& _ComputeShader);
-
     ~ComputeShader();
   public:
+    ComputeShader& operator=(const ComputeShader& _ComputeShader);
+
+    ComputeShader& operator=(ComputeShader&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const ComputeShader& _ComputeShader)const noexcept { return ID_ == _ComputeShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const ComputeShader& _ComputeShader)const noexcept { return ID_ != _ComputeShader.ID_; }

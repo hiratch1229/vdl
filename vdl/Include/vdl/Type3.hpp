@@ -46,6 +46,10 @@ namespace vdl
   public:
     Type3() = default;
 
+    Type3(const Type3&) = default;
+
+    Type3(Type3&&) = default;
+
     constexpr Type3(Type _x, Type _y, Type _z)noexcept
       : x(_x)
       , y(_y)
@@ -80,6 +84,10 @@ namespace vdl
       , y(static_cast<Type>(_yz.x))
       , z(static_cast<Type>(_yz.y)) {}
   public:
+    Type3& operator=(const Type3&) = default;
+
+    Type3& operator=(Type3&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const Type3& _v)const noexcept { return x == _v.x && y == _v.y && z == _v.z; }
 
     [[nodiscard]] constexpr bool operator!=(const Type3& _v)const noexcept { return x != _v.x || y != _v.y || z != _v.z; }
@@ -87,7 +95,7 @@ namespace vdl
     [[nodiscard]] constexpr Type3 operator+()const noexcept { return *this; }
 
     [[nodiscard]] constexpr Type3 operator-()const noexcept { return { -x, -y, -z }; }
-
+    
     ARITHMETIC_OPERATOR(+);
 
     ARITHMETIC_OPERATOR(-);

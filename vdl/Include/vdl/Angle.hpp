@@ -16,6 +16,8 @@ template<class T>\
 ClassName& operator##Operator(T _s)noexcept { Value_ Operator static_cast<float>(_s); return *this; }\
 
 #define MEMBER_COMMON_OPERATOR(ClassName)\
+ClassName& operator=(ClassName&&) = default;\
+\
 MEMBER_COMPARISON_OPERATOR(ClassName, ==)\
 \
 MEMBER_COMPARISON_OPERATOR(ClassName, !=)\
@@ -85,11 +87,12 @@ namespace vdl
   public:
     Radian() = default;
 
-    constexpr Radian(float _Radian)noexcept
-      : Value_(_Radian) {}
+    Radian(const Radian&) = default;
 
-    constexpr Radian(const Radian& _Radian)noexcept
-      : Value_(_Radian.Value_) {}
+    Radian(Radian&&) = default;
+
+   constexpr Radian(float _Radian)noexcept
+      : Value_(_Radian) {}
 
     constexpr Radian(const Degree& _Degree)noexcept;
   public:
@@ -115,11 +118,12 @@ namespace vdl
   public:
     Degree() = default;
 
+    Degree(const Degree&) = default;
+
+    Degree(Degree&&) = default;
+
     constexpr Degree(float _Degree)noexcept
       : Value_(_Degree) {}
-
-    constexpr Degree(const Degree& _Degree)noexcept
-      : Value_(_Degree.Value_) {}
 
     constexpr Degree(const Radian& _Radian)noexcept;
   public:
@@ -211,4 +215,3 @@ namespace std
 #undef COMPARISON_OPERATOR
 #undef ARITHMETIC_OPERATOR
 #undef COMMON_OPERATOR
-

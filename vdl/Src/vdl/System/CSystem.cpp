@@ -61,6 +61,8 @@ void CSystem::Initialize()
     MilliSecondsPerFrequency_ = 1000.0 / static_cast<double>(Frequency.QuadPart);
   }
 
+  SetMaxFramerate(kInitMaxFramRate);
+
   SystemState_ = SystemState::eInitialized;
 }
 
@@ -73,7 +75,7 @@ bool CSystem::Update()
 
     const vdl::uint2& WindowSize = pWindow->GetWindowSize();
     const vdl::Viewport Viewport(0.0f, WindowSize);
-    const vdl::Scissor Scissor(0.0f, WindowSize);
+    const vdl::Scissor Scissor(0, WindowSize);
 
     for (vdl::uint i = 0; i < static_cast<vdl::uint>(RenderType::eNum); ++i)
     {

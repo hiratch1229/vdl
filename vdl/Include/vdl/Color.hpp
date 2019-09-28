@@ -39,21 +39,11 @@ namespace vdl
     constexpr Color(const Color& _RGB, uint8_t _Alpha)noexcept
       : Red(_RGB.Red), Green(_RGB.Green), Blue(_RGB.Blue), Alpha(_Alpha) {}
 
-    constexpr Color(const Color& _Color)noexcept
-      : Bit(_Color.Bit) {}
-
     constexpr Color(const ColorF& _Color)noexcept;
-
-    Color& operator=(const Color& _Color)noexcept
-    {
-      Bit = _Color.Bit;
-
-      return *this;
-    }
   public:
-    [[nodiscard]] constexpr bool operator ==(const Color& _Color)const noexcept { return Bit == _Color.Bit; }
+    [[nodiscard]] constexpr bool operator==(const Color& _Color)const noexcept { return Bit == _Color.Bit; }
 
-    [[nodiscard]] constexpr bool operator !=(const Color& _Color)const noexcept { return Bit != _Color.Bit; }
+    [[nodiscard]] constexpr bool operator!=(const Color& _Color)const noexcept { return Bit != _Color.Bit; }
   };
 
   struct ColorF
@@ -78,20 +68,7 @@ namespace vdl
     constexpr ColorF(const ColorF& _RGB, float _Alpha)noexcept
       : Red(_RGB.Red), Green(_RGB.Green), Blue(_RGB.Blue), Alpha(_Alpha) {}
 
-    constexpr ColorF(const ColorF& _Color)noexcept
-      : Red(_Color.Red), Green(_Color.Green), Blue(_Color.Blue), Alpha(_Color.Alpha) {}
-
     constexpr ColorF(const Color& _Color)noexcept;
-
-    ColorF& operator =(const ColorF& _Color)noexcept
-    {
-      Red = _Color.Red;
-      Green = _Color.Green;
-      Blue = _Color.Blue;
-      Alpha = _Color.Alpha;
-
-      return *this;
-    }
   public:
     [[nodiscard]] constexpr bool operator ==(const ColorF& _Color)const noexcept { return Red == _Color.Red && Green == _Color.Green && Blue == _Color.Blue && Alpha == _Color.Alpha; }
 

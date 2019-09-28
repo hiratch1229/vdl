@@ -44,6 +44,10 @@ namespace vdl
   public:
     Type2() = default;
 
+    Type2(const Type2&) = default;
+
+    Type2(Type2&&) = default;
+
     constexpr Type2(Type _x, Type _y)noexcept
       : x(_x)
       , y(_y) {}
@@ -62,6 +66,10 @@ namespace vdl
       : x(static_cast<Type>(_v.x))
       , y(static_cast<Type>(_v.y)) {}
   public:
+    Type2& operator=(const Type2&) = default;
+
+    Type2& operator=(Type2&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const Type2& _v)const noexcept { return x == _v.x && y == _v.y; }
 
     [[nodiscard]] constexpr bool operator!=(const Type2& _v)const noexcept { return x != _v.x || y != _v.y; }

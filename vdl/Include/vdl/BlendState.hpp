@@ -93,11 +93,11 @@ namespace vdl
 #pragma warning(default:4201)
   public:
     constexpr RenderTextureBlendState(bool _BlendEnable = false, BlendType _SrcBlend = BlendType::eOne, BlendType _DestBlend = BlendType::eZero, BlendOpType _BlendOp = BlendOpType::eAdd,
-      BlendType _SrcBlendAlpha = BlendType::eOne, BlendType _DestBlendAlpha = BlendType::eZero, BlendOpType _BlendOpAlpha = BlendOpType::eAdd, ColorWriteEnableType _RenderTargetWriteMask = ColorWriteEnableType::eAll)
+      BlendType _SrcBlendAlpha = BlendType::eOne, BlendType _DestBlendAlpha = BlendType::eZero, BlendOpType _BlendOpAlpha = BlendOpType::eAdd, ColorWriteEnableType _RenderTargetWriteMask = ColorWriteEnableType::eAll)noexcept
       : BlendEnable(_BlendEnable), SrcBlend(_SrcBlend), DestBlend(_DestBlend), BlendOp(_BlendOp),
       SrcBlendAlpha(_SrcBlendAlpha), DestBlendAlpha(_DestBlendAlpha), BlendOpAlpha(_BlendOpAlpha), RenderTargetWriteMask(_RenderTargetWriteMask) {}
 
-    RenderTextureBlendState(PreDefined _PreDefined)
+    RenderTextureBlendState(PreDefined _PreDefined)noexcept
     {
       static constexpr RenderTextureBlendState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
@@ -155,11 +155,11 @@ namespace vdl
       const RenderTextureBlendState& _RenderTexture0 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture1 = RenderTextureBlendState::kDefault,
       const RenderTextureBlendState& _RenderTexture2 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture3 = RenderTextureBlendState::kDefault,
       const RenderTextureBlendState& _RenderTexture4 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture5 = RenderTextureBlendState::kDefault,
-      const RenderTextureBlendState& _RenderTexture6 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture7 = RenderTextureBlendState::kDefault)
+      const RenderTextureBlendState& _RenderTexture6 = RenderTextureBlendState::kDefault, const RenderTextureBlendState& _RenderTexture7 = RenderTextureBlendState::kDefault)noexcept
       : AlphaToCoverageEnable(_AlphaToCoverageEnable), IndependentBlendEnable(_IndependentBlendEnable),
       RenderTexture({ _RenderTexture0, _RenderTexture1, _RenderTexture2, _RenderTexture3, _RenderTexture4, _RenderTexture5, _RenderTexture6, _RenderTexture7 }) {}
 
-    BlendState(PreDefined _PreDefined)
+    BlendState(PreDefined _PreDefined)noexcept
     {
       static const BlendState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {

@@ -47,6 +47,8 @@ namespace vdl::Input
   private:
     uint8_t Index_;
   public:
+    Gamepad() = default;
+
     constexpr Gamepad(uint8_t _Index)noexcept
       : Index_(_Index) {}
   public:

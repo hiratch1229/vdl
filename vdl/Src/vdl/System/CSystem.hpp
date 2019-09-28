@@ -13,6 +13,8 @@ class IGUI;
 
 class CSystem : public ISystem
 {
+  static constexpr vdl::uint kInitMaxFramRate = 60;
+private:
   enum class SystemState
   {
     eInitialized,

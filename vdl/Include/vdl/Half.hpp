@@ -47,12 +47,5 @@ namespace vdl
     [[nodiscard]] bool operator==(const half& _v)const noexcept { return Bits == _v.Bits; }
 
     [[nodiscard]] bool operator!=(const half& _v)const noexcept { return Bits != _v.Bits; }
-
-    half& operator=(float _v)noexcept
-    {
-      Bits = ToHalf(_v);
-
-      return *this; 
-    }
   };
 }

@@ -55,7 +55,5 @@ namespace vdl
     std::vector<Material> Materials;
     std::vector<Animation> Animations;
     Matrix GlobalTransform = Matrix::Identity();
-  public:
-    SkinnedMeshData() = default;
   };
 }

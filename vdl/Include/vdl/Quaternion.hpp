@@ -26,16 +26,6 @@ namespace vdl
     
     [[nodiscard]] Quaternion operator*(const Quaternion& _q)const { return DirectX::XMQuaternionMultiply(*this, _q); }
 
-    Quaternion& operator=(const Quaternion& _q)noexcept
-    {
-      x = _q.x;
-      y = _q.y;
-      z = _q.z;
-      w = _q.w;
-
-      return *this;
-    }
-
     Quaternion& operator*=(const Quaternion& _q)
     {
       *this = DirectX::XMQuaternionMultiply(*this, _q);

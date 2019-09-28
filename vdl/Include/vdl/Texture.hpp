@@ -13,6 +13,8 @@ namespace vdl
   public:
     Texture() = default;
 
+    Texture(Texture&&) = default;
+
     //  ƒtƒ@ƒCƒ‹‚©‚çì¬
     Texture(const char* _FilePath, bool _isSerialize = true);
 
@@ -24,10 +26,12 @@ namespace vdl
 
     Texture(const Texture& _Texture);
 
-    Texture& operator=(const Texture& _Texture);
-
     virtual ~Texture();
   public:
+    Texture& operator=(const Texture& _Texture);
+
+    Texture& operator=(Texture&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const Texture& _Texture)const noexcept { return ID_ == _Texture.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const Texture& _Texture)const noexcept { return ID_ != _Texture.ID_; }

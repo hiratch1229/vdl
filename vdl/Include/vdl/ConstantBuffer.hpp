@@ -12,14 +12,18 @@ namespace vdl
     public:
       ConstantBufferData() = default;
 
+      ConstantBufferData(ConstantBufferData&&) = default;
+
       ConstantBufferData(uint _BufferSize);
 
       ConstantBufferData(const ConstantBufferData& _ConstantBufferData);
 
       ~ConstantBufferData();
-
-      ConstantBufferData& operator=(const ConstantBufferData& _ConstantBufferData);
     public:
+      ConstantBufferData& operator=(const ConstantBufferData& _ConstantBufferData);
+      
+      ConstantBufferData& operator=(ConstantBufferData&&) = default;
+
       [[nodiscard]] constexpr bool operator==(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ == _ConstantBufferData.ID_; }
 
       [[nodiscard]] constexpr bool operator!=(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ != _ConstantBufferData.ID_; }
@@ -48,6 +52,10 @@ namespace vdl
     {
       GetData() = _Data;
     }
+  public:
+    [[nodiscard]] bool operator==(const ConstantBuffer& _ConstantBuffer)const noexcept { return Data_ == _ConstantBuffer.Data_; }
+
+    [[nodiscard]] bool operator!=(const ConstantBuffer& _ConstantBuffer)const noexcept { return Data_ != _ConstantBuffer.Data_; }
   public:
     [[nodiscard]] T& GetData() { return *reinterpret_cast<T*>(Data_.GetData()); }
 

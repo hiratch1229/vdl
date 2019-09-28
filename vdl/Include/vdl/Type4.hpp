@@ -48,6 +48,10 @@ namespace vdl
   public:
     Type4() = default;
 
+    Type4(const Type4&) = default;
+
+    Type4(Type4&&) = default;
+
     constexpr Type4(Type _x, Type _y, Type _z, Type _w)noexcept
       : x(_x)
       , y(_y)
@@ -116,6 +120,10 @@ namespace vdl
       , z(static_cast<Type>(_yzw.y))
       , w(static_cast<Type>(_yzw.z)) {}
   public:
+    Type4& operator=(const Type4&) = default;
+
+    Type4& operator=(Type4&&) = default;
+
     [[nodiscard]] constexpr bool operator==(const Type4& _v)const noexcept { return x == _v.x && y == _v.y && z == _v.z && w == _v.w; }
 
     [[nodiscard]] constexpr bool operator!=(const Type4& _v)const noexcept { return x != _v.x || y != _v.y || z != _v.z || w != _v.w; }

@@ -63,10 +63,12 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
-    constexpr DepthStencilOpState(StencilOpType _StencilFailOp, StencilOpType _StencilDepthFailOp, StencilOpType _StencilPassOp, ComparisonFuncType _StencilFunc)
+    DepthStencilOpState() = default;
+
+    constexpr DepthStencilOpState(StencilOpType _StencilFailOp, StencilOpType _StencilDepthFailOp, StencilOpType _StencilPassOp, ComparisonFuncType _StencilFunc)noexcept
       : StencilFailOp(_StencilFailOp), StencilDepthFailOp(_StencilDepthFailOp), StencilPassOp(_StencilPassOp), StencilFunc(_StencilFunc) {}
 
-    DepthStencilOpState(PreDefined _PreDefined)
+    DepthStencilOpState(PreDefined _PreDefined)noexcept
     {
       static constexpr DepthStencilOpState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
@@ -76,6 +78,7 @@ namespace vdl
 
       *this = PreDefineds[static_cast<uint>(_PreDefined)];
     }
+  public:
     [[nodiscard]] constexpr bool operator==(const DepthStencilOpState& _DepthStencilOpState)const noexcept { return Data == _DepthStencilOpState.Data; }
 
     [[nodiscard]] constexpr bool operator!=(const DepthStencilOpState& _DepthStencilOpState)const noexcept { return Data != _DepthStencilOpState.Data;; }
@@ -116,14 +119,17 @@ namespace vdl
     };
 #pragma warning(default:4201)
   public:
+    constexpr DepthStencilState(const DepthStencilState& _DepthStencilState)noexcept
+      : Data(_DepthStencilState.Data) {}
+
     constexpr DepthStencilState(bool _DepthEnable = true, DepthWriteMaskType _DepthWriteMask = DepthWriteMaskType::eAll, ComparisonFuncType _DepthFunc = ComparisonFuncType::eLess,
       bool _StencilEnable = false, uint8_t _StencilReadMask = 0xFF, uint8_t _StencilWriteMask = 0xFF,
-      const DepthStencilOpState & _FrontFace = DepthStencilOpState::kDefaultFront, const DepthStencilOpState & _BackFace = DepthStencilOpState::kDefaultBack)
+      const DepthStencilOpState & _FrontFace = DepthStencilOpState::kDefaultFront, const DepthStencilOpState & _BackFace = DepthStencilOpState::kDefaultBack)noexcept
       : DepthEnable(_DepthEnable), DepthWriteMask(_DepthWriteMask), DepthFunc(_DepthFunc),
       StencilEnable(_StencilEnable), StencilReadMask(_StencilReadMask), StencilWriteMask(_StencilWriteMask),
       FrontFace(_FrontFace), BackFace(_BackFace) {}
 
-    DepthStencilState(PreDefined _PreDefined)
+    DepthStencilState(PreDefined _PreDefined)noexcept
     {
       static const DepthStencilState PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
