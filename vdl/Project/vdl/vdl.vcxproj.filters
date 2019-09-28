@@ -112,6 +112,9 @@
     <Filter Include="Src\Camera">
       <UniqueIdentifier>{41e07a2e-2a40-4062-b662-4b2770adc965}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\MotionData">
+      <UniqueIdentifier>{a8f8be3b-32ca-4b50-9239-9bb7b459c86c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -478,6 +481,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Camera\Camera.cpp">
       <Filter>Src\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\MotionData\MotionData.cpp">
+      <Filter>Src\MotionData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

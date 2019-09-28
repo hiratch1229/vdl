@@ -23,9 +23,6 @@ private:
   using BoneInfluencePerControlPoint = std::vector<BoneInfluence>;
   using BoneInfluencePerControlPoints = std::vector<BoneInfluencePerControlPoint>;
 private:
-  static constexpr vdl::uint kAnimationSamplingRate = 24;
-  static constexpr float kAnimationSamplingTime = 1.0f / kAnimationSamplingRate;
-private:
   fbxsdk::FbxManager* pManager_;
 private:
   fbxsdk::FbxScene* ImportScene(const char* _FilePath)const;

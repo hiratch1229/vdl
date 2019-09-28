@@ -435,7 +435,7 @@ void FBXLoader::FetchAnimations(fbxsdk::FbxMesh* _pMesh, Animations* _pAnimation
 
     fbxsdk::FbxTime SamplingStep;
     SamplingStep.SetTime(0, 0, 1, 0, 0, TimeMode);
-    SamplingStep = static_cast<fbxsdk::FbxLongLong>(SamplingStep.Get() * static_cast<double>(kAnimationSamplingTime));
+    SamplingStep = static_cast<fbxsdk::FbxLongLong>(SamplingStep.Get() * static_cast<double>(Constants::kAnimationSamplingTime));
 
     for (fbxsdk::FbxTime CurrentTime = StartTime; CurrentTime < EndTime; CurrentTime += SamplingStep)
     {

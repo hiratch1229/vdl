@@ -143,6 +143,7 @@
     <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\ModelManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Model\Model.cpp" />
+    <ClCompile Include="..\..\Src\vdl\MotionData\MotionData.cpp" />
     <ClCompile Include="..\..\Src\vdl\Renderer\CRenderer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Renderer\Renderer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Renderer\RendererFactory.cpp" />

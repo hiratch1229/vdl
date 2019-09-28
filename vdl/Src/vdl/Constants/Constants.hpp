@@ -35,6 +35,10 @@ namespace Constants
 
   constexpr const char* kDefaultSkinnedMeshPixelShaderFilePath = vdl::Constants::kDefaultSkinnedMeshPixelShaderFilePath;
 
+  constexpr vdl::uint kAnimationSamplingRate = 24;
+  
+  constexpr float kAnimationSamplingTime = 1.0f / kAnimationSamplingRate;
+
   constexpr vdl::uint kXInputButtonNum = 14;
 
   constexpr vdl::uint kMaxTextureBatchNum = 256;

@@ -1,4 +1,5 @@
 #pragma once
+#include "Fwd.hpp"
 #include "Types.hpp"
 
 #include <vector>
@@ -38,4 +39,6 @@ namespace vdl
       return *this;
     }
   };
+
+  void UpdateMotion(const SkinnedMesh& _SkinnedMesh, MotionData* _pMotionData, float _DeltaTime, bool _isLoop = true);
 }

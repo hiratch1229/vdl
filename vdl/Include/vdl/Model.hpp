@@ -1,6 +1,8 @@
 #pragma once
+#include "Fwd.hpp"
 #include "ID.hpp"
-#include "MeshData.hpp"
+
+#include <vector>
 
 namespace vdl
 {
