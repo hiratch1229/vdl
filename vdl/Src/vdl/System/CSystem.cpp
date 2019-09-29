@@ -51,17 +51,20 @@ void CSystem::Initialize()
   pRenderer_->Initialize();
   pGUI_->Initialize();
 
-  //  ü”g”‚ğæ“¾
+  //  ƒtƒŒ[ƒ€ƒŒ[ƒg‚ğİ’è
   {
-    LARGE_INTEGER Frequency;
-    ::QueryPerformanceFrequency(&Frequency);
-    assert(Frequency.QuadPart != 0);
+    //  ü”g”‚ğæ“¾
+    {
+      LARGE_INTEGER Frequency;
+      ::QueryPerformanceFrequency(&Frequency);
+      assert(Frequency.QuadPart != 0);
 
-    //  ü”g”‚²‚Æ‚ÌŠÔ‚ğZo(ms)
-    MilliSecondsPerFrequency_ = 1000.0 / static_cast<double>(Frequency.QuadPart);
+      //  ü”g”‚²‚Æ‚ÌŠÔ‚ğZo(ms)
+      MilliSecondsPerFrequency_ = 1000.0 / static_cast<double>(Frequency.QuadPart);
+    }
+
+    SetMaxFramerate(kInitMaxFramRate);
   }
-
-  SetMaxFramerate(kInitMaxFramRate);
 
   SystemState_ = SystemState::eInitialized;
 }
