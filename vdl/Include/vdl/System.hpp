@@ -28,4 +28,6 @@ namespace vdl::System
   void DisableDefaultActions(uint _DefaultActionFlags);
 
   [[nodiscard]] float GetDeltaTime();
+
+  [[nodiscard]] uint GetFPS();
 }

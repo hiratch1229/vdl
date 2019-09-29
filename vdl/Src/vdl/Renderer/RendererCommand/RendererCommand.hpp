@@ -81,6 +81,8 @@ class RendererCommandList
 {
   static constexpr vdl::uint kShaderTypes = static_cast<vdl::uint>(ShaderType::eGraphicsNum);
   static_assert(std::is_same<DisplayObject, vdl::Texture>::value || std::is_same<DisplayObject, vdl::StaticMesh>::value || std::is_same<DisplayObject, vdl::SkinnedMesh>::value);
+  static constexpr vdl::uint kMaxBatchNum = (std::is_same<DisplayObject, vdl::Texture>::value ? Constants::kMaxTextureBatchNum
+    : std::is_same<DisplayObject, vdl::StaticMesh>::value ? Constants::kMaxStaticMeshBatchNum : Constants::kMaxSkinnedMeshBatchNum);
 private:
   using Samplers = std::vector<vdl::Sampler>;
   using TextureIDs = std::vector<vdl::ID>;

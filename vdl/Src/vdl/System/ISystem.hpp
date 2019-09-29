@@ -22,7 +22,9 @@ public:
 
   virtual void SetMaxFramerate(vdl::uint _MaxFramerate) = 0;
 
-  [[nodiscard]] virtual float GetDeltaTime() = 0;
+  [[nodiscard]] virtual float GetDeltaTime()const = 0;
+
+  [[nodiscard]] virtual vdl::uint GetFPS()const = 0;
 
   virtual void Pause() = 0;
 

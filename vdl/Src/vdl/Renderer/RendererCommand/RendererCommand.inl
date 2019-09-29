@@ -275,8 +275,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
 
       for (; RendererCommandCount < RendererCommandNum; ++RendererCommandCount)
       {
-        DrawState = DrawStateType::eContinue;
-        ++ContinuousDrawCallNum;
+        DrawState = (++ContinuousDrawCallNum >= kMaxBatchNum ? DrawStateType::eFlush : DrawStateType::eContinue);
 
         const vdl::ID CurrentDisplayObjectID = DisplayObjectIDs_[RendererCommands_[RendererCommandCount].second];
         const vdl::uint NextRendererCommandCount = RendererCommandCount + 1;

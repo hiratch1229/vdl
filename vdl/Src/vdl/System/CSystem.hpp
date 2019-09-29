@@ -33,12 +33,16 @@ private:
   SystemState SystemState_;
   vdl::uint DefaultActionFlags_ = 0;
   vdl::uint ValidDefaultActions_ = ~0;
-  double MilliSecondsPerFrequency_ = 0.0f;
+  double SecondsPerFrequency_ = 0.0f;
   double FrameInterval_ = 0.0;
   double LastTime_ = 0.0;
   double DeltaTime_ = 0.0;
+  vdl::uint Frames_ = 0;
+  vdl::uint CurrentFPS_ = 0;
+  double TimeStamp_ = 0.0;
+  double TimeTlapsed_ = 0.0;
 private:
-  double GetMicroSecond()const;
+  double GetSecond()const;
 public:
   CSystem() = default;
 
@@ -52,9 +56,11 @@ public:
 
   void ReportDefaultActions(vdl::uint _DefaultActionFlags)override { DefaultActionFlags_ |= (ValidDefaultActions_ & _DefaultActionFlags); }
 
-  void SetMaxFramerate(vdl::uint _MaxFramerate)override { FrameInterval_ = (_MaxFramerate == 0 ? 0.0 : 1.0 / _MaxFramerate) * MilliSecondsPerFrequency_; }
+  void SetMaxFramerate(vdl::uint _MaxFramerate)override { FrameInterval_ = (_MaxFramerate == 0 ? 0.0 : 1.0 / _MaxFramerate); }
 
-  float GetDeltaTime()override { return static_cast<float>(DeltaTime_); }
+  float GetDeltaTime()const override { return static_cast<float>(DeltaTime_); }
+  
+  vdl::uint GetFPS()const override { return CurrentFPS_; }
 
   void Pause()override { SystemState_ = SystemState::ePause; }
 
@@ -66,6 +72,6 @@ public:
     }
 
     SystemState_ = SystemState::eRunning;
-    LastTime_ = GetMicroSecond();
+    LastTime_ = GetSecond();
   }
 };

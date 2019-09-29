@@ -31,4 +31,9 @@ namespace vdl::System
   {
     return Engine::Get<ISystem>()->GetDeltaTime();
   }
+
+  uint GetFPS()
+  {
+    return Engine::Get<ISystem>()->GetFPS();
+  }
 }

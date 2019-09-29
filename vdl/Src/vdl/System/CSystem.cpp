@@ -51,17 +51,20 @@ void CSystem::Initialize()
   pRenderer_->Initialize();
   pGUI_->Initialize();
 
-  //  ü”g”‚ğæ“¾
+  //  ƒtƒŒ[ƒ€ƒŒ[ƒg‚ğİ’è
   {
-    LARGE_INTEGER Frequency;
-    ::QueryPerformanceFrequency(&Frequency);
-    assert(Frequency.QuadPart != 0);
+    //  ü”g”‚ğæ“¾
+    {
+      LARGE_INTEGER Frequency;
+      ::QueryPerformanceFrequency(&Frequency);
+      assert(Frequency.QuadPart != 0);
 
-    //  ü”g”‚²‚Æ‚ÌŠÔ‚ğZo(ms)
-    MilliSecondsPerFrequency_ = 1000.0 / static_cast<double>(Frequency.QuadPart);
+      //  ü”g”‚²‚Æ‚ÌŠÔ‚ğZo(s)
+      SecondsPerFrequency_ = 1.0 / static_cast<double>(Frequency.QuadPart);
+    }
+
+    SetMaxFramerate(kInitMaxFramRate);
   }
-
-  SetMaxFramerate(kInitMaxFramRate);
 
   SystemState_ = SystemState::eInitialized;
 }
@@ -125,9 +128,10 @@ bool CSystem::Update()
     double DeltaTime;
     double SleepTime;
 
+    ++Frames_;
     do
     {
-      CurrentTime = GetMicroSecond();
+      CurrentTime = GetSecond();
       DeltaTime = CurrentTime - LastTime_;
       SleepTime = FrameInterval_ - DeltaTime;
 
@@ -140,10 +144,17 @@ bool CSystem::Update()
         //  ¸“x‚ğŒ³‚É–ß‚·
         ::timeEndPeriod(1);
       }
-    } while (SleepTime > 0.5 || SystemState_ == SystemState::ePause);
+    } while (SleepTime > 0.0 || SystemState_ == SystemState::ePause);
 
     LastTime_ = CurrentTime;
     DeltaTime_ = DeltaTime;
+
+    if ((TimeStamp_ += DeltaTime) >= 1.0)
+    {
+      CurrentFPS_ = Frames_;
+      Frames_ = 0;
+      TimeStamp_ = 0.0;
+    }
   }
 
   //  “ü—ÍŒn‚ÌXV
@@ -161,10 +172,10 @@ bool CSystem::Update()
 
 //--------------------------------------------------
 
-double CSystem::GetMicroSecond()const
+double CSystem::GetSecond()const
 {
   LARGE_INTEGER Counter;
   ::QueryPerformanceCounter(&Counter);
 
-  return Counter.QuadPart * MilliSecondsPerFrequency_;
+  return Counter.QuadPart * SecondsPerFrequency_;
 }
