@@ -6,7 +6,7 @@
 #endif 
 
 //  Žg—p•`‰æAPI
-#define VDL_USING_DIRECTX11
+//#define VDL_USING_DIRECTX11
 //#define VDL_USING_DIRECTX12
 //#define VDL_USING_VULKAN
 

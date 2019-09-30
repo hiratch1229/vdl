@@ -16,6 +16,7 @@
 #include <vdl/Texture.hpp>
 #include <vdl/GUI.hpp>
 #include <vdl/Topology.hpp>
+#include <vdl/Macro.hpp>
 
 namespace
 {
@@ -540,52 +541,52 @@ namespace
   0xFF0E, 0xFF3B, 0xFF3D, 0xFF5D, 0xFF61, 0xFF9F, 0xFFE3, 0xFFE3, 0xFFE5, 0xFFE5, 0xFFFF, 0xFFFF, 0,
   };
 
-  constexpr const char* kVertexShader =
-    "struct VS_IN\
-    {\
-      float2 Position : POSITION;\
-      float2 Texcoord : TEXCOORD;\
-      float4 Color : COLOR;\
-    };\
-    \
-    struct PS_IN\
-    {\
-      float4 Position : SV_POSITION;\
-      float4 Color : COLOR;\
-      float2 Texcoord : TEXCOORD;\
-    };\
-    \
-    cbuffer ConstantBuffer : register(b0)\
-    {\
-      float2 Scale;\
-      float2 Translate;\
-    };\
-    \
-    PS_IN main(VS_IN In)\
-    {\
-      PS_IN Out;\
-      Out.Position = float4(In.Position * Scale + Translate, 0.0f, 1.0f);\
-      Out.Color = In.Color;\
-      Out.Texcoord = In.Texcoord;\
-    \
-      return Out;\
-    }";
+  constexpr const char kVertexShader[] = {
+    "struct VS_IN"
+    "{"
+    "  float2 Position : POSITION;"
+    "  float2 Texcoord : TEXCOORD;"
+    "  float4 Color : COLOR;"
+    "};"
+    ""
+    "struct PS_IN"
+    "{"
+    "  float4 Position : SV_POSITION;"
+    "  float4 Color : COLOR;"
+    "  float2 Texcoord : TEXCOORD;"
+    "};"
+    ""
+    "cbuffer ConstantBuffer : register(b0)"
+    "{"
+    "  float2 Scale;"
+    "  float2 Translate;"
+    "};"
+    ""
+    "PS_IN main(VS_IN In)"
+    "{"
+    "  PS_IN Out;"
+    "  Out.Position = float4(In.Position * Scale + Translate, 0.0f, 1.0f);"
+    "  Out.Color = In.Color;"
+    "  Out.Texcoord = In.Texcoord;"
+    ""
+    "  return Out;"
+    "}" };
 
-  constexpr const char* kPixelShader =
-    "struct PS_IN\
-    {\
-      float4 Position : SV_POSITION; \
-      float4 Color : COLOR; \
-      float2 Texcoord : TEXCOORD; \
-    };\
-    \
-    SamplerState Sampler : register(s0);\
-    Texture2D Texture : register(t0);\
-    \
-    float4 main(PS_IN In) : SV_TARGET\
-    {\
-      return In.Color * Texture.Sample(Sampler, In.Texcoord);\
-    }";
+  constexpr const char kPixelShader[] = {
+    "struct PS_IN"
+    "{"
+    "  float4 Position : SV_POSITION;"
+    "  float4 Color : COLOR;"
+    "  float2 Texcoord : TEXCOORD;"
+    "};"
+    ""
+    "SamplerState Sampler : register(s0);"
+    "Texture2D Texture : register(t0);"
+    ""
+    "float4 main(PS_IN In) : SV_TARGET"
+    "{"
+    "  return In.Color * Texture.Sample(Sampler, In.Texcoord);"
+    "}" };
 
   template<class T>
   inline ImVec2 Cast(const vdl::Type2<T>& _v)
@@ -658,8 +659,8 @@ void CGUI::Initialize()
 
   //  シェーダーの作成
   {
-    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(::strlen(kVertexShader)), vdl::InputLayout::eGUI);
-    PixelShader_ = vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(::strlen(kPixelShader)));
+    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kVertexShader)), vdl::InputLayout::eGUI);
+    PixelShader_ = vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kPixelShader)));
   }
 
   //  フォントの作成

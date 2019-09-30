@@ -4,6 +4,7 @@
 #include <vdl/Type2.hpp>
 #include <vdl/Color.hpp>
 #include <vdl/Format.hpp>
+#include <vdl/Macro.hpp>
 
 namespace Constants
 {
@@ -23,20 +24,32 @@ namespace Constants
 
   constexpr vdl::uint kMaxConstantBufferNum = vdl::Constants::kMaxConstantBufferNum;
 
-  constexpr const char* kDefaultTextureVertexShaderFilePath = vdl::Constants::kDefaultTextureVertexShaderFilePath;
+  constexpr const char* kDefaultTextureVertexShaderCode = vdl::Constants::kDefaultTextureVertexShaderCode;
 
-  constexpr const char* kDefaultTexturePixelShaderFilePath = vdl::Constants::kDefaultTexturePixelShaderFilePath;
+  constexpr vdl::uint kDefaultTextureVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultTextureVertexShaderCode));
 
-  constexpr const char* kDefaultStaticMeshVertexShaderFilePath = vdl::Constants::kDefaultStaticMeshVertexShaderFilePath;
+  constexpr const char* kDefaultTexturePixelShaderCode = vdl::Constants::kDefaultTexturePixelShaderCode;
 
-  constexpr const char* kDefaultStaticMeshPixelShaderFilePath = vdl::Constants::kDefaultStaticMeshPixelShaderFilePath;
+  constexpr vdl::uint kDefaultTexturePixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultTexturePixelShaderCode));
 
-  constexpr const char* kDefaultSkinnedMeshVertexShaderFilePath = vdl::Constants::kDefaultSkinnedMeshVertexShaderFilePath;
+  constexpr const char* kDefaultStaticMeshVertexShaderCode = vdl::Constants::kDefaultStaticMeshVertexShaderCode;
 
-  constexpr const char* kDefaultSkinnedMeshPixelShaderFilePath = vdl::Constants::kDefaultSkinnedMeshPixelShaderFilePath;
+  constexpr vdl::uint kDefaultStaticMeshVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultStaticMeshVertexShaderCode));
+
+  constexpr const char* kDefaultStaticMeshPixelShaderCode = vdl::Constants::kDefaultStaticMeshPixelShaderCode;
+
+  constexpr vdl::uint kDefaultStaticMeshPixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultStaticMeshPixelShaderCode));
+
+  constexpr const char* kDefaultSkinnedMeshVertexShaderCode = vdl::Constants::kDefaultSkinnedMeshVertexShaderCode;
+
+  constexpr vdl::uint kDefaultSkinnedMeshVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultSkinnedMeshVertexShaderCode));
+
+  constexpr const char* kDefaultSkinnedMeshPixelShaderCode = vdl::Constants::kDefaultSkinnedMeshPixelShaderCode;
+
+  constexpr vdl::uint kDefaultSkinnedMeshPixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultSkinnedMeshPixelShaderCode));
 
   constexpr vdl::uint kAnimationSamplingRate = 24;
-  
+
   constexpr float kAnimationSamplingTime = 1.0f / kAnimationSamplingRate;
 
   constexpr vdl::uint kXInputButtonNum = 14;

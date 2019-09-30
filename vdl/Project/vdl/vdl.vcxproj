@@ -161,33 +161,7 @@
     <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Shader\SkinnedMesh\Bone.hlsli" />
-    <None Include="..\..\Shader\SkinnedMesh\SkinnedMesh.hlsli" />
-    <None Include="..\..\Shader\StaticMesh\StaticMesh.hlsli" />
-    <None Include="..\..\Shader\Texture\Texture.hlsli" />
     <None Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\Shader\StaticMesh\StaticMeshPS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\Shader\StaticMesh\StaticMeshVS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\Shader\Texture\TexturePS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\Shader\Texture\TextureVS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\Shader\SkinnedMesh\SkinnedMeshPS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\Shader\SkinnedMesh\SkinnedMeshVS.hlsl">
-      <FileType>Document</FileType>
-    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -326,7 +300,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>..\..\Lib;</AdditionalLibraryDirectories>
-      <OutputFile>$(SolutionDir)$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>
       </AdditionalDependencies>
     </Lib>
@@ -352,7 +326,7 @@
     <Lib>
       <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX11_d.lib</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -449,7 +423,7 @@
       <AdditionalDependencies>
       </AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
-      <OutputFile>$(SolutionDir)$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">
@@ -475,7 +449,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <OutputFile>$(SolutionDir)$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX11.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
     </Lib>
