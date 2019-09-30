@@ -15,13 +15,8 @@ public:
 private:
   void Swap(ReferenceCount& _Other)
   {
-    T* TempPtr = Ptr_;
-    Ptr_ = _Other.Ptr_;
-    _Other.Ptr_ = TempPtr;
-
-    vdl::uint TempCount = Count_;
-    Count_ = _Other.Count_;
-    _Other.Count_ = TempCount;
+    vdl::Macro::Swap(Ptr_, _Other.Ptr_);
+    vdl::Macro::Swap(Count_, _Other.Count_);
   }
 public:
   ReferenceCount()noexcept

@@ -31,4 +31,13 @@ namespace vdl::Macro
   {
     return Size;
   }
+
+  //  ƒf[ƒ^‚Ì“ü‚ê‘Ö‚¦
+  template<class T>
+  inline void Swap(T& _Obj1, T& _Obj2)
+  {
+    T Temp = _Obj1;
+    _Obj1 = _Obj2;
+    _Obj2 = Temp;
+  }
 }

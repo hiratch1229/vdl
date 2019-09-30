@@ -49,6 +49,7 @@ MeshDatas FBXLoader::Load(const char* _FilePath)const
 
   fbxsdk::FbxScene* pScene = ImportScene(_FilePath);
 
+  bool isIndexInverse = false;
   vdl::Matrix AxisSystemConversion = vdl::Matrix::Identity();
   vdl::Matrix SystemUnitConversion = vdl::Matrix::Identity();
   {
@@ -67,6 +68,7 @@ MeshDatas FBXLoader::Load(const char* _FilePath)const
 
     if (fbxsdk::FbxAxisSystem::MayaYUp == GlobalSettings.GetAxisSystem())
     {
+      isIndexInverse = true;
       AxisSystemConversion._33 *= -1;
     }
     if (fbxsdk::FbxSystemUnit::cm == GlobalSettings.GetSystemUnit())
@@ -93,7 +95,7 @@ MeshDatas FBXLoader::Load(const char* _FilePath)const
 
     FetchMaterials(pFbxMesh, &MeshData.Materials, Directory, FileFormat, TexureLoader);
     FetchVertices(pFbxMesh, &MeshData.Vertices, BoneInfluencePerControlPoints);
-    FetchIndices(pFbxMesh, &MeshData.Indices, &MeshDatas[FbxMeshCount].Materials);
+    FetchIndices(pFbxMesh, &MeshData.Indices, &MeshDatas[FbxMeshCount].Materials, isIndexInverse);
     FetchAnimations(pFbxMesh, &MeshData.Animations);
 
     fbxsdk::FbxNode* pNode = pFbxMesh->GetNode();
@@ -370,7 +372,7 @@ void FBXLoader::FetchVertices(fbxsdk::FbxMesh* _pMesh, Vertices* _pVertices, con
   }
 }
 
-void FBXLoader::FetchIndices(fbxsdk::FbxMesh* _pMesh, Indices* _pIndices, Materials* _pMaterials)const
+void FBXLoader::FetchIndices(fbxsdk::FbxMesh* _pMesh, Indices* _pIndices, Materials* _pMaterials, bool _isIndexInverse)const
 {
   assert(_pMesh && _pIndices && _pMaterials);
 
@@ -402,10 +404,14 @@ void FBXLoader::FetchIndices(fbxsdk::FbxMesh* _pMesh, Indices* _pIndices, Materi
     Material& Material = (*_pMaterials)[(hasMaterial ? MaterialIndices[PolygonCount] : 0)];
     const vdl::uint OffsetIndex = Material.IndexStart + Material.IndexCount;
 
-    for (vdl::uint VertexCount = 0; VertexCount < 3; ++VertexCount)
-    {
-      (*_pIndices)[static_cast<size_t>(OffsetIndex) + VertexCount] = VertexNum++;
-    }
+    //for (vdl::uint VertexCount = 0; VertexCount < 3; ++VertexCount)
+    //{
+    //  (*_pIndices)[static_cast<size_t>(OffsetIndex) + VertexCount] = VertexNum++;
+    //}
+    (*_pIndices)[static_cast<size_t>(OffsetIndex) + (_isIndexInverse ? 2 : 0)] = VertexNum++;
+    (*_pIndices)[static_cast<size_t>(OffsetIndex) + 1] = VertexNum++;
+    (*_pIndices)[static_cast<size_t>(OffsetIndex) + (_isIndexInverse ? 0 : 2)] = VertexNum++;
+
     Material.IndexCount += 3;
   }
 }

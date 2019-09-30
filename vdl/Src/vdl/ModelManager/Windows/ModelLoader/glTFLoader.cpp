@@ -3,6 +3,8 @@
 #include <vdl/TextureManager/Windows/TextureLoader/TextureLoader.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
+#include <vdl/Macro.hpp>
+
 #include <filesystem>
 #include <sstream>
 
@@ -243,20 +245,29 @@ void glTFLoader::FetchVerticesAndIndices(const std::unique_ptr<Microsoft::glTF::
         const Microsoft::glTF::Accessor Accessor = _Document.accessors.Get(MeshPrimitive.indicesAccessorId);
 
         Indices Indices;
-        if (Microsoft::glTF::ComponentType::COMPONENT_UNSIGNED_INT == Accessor.componentType)
         {
-          Indices = _pResourceReader->ReadBinaryData<vdl::uint32_t>(_Document, Accessor);
-        }
-        else
-        {
-          for (auto& Index : _pResourceReader->ReadBinaryData<vdl::uint16_t>(_Document, Accessor))
+          if (Microsoft::glTF::ComponentType::COMPONENT_UNSIGNED_INT == Accessor.componentType)
           {
-            Indices.push_back(static_cast<vdl::uint32_t>(Index));
+            Indices = _pResourceReader->ReadBinaryData<vdl::uint32_t>(_Document, Accessor);
           }
+          else
+          {
+            for (auto& Index : _pResourceReader->ReadBinaryData<vdl::uint16_t>(_Document, Accessor))
+            {
+              Indices.push_back(static_cast<vdl::uint32_t>(Index));
+            }
+          }
+        }
+        IndicesNum = static_cast<vdl::IndexType>(Indices.size());
+        assert(IndicesNum % 3 == 0);
+
+        const vdl::uint PolygonNum = IndicesNum / 3;
+        for (vdl::uint PolygonCount = 0; PolygonCount < PolygonNum; ++PolygonCount)
+        {
+          vdl::Macro::Swap(Indices[PolygonCount * 3 + 0], Indices[PolygonCount * 3 + 2]);
         }
 
         _pIndices->insert(_pIndices->end(), Indices.begin(), Indices.end());
-        IndicesNum = static_cast<vdl::IndexType>(Indices.size());
       }
 
       //  ÉfÅ[É^ÇÃèÛë‘Çï€ë∂

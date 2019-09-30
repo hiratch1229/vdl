@@ -7,14 +7,14 @@ void Main()
   vdl::float2 DisplaySize = vdl::Window::GetWindowSize();
   vdl::Degree Angle = 0.0f;
 
-  vdl::StaticMesh Model = vdl::StaticMeshData::Box();
-  //vdl::Model Model("Data/danbo_atk.fbx");
+  //vdl::StaticMesh Model = vdl::StaticMeshData::Box();
+  vdl::Model Model("Data/danbo_atk.fbx");
   vdl::float3 Position = 0.0f;
   vdl::float3 Scale = 1.0f;
   int ModelNum = 1;
 
   vdl::Camera Camera(vdl::float3(0.0f, 0.0f, -10.0f));
-  vdl::Renderer3D::SetRasterizerState(vdl::RasterizerState::kSolidCullFront);
+  //vdl::Renderer3D::SetRasterizerState(vdl::RasterizerState::kSolidCullFront);
 
   while (vdl::System::Update())
   {

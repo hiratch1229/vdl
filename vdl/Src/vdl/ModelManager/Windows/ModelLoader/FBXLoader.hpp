@@ -30,7 +30,7 @@ private:
   void FetchMaterials(fbxsdk::FbxMesh* _pMesh, Materials* _pMaterials, const std::string& _FileDirectory, const std::string& _FileFormat, const TextureLoader& _TextureLoader)const;
   void FetchInfluences(fbxsdk::FbxMesh* _pMesh, BoneInfluencePerControlPoints* _pInfluences)const;
   void FetchVertices(fbxsdk::FbxMesh* _pMesh, Vertices* _pVertices, const BoneInfluencePerControlPoints& _BoneInfluencePerControlPoints)const;
-  void FetchIndices(fbxsdk::FbxMesh* _pMesh, Indices* _pIndices, Materials* _pMaterials)const;
+  void FetchIndices(fbxsdk::FbxMesh* _pMesh, Indices* _pIndices, Materials* _pMaterials, bool _isIndexInverse)const;
   void FetchAnimations(fbxsdk::FbxMesh* _pMesh, Animations* _pAnimations)const;
   void FetchBoneMatrices(fbxsdk::FbxMesh* _pMesh, Skeletal* _pSkeletal, fbxsdk::FbxTime _Time)const;
 public:
