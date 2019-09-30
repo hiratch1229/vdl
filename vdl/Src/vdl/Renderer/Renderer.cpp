@@ -5,17 +5,43 @@
 #include <vdl/Engine.hpp>
 #include <vdl/Renderer/IRenderer.hpp>
 
+#include <vdl/Window.hpp>
+
+namespace
+{
+  inline bool CheckSupportMultiRenderTextures(const vdl::RenderTextures& _RenderTextures)
+  {
+    const vdl::uint2 TexureSize = (_RenderTextures[0].isEmpty() ? vdl::Window::GetWindowSize() : _RenderTextures[0].GetSize());
+
+    for (size_t RenderTextureCount = 1; RenderTextureCount < vdl::Constants::kMaxRenderTextureNum; ++RenderTextureCount)
+    {
+      const vdl::RenderTexture& RenderTexture = _RenderTextures[RenderTextureCount];
+
+      //  テクスチャが設定されていないなら終了
+      if (RenderTexture.isEmpty())
+      {
+        return true;
+      }
+
+      //  サイズが最初のレンダーターゲットと違うならエラー
+      if (RenderTexture.GetSize() != TexureSize)
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+}
+
 namespace vdl
 {
   namespace Renderer
   {
-    void SetRenderTexture(const RenderTexture& _RenderTexture, const DepthStencilTexture& _DepthStencilTexture)
+    void SetRenderTextures(const RenderTextures& _RenderTextures, const DepthStencilTexture& _DepthStencilTexture)
     {
-      Engine::Get<IRenderer>()->SetRenderTextures({ _RenderTexture }, _DepthStencilTexture);
-    }
+      assert(CheckSupportMultiRenderTextures(_RenderTextures));
 
-    void SetRenderTexture(const RenderTextures& _RenderTextures, const DepthStencilTexture& _DepthStencilTexture)
-    {
       Engine::Get<IRenderer>()->SetRenderTextures(_RenderTextures, _DepthStencilTexture);
     }
 

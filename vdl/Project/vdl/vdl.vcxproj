@@ -60,6 +60,7 @@
     <ClInclude Include="..\..\Include\vdl\Image.hpp" />
     <ClInclude Include="..\..\Include\vdl\InputLayout.hpp" />
     <ClInclude Include="..\..\Include\vdl\Keyboard.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Light.hpp" />
     <ClInclude Include="..\..\Include\vdl\MotionData.hpp" />
     <ClInclude Include="..\..\Include\vdl\Macro.hpp" />
     <ClInclude Include="..\..\Include\vdl\Math.hpp" />
