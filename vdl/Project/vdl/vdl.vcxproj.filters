@@ -103,6 +103,21 @@
     <Filter Include="Src\MotionData">
       <UniqueIdentifier>{a8f8be3b-32ca-4b50-9239-9bb7b459c86c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{3bf4e7c9-923d-4af1-b78a-2ee2028696b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Texture">
+      <UniqueIdentifier>{a78628b8-324b-419d-81c2-ecef0ad6669a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\StaticMesh">
+      <UniqueIdentifier>{577fa901-d6d7-4331-81c9-a355e773732d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\SkinnedMesh">
+      <UniqueIdentifier>{a5d67aaf-2d36-41d8-bee1-44e97f0e9673}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Option">
+      <UniqueIdentifier>{0374a399-25ca-47f3-8c64-8154cf8a12ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -481,5 +496,40 @@
     <None Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl">
       <Filter>Src\Renderer\RendererCommand</Filter>
     </None>
+    <None Include="..\..\Shader\Texture\Texture.hlsli">
+      <Filter>Shader\Texture</Filter>
+    </None>
+    <None Include="..\..\Shader\SkinnedMesh\Bone.hlsli">
+      <Filter>Shader\SkinnedMesh</Filter>
+    </None>
+    <None Include="..\..\Shader\SkinnedMesh\SkinnedMesh.hlsli">
+      <Filter>Shader\SkinnedMesh</Filter>
+    </None>
+    <None Include="..\..\Shader\StaticMesh\StaticMesh.hlsli">
+      <Filter>Shader\StaticMesh</Filter>
+    </None>
+    <None Include="..\..\Shader\Option\Light.hlsli">
+      <Filter>Shader\Option</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
+      <Filter>Shader\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\Texture\TextureVS.hlsl">
+      <Filter>Shader\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\SkinnedMesh\SkinnedMeshPS.hlsl">
+      <Filter>Shader\SkinnedMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\SkinnedMesh\SkinnedMeshVS.hlsl">
+      <Filter>Shader\SkinnedMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\StaticMesh\StaticMeshPS.hlsl">
+      <Filter>Shader\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\StaticMesh\StaticMeshVS.hlsl">
+      <Filter>Shader\StaticMesh</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

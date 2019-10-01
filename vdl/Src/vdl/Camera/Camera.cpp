@@ -35,13 +35,16 @@ namespace vdl
     if (pMouse->Press(Input::Mouse::Buttons::eRight))
     {
       const float3 AxisZ = _pCamera->ViewVector();
-
       const float3 AxisY = _pCamera->Up.Normalize();
       const float3 AxisX = AxisY.Cross(AxisZ.Normalize());
 
-      const Matrix Rotation = Matrix::Rotate(Quaternion::RotationAxis(AxisX, pMouse->GetDelta().y * 0.01f) * Quaternion::RotationAxis(AxisY, -pMouse->GetDelta().x * 0.01f));
+      if (const int2 MouseDelta = pMouse->GetDelta();
+        MouseDelta != 0)
+      {
+        const Matrix Rotation = Matrix::Rotate(Quaternion::RotationAxis(AxisX, MouseDelta.y * 0.01f) * Quaternion::RotationAxis(AxisY, -MouseDelta.x * 0.01f));
 
-      _pCamera->Position = _pCamera->Target + AxisZ * Rotation;
+        _pCamera->Position = _pCamera->Target - AxisZ * Rotation;
+      }
     }
     if (int Wheel = pMouse->GetWheel().y; Wheel != 0)
     {

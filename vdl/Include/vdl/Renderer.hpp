@@ -1,8 +1,8 @@
 #pragma once
 #include "Fwd.hpp"
 
+#include "Texture.hpp"
 #include "Color.hpp"
-#include "Viewport.hpp"
 
 namespace vdl::Renderer
 {

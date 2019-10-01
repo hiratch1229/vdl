@@ -21,10 +21,8 @@ PS_IN main(VS_IN In)
 
   const float4 World = mul(In.Position, In.World);
 
-  Out.World = World.xyz;
   Out.Position = mul(World, ViewProjectionMatrix);
   Out.Texcoord = In.Texcoord;
-  Out.Normal = normalize(mul(In.Normal, In.World)).xyz;
   Out.Color = In.Color;
   
   return Out;
