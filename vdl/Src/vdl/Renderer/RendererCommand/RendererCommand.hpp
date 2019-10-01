@@ -173,84 +173,85 @@ public:
 
   void Flush(IDeviceContext* _pDeviceContext, IBuffer* _pInstanceBuffer);
 
+  [[nodiscard]] bool HasDrawCommand()const { return StateChangeFlags_.Has(RendererCommandType::eDraw); }
+
   void PushDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData);
-  const InstanceData& GetInstanceData(vdl::uint _Index)const { return Instances_[_Index]; }
+  [[nodiscard]] const InstanceData& GetInstanceData(vdl::uint _Index)const { return Instances_[_Index]; }
 
   void PushScissor(const vdl::Scissor& _Scissor);
-  const vdl::Scissor& GetCurrentScissor()const { return CurrentScissor_; }
+  [[nodiscard]] const vdl::Scissor& GetCurrentScissor()const { return CurrentScissor_; }
 
   void PushViewport(const vdl::Viewport& _Viewport);
-  const vdl::Viewport& GetCurrentViewport()const { return CurrentViewport_; }
+  [[nodiscard]] const vdl::Viewport& GetCurrentViewport()const { return CurrentViewport_; }
 
   void PushBlendState(const vdl::BlendState& _BlendState);
-  const vdl::BlendState& GetCurrentBlendState()const { return CurrentBlendState_; }
+  [[nodiscard]] const vdl::BlendState& GetCurrentBlendState()const { return CurrentBlendState_; }
 
   void PushDepthStencilState(const vdl::DepthStencilState& _DepthStencilState);
-  const vdl::DepthStencilState& GetCurrentDepthStencilState()const { return CurrentDepthStencilState_; }
+  [[nodiscard]] const vdl::DepthStencilState& GetCurrentDepthStencilState()const { return CurrentDepthStencilState_; }
 
   void PushRasterizerState(const vdl::RasterizerState& _RasterizerState);
-  const vdl::RasterizerState& GetCurrentRasterizerState()const { return CurrentRasterizerState_; }
+  [[nodiscard]] const vdl::RasterizerState& GetCurrentRasterizerState()const { return CurrentRasterizerState_; }
 
   void PushVertexShader(const vdl::VertexShader& _VertexShader);
-  const vdl::VertexShader& GetCurrentVertexShader()const { return CurrentVertexShader_; }
+  [[nodiscard]] const vdl::VertexShader& GetCurrentVertexShader()const { return CurrentVertexShader_; }
 
   void PushHullShader(const vdl::HullShader& _HullShader);
-  const vdl::HullShader& GetCurrentHullShader()const { return CurrentHullShader_; }
+  [[nodiscard]] const vdl::HullShader& GetCurrentHullShader()const { return CurrentHullShader_; }
 
   void PushDomainShader(const vdl::DomainShader& _DomainShader);
-  const vdl::DomainShader& GetCurrentDomainShader()const { return CurrentDomainShader_; }
+  [[nodiscard]] const vdl::DomainShader& GetCurrentDomainShader()const { return CurrentDomainShader_; }
 
   void PushGeometryShader(const vdl::GeometryShader& _GeometryShader);
-  const vdl::GeometryShader& GetCurrentGeometryShader()const { return CurrentGeometryShader_; }
+  [[nodiscard]] const vdl::GeometryShader& GetCurrentGeometryShader()const { return CurrentGeometryShader_; }
 
   void PushPixelShader(const vdl::PixelShader& _PixelShader);
-  const vdl::PixelShader& GetCurrentPixelShader()const { return CurrentPixelShader_; }
+  [[nodiscard]] const vdl::PixelShader& GetCurrentPixelShader()const { return CurrentPixelShader_; }
 
   void PushVertexStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot);
-  std::vector<vdl::Sampler> GetVertexStageSamplers(vdl::uint _Index)const { return Samplers_[static_cast<vdl::uint>(ShaderType::eVertexShader)][_Index]; }
-  const std::vector<vdl::Sampler>& GetCurrentVertexStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eVertexShader)]; }
+  [[nodiscard]] const std::vector<vdl::Sampler>& GetCurrentVertexStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eVertexShader)]; }
 
   void PushHullStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot);
-  const std::vector<vdl::Sampler>& GetCurrentHullStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eHullShader)]; }
+  [[nodiscard]] const std::vector<vdl::Sampler>& GetCurrentHullStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eHullShader)]; }
 
   void PushDomainStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot);
-  const std::vector<vdl::Sampler>& GetCurrentDomainStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eDomainShader)]; }
+  [[nodiscard]] const std::vector<vdl::Sampler>& GetCurrentDomainStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eDomainShader)]; }
 
   void PushGeometryStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot);
-  const std::vector<vdl::Sampler>& GetCurrentGeometryStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eGeometryShader)]; }
+  [[nodiscard]] const std::vector<vdl::Sampler>& GetCurrentGeometryStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eGeometryShader)]; }
 
   void PushPixelStageSampler(const vdl::Sampler& _Sampler, vdl::uint _Slot);
-  const std::vector<vdl::Sampler>& GetCurrentPixelStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)]; }
+  [[nodiscard]] const std::vector<vdl::Sampler>& GetCurrentPixelStageSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)]; }
 
   void PushVertexStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot);
-  const vdl::Texture& GetCurrentVertexStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eVertexShader)][_Slot]); }
+  [[nodiscard]] const vdl::Texture& GetCurrentVertexStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eVertexShader)][_Slot]); }
 
   void PushHullStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot);
-  const vdl::Texture& GetCurrentHullStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eHullShader)][_Slot]); }
+  [[nodiscard]] const vdl::Texture& GetCurrentHullStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eHullShader)][_Slot]); }
 
   void PushDomainStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot);
-  const vdl::Texture& GetCurrentDomainStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eDomainShader)][_Slot]); }
+  [[nodiscard]] const vdl::Texture& GetCurrentDomainStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eDomainShader)][_Slot]); }
 
   void PushGeometryStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot);
-  const vdl::Texture& GetCurrentGeometryStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eGeometryShader)][_Slot]); }
+  [[nodiscard]] const vdl::Texture& GetCurrentGeometryStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::eGeometryShader)][_Slot]); }
 
   void PushPixelStageTexture(const vdl::Texture& _Texture, vdl::uint _Slot);
-  const vdl::Texture& GetCurrentPixelStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::ePixelShader)][_Slot]); }
+  [[nodiscard]] const vdl::Texture& GetCurrentPixelStageTexture(vdl::uint _Slot)const { return ReservedTextures_.at(CurrentTextureIDs_[static_cast<vdl::uint>(ShaderType::ePixelShader)][_Slot]); }
 
   void PushVertexStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot);
-  const vdl::Detail::ConstantBufferData& GetCurrentVertexStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::eVertexShader)][_Slot]); }
+  [[nodiscard]] const vdl::Detail::ConstantBufferData& GetCurrentVertexStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::eVertexShader)][_Slot]); }
 
   void PushHullStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot);
-  const vdl::Detail::ConstantBufferData& GetCurrentHullStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::eHullShader)][_Slot]); }
+  [[nodiscard]] const vdl::Detail::ConstantBufferData& GetCurrentHullStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::eHullShader)][_Slot]); }
 
   void PushDomainStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot);
-  const vdl::Detail::ConstantBufferData& GetCurrentDomainStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::eDomainShader)][_Slot]); }
+  [[nodiscard]] const vdl::Detail::ConstantBufferData& GetCurrentDomainStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::eDomainShader)][_Slot]); }
 
   void PushGeometryStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot);
-  const vdl::Detail::ConstantBufferData& GetCurrentGeometryStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::eGeometryShader)][_Slot]); }
+  [[nodiscard]] const vdl::Detail::ConstantBufferData& GetCurrentGeometryStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::eGeometryShader)][_Slot]); }
 
   void PushPixelStageConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer, vdl::uint _Slot);
-  const vdl::Detail::ConstantBufferData& GetCurrentPixelStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::ePixelShader)][_Slot]); }
+  [[nodiscard]] const vdl::Detail::ConstantBufferData& GetCurrentPixelStageConstantBuffer(vdl::uint _Slot)const { return ReservedConstantBuffers_.at(CurrentConstantBufferIDs_[static_cast<vdl::uint>(ShaderType::ePixelShader)][_Slot]); }
 };
 
 #include "RendererCommand.inl"

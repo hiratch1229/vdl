@@ -76,7 +76,7 @@ void CSwapChain::Initialize()
 
   //  深度ステンシルビューの作成
   {
-    D3D11_TEXTURE2D_DESC DepthStencilBufferDesc = BackBufferDesc;
+    D3D11_TEXTURE2D_DESC DepthStencilBufferDesc = std::move(BackBufferDesc);
     {
       DepthStencilBufferDesc.Format = kDepthStencilFormat;
       DepthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;

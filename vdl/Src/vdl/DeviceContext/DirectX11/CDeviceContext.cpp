@@ -743,9 +743,10 @@ void CDeviceContext::PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, 
   {
     for (vdl::uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
     {
-      assert(_Textures[TextureCount].GetID() != std::nullopt);
-
-      pShaderResources[TextureCount] = static_cast<CTexture*>(pTextureManager_->GetTexture(_Textures[TextureCount].GetID()))->pShaderResourceView.Get();
+      if (!_Textures[TextureCount].isEmpty())
+      {
+        pShaderResources[TextureCount] = static_cast<CTexture*>(pTextureManager_->GetTexture(_Textures[TextureCount].GetID()))->pShaderResourceView.Get();
+      }
     }
   }
 

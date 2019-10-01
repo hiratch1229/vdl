@@ -97,7 +97,7 @@ void CRenderer::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, co
   if (OutputManager_ != OutputManager)
   {
     Flush();
-    OutputManager = std::move(OutputManager);
+    OutputManager_ = std::move(OutputManager);
   }
 }
 
@@ -189,30 +189,55 @@ void CRenderer::Clear(const vdl::DepthStencilTexture& _DepthStencilTexture, floa
 
 void CRenderer::Flush()
 {
-  //  それぞれのドローコールをソート(マルチスレッド)
+  const bool HasStaticMeshDrawCommand = StaticMeshRendererCommandList_.HasDrawCommand();
+  const bool HasSkinnedMeshDrawCommand = SkinnedMeshRendererCommandList_.HasDrawCommand();
+  const bool HasTextureDrawCommand = TextureRendererCommandList_.HasDrawCommand();
+
+  if (HasStaticMeshDrawCommand || HasSkinnedMeshDrawCommand || HasTextureDrawCommand)
   {
-    StaticMeshRendererCommandList_.Adjust();
-    //SkinnedMeshRendererCommandList_.Adjust();
-    TextureRendererCommandList_.Adjust();
+    //  それぞれのドローコールをソート(マルチスレッド)
+    {
+      if (HasStaticMeshDrawCommand)
+      {
+        StaticMeshRendererCommandList_.Adjust();
+      }
+      //if (HasSkinnedMeshDrawCommand)
+      //{
+      //  SkinnedMeshRendererCommandList_.Adjust();
+      //}
+      if (HasTextureDrawCommand)
+      {
+        TextureRendererCommandList_.Adjust();
+      }
+    }
+
+    pDeviceContext_->SetRenderTextures(OutputManager_.RenderTextures, OutputManager_.DepthStencilTexture);
+
+    if (HasStaticMeshDrawCommand)
+    {
+      pDeviceContext_->SetInputLayout(vdl::InputLayout::eStaticMesh);
+      pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
+      StaticMeshRendererCommandList_.Flush(pDeviceContext_, pStaticMeshInstanceBuffer_.get());
+      StaticMeshRendererCommandList_.Reset();
+    }
+    //if (HasSkinnedMeshDrawCommand)
+    //{
+    //  pDeviceContext_->SetInputLayout(vdl::InputLayout::eSkinnedMesh);
+    //  SkinnedMeshRendererCommandList_.Flush(pDeviceContext_, pSkinnedMeshInstanceBuffer_.get());
+    //  SkinnedMeshRendererCommandList_.Reset();
+    //}
+    if (HasTextureDrawCommand)
+    {
+      pDeviceContext_->SetInputLayout(vdl::InputLayout::eTexture);
+      pDeviceContext_->SetTopology(vdl::Topology::eTriangleStrip);
+      pDeviceContext_->SetVertexBuffer(pTextureVertexBuffer_.get());
+      TextureRendererCommandList_.Flush(pDeviceContext_, pTextureInstanceBuffer_.get());
+      TextureRendererCommandList_.Reset();
+
+      vdl::Texture EmptyTexture;
+      pDeviceContext_->PSSetTextures(0, 1, &EmptyTexture);
+    }
+
+    pDeviceContext_->Flush();
   }
-
-  pDeviceContext_->SetRenderTextures(OutputManager_.RenderTextures, OutputManager_.DepthStencilTexture);
-
-  pDeviceContext_->SetInputLayout(vdl::InputLayout::eStaticMesh);
-  pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
-  StaticMeshRendererCommandList_.Flush(pDeviceContext_, pStaticMeshInstanceBuffer_.get());
-
-  //pDeviceContext_->SetInputLayout(vdl::InputLayout::eSkinnedMesh);
-  //SkinnedMeshRendererCommandList_.Flush(pDeviceContext_, pSkinnedMeshInstanceBuffer_.get());
-
-  pDeviceContext_->SetInputLayout(vdl::InputLayout::eTexture);
-  pDeviceContext_->SetTopology(vdl::Topology::eTriangleStrip);
-  pDeviceContext_->SetVertexBuffer(pTextureVertexBuffer_.get());
-  TextureRendererCommandList_.Flush(pDeviceContext_, pTextureInstanceBuffer_.get());
-
-  StaticMeshRendererCommandList_.Reset();
-  SkinnedMeshRendererCommandList_.Reset();
-  TextureRendererCommandList_.Reset();
-
-  pDeviceContext_->Flush();
 }

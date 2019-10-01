@@ -760,6 +760,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
   }
 
   StateChangeFlags_.Clear();
+  StateChangeFlags_.Set(RendererCommandType::eDraw);
 }
 
 #define SetState(RendererCommandType, StateName)\

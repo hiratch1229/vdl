@@ -351,8 +351,6 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
   CRenderTexture* pRenderTexture = new CRenderTexture;
   pRenderTexture->TextureSize = _TextureSize;
 
-  constexpr DXGI_FORMAT kTextureFormat = Cast(Constants::kTextureFormat);
-
   HRESULT hr = S_OK;
 
   D3D11_TEXTURE2D_DESC RenderTargetDesc;
@@ -364,7 +362,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
     RenderTargetDesc.Format = Cast(_Format);
     RenderTargetDesc.SampleDesc.Count = 1;
     RenderTargetDesc.SampleDesc.Quality = 0;
-    RenderTargetDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    RenderTargetDesc.Usage = D3D11_USAGE_DEFAULT;
     RenderTargetDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
     RenderTargetDesc.CPUAccessFlags = 0;
     RenderTargetDesc.MiscFlags = 0;
@@ -405,7 +403,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     DepthStencilBufferDesc.Format = Cast(_Format);
     DepthStencilBufferDesc.SampleDesc.Count = 1;
     DepthStencilBufferDesc.SampleDesc.Quality = 0;
-    DepthStencilBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    DepthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
     DepthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
     DepthStencilBufferDesc.CPUAccessFlags = 0;
     DepthStencilBufferDesc.MiscFlags = 0;

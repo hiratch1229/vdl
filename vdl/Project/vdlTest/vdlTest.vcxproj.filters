@@ -12,10 +12,26 @@
     <Filter Include="シェーダーファイル">
       <UniqueIdentifier>{2c5b39b0-80c4-431d-864d-53aa42723102}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\StaticMesh">
+      <UniqueIdentifier>{a75c6801-4e29-4aeb-b62d-60b262af5a17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shader\StaticMesh\StaticMeshPS.hlsl">
+      <Filter>シェーダーファイル\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\StaticMesh\StaticMeshVS.hlsl">
+      <Filter>シェーダーファイル\StaticMesh</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\StaticMesh\StaticMesh.hlsli">
+      <Filter>シェーダーファイル\StaticMesh</Filter>
+    </None>
   </ItemGroup>
 </Project>
