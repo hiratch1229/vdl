@@ -63,11 +63,12 @@ void CDevice::Initialize()
   //  エラーチェック用
   HRESULT hr = S_OK;
 
-  vdl::uint CreateDeviceFlag = 0;
-  vdl::uint DxgiCreateFactoryFlag = 0;
 #if defined( DEBUG ) || defined( _DEBUG )
-  CreateDeviceFlag |= D3D11_CREATE_DEVICE_DEBUG;
-  DxgiCreateFactoryFlag |= DXGI_CREATE_FACTORY_DEBUG;
+  constexpr vdl::uint kCreateDeviceFlag = D3D11_CREATE_DEVICE_DEBUG;
+  constexpr vdl::uint kDxgiCreateFactoryFlag = DXGI_CREATE_FACTORY_DEBUG;
+#else
+  constexpr vdl::uint kCreateDeviceFlag = 0;
+  constexpr vdl::uint kDxgiCreateFactoryFlag = 0;
 #endif
 
   constexpr D3D_DRIVER_TYPE kDriverTypes[] =
@@ -92,7 +93,7 @@ void CDevice::Initialize()
 
   Microsoft::WRL::ComPtr<IDXGIFactory7> pFactory;
   {
-    hr = ::CreateDXGIFactory2(DxgiCreateFactoryFlag, IID_PPV_ARGS(pFactory.GetAddressOf()));
+    hr = ::CreateDXGIFactory2(kDxgiCreateFactoryFlag, IID_PPV_ARGS(pFactory.GetAddressOf()));
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
   }
 
@@ -131,7 +132,7 @@ void CDevice::Initialize()
   for (auto i : kDriverTypes)
   {
     //  デバイスを作成
-    hr = ::D3D11CreateDevice(pAdapter.Get(), kDriverTypes[i], nullptr, CreateDeviceFlag, kFeatureLevels,
+    hr = ::D3D11CreateDevice(pAdapter.Get(), kDriverTypes[i], nullptr, kCreateDeviceFlag, kFeatureLevels,
       kFeatureLevelNum, D3D11_SDK_VERSION, pDevice_.GetAddressOf(), &FeatureLevel, pImmediateContext_.GetAddressOf());
 
     //  成功時に終了

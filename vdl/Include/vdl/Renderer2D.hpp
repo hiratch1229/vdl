@@ -1,8 +1,11 @@
 #pragma once
 #include "Fwd.hpp"
-#include "Texture.hpp"
+#include "Types.hpp"
+#include "Type2.hpp"
+#include "Angle.hpp"
 #include "GraphicsState.hpp"
 #include "Shader.hpp"
+#include "Texture.hpp"
 #include "ConstantBuffer.hpp"
 
 namespace vdl

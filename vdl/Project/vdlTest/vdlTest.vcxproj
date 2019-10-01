@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Scene\SceneMultiRenderTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\StaticMesh\StaticMesh.hlsli" />
@@ -39,6 +40,10 @@
     <FxCompile Include="Shader\StaticMesh\StaticMeshVS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Scene\Scene.hpp" />
+    <ClInclude Include="Scene\SceneMultiRenderTexture.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

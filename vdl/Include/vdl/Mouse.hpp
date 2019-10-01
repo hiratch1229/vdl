@@ -1,4 +1,5 @@
 #pragma once
+#include "Fwd.hpp"
 #include "Type2.hpp"
 #include "Button.hpp"
 

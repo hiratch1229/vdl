@@ -3,6 +3,8 @@
 #include <vdl/Engine.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 
+#include <vdl/Image.hpp>
+
 namespace vdl
 {
   Texture::Texture(const char* _FilePath, bool _isSerialize)
@@ -59,6 +61,11 @@ namespace vdl
 
   Texture& Texture::operator=(Texture&& _Texture)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<ITextureManager>()->Release(ID_);
+    }
+
     ID_ = _Texture.ID_;
     _Texture.ID_ = std::nullopt;
 

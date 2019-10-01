@@ -1,6 +1,5 @@
 #pragma once
 #include "Fwd.hpp"
-
 #include "Texture.hpp"
 #include "Color.hpp"
 

@@ -27,6 +27,8 @@ namespace vdl::System
 
   void DisableDefaultActions(uint _DefaultActionFlags);
 
+  void SetMaxFPS(uint _MaxFPS);
+
   [[nodiscard]] float GetDeltaTime();
 
   [[nodiscard]] uint GetFPS();

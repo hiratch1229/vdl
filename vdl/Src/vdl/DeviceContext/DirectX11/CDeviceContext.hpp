@@ -3,6 +3,7 @@
 
 #include <vdl/InputLayout.hpp>
 #include <vdl/GraphicsState.hpp>
+#include <vdl/Texture.hpp>
 #include <vdl/Sampler.hpp>
 #include <vdl/Hash.hpp>
 

@@ -363,11 +363,9 @@ void CDeviceContext::SetViewport(const vdl::Viewport& _Viewport)
 
 void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)
 {
-  const vdl::RenderTexture EmptyRenderTexture = vdl::RenderTexture();
-
-  auto GetRenderTargetView = [&](const vdl::RenderTexture& _RenderTexture)->ID3D11RenderTargetView *
+  auto GetRenderTargetView = [&](const vdl::RenderTexture& _RenderTexture)->ID3D11RenderTargetView*
   {
-    assert(_RenderTexture != EmptyRenderTexture);
+    assert(!_RenderTexture.isEmpty());
 
     return static_cast<CRenderTexture*>(pTextureManager_->GetTexture(_RenderTexture.GetID()))->pRenderTargetView.Get();
   };
@@ -375,21 +373,21 @@ void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures
   std::vector<ID3D11RenderTargetView*> pRenderTeargetViews;
   ID3D11DepthStencilView* pDepthStencilView;
 
-  pRenderTeargetViews.push_back((_RenderTextures[0] == EmptyRenderTexture ? pSwapChain_->GetRenderTargetView() : GetRenderTargetView(_RenderTextures[0])));
+  pRenderTeargetViews.push_back((_RenderTextures[0].isEmpty() ? pSwapChain_->GetRenderTargetView() : GetRenderTargetView(_RenderTextures[0])));
 
   for (vdl::uint RenderTextureCount = 1; RenderTextureCount < Constants::kMaxRenderTextureNum; ++RenderTextureCount)
   {
-    if (_RenderTextures[RenderTextureCount] == EmptyRenderTexture)
+    if (_RenderTextures[RenderTextureCount].isEmpty())
     {
       break;
     }
 
     pRenderTeargetViews.push_back(GetRenderTargetView(_RenderTextures[RenderTextureCount]));
   }
-  pDepthStencilView = (_DepthStenilTexture == vdl::DepthStencilTexture() ? pSwapChain_->GetDepthStencilView()
+  pDepthStencilView = (_DepthStenilTexture.isEmpty() ? pSwapChain_->GetDepthStencilView()
     : static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(_DepthStenilTexture.GetID()))->pDepthStencilView.Get());
-
   assert(!pRenderTeargetViews.empty() && pDepthStencilView);
+
   pD3D11ImmediateContext_->OMSetRenderTargets(static_cast<vdl::uint>(pRenderTeargetViews.size()), pRenderTeargetViews.data(), pDepthStencilView);
 }
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "Fwd.hpp"
 #include "Type2.hpp"
 #include "Type3.hpp"
 #include "Type4.hpp"

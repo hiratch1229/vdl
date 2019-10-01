@@ -27,6 +27,11 @@ namespace vdl::System
     Engine::Get<ISystem>()->DisableDefaultActions(_DefaultActionFlags);
   }
 
+  void SetMaxFPS(uint _MaxFPS)
+  {
+    Engine::Get<ISystem>()->SetMaxFPS(_MaxFPS);
+  }
+
   float GetDeltaTime()
   {
     return Engine::Get<ISystem>()->GetDeltaTime();

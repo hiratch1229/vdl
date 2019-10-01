@@ -20,7 +20,7 @@ public:
 
   virtual void ReportDefaultActions(vdl::uint _DefaultActionFlags) = 0;
 
-  virtual void SetMaxFramerate(vdl::uint _MaxFramerate) = 0;
+  virtual void SetMaxFPS(vdl::uint _MaxFPS) = 0;
 
   [[nodiscard]] virtual float GetDeltaTime()const = 0;
 

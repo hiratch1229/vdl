@@ -1,6 +1,4 @@
 #pragma once
-#include "Fwd.hpp"
-
 #include <cmath>
 #include <string>
 #include <fstream>

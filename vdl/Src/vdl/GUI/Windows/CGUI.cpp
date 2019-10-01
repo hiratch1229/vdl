@@ -10,12 +10,13 @@
 #include <vdl/Input/Mouse/IMouse.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 
-#include <vdl/Mouse.hpp>
-#include <vdl/Scissor.hpp>
 #include <vdl/Math.hpp>
+#include <vdl/Topology.hpp>
+#include <vdl/Scissor.hpp>
+#include <vdl/Image.hpp>
 #include <vdl/Texture.hpp>
 #include <vdl/GUI.hpp>
-#include <vdl/Topology.hpp>
+#include <vdl/Mouse.hpp>
 #include <vdl/Macro.hpp>
 
 namespace

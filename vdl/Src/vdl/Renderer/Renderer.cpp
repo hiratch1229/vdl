@@ -7,6 +7,8 @@
 
 #include <vdl/Window.hpp>
 
+#include <assert.h>
+
 namespace
 {
   inline bool CheckSupportMultiRenderTextures(const vdl::RenderTextures& _RenderTextures)

@@ -13,8 +13,6 @@ class IGUI;
 
 class CSystem : public ISystem
 {
-  static constexpr vdl::uint kInitMaxFramRate = 60;
-private:
   enum class SystemState
   {
     eInitialized,
@@ -56,7 +54,7 @@ public:
 
   void ReportDefaultActions(vdl::uint _DefaultActionFlags)override { DefaultActionFlags_ |= (ValidDefaultActions_ & _DefaultActionFlags); }
 
-  void SetMaxFramerate(vdl::uint _MaxFramerate)override { FrameInterval_ = (_MaxFramerate == 0 ? 0.0 : 1.0 / _MaxFramerate); }
+  void SetMaxFPS(vdl::uint _MaxFPS)override { FrameInterval_ = (_MaxFPS == 0 ? 0.0 : 1.0 / _MaxFPS); }
 
   float GetDeltaTime()const override { return static_cast<float>(DeltaTime_); }
   

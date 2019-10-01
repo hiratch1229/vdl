@@ -2,8 +2,8 @@
 
 struct PS_OUT
 {
-  float4 Color : SV_TARGET0;
-  float4 Position : SV_TARGET1;
+  float4 Blue : SV_TARGET0;
+  float4 Red : SV_TARGET1;
 };
 
 
@@ -14,8 +14,10 @@ PS_OUT main(PS_IN In)
 {
   PS_OUT Out;
 
-  Out.Color = Texture.Sample(Sampler, In.Texcoord) * In.Color;
-  Out.Position = In.Position;
+  Out.Blue = float4(0.0f, 0.0f, 1.0f, 1.0f);
+  Out.Red = float4(1.0f, 0.0f, 0.0f, 1.0f);
+  //Out.Color = Texture.Sample(Sampler, In.Texcoord) * In.Color;
+  //Out.Position = In.Position;
 
   return Out;
 }

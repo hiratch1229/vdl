@@ -15,10 +15,16 @@
     <Filter Include="シェーダーファイル\StaticMesh">
       <UniqueIdentifier>{a75c6801-4e29-4aeb-b62d-60b262af5a17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{fbc731f7-cc84-4d6d-a3d9-828bb4b578c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneMultiRenderTexture.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,5 +39,13 @@
     <None Include="Shader\StaticMesh\StaticMesh.hlsli">
       <Filter>シェーダーファイル\StaticMesh</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Scene\Scene.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneMultiRenderTexture.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

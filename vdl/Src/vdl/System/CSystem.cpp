@@ -16,6 +16,7 @@
 #include <Vdl/ShaderManager/IShaderManager.hpp>
 #include <vdl/Renderer/IRenderer.hpp>
 #include <vdl/GUI/IGUI.hpp>
+#include <vdl/Constants/Constants.hpp>
 
 #include <vdl/System.hpp>
 
@@ -63,7 +64,7 @@ void CSystem::Initialize()
       SecondsPerFrequency_ = 1.0 / static_cast<double>(Frequency.QuadPart);
     }
 
-    SetMaxFramerate(kInitMaxFramRate);
+    SetMaxFPS(Constants::kDefaultMaxFPS);
   }
 
   SystemState_ = SystemState::eInitialized;

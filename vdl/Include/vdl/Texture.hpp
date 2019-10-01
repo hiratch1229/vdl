@@ -1,8 +1,8 @@
 #pragma once
+#include "Fwd.hpp"
 #include "ID.hpp"
 #include "Color.hpp"
-#include "Image.hpp"
-#include "Format.hpp"
+#include "Constants.hpp"
 
 namespace vdl
 {

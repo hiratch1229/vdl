@@ -1,8 +1,8 @@
 #pragma once
-#include "Matrix.hpp"
 #include "Types.hpp"
 #include "Texture.hpp"
 #include "Vertex.hpp"
+#include "Matrix.hpp"
 
 #include <vector>
 #include <unordered_map>

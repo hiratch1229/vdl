@@ -1,6 +1,7 @@
 #pragma once
-#include "Button.hpp"
+#include "Fwd.hpp"
 #include "Type2.hpp"
+#include "Button.hpp"
 
 namespace vdl::Input
 {
