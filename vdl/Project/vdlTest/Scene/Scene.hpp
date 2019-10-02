@@ -4,6 +4,7 @@
 enum class SceneType : vdl::uint
 {
   eMultiRenderTexture,
+  eTessellation,
 
   eNum
 };
@@ -15,7 +16,9 @@ public:
 
   virtual ~IScene() = default;
 
-  [[nodiscard]] virtual SceneType GetType()const = 0;
+  virtual void Initialize() = 0;
 
   virtual void Update() = 0;
+
+  [[nodiscard]] virtual SceneType GetType()const = 0;
 };

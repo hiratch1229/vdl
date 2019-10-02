@@ -50,6 +50,11 @@ namespace vdl
   
   VertexShader& VertexShader::operator=(VertexShader&& _VertexShader)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<IShaderManager>()->Release(ID_);
+    }
+
     ID_ = _VertexShader.ID_;
     _VertexShader.ID_ = std::nullopt;
 
@@ -116,6 +121,11 @@ namespace vdl
 
   HullShader& HullShader::operator=(HullShader&& _HullShader)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<IShaderManager>()->Release(ID_);
+    }
+
     ID_ = _HullShader.ID_;
     _HullShader.ID_ = std::nullopt;
 
@@ -175,6 +185,11 @@ namespace vdl
 
   DomainShader& DomainShader::operator=(DomainShader&& _DomainShader)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<IShaderManager>()->Release(ID_);
+    }
+
     ID_ = _DomainShader.ID_;
     _DomainShader.ID_ = std::nullopt;
 
@@ -234,6 +249,11 @@ namespace vdl
 
   GeometryShader& GeometryShader::operator=(GeometryShader&& _GeometryShader)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<IShaderManager>()->Release(ID_);
+    }
+
     ID_ = _GeometryShader.ID_;
     _GeometryShader.ID_ = std::nullopt;
 
@@ -293,6 +313,11 @@ namespace vdl
 
   PixelShader& PixelShader::operator=(PixelShader&& _PixelShader)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<IShaderManager>()->Release(ID_);
+    }
+
     ID_ = _PixelShader.ID_;
     _PixelShader.ID_ = std::nullopt;
 
@@ -352,6 +377,11 @@ namespace vdl
 
   ComputeShader& ComputeShader::operator=(ComputeShader&& _ComputeShader)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<IShaderManager>()->Release(ID_);
+    }
+
     ID_ = _ComputeShader.ID_;
     _ComputeShader.ID_ = std::nullopt;
 

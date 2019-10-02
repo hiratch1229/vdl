@@ -4,6 +4,7 @@
 #include <vdl/Type2.hpp>
 #include <vdl/Color.hpp>
 #include <vdl/Macro.hpp>
+#include <vdl/Format.hpp>
 
 namespace Constants
 {
@@ -26,10 +27,6 @@ namespace Constants
   constexpr vdl::uint kMaxTextureNum = vdl::Constants::kMaxTextureNum;
 
   constexpr vdl::uint kMaxConstantBufferNum = vdl::Constants::kMaxConstantBufferNum;
-
-  constexpr vdl::Format kSwapChainFormat = vdl::Constants::kSwapChainFormat;
-
-  constexpr vdl::Format kDepthStencilFormat = vdl::Constants::kDepthStencilFormat;
 
   constexpr const char* kDefaultTextureVertexShaderCode = vdl::Constants::kDefaultTextureVertexShaderCode;
 

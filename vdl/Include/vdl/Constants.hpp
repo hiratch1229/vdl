@@ -1,7 +1,6 @@
 #pragma once
 #include "Types.hpp"
 #include "Type2.hpp"
-#include "Format.hpp"
 
 namespace vdl::Constants
 {
@@ -24,10 +23,6 @@ namespace vdl::Constants
   constexpr uint kMaxTextureNum = 128;
 
   constexpr uint kMaxConstantBufferNum = 14;
-
-  constexpr Format kSwapChainFormat = vdl::Format::eR8G8B8A8_Unorm;
-
-  constexpr Format kDepthStencilFormat = vdl::Format::eD24_Unorm_S8_Uint;
 
   constexpr const char kDefaultTextureVertexShaderCode[] = {
     "struct VS_IN"

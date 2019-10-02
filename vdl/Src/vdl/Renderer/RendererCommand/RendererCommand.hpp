@@ -28,6 +28,7 @@ class IModelManager;
 enum class RendererCommandType
 {
   eDraw = 0,
+  eSetTopology,
   eSetScissor,
   eSetViewport,
   eSetBlendState,
@@ -73,7 +74,7 @@ public:
 
   void Set(RendererCommandType _Command) { Flags_ |= 1 << static_cast<vdl::uint>(_Command); }
 
-  void Cancel(RendererCommandType _Command) { Flags_ &= ~(1 << static_cast<vdl::uint>(_Command)); }
+  //void Cancel(RendererCommandType _Command) { Flags_ &= ~(1 << static_cast<vdl::uint>(_Command)); }
 };
 
 template<class DisplayObject, class InstanceData>
@@ -102,6 +103,7 @@ private:
   std::vector<InstanceData> Instances_;
 
   std::vector<vdl::Scissor> Scissors_;
+  std::vector<vdl::Topology> Topologys_;
   std::vector<vdl::Viewport> Viewports_;
   std::vector<vdl::BlendState> BlendStates_;
   std::vector<vdl::DepthStencilState> DepthStencilStates_;
@@ -116,6 +118,7 @@ private:
   std::array<ConstantBufferIDs, kShaderTypes> LastConstantBufferIDs_;
   std::array<std::vector<ConstantBufferIDs>, kShaderTypes> ConstantBufferIDs_;
 
+  vdl::Topology CurrentTopology_;
   vdl::Scissor CurrentScissor_;
   vdl::Viewport CurrentViewport_;
   vdl::BlendState CurrentBlendState_;
@@ -164,7 +167,7 @@ private:
 public:
   RendererCommandList() = default;
 
-  void Initialize(const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
+  void Initialize(vdl::Topology _Topology, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
     const vdl::Sampler& _Sampler, const vdl::VertexShader& _VertexShader, const vdl::PixelShader& _PixelShader);
 
   void Reset();
@@ -173,10 +176,13 @@ public:
 
   void Flush(IDeviceContext* _pDeviceContext, IBuffer* _pInstanceBuffer);
 
-  [[nodiscard]] bool HasDrawCommand()const { return StateChangeFlags_.Has(RendererCommandType::eDraw); }
+  [[nodiscard]] bool HasDrawCommand()const { return !ReservedDisplayObjects_.empty(); }
 
   void PushDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData);
   [[nodiscard]] const InstanceData& GetInstanceData(vdl::uint _Index)const { return Instances_[_Index]; }
+
+  void PushTopology(const vdl::Topology& _Topology);
+  [[nodiscard]] const vdl::Topology& GetCurrentTopology()const { return CurrentTopology_; }
 
   void PushScissor(const vdl::Scissor& _Scissor);
   [[nodiscard]] const vdl::Scissor& GetCurrentScissor()const { return CurrentScissor_; }

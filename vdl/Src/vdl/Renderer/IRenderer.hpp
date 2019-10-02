@@ -35,6 +35,8 @@ public:
 
   virtual void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture) = 0;
 
+  virtual void SetTopology(vdl::Topology _Topology, RenderType _Type) = 0;
+
   virtual void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type) = 0;
 
   virtual void SetViewport(const vdl::Viewport& _Viewport, RenderType _Type) = 0;

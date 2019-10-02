@@ -42,5 +42,9 @@ namespace vdl
     ePatchList30ControlPoint,
     ePatchList31ControlPoint,
     ePatchList32ControlPoint,
+
+    eDefaultTexture = eTriangleStrip,
+    eDefaultStaticMesh = eTriangleList,
+    eDefaultSkinnedMesh = eTriangleList,
   };
 }

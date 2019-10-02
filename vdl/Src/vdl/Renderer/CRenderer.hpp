@@ -87,6 +87,26 @@ public:
 
   void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)override;
 
+  void SetTopology(vdl::Topology _Topology, RenderType _Type)override
+  {
+    switch (_Type)
+    {
+    case RenderType::eNone:
+      //  TODO
+      break;
+    case RenderType::eTexture:
+      TextureRendererCommandList_.PushTopology(_Topology);
+      break;
+    case RenderType::eStaticMesh:
+      StaticMeshRendererCommandList_.PushTopology(_Topology);
+      break;
+    case RenderType::eSkinnedMesh:
+      SkinnedMeshRendererCommandList_.PushTopology(_Topology);
+      break;
+    default: assert(false);
+    }
+  }
+
   void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type)override
   {
     switch (_Type)

@@ -171,6 +171,8 @@ namespace vdl
 
   namespace RendererTexture
   {
+    void SetTopology(Topology _Topology);
+
     void SetVertexShader(const VertexShader& _VertexShader);
 
     void SetHullShader(const HullShader& _HullShader);

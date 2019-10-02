@@ -44,13 +44,13 @@ void CRenderer::Initialize()
 
   //  描画コマンドリストの初期化
   {
-    TextureRendererCommandList_.Initialize(vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault2D, vdl::RasterizerState::kDefault2D, vdl::Sampler::kDefault2D,
+    TextureRendererCommandList_.Initialize(vdl::Topology::eDefaultTexture, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault2D, vdl::RasterizerState::kDefault2D, vdl::Sampler::kDefault2D,
       vdl::VertexShader(Constants::kDefaultTextureVertexShaderCode, Constants::kDefaultTextureVertexShaderSize, vdl::InputLayout::eTexture),
       vdl::PixelShader(Constants::kDefaultTexturePixelShaderCode, Constants::kDefaultTexturePixelShaderSize));
-    StaticMeshRendererCommandList_.Initialize(vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
+    StaticMeshRendererCommandList_.Initialize(vdl::Topology::eDefaultStaticMesh, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
       vdl::VertexShader(Constants::kDefaultStaticMeshVertexShaderCode, Constants::kDefaultStaticMeshVertexShaderSize, vdl::InputLayout::eStaticMesh),
       vdl::PixelShader(Constants::kDefaultStaticMeshPixelShaderCode, Constants::kDefaultStaticMeshPixelShaderSize));
-    SkinnedMeshRendererCommandList_.Initialize(vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
+    SkinnedMeshRendererCommandList_.Initialize(vdl::Topology::eDefaultSkinnedMesh, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
       vdl::VertexShader(Constants::kDefaultSkinnedMeshVertexShaderCode, Constants::kDefaultSkinnedMeshVertexShaderSize, vdl::InputLayout::eSkinnedMesh),
       vdl::PixelShader(Constants::kDefaultSkinnedMeshPixelShaderCode, Constants::kDefaultSkinnedMeshPixelShaderSize));
   }
@@ -216,7 +216,6 @@ void CRenderer::Flush()
     if (HasStaticMeshDrawCommand)
     {
       pDeviceContext_->SetInputLayout(vdl::InputLayout::eStaticMesh);
-      pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
       StaticMeshRendererCommandList_.Flush(pDeviceContext_, pStaticMeshInstanceBuffer_.get());
       StaticMeshRendererCommandList_.Reset();
     }
@@ -229,7 +228,6 @@ void CRenderer::Flush()
     if (HasTextureDrawCommand)
     {
       pDeviceContext_->SetInputLayout(vdl::InputLayout::eTexture);
-      pDeviceContext_->SetTopology(vdl::Topology::eTriangleStrip);
       pDeviceContext_->SetVertexBuffer(pTextureVertexBuffer_.get());
       TextureRendererCommandList_.Flush(pDeviceContext_, pTextureInstanceBuffer_.get());
       TextureRendererCommandList_.Reset();

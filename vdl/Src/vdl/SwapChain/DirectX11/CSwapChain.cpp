@@ -17,7 +17,8 @@ void CSwapChain::Initialize()
 
   const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
 
-  constexpr DXGI_FORMAT kDepthStencilFormat = Cast(Constants::kDepthStencilFormat);
+  constexpr DXGI_FORMAT kSwapChainFormat = Cast(vdl::Format::eSwapChain);
+  constexpr DXGI_FORMAT kDepthStencilFormat = Cast(vdl::Format::eDepthStencil);
 
   //  エラーチェック用
   HRESULT hr = S_OK;
@@ -28,7 +29,7 @@ void CSwapChain::Initialize()
     SwapChainDesc.BufferDesc.Height = Constants::kDefaultWindowSize.y;
     SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
     SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-    SwapChainDesc.BufferDesc.Format = Cast(Constants::kSwapChainFormat);
+    SwapChainDesc.BufferDesc.Format = kSwapChainFormat;
     SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
     SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
     SwapChainDesc.SampleDesc.Count = 1;

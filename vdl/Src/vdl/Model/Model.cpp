@@ -48,6 +48,11 @@ namespace vdl
 
   StaticMesh& StaticMesh::operator=(StaticMesh&& _StaticMesh)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<IModelManager>()->Release(ID_);
+    }
+
     ID_ = _StaticMesh.ID_;
     _StaticMesh.ID_ = std::nullopt;
 
@@ -112,6 +117,11 @@ namespace vdl
 
   SkinnedMesh& SkinnedMesh::operator=(SkinnedMesh&& _SkinnedMesh)noexcept
   {
+    if (ID_)
+    {
+      Engine::Get<IModelManager>()->Release(ID_);
+    }
+
     ID_ = _SkinnedMesh.ID_;
     _SkinnedMesh.ID_ = std::nullopt;
 

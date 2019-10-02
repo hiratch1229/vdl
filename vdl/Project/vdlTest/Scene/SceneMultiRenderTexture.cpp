@@ -1,39 +1,43 @@
 #include "SceneMultiRenderTexture.hpp"
 
-SceneMultiRenderTexture::SceneMultiRenderTexture()
+using namespace vdl;
+
+void SceneMultiRenderTexture::Initialize()
 {
-  for (vdl::uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)
+  for (uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)
   {
-    RenderTextures_[RenderTextureCount] = vdl::RenderTexture(kRenderTextureSize, vdl::Constants::kSwapChainFormat);
+    RenderTextures_[RenderTextureCount] = vdl::RenderTexture(kRenderTextureSize, Format::eSwapChain);
   }
 
   Model_ = vdl::Model("Data/danbo_atk.fbx");
 
-  vdl::RendererStaticMesh::SetPixelShader(vdl::PixelShader("Shader/StaticMesh/StaticMeshPS.hlsl"));
+  RendererStaticMesh::SetVertexShader(VertexShader("Shader/MultiRenderTexture/MultiRenderTextureVS.hlsl", InputLayout::eStaticMesh));
+  RendererStaticMesh::SetPixelShader(PixelShader("Shader/MultiRenderTexture/MultiRenderTexturePS.hlsl"));
 }
 
 SceneMultiRenderTexture::~SceneMultiRenderTexture()
 {
-  vdl::RendererStaticMesh::SetPixelShader(vdl::PixelShader(vdl::Constants::kDefaultStaticMeshPixelShaderCode, static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultStaticMeshPixelShaderCode))));
+  RendererStaticMesh::SetVertexShader(VertexShader(Constants::kDefaultStaticMeshVertexShaderCode, static_cast<uint>(Macro::ArraySize(Constants::kDefaultStaticMeshVertexShaderCode)), InputLayout::eStaticMesh));
+  RendererStaticMesh::SetPixelShader(PixelShader(Constants::kDefaultStaticMeshPixelShaderCode, static_cast<uint>(Macro::ArraySize(Constants::kDefaultStaticMeshPixelShaderCode))));
 }
 
 void SceneMultiRenderTexture::Update()
 {
-  for (vdl::uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)
+  for (uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)
   {
-    vdl::Renderer::Clear(RenderTextures_[RenderTextureCount]);
+    Renderer::Clear(RenderTextures_[RenderTextureCount]);
   }
 
-  vdl::Renderer::SetRenderTextures(RenderTextures_, vdl::DepthStencilTexture());
+  Renderer::SetRenderTextures(RenderTextures_, DepthStencilTexture());
 
-  vdl::Renderer3D::Draw(Model_, vdl::Matrix::Identity());
+  Renderer3D::Draw(Model_, Matrix::Identity());
 
-  vdl::Renderer::SetRenderTexture(vdl::RenderTexture(), vdl::DepthStencilTexture());
+  Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
 
-  for (vdl::uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)
+  for (uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)
   {
-    vdl::Renderer2D::Draw(RenderTextures_[RenderTextureCount],
-      vdl::float2(kRenderTextureSize.x / kUsingRenderTextureNum, 0.0f) * RenderTextureCount,
-      vdl::float2(kRenderTextureSize.x / kUsingRenderTextureNum, kRenderTextureSize.y));
+    Renderer2D::Draw(RenderTextures_[RenderTextureCount],
+      float2(kRenderTextureSize.x / kUsingRenderTextureNum, 0.0f) * RenderTextureCount,
+      float2(kRenderTextureSize.x / kUsingRenderTextureNum, kRenderTextureSize.y));
   }
 }

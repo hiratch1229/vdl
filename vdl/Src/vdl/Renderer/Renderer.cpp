@@ -60,6 +60,11 @@ namespace vdl
 
   namespace Renderer2D
   {
+    void SetTopology(Topology _Topology)
+    {
+      Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eTexture);
+    }
+
     void SetScissor(const Scissor& _Scissor)
     {
       Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eTexture);
@@ -200,6 +205,11 @@ namespace vdl
 
   namespace RendererTexture
   {
+    void SetTopology(Topology _Topology)
+    {
+      Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eTexture);
+    }
+
     void SetVertexShader(const VertexShader& _VertexShader)
     {
       assert(!_VertexShader.isEmpty());
@@ -453,6 +463,11 @@ namespace vdl
 
   namespace RendererStaticMesh
   {
+    void SetTopology(Topology _Topology)
+    {
+      Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eStaticMesh);
+    }
+
     void SetVertexShader(const VertexShader& _VertexShader)
     {
       assert(!_VertexShader.isEmpty());
@@ -485,6 +500,11 @@ namespace vdl
 
   namespace RendererSkinnedMesh
   {
+    void SetTopology(Topology _Topology)
+    {
+      Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eSkinnedMesh);
+    }
+
     void SetVertexShader(const VertexShader& _VertexShader)
     {
       assert(!_VertexShader.isEmpty());

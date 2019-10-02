@@ -57,7 +57,7 @@ namespace vdl
 
     [[nodiscard]] bool operator!=(const ConstantBuffer& _ConstantBuffer)const noexcept { return Data_ != _ConstantBuffer.Data_; }
   public:
-    [[nodiscard]] T& GetData() { return *reinterpret_cast<T*>(Data_.GetData()); }
+    [[nodiscard]] T& GetData()const { return *reinterpret_cast<T*>(Data_.GetData()); }
 
     [[nodiscard]] const void* GetPtr()const { return Data_.GetData(); }
 

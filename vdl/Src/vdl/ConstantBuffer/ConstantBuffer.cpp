@@ -46,7 +46,12 @@ namespace vdl::Detail
 
   ConstantBufferData& ConstantBufferData::operator=(ConstantBufferData&& _ConstantBufferData)noexcept
   {
-    ID_ = std::move(_ConstantBufferData.ID_);
+    if (ID_)
+    {
+      Engine::Get<IBufferManager>()->Release(ID_);
+    }
+
+    ID_ = _ConstantBufferData.ID_;
     _ConstantBufferData.ID_ = std::nullopt;
 
     return *this;

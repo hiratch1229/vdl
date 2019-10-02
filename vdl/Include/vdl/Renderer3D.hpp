@@ -162,6 +162,8 @@ namespace vdl
 
   namespace RendererStaticMesh
   {
+    void SetTopology(Topology _Topology);
+
     void SetVertexShader(const VertexShader& _VertexShader);
 
     void SetHullShader(const HullShader& _HullShader);
@@ -211,6 +213,8 @@ namespace vdl
 
   namespace RendererSkinnedMesh
   {
+    void SetTopology(Topology _Topology);
+
     void SetVertexShader(const VertexShader& _VertexShader);
 
     void SetHullShader(const HullShader& _HullShader);
