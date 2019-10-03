@@ -12,12 +12,12 @@ class IDeviceContext;
 
 class CSwapChain : public ISwapChain
 {
-  IWindow* pWindow_;
-  IDeviceContext* pDeviceContext_;
-private:
   Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain_;
   Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView_;
   Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView_;
+private:
+  IWindow* pWindow_;
+  IDeviceContext* pDeviceContext_;
 public:
   ID3D11RenderTargetView* GetRenderTargetView()const { return pRenderTargetView_.Get(); }
   ID3D11DepthStencilView* GetDepthStencilView()const { return pDepthStencilView_.Get(); }

@@ -8,13 +8,13 @@ class CDeviceContext;
 
 class CDevice : public IDevice
 {
-  CDeviceContext* pDeviceContext_;
+  Microsoft::WRL::ComPtr<ID3D11Device> pD3D11Device_;
+  Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3D11ImmediateContext_;
 private:
-  Microsoft::WRL::ComPtr<ID3D11Device> pDevice_;
-  Microsoft::WRL::ComPtr<ID3D11DeviceContext> pImmediateContext_;
+  CDeviceContext* pDeviceContext_;
 public:
-  [[nodiscard]] ID3D11Device* GetDevice()const { return pDevice_.Get(); }
-  [[nodiscard]] ID3D11DeviceContext* GetImmediateContext()const { return pImmediateContext_.Get(); }
+  [[nodiscard]] ID3D11Device* GetDevice()const { return pD3D11Device_.Get(); }
+  [[nodiscard]] ID3D11DeviceContext* GetImmediateContext()const { return pD3D11ImmediateContext_.Get(); }
 public:
   void Initialize()override;
 
@@ -30,11 +30,15 @@ public:
 
   void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize)override;
 
+  void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _BufferSize)override;
+
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)override;
 
   void CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)override;
+
+  void CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)override;
 
   void WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const override;
   

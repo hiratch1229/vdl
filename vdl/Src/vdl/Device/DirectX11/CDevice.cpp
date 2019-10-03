@@ -133,7 +133,7 @@ void CDevice::Initialize()
   {
     //  デバイスを作成
     hr = ::D3D11CreateDevice(pAdapter.Get(), kDriverTypes[i], nullptr, kCreateDeviceFlag, kFeatureLevels,
-      kFeatureLevelNum, D3D11_SDK_VERSION, pDevice_.GetAddressOf(), &FeatureLevel, pImmediateContext_.GetAddressOf());
+      kFeatureLevelNum, D3D11_SDK_VERSION, pD3D11Device_.GetAddressOf(), &FeatureLevel, pD3D11ImmediateContext_.GetAddressOf());
 
     //  成功時に終了
     if (SUCCEEDED(hr))
@@ -163,7 +163,7 @@ void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _Stride, v
     BufferDesc.StructureByteStride = 0;
   }
 
-  hr = pDevice_->CreateBuffer(&BufferDesc, nullptr, pVertexBuffer->pBuffer.GetAddressOf());
+  hr = pD3D11Device_->CreateBuffer(&BufferDesc, nullptr, pVertexBuffer->pBuffer.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppVertexBuffer) = std::move(pVertexBuffer);
@@ -195,7 +195,7 @@ void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertice
     InitialData.SysMemSlicePitch = 0;
   }
 
-  hr = pDevice_->CreateBuffer(&BufferDesc, &InitialData, pVertexBuffer->pBuffer.GetAddressOf());
+  hr = pD3D11Device_->CreateBuffer(&BufferDesc, &InitialData, pVertexBuffer->pBuffer.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppVertexBuffer) = std::move(pVertexBuffer);
@@ -220,7 +220,7 @@ void CDevice::CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _Strid
     BufferDesc.StructureByteStride = 0;
   }
 
-  hr = pDevice_->CreateBuffer(&BufferDesc, nullptr, pInstanceBuffer->pBuffer.GetAddressOf());
+  hr = pD3D11Device_->CreateBuffer(&BufferDesc, nullptr, pInstanceBuffer->pBuffer.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppInstanceBuffer) = std::move(pInstanceBuffer);
@@ -245,7 +245,7 @@ void CDevice::CreateIndexBuffer(IBuffer** _ppIndexBuffer, vdl::uint _BufferSize,
     BufferDesc.StructureByteStride = 0;
   }
 
-  hr = pDevice_->CreateBuffer(&BufferDesc, nullptr, pIndexBuffer->pBuffer.GetAddressOf());
+  hr = pD3D11Device_->CreateBuffer(&BufferDesc, nullptr, pIndexBuffer->pBuffer.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppIndexBuffer) = std::move(pIndexBuffer);
@@ -277,7 +277,7 @@ void CDevice::CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, 
     InitialData.SysMemSlicePitch = 0;
   }
 
-  hr = pDevice_->CreateBuffer(&BufferDesc, &InitialData, pIndexBuffer->pBuffer.GetAddressOf());
+  hr = pD3D11Device_->CreateBuffer(&BufferDesc, &InitialData, pIndexBuffer->pBuffer.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppIndexBuffer) = std::move(pIndexBuffer);
@@ -292,6 +292,30 @@ void CDevice::CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _Buffe
   (*_ppConstantBuffer) = std::move(pConstantBuffer);
 }
 
+void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _BufferSize)
+{
+  assert(_ppUnorderedAccessBuffer);
+
+  CUnordererdAccessBuffer* pUnordererdAccessBuffer = new CUnordererdAccessBuffer(_BufferSize);
+
+  HRESULT hr = S_OK;
+
+  D3D11_BUFFER_DESC BufferDesc;
+  {
+    BufferDesc.ByteWidth = _BufferSize;
+    BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    BufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+    BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    BufferDesc.MiscFlags = 0;
+    BufferDesc.StructureByteStride = 0;
+  }
+
+  hr = pD3D11Device_->CreateBuffer(&BufferDesc, nullptr, pUnordererdAccessBuffer->pBuffer.GetAddressOf());
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+  (*_ppUnorderedAccessBuffer) = std::move(pUnordererdAccessBuffer);
+}
+
 void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
 {
   assert(_ppTexture);
@@ -303,19 +327,19 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
 
   HRESULT hr = S_OK;
 
-  D3D11_TEXTURE2D_DESC Texture2DDesc;
+  D3D11_TEXTURE2D_DESC TextureDesc;
   {
-    Texture2DDesc.Width = pTexture->TextureSize.x;
-    Texture2DDesc.Height = pTexture->TextureSize.y;
-    Texture2DDesc.MipLevels = 1;
-    Texture2DDesc.ArraySize = 1;
-    Texture2DDesc.Format = kTextureFormat;
-    Texture2DDesc.SampleDesc.Count = 1;
-    Texture2DDesc.SampleDesc.Quality = 0;
-    Texture2DDesc.Usage = D3D11_USAGE_IMMUTABLE;
-    Texture2DDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    Texture2DDesc.CPUAccessFlags = 0;
-    Texture2DDesc.MiscFlags = 0;
+    TextureDesc.Width = pTexture->TextureSize.x;
+    TextureDesc.Height = pTexture->TextureSize.y;
+    TextureDesc.MipLevels = 1;
+    TextureDesc.ArraySize = 1;
+    TextureDesc.Format = kTextureFormat;
+    TextureDesc.SampleDesc.Count = 1;
+    TextureDesc.SampleDesc.Quality = 0;
+    TextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    TextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    TextureDesc.CPUAccessFlags = 0;
+    TextureDesc.MiscFlags = 0;
   }
 
   D3D11_SUBRESOURCE_DATA InitialData;
@@ -327,7 +351,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
 
   Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture2D;
   {
-    hr = pDevice_->CreateTexture2D(&Texture2DDesc, &InitialData, pTexture2D.GetAddressOf());
+    hr = pD3D11Device_->CreateTexture2D(&TextureDesc, &InitialData, pTexture2D.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
@@ -339,7 +363,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
     ShaderResourceViewDesc.Texture2D.MipLevels = 1;
   }
 
-  hr = pDevice_->CreateShaderResourceView(pTexture2D.Get(), &ShaderResourceViewDesc, pTexture->pShaderResourceView.GetAddressOf());
+  hr = pD3D11Device_->CreateShaderResourceView(pTexture2D.Get(), &ShaderResourceViewDesc, pTexture->pShaderResourceView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppTexture) = std::move(pTexture);
@@ -371,14 +395,14 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
 
   Microsoft::WRL::ComPtr<ID3D11Texture2D> pRenderTarget;
   {
-    hr = pDevice_->CreateTexture2D(&RenderTargetDesc, nullptr, pRenderTarget.GetAddressOf());
+    hr = pD3D11Device_->CreateTexture2D(&RenderTargetDesc, nullptr, pRenderTarget.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-  hr = pDevice_->CreateShaderResourceView(pRenderTarget.Get(), nullptr, pRenderTexture->pShaderResourceView.GetAddressOf());
+  hr = pD3D11Device_->CreateShaderResourceView(pRenderTarget.Get(), nullptr, pRenderTexture->pShaderResourceView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
-  hr = pDevice_->CreateRenderTargetView(pRenderTarget.Get(), nullptr, pRenderTexture->pRenderTargetView.GetAddressOf());
+  hr = pD3D11Device_->CreateRenderTargetView(pRenderTarget.Get(), nullptr, pRenderTexture->pRenderTargetView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppRenderTexture) = std::move(pRenderTexture);
@@ -390,8 +414,6 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
 
   CDepthStencilTexture* pDepthStencilTexture = new CDepthStencilTexture;
   pDepthStencilTexture->TextureSize = _TextureSize;
-
-  constexpr DXGI_FORMAT kTextureFormat = Cast(Constants::kTextureFormat);
 
   HRESULT hr = S_OK;
 
@@ -412,17 +434,56 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
 
   Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencilBuffer;
   {
-    hr = pDevice_->CreateTexture2D(&DepthStencilBufferDesc, nullptr, pDepthStencilBuffer.GetAddressOf());
+    hr = pD3D11Device_->CreateTexture2D(&DepthStencilBufferDesc, nullptr, pDepthStencilBuffer.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-  hr = pDevice_->CreateShaderResourceView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilTexture->pShaderResourceView.GetAddressOf());
+  hr = pD3D11Device_->CreateShaderResourceView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilTexture->pShaderResourceView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
-  hr = pDevice_->CreateDepthStencilView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilTexture->pDepthStencilView.GetAddressOf());
+  hr = pD3D11Device_->CreateDepthStencilView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilTexture->pDepthStencilView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppDepthStecilTexture) = std::move(pDepthStencilTexture);
+}
+
+void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)
+{
+  assert(_ppUnorderedAccessTexture);
+
+  CUnorderedAccessTexture* pUnorderedAccessTexture = new CUnorderedAccessTexture;
+  pUnorderedAccessTexture->TextureSize = _TextureSize;
+
+  HRESULT hr = S_OK;
+
+  D3D11_TEXTURE2D_DESC UnorderedAccessTextureDesc;
+  {
+    UnorderedAccessTextureDesc.Width = pUnorderedAccessTexture->TextureSize.x;
+    UnorderedAccessTextureDesc.Height = pUnorderedAccessTexture->TextureSize.y;
+    UnorderedAccessTextureDesc.MipLevels = 1;
+    UnorderedAccessTextureDesc.ArraySize = 1;
+    UnorderedAccessTextureDesc.Format = Cast(_Format);
+    UnorderedAccessTextureDesc.SampleDesc.Count = 1;
+    UnorderedAccessTextureDesc.SampleDesc.Quality = 0;
+    UnorderedAccessTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    UnorderedAccessTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    UnorderedAccessTextureDesc.CPUAccessFlags = 0;
+    UnorderedAccessTextureDesc.MiscFlags = 0;
+  }
+
+  Microsoft::WRL::ComPtr<ID3D11Texture2D> pUnorderedAccessBuffer;
+  {
+    hr = pD3D11Device_->CreateTexture2D(&UnorderedAccessTextureDesc, nullptr, pUnorderedAccessBuffer.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  }
+
+  hr = pD3D11Device_->CreateShaderResourceView(pUnorderedAccessBuffer.Get(), nullptr, pUnorderedAccessTexture->pShaderResourceView.GetAddressOf());
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+  hr = pD3D11Device_->CreateUnorderedAccessView(pUnorderedAccessBuffer.Get(), nullptr, pUnorderedAccessTexture->pUnorderedAccessView.GetAddressOf());
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+  (*_ppUnorderedAccessTexture) = std::move(pUnorderedAccessTexture);
 }
 
 void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const
@@ -436,12 +497,12 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     ID3D11Buffer* pBuffer = static_cast<CVertexBuffer*>(_pDstBuffer)->pBuffer.Get();
 
     D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
-    hr = pImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
+    hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
     ::memcpy(MappedSubresorce.pData, _pSrcBuffer, _BufferSize);
 
-    pImmediateContext_->Unmap(pBuffer, 0);
+    pD3D11ImmediateContext_->Unmap(pBuffer, 0);
   }
   break;
   case BufferType::eInstanceBuffer:
@@ -449,12 +510,12 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     ID3D11Buffer* pBuffer = static_cast<CInstanceBuffer*>(_pDstBuffer)->pBuffer.Get();
 
     D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
-    hr = pImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
+    hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
     ::memcpy(MappedSubresorce.pData, _pSrcBuffer, _BufferSize);
 
-    pImmediateContext_->Unmap(pBuffer, 0);
+    pD3D11ImmediateContext_->Unmap(pBuffer, 0);
   }
   break;
   case BufferType::eIndexBuffer:
@@ -462,12 +523,12 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     ID3D11Buffer* pBuffer = static_cast<CIndexBuffer*>(_pDstBuffer)->pBuffer.Get();
 
     D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
-    hr = pImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
+    hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
     ::memcpy(MappedSubresorce.pData, _pSrcBuffer, _BufferSize);
 
-    pImmediateContext_->Unmap(pBuffer, 0);
+    pD3D11ImmediateContext_->Unmap(pBuffer, 0);
   }
   break;
   case BufferType::eConstantBuffer:
@@ -475,12 +536,12 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     ID3D11Buffer* pBuffer = static_cast<CConstantBuffer*>(_pDstBuffer)->pBuffer.Get();
 
     D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
-    hr = pImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
+    hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
     ::memcpy(MappedSubresorce.pData, _pSrcBuffer, _BufferSize);
 
-    pImmediateContext_->Unmap(pBuffer, 0);
+    pD3D11ImmediateContext_->Unmap(pBuffer, 0);
   }
   break;
   case BufferType::eUnorderedAccessBuffer:
@@ -488,12 +549,12 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     ID3D11Buffer* pBuffer = static_cast<CUnordererdAccessBuffer*>(_pDstBuffer)->pBuffer.Get();
 
     D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
-    hr = pImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
+    hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
     ::memcpy(MappedSubresorce.pData, _pSrcBuffer, _BufferSize);
 
-    pImmediateContext_->Unmap(pBuffer, 0);
+    pD3D11ImmediateContext_->Unmap(pBuffer, 0);
   }
   break;
   default: assert(false);
@@ -521,7 +582,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
 
     Microsoft::WRL::ComPtr<ID3D11HullShader> pHullShader;
     {
-      hr = pDevice_->CreateHullShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pHullShader.GetAddressOf());
+      hr = pD3D11Device_->CreateHullShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pHullShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -536,7 +597,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
 
     Microsoft::WRL::ComPtr<ID3D11DomainShader> pDomainShader;
     {
-      hr = pDevice_->CreateDomainShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pDomainShader.GetAddressOf());
+      hr = pD3D11Device_->CreateDomainShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pDomainShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -551,7 +612,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
 
     Microsoft::WRL::ComPtr<ID3D11GeometryShader> pGeometryShader;
     {
-      hr = pDevice_->CreateGeometryShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pGeometryShader.GetAddressOf());
+      hr = pD3D11Device_->CreateGeometryShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pGeometryShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -566,7 +627,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
 
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
     {
-      hr = pDevice_->CreatePixelShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pPixelShader.GetAddressOf());
+      hr = pD3D11Device_->CreatePixelShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pPixelShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -581,7 +642,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
 
     Microsoft::WRL::ComPtr<ID3D11ComputeShader> pComputeShader;
     {
-      hr = pDevice_->CreateComputeShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pComputeShader.GetAddressOf());
+      hr = pD3D11Device_->CreateComputeShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pComputeShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -614,7 +675,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
 
     Microsoft::WRL::ComPtr<ID3D11HullShader> pHullShader;
     {
-      hr = pDevice_->CreateHullShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pHullShader.GetAddressOf());
+      hr = pD3D11Device_->CreateHullShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pHullShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -629,7 +690,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
 
     Microsoft::WRL::ComPtr<ID3D11DomainShader> pDomainShader;
     {
-      hr = pDevice_->CreateDomainShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pDomainShader.GetAddressOf());
+      hr = pD3D11Device_->CreateDomainShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pDomainShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -644,7 +705,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
 
     Microsoft::WRL::ComPtr<ID3D11GeometryShader> pGeometryShader;
     {
-      hr = pDevice_->CreateGeometryShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pGeometryShader.GetAddressOf());
+      hr = pD3D11Device_->CreateGeometryShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pGeometryShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -659,7 +720,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
 
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
     {
-      hr = pDevice_->CreatePixelShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pPixelShader.GetAddressOf());
+      hr = pD3D11Device_->CreatePixelShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pPixelShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -674,7 +735,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
 
     Microsoft::WRL::ComPtr<ID3D11ComputeShader> pComputeShader;
     {
-      hr = pDevice_->CreateComputeShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pComputeShader.GetAddressOf());
+      hr = pD3D11Device_->CreateComputeShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pComputeShader.GetAddressOf());
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
@@ -701,7 +762,7 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath,
 
   Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
   {
-    hr = pDevice_->CreateVertexShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pVertexShader.GetAddressOf());
+    hr = pD3D11Device_->CreateVertexShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pVertexShader.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
@@ -730,7 +791,7 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, v
 
   Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
   {
-    hr = pDevice_->CreateVertexShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pVertexShader.GetAddressOf());
+    hr = pD3D11Device_->CreateVertexShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pVertexShader.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 

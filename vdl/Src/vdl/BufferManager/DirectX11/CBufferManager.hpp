@@ -9,9 +9,9 @@ class IDevice;
 
 class CBufferManager : public IBufferManager
 {
-  IDevice* pDevice_;
-private:
   ID3D11Device* pD3D11Device_;
+private:
+  IDevice* pDevice_;
   ReferenceCounts<IBuffer> Buffers_;
 public:
   CBufferManager() = default;

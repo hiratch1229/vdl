@@ -26,8 +26,8 @@ void SceneTessellation::Initialize()
 
 SceneTessellation::~SceneTessellation()
 {
-  RendererStaticMesh::SetShaders(VertexShader(Constants::kDefaultStaticMeshVertexShaderCode, static_cast<uint>(Macro::ArraySize(Constants::kDefaultStaticMeshVertexShaderCode)), InputLayout::eStaticMesh),
-    PixelShader(Constants::kDefaultStaticMeshPixelShaderCode, static_cast<uint>(Macro::ArraySize(Constants::kDefaultStaticMeshPixelShaderCode))));
+  RendererStaticMesh::SetShaders(VertexShader("ShaderStaticMesh/StaticMeshVS.hlsl", InputLayout::eStaticMesh),
+    PixelShader("ShaderStaticMesh/StaticMeshPS.hlsl"));
 
   RendererStaticMesh::SetTopology(Topology::eDefaultStaticMesh);
 

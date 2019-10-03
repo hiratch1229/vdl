@@ -19,13 +19,13 @@ class IShaderManager;
 
 class CDeviceContext : public IDeviceContext
 {
+  ID3D11Device* pD3D11Device_;
+  ID3D11DeviceContext* pD3D11ImmediateContext_;
+private:
   CSwapChain* pSwapChain_;
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
-private:
-  ID3D11Device* pD3D11Device_;
-  ID3D11DeviceContext* pD3D11ImmediateContext_;
 private:
   std::unordered_map<vdl::InputLayout, Microsoft::WRL::ComPtr<ID3D11InputLayout>> InputLayouts_;
   std::unordered_map<vdl::BlendState, Microsoft::WRL::ComPtr<ID3D11BlendState>> BlendStates_;

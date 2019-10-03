@@ -77,13 +77,13 @@ public:
   
   virtual void PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) = 0;
 
-  //virtual void CSSetShader(const vdl::ComputeShader& _ComputeShader) = 0;
+  virtual void CSSetShader(const vdl::ComputeShader& _ComputeShader) = 0;
 
-  //virtual void CSSetTexture(vdl::uint _StartSlot, vdl::uint _TextureNum, vdl::Texture* _Textures[]) = 0;
+  virtual void CSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
 
-  //virtual void CSSetSampler(vdl::uint _StartSlot, vdl::uint _SamplerNum, vdl::Sampler _Samplers[]) = 0;
+  virtual void CSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[]) = 0;
   
-  //virtual void CSSetConstantBuffer(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::detail::ConstantBufferData _ConstantBuffers[]) = 0;
+  virtual void CSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) = 0;
 
   virtual void ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor) = 0;
 
@@ -95,7 +95,7 @@ public:
 
   virtual void DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount, vdl::uint _FirstIndex, vdl::uint _VertexOffset, vdl::uint _FirstInstance) = 0;
 
-  //virtual void Dispatch(vdl::uint _ThreadGropuX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ) = 0;
+  virtual void Dispatch(vdl::uint _ThreadGropuX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ) = 0;
 
   virtual void Flush() = 0;
 };

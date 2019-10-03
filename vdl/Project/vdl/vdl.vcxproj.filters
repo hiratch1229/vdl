@@ -118,6 +118,9 @@
     <Filter Include="Shader\Option">
       <UniqueIdentifier>{0374a399-25ca-47f3-8c64-8154cf8a12ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Computer">
+      <UniqueIdentifier>{b2052662-ce0e-4c2b-b29c-9189f40d2ea9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -381,6 +384,12 @@
     <ClInclude Include="..\..\Include\vdl\Light.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Computer\IComputer.hpp">
+      <Filter>Src\Computer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Computer\CComputer.hpp">
+      <Filter>Src\Computer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -490,6 +499,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\MotionData\MotionData.cpp">
       <Filter>Src\MotionData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Computer\ComputerFactory.cpp">
+      <Filter>Src\Computer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Computer\CComputer.cpp">
+      <Filter>Src\Computer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

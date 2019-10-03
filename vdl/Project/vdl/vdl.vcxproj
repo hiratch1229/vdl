@@ -96,6 +96,8 @@
     <ClInclude Include="..\..\Include\vdl\XInput.hpp" />
     <ClInclude Include="..\..\Src\vdl\BufferManager\IBufferManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\IBuffer.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Computer\CComputer.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Computer\IComputer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Constants\Constants.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\IDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\IDevice.hpp" />
@@ -127,6 +129,8 @@
     <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Camera\Camera.cpp" />
     <ClCompile Include="..\..\Src\vdl\Collision2D\Collision2D.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Computer\CComputer.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Computer\ComputerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />

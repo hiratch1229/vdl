@@ -17,8 +17,8 @@ void SceneMultiRenderTexture::Initialize()
 
 SceneMultiRenderTexture::~SceneMultiRenderTexture()
 {
-  RendererStaticMesh::SetVertexShader(VertexShader(Constants::kDefaultStaticMeshVertexShaderCode, static_cast<uint>(Macro::ArraySize(Constants::kDefaultStaticMeshVertexShaderCode)), InputLayout::eStaticMesh));
-  RendererStaticMesh::SetPixelShader(PixelShader(Constants::kDefaultStaticMeshPixelShaderCode, static_cast<uint>(Macro::ArraySize(Constants::kDefaultStaticMeshPixelShaderCode))));
+  RendererStaticMesh::SetShaders(VertexShader("ShaderStaticMesh/StaticMeshVS.hlsl", InputLayout::eStaticMesh),
+    PixelShader("ShaderStaticMesh/StaticMeshPS.hlsl"));
 }
 
 void SceneMultiRenderTexture::Update()

@@ -60,8 +60,11 @@ public:
 struct CUnordererdAccessBuffer : public IBuffer
 {
   Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
+  void* Buffer;
+  vdl::uint BufferSize;
 public:
-  CUnordererdAccessBuffer() = default;
+  CUnordererdAccessBuffer(vdl::uint _BufferSize)
+    : Buffer(new char[_BufferSize]), BufferSize(_BufferSize) {}
 
   BufferType GetType()const override final { return BufferType::eUnorderedAccessBuffer; }
 };
