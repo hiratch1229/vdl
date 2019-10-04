@@ -17,15 +17,15 @@ namespace vdl::Input
     };
 
     //  左 ボタン
-    constexpr Button ButtonLeft{ InputDevice::eMouse, Buttons::eLeft };
+    constexpr Button ButtonLeft{ InputDeviceType::eMouse, Buttons::eLeft };
     //  中(ホイール) ボタン
-    constexpr Button ButtonCenter{ InputDevice::eMouse, Buttons::eMiddle };
+    constexpr Button ButtonCenter{ InputDeviceType::eMouse, Buttons::eMiddle };
     //  右 ボタン
-    constexpr Button ButtonRight{ InputDevice::eMouse, Buttons::eRight };
+    constexpr Button ButtonRight{ InputDeviceType::eMouse, Buttons::eRight };
     //  X1(戻る) ボタン
-    constexpr Button ButtonX1{ InputDevice::eMouse, Buttons::eX1 };
+    constexpr Button ButtonX1{ InputDeviceType::eMouse, Buttons::eX1 };
     //  X2(進む) ボタン
-    constexpr Button ButtonX2{ InputDevice::eMouse, Buttons::eX2 };
+    constexpr Button ButtonX2{ InputDeviceType::eMouse, Buttons::eX2 };
 
     //  座標を取得
     int2 GetPos();

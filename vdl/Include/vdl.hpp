@@ -16,7 +16,6 @@
 #include <vdl/Platform.hpp>
 #include <vdl/Types.hpp>
 #include <vdl/Fwd.hpp>
-#include <vdl/ID.hpp>
 #include <vdl/System.hpp>
 #include <vdl/Window.hpp>
 #include <vdl/Constants.hpp>

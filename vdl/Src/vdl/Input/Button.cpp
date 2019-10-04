@@ -14,13 +14,13 @@ namespace vdl::Input
   {
     switch (_Button.GetInputDevice())
     {
-    case InputDevice::eKeyboard:
+    case InputDeviceType::eKeyboard:
       return Engine::Get<IKeyboard>()->Press(_Button.GetCode());
-    case InputDevice::eMouse:
+    case InputDeviceType::eMouse:
       return Engine::Get<IMouse>()->Press(_Button.GetCode());
-    case InputDevice::eXInput:
+    case InputDeviceType::eXInput:
       return Engine::Get<IXInput>()->Press(_Button.GetIndex(), _Button.GetCode());
-    case InputDevice::eGamepad:
+    case InputDeviceType::eGamepad:
       return Engine::Get<IGamepad>()->Press(_Button.GetIndex(), _Button.GetCode());
     default: assert(false);
     }
@@ -32,13 +32,13 @@ namespace vdl::Input
   {
     switch (_Button.GetInputDevice())
     {
-    case InputDevice::eKeyboard:
+    case InputDeviceType::eKeyboard:
       return Engine::Get<IKeyboard>()->Pressed(_Button.GetCode());
-    case InputDevice::eMouse:
+    case InputDeviceType::eMouse:
       return Engine::Get<IMouse>()->Pressed(_Button.GetCode());
-    case InputDevice::eXInput:
+    case InputDeviceType::eXInput:
       return Engine::Get<IXInput>()->Pressed(_Button.GetIndex(), _Button.GetCode());
-    case InputDevice::eGamepad:
+    case InputDeviceType::eGamepad:
       return Engine::Get<IGamepad>()->Pressed(_Button.GetIndex(), _Button.GetCode());
     default: assert(false);
     }
@@ -50,13 +50,13 @@ namespace vdl::Input
   {
     switch (_Button.GetInputDevice())
     {
-    case InputDevice::eKeyboard:
+    case InputDeviceType::eKeyboard:
       return Engine::Get<IKeyboard>()->Released(_Button.GetCode());
-    case InputDevice::eMouse:
+    case InputDeviceType::eMouse:
       return Engine::Get<IMouse>()->Released(_Button.GetCode());
-    case InputDevice::eXInput:
+    case InputDeviceType::eXInput:
       return Engine::Get<IXInput>()->Released(_Button.GetIndex(), _Button.GetCode());
-    case InputDevice::eGamepad:
+    case InputDeviceType::eGamepad:
       return Engine::Get<IGamepad>()->Released(_Button.GetIndex(), _Button.GetCode());
     default: assert(false);
     }
@@ -68,13 +68,13 @@ namespace vdl::Input
   {
     switch (_Button.GetInputDevice())
     {
-    case InputDevice::eKeyboard:
+    case InputDeviceType::eKeyboard:
       return Engine::Get<IKeyboard>()->Release(_Button.GetCode());
-    case InputDevice::eMouse:
+    case InputDeviceType::eMouse:
       return Engine::Get<IMouse>()->Release(_Button.GetCode());
-    case InputDevice::eXInput:
+    case InputDeviceType::eXInput:
       return Engine::Get<IXInput>()->Release(_Button.GetIndex(), _Button.GetCode());
-    case InputDevice::eGamepad:
+    case InputDeviceType::eGamepad:
       return Engine::Get<IGamepad>()->Release(_Button.GetIndex(), _Button.GetCode());
     default: assert(false);
     }

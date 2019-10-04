@@ -1,6 +1,5 @@
 #pragma once
 #include "Fwd.hpp"
-#include "Types.hpp"
 
 #include <cmath>
 #include <string>

@@ -1,5 +1,5 @@
 #pragma once
-#include "Types.hpp"
+#include "Fwd.hpp"
 #include "Constants.hpp"
 
 #include <array>

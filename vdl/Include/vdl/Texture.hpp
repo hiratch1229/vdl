@@ -1,6 +1,5 @@
 #pragma once
 #include "Fwd.hpp"
-#include "ID.hpp"
 #include "Color.hpp"
 #include "Constants.hpp"
 
@@ -48,7 +47,7 @@ namespace vdl
   public:
     RenderTexture() = default;
 
-    RenderTexture(const uint2& _TextureSize, Format _Format);
+    RenderTexture(const uint2& _TextureSize, FormatType _Format);
   };
 
   class DepthStencilTexture : public Texture
@@ -56,6 +55,14 @@ namespace vdl
   public:
     DepthStencilTexture() = default;
 
-    DepthStencilTexture(const uint2& _TextureSize, Format _Format);
+    DepthStencilTexture(const uint2& _TextureSize, FormatType _Format);
+  };
+
+  class UnorderedAccessTexture : public Texture
+  {
+  public:
+    UnorderedAccessTexture() = default;
+
+    UnorderedAccessTexture(const uint2& _TextureSize, FormatType _Format);
   };
 }

@@ -39,33 +39,33 @@ namespace vdl::Input
   public:
     [[nodiscard]] constexpr uint8_t GetIndex()const noexcept { return Index_; }
   public:
-    [[nodiscard]] constexpr Button ButtonUp()const noexcept { return { InputDevice::eXInput, Buttons::eUp, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonUp()const noexcept { return { InputDeviceType::eXInput, Buttons::eUp, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonDown()const noexcept { return { InputDevice::eXInput, Buttons::eDown, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonDown()const noexcept { return { InputDeviceType::eXInput, Buttons::eDown, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonLeft()const noexcept { return { InputDevice::eXInput, Buttons::eLeft, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonLeft()const noexcept { return { InputDeviceType::eXInput, Buttons::eLeft, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonRight()const noexcept { return { InputDevice::eXInput, Buttons::eRight, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonRight()const noexcept { return { InputDeviceType::eXInput, Buttons::eRight, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonStart()const noexcept { return { InputDevice::eXInput, Buttons::eStart, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonStart()const noexcept { return { InputDeviceType::eXInput, Buttons::eStart, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonSelect()const noexcept { return { InputDevice::eXInput, Buttons::eBack, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonSelect()const noexcept { return { InputDeviceType::eXInput, Buttons::eBack, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonLeftStick()const noexcept { return { InputDevice::eXInput, Buttons::eLeftStick, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonLeftStick()const noexcept { return { InputDeviceType::eXInput, Buttons::eLeftStick, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonRightStick()const noexcept { return { InputDevice::eXInput, Buttons::eRightStick, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonRightStick()const noexcept { return { InputDeviceType::eXInput, Buttons::eRightStick, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonLB()const noexcept { return { InputDevice::eXInput, Buttons::eLB, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonLB()const noexcept { return { InputDeviceType::eXInput, Buttons::eLB, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonRB()const noexcept { return { InputDevice::eXInput, Buttons::eRB, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonRB()const noexcept { return { InputDeviceType::eXInput, Buttons::eRB, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonA()const noexcept { return { InputDevice::eXInput, Buttons::eA, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonA()const noexcept { return { InputDeviceType::eXInput, Buttons::eA, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonB()const noexcept { return { InputDevice::eXInput, Buttons::eB, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonB()const noexcept { return { InputDeviceType::eXInput, Buttons::eB, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonX()const noexcept { return { InputDevice::eXInput, Buttons::eX, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonX()const noexcept { return { InputDeviceType::eXInput, Buttons::eX, Index_ }; }
 
-    [[nodiscard]] constexpr Button ButtonY()const noexcept { return { InputDevice::eXInput, Buttons::eY, Index_ }; }
+    [[nodiscard]] constexpr Button ButtonY()const noexcept { return { InputDeviceType::eXInput, Buttons::eY, Index_ }; }
   };
 
   //  ê⁄ë±Ç≥ÇÍÇƒÇ¢ÇÈÇ©ämîF

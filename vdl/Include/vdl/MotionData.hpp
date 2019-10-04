@@ -1,8 +1,5 @@
 #pragma once
 #include "Fwd.hpp"
-#include "Types.hpp"
-
-#include <vector>
 
 namespace vdl
 {

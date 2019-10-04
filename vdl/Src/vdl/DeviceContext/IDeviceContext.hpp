@@ -21,9 +21,9 @@ public:
 
   virtual void SetIndexBuffer(const IBuffer* _pIndexBuffer) = 0;
 
-  virtual void SetInputLayout(vdl::InputLayout _InputLayout) = 0;
+  virtual void SetInputLayout(vdl::InputLayoutType _InputLayout) = 0;
 
-  virtual void SetTopology(vdl::Topology _Topology) = 0;
+  virtual void SetTopology(vdl::TopologyType _Topology) = 0;
 
   virtual void SetScissor(const vdl::Scissor& _Scissor) = 0;
 

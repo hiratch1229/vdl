@@ -1,5 +1,5 @@
 #pragma once
-#include "Types.hpp"
+#include "Fwd.hpp"
 #include "Texture.hpp"
 #include "Vertex.hpp"
 #include "Matrix.hpp"

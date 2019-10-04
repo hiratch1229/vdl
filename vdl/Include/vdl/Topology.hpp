@@ -1,9 +1,9 @@
 #pragma once
-#include "Types.hpp"
+#include "Fwd.hpp"
 
 namespace vdl
 {
-  enum class Topology : uint8_t
+  enum class TopologyType : uint8_t
   {
     ePointList,
     eLineList,

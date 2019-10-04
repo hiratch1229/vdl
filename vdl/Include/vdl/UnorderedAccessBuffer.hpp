@@ -1,6 +1,16 @@
 #pragma once
-#include "Types.hpp"
-#include "ID.hpp"
+#include "Fwd.hpp"
+
+namespace vdl
+{
+  namespace Detail
+  {
+    class UnorderedAccessBufferData
+    {
+
+    };
+  }
+}
 
 //namespace vdl
 //{

@@ -1,4 +1,5 @@
 #pragma once
+#include "Fwd.hpp"
 #include "Type3.hpp"
 #include "Angle.hpp"
 

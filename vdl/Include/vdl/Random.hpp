@@ -1,4 +1,5 @@
 #pragma once
+#include "Fwd.hpp"
 #include "Type4.hpp"
 #include <assert.h>
 

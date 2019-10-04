@@ -59,7 +59,7 @@ namespace vdl::Input
   public:
     [[nodiscard]] constexpr uint8_t GetIndex()const noexcept { return Index_; }
 
-    [[nodiscard]] Button GetButton(uint8_t _Number)const noexcept { return { InputDevice::eGamepad, _Number, Index_ }; }
+    [[nodiscard]] Button GetButton(uint8_t _Number)const noexcept { return { InputDeviceType::eGamepad, _Number, Index_ }; }
 
     [[nodiscard]] uint GetButtonNum()const;
   };

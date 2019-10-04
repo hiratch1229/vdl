@@ -1,8 +1,9 @@
 #pragma once
+#include "Fwd.hpp"
 
 namespace vdl
 {
-  enum class Format
+  enum class FormatType : uint8_t
   {
     eUnknown,
     eR32G32B32A32_Typeless,

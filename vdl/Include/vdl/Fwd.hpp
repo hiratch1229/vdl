@@ -4,6 +4,8 @@
 
 #include <array>
 #include <vector>
+#include <optional>
+#include <variant>
 
 namespace vdl
 {
@@ -68,12 +70,12 @@ namespace vdl
   //-------------------------
   //  InputLayout.hpp
   //-------------------------
-  enum class InputLayout : uint8_t;
+  enum class InputLayoutType : uint8_t;
 
   //-------------------------
   //  Topology.hpp
   //-------------------------
-  enum class Topology : uint8_t;
+  enum class TopologyType : uint8_t;
 
   //-------------------------
   //  Scissor.hpp
@@ -134,7 +136,7 @@ namespace vdl
   //-------------------------
   //  Format.hpp
   //-------------------------
-  enum class Format;
+  enum class FormatType : uint8_t;
 
   //-------------------------
   //  Texture.hpp
@@ -143,6 +145,7 @@ namespace vdl
   class RenderTexture;
   using RenderTextures = std::array<RenderTexture, Constants::kMaxRenderTextureNum>;
   class DepthStencilTexture;
+  class UnorderedAccessTexture;
 
   //-------------------------
   //  Sampler.hpp
@@ -154,6 +157,12 @@ namespace vdl
   //-------------------------
   namespace Detail { class ConstantBufferData; }
   template<class T> class ConstantBuffer;
+
+  //-------------------------
+  //  UnorderedAccessBuffer.hpp
+  //-------------------------
+  namespace Detail { class UnorderedAccessBufferData; }
+  template<class T> class UnorderedAccessBuffer;
 
   //-------------------------
   //  Camera.hpp
@@ -194,7 +203,7 @@ namespace vdl
   //-------------------------
   namespace Geometry3D { struct AABB; }
   namespace Geometry3D { struct OBB; }
-  
+
   //-------------------------
   //  Sphere.hpp
   //-------------------------
@@ -208,7 +217,7 @@ namespace vdl
   //-------------------------
   //  Button.hpp
   //-------------------------
-  namespace Input { enum class InputDevice : uint8_t; }
+  namespace Input { enum class InputDeviceType : uint8_t; }
   namespace Input { class Button; }
 
   //-------------------------
@@ -220,4 +229,10 @@ namespace vdl
   //  Gamepad.hpp
   //-------------------------
   namespace Input { class Gamepad; }
+
+  //-------------------------
+  //-------------------------
+  using ID = std::optional<uint>;
+  using ShaderResource = std::variant<Texture, Detail::UnorderedAccessBufferData>;
+  using UnorderedAccessObject = std::variant<UnorderedAccessTexture, Detail::UnorderedAccessBufferData>;
 }

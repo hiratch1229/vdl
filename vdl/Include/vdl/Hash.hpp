@@ -1,5 +1,7 @@
 #pragma once
-#include "GraphicsState.hpp"
+#include "BlendState.hpp"
+#include "DepthStencilState.hpp"
+#include "RasterizerState.hpp"
 #include "Sampler.hpp"
 
 #include <type_traits>

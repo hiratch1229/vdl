@@ -204,9 +204,6 @@
     <ClInclude Include="..\..\Include\vdl\Texture.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\ID.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Src\vdl\ModelManager\IModelManager.hpp">
       <Filter>Src\ModelManager</Filter>
     </ClInclude>

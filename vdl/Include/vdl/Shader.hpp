@@ -1,6 +1,5 @@
 #pragma once
 #include "Fwd.hpp"
-#include "ID.hpp"
 
 namespace vdl
 {
@@ -10,9 +9,9 @@ namespace vdl
   public:
     VertexShader() = default;
 
-    VertexShader(const char* _FilePath, InputLayout _InputLayout, const char* _EntryPoint = "main");
+    VertexShader(const char* _FilePath, InputLayoutType _InputLayout, const char* _EntryPoint = "main");
 
-    VertexShader(const char* _Source, uint _DataSize, InputLayout _InputLayout, const char* _EntryPoint = "main");
+    VertexShader(const char* _Source, uint _DataSize, InputLayoutType _InputLayout, const char* _EntryPoint = "main");
 
     VertexShader(const VertexShader& _VertexShader);
 
@@ -32,7 +31,7 @@ namespace vdl
 
     [[nodiscard]] bool isEmpty()const noexcept { return ID_ ==std::nullopt; }
 
-    [[nodiscard]] InputLayout GetInputLayout()const;
+    [[nodiscard]] InputLayoutType GetInputLayout()const;
   };
 
   class HullShader

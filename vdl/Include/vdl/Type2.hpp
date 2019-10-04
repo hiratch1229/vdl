@@ -1,6 +1,4 @@
 #pragma once
-#include "Types.hpp"
-
 #include <cmath>
 #include <string>
 #include <fstream>

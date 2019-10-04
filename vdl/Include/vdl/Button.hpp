@@ -1,11 +1,9 @@
 #pragma once
-#include "Types.hpp"
-
-#include <utility>
+#include "Fwd.hpp"
 
 namespace vdl::Input
 {
-  enum class InputDevice : uint8_t
+  enum class InputDeviceType : uint8_t
   {
     eNone,
     eKeyboard,
@@ -21,7 +19,7 @@ namespace vdl::Input
       struct
       {
         //  入力デバイス
-        InputDevice InputDevice_;
+        InputDeviceType InputDevice_;
         //  決められた番号
         uint8_t Code_;
         //  入力デバイスのインデックス
@@ -31,16 +29,16 @@ namespace vdl::Input
     };
   public:
     Button()noexcept
-      : InputDevice_(InputDevice::eNone) {}
+      : InputDevice_(InputDeviceType::eNone) {}
 
-    constexpr Button(InputDevice _InputDevice, uint8_t _Code, uint8_t _Index = 0)noexcept
+    constexpr Button(InputDeviceType _InputDevice, uint8_t _Code, uint8_t _Index = 0)noexcept
       : InputDevice_(_InputDevice), Code_(_Code), Index_(_Index) {}
   public:
     [[nodiscard]] constexpr bool operator==(const Button& _Button)const noexcept { return ID_ == _Button.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const Button& _Button)const noexcept { return ID_ != _Button.ID_; }
   public:
-    [[nodiscard]] constexpr InputDevice GetInputDevice()const noexcept { return InputDevice_; }
+    [[nodiscard]] constexpr InputDeviceType GetInputDevice()const noexcept { return InputDevice_; }
 
     [[nodiscard]] constexpr uint8_t GetCode()const noexcept { return Code_; }
 

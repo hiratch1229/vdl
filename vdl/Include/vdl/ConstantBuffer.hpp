@@ -1,6 +1,5 @@
 #pragma once
-#include "ID.hpp"
-#include "Types.hpp"
+#include "Fwd.hpp"
 
 namespace vdl
 {

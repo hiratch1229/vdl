@@ -1,9 +1,9 @@
 #pragma once
-#include "vdl/Types.hpp"
+#include "Fwd.hpp"
 
 namespace vdl
 {
-  enum class InputLayout : uint8_t
+  enum class InputLayoutType : uint8_t
   {
     eNone,
     eTexture,
