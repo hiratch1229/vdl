@@ -60,6 +60,7 @@
 #include <vdl/Renderer.hpp>
 #include <vdl/Renderer2D.hpp>
 #include <vdl/Renderer3D.hpp>
+#include <vdl/Computer.hpp>
 #include <vdl/GUI.hpp>
 #include <vdl/Light.hpp>
 

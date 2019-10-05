@@ -14,7 +14,6 @@ private:
 private:
   vdl::StaticMesh Rectangle_;
   vdl::ConstantBuffer<ConstantBufferData> ConstantBuffer_;
-
 public:
   SceneTessellation() = default;
 

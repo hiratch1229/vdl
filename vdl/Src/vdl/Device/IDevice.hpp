@@ -29,7 +29,7 @@ public:
 
   virtual void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize) = 0;
 
-  virtual void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _BufferSize) = 0;
+  virtual void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer) = 0;
 
   virtual void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image) = 0;
 

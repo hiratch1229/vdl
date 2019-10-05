@@ -660,7 +660,7 @@ void CGUI::Initialize()
 
   //  シェーダーの作成
   {
-    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kVertexShader)), vdl::InputLayout::eGUI);
+    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kVertexShader)), vdl::InputLayoutType::eGUI);
     PixelShader_ = vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kPixelShader)));
   }
 
@@ -819,8 +819,8 @@ void CGUI::Draw()
   pDeviceContext_->SetVertexBuffer(pVertexBuffers_[0].get());
   pDeviceContext_->SetInstanceBuffer(nullptr);
   pDeviceContext_->SetIndexBuffer(pIndexBuffers_[0].get());
-  pDeviceContext_->SetInputLayout(vdl::InputLayout::eGUI);
-  pDeviceContext_->SetTopology(vdl::Topology::eTriangleList);
+  pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eGUI);
+  pDeviceContext_->SetTopology(vdl::TopologyType::eTriangleList);
 
   pDeviceContext_->SetViewport(Viewport_);
   pDeviceContext_->SetRenderTextures({ vdl::RenderTexture() }, vdl::DepthStencilTexture());

@@ -74,15 +74,23 @@ public:
 
   [[nodiscard]] bool Has(RendererCommandType _Command)const { return Flags_ & (1 << static_cast<vdl::uint>(_Command)); }
 
-  void Set(RendererCommandType _Command) { Flags_ |= 1 << static_cast<vdl::uint>(_Command); }
+  void Set(RendererCommandType _Command) { Flags_ |= (1 << static_cast<vdl::uint>(_Command)); }
+
+  void Cancel(RendererCommandType _Command) { Flags_ &= ~(1 << static_cast<vdl::uint>(_Command)); }
+};
+
+class Empty
+{
+
 };
 
 template<class DisplayObject, class InstanceData>
 class RendererCommandList
 {
   static constexpr vdl::uint kShaderTypes = static_cast<vdl::uint>(ShaderType::eGraphicsNum);
-  static_assert(std::is_same<DisplayObject, vdl::Texture>::value || std::is_same<DisplayObject, vdl::StaticMesh>::value || std::is_same<DisplayObject, vdl::SkinnedMesh>::value);
-  static constexpr vdl::uint kMaxBatchNum = (std::is_same<DisplayObject, vdl::Texture>::value ? Constants::kMaxTextureBatchNum
+  static_assert(std::is_same<DisplayObject, Empty>::value || std::is_same<DisplayObject, vdl::Texture>::value
+    || std::is_same<DisplayObject, vdl::StaticMesh>::value || std::is_same<DisplayObject, vdl::SkinnedMesh>::value);
+  static constexpr vdl::uint kMaxBatchNum = (std::is_same<DisplayObject, Empty>::value ? 1 : std::is_same<DisplayObject, vdl::Texture>::value ? Constants::kMaxTextureBatchNum
     : std::is_same<DisplayObject, vdl::StaticMesh>::value ? Constants::kMaxStaticMeshBatchNum : Constants::kMaxSkinnedMeshBatchNum);
 private:
   using Textures = std::vector<vdl::Texture>;
@@ -103,7 +111,7 @@ private:
   std::vector<InstanceData> Instances_;
 
   std::vector<vdl::Scissor> Scissors_;
-  std::vector<vdl::Topology> Topologys_;
+  std::vector<vdl::TopologyType> Topologys_;
   std::vector<vdl::Viewport> Viewports_;
   std::vector<vdl::BlendState> BlendStates_;
   std::vector<vdl::DepthStencilState> DepthStencilStates_;
@@ -118,7 +126,7 @@ private:
   std::array<ConstantBuffers, kShaderTypes> LastConstantBuffers_;
   std::array<std::vector<ConstantBuffers>, kShaderTypes> ConstantBuffers_;
 
-  vdl::Topology CurrentTopology_;
+  vdl::TopologyType CurrentTopology_;
   vdl::Scissor CurrentScissor_;
   vdl::Viewport CurrentViewport_;
   vdl::BlendState CurrentBlendState_;
@@ -137,7 +145,7 @@ private:
 public:
   RendererCommandList() = default;
 
-  void Initialize(vdl::Topology _Topology, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
+  void Initialize(vdl::TopologyType _Topology, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
     const vdl::Sampler& _Sampler, const vdl::VertexShader& _VertexShader, const vdl::PixelShader& _PixelShader);
 
   void Reset();
@@ -151,8 +159,8 @@ public:
   void PushDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData);
   [[nodiscard]] const InstanceData& GetInstanceData(vdl::uint _Index)const { return Instances_[_Index]; }
 
-  void PushTopology(const vdl::Topology& _Topology);
-  [[nodiscard]] const vdl::Topology& GetCurrentTopology()const { return CurrentTopology_; }
+  void PushTopology(const vdl::TopologyType& _Topology);
+  [[nodiscard]] const vdl::TopologyType& GetCurrentTopology()const { return CurrentTopology_; }
 
   void PushScissor(const vdl::Scissor& _Scissor);
   [[nodiscard]] const vdl::Scissor& GetCurrentScissor()const { return CurrentScissor_; }

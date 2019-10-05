@@ -1,6 +1,5 @@
 #pragma once
 #include <vdl/Fwd.hpp>
-#include <vdl/ID.hpp>
 
 #include "Mesh.hpp"
 

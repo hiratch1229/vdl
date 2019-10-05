@@ -82,20 +82,27 @@ namespace vdl
 
   uint2 Texture::GetSize()const
   {
+    assert(!isEmpty());
+
     return Engine::Get<ITextureManager>()->GetTexture(ID_)->GetSize();
   }
 
   //--------------------------------------------------
 
-  RenderTexture::RenderTexture(const uint2& _TextureSize, Format _Format)
+  RenderTexture::RenderTexture(const uint2& _TextureSize, FormatType _Format)
   {
     ID_ = Engine::Get<ITextureManager>()->CreateRenderTexture(_TextureSize, _Format);
   }
 
   //--------------------------------------------------
 
-  DepthStencilTexture::DepthStencilTexture(const uint2& _TextureSize, Format _Format)
+  DepthStencilTexture::DepthStencilTexture(const uint2& _TextureSize, FormatType _Format)
   {
     ID_ = Engine::Get<ITextureManager>()->CreateDepthStencilTexture(_TextureSize, _Format);
+  }
+
+  UnorderedAccessTexture::UnorderedAccessTexture(const uint2& _TextureSize, FormatType _Format)
+  {
+    ID_ = Engine::Get<ITextureManager>()->CreateUnorderedAccessTexture(_TextureSize, _Format);
   }
 }

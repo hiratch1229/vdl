@@ -56,11 +56,262 @@ namespace vdl
     {
       Engine::Get<IRenderer>()->Clear(_DepthStencilTexture, _ClearDepth, _ClearStencil);
     }
+
+    void Clear(const UnorderedAccessTexture& _UnorderedAccessTexture, const ColorF& _ClearColor)
+    {
+      assert(!_UnorderedAccessTexture.isEmpty());
+
+      Engine::Get<IRenderer>()->Clear(_UnorderedAccessTexture, _ClearColor);
+    }
+
+    void SetTopology(TopologyType _Topology)
+    {
+      Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eNone);
+    }
+
+    void SetScissor(const Scissor& _Scissor)
+    {
+      Engine::Get<IRenderer>()->SetScissor(_Scissor, RenderType::eNone);
+    }
+
+    void SetViewport(const Viewport& _Viewport)
+    {
+      Engine::Get<IRenderer>()->SetViewport(_Viewport, RenderType::eNone);
+    }
+
+    void SetBlendState(const BlendState& _BlendState)
+    {
+      Engine::Get<IRenderer>()->SetBlendState(_BlendState, RenderType::eNone);
+    }
+
+    void SetDepthStencilState(const DepthStencilState& _DepthStencilState)
+    {
+      Engine::Get<IRenderer>()->SetDepthStencilState(_DepthStencilState, RenderType::eNone);
+    }
+
+    void SetRasterizerState(const RasterizerState& _RasterizerState)
+    {
+      Engine::Get<IRenderer>()->SetRasterizerState(_RasterizerState, RenderType::eNone);
+    }
+
+    void SetVertexShader(const VertexShader& _VertexShader)
+    {
+      assert(!_VertexShader.isEmpty());
+
+      Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, RenderType::eNone);
+    }
+
+    void SetHullShader(const HullShader& _HullShader)
+    {
+      Engine::Get<IRenderer>()->SetHullShader(_HullShader, RenderType::eNone);
+    }
+
+    void SetDomainShader(const DomainShader& _DomainShader)
+    {
+      Engine::Get<IRenderer>()->SetDomainShader(_DomainShader, RenderType::eNone);
+    }
+
+    void SetGeometryShader(const GeometryShader& _GeometryShader)
+    {
+      Engine::Get<IRenderer>()->SetGeometryShader(_GeometryShader, RenderType::eNone);
+    }
+
+    void SetPixelShader(const PixelShader& _PixelShader)
+    {
+      assert(!_PixelShader.isEmpty());
+
+      Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eNone);
+    }
+
+    void SetVertexStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    {
+      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+
+      if (_TextureNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eVertexShader, RenderType::eNone);
+    }
+
+    void SetHullStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    {
+      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+
+      if (_TextureNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eHullShader, RenderType::eNone);
+    }
+
+    void SetDomainStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    {
+      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+
+      if (_TextureNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eDomainShader, RenderType::eNone);
+    }
+
+    void SetGeometryStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    {
+      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+
+      if (_TextureNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eGeometryShader, RenderType::eNone);
+    }
+
+    void SetPixelStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    {
+      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+
+      if (_TextureNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::ePixelShader, RenderType::eNone);
+    }
+
+    void SetVertexStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[])
+    {
+      assert(_StartSlot + _SamplerNum - 1 < Constants::kMaxSamplerNum);
+
+      if (_SamplerNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetSamplers(_StartSlot, _SamplerNum, _Sampler, ShaderType::eVertexShader, RenderType::eNone);
+    }
+
+    void SetHullStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[])
+    {
+      assert(_StartSlot + _SamplerNum - 1 < Constants::kMaxSamplerNum);
+
+      if (_SamplerNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetSamplers(_StartSlot, _SamplerNum, _Sampler, ShaderType::eHullShader, RenderType::eNone);
+    }
+
+    void SetDomainStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[])
+    {
+      assert(_StartSlot + _SamplerNum - 1 < Constants::kMaxSamplerNum);
+
+      if (_SamplerNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetSamplers(_StartSlot, _SamplerNum, _Sampler, ShaderType::eDomainShader, RenderType::eNone);
+    }
+
+    void SetGeometryStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[])
+    {
+      assert(_StartSlot + _SamplerNum - 1 < Constants::kMaxSamplerNum);
+
+      if (_SamplerNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetSamplers(_StartSlot, _SamplerNum, _Sampler, ShaderType::eGeometryShader, RenderType::eNone);
+    }
+
+    void SetPixelStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[])
+    {
+      assert(_StartSlot + _SamplerNum - 1 < Constants::kMaxSamplerNum);
+
+      if (_SamplerNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetSamplers(_StartSlot, _SamplerNum, _Sampler, ShaderType::ePixelShader, RenderType::eNone);
+    }
+
+    void SetVertexStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[])
+    {
+      assert(_StartSlot + _BufferNum - 1 < Constants::kMaxConstantBufferNum);
+
+      if (_BufferNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetConstantBuffers(_StartSlot, _BufferNum, _ConstantBuffers, ShaderType::eVertexShader, RenderType::eNone);
+    }
+
+    void SetHullStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[])
+    {
+      assert(_StartSlot + _BufferNum - 1 < Constants::kMaxConstantBufferNum);
+
+      if (_BufferNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetConstantBuffers(_StartSlot, _BufferNum, _ConstantBuffers, ShaderType::eHullShader, RenderType::eNone);
+    }
+
+    void SetDomainStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[])
+    {
+      assert(_StartSlot + _BufferNum - 1 < Constants::kMaxConstantBufferNum);
+
+      if (_BufferNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetConstantBuffers(_StartSlot, _BufferNum, _ConstantBuffers, ShaderType::eDomainShader, RenderType::eNone);
+    }
+
+    void SetGeometryStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[])
+    {
+      assert(_StartSlot + _BufferNum - 1 < Constants::kMaxConstantBufferNum);
+
+      if (_BufferNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetConstantBuffers(_StartSlot, _BufferNum, _ConstantBuffers, ShaderType::eGeometryShader, RenderType::eNone);
+    }
+
+    void SetPixelStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[])
+    {
+      assert(_StartSlot + _BufferNum - 1 < Constants::kMaxConstantBufferNum);
+
+      if (_BufferNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetConstantBuffers(_StartSlot, _BufferNum, _ConstantBuffers, ShaderType::ePixelShader, RenderType::eNone);
+    }
+
+    void Draw(uint _VertexCount)
+    {
+      Engine::Get<IRenderer>()->Draw(_VertexCount);
+    }
   }
 
   namespace Renderer2D
   {
-    void SetTopology(Topology _Topology)
+    void SetTopology(TopologyType _Topology)
     {
       Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eTexture);
     }
@@ -88,6 +339,35 @@ namespace vdl
     void SetRasterizerState(const RasterizerState& _RasterizerState)
     {
       Engine::Get<IRenderer>()->SetRasterizerState(_RasterizerState, RenderType::eTexture);
+    }
+
+    void SetVertexShader(const VertexShader& _VertexShader)
+    {
+      assert(!_VertexShader.isEmpty());
+
+      Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, RenderType::eTexture);
+    }
+
+    void SetHullShader(const HullShader& _HullShader)
+    {
+      Engine::Get<IRenderer>()->SetHullShader(_HullShader, RenderType::eTexture);
+    }
+
+    void SetDomainShader(const DomainShader& _DomainShader)
+    {
+      Engine::Get<IRenderer>()->SetDomainShader(_DomainShader, RenderType::eTexture);
+    }
+
+    void SetGeometryShader(const GeometryShader& _GeometryShader)
+    {
+      Engine::Get<IRenderer>()->SetGeometryShader(_GeometryShader, RenderType::eTexture);
+    }
+
+    void SetPixelShader(const PixelShader& _PixelShader)
+    {
+      assert(!_PixelShader.isEmpty());
+
+      Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eTexture);
     }
 
     void SetVertexStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
@@ -200,43 +480,6 @@ namespace vdl
       assert(!_Texture.isEmpty());
 
       Engine::Get<IRenderer>()->Draw(_Texture, _DestLeftTop, _DestSize, _SrcLeftPos, _SrcSize, _Angle, _Color);
-    }
-  }
-
-  namespace RendererTexture
-  {
-    void SetTopology(Topology _Topology)
-    {
-      Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eTexture);
-    }
-
-    void SetVertexShader(const VertexShader& _VertexShader)
-    {
-      assert(!_VertexShader.isEmpty());
-
-      Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, RenderType::eTexture);
-    }
-
-    void SetHullShader(const HullShader& _HullShader)
-    {
-      Engine::Get<IRenderer>()->SetHullShader(_HullShader, RenderType::eTexture);
-    }
-
-    void SetDomainShader(const DomainShader& _DomainShader)
-    {
-      Engine::Get<IRenderer>()->SetDomainShader(_DomainShader, RenderType::eTexture);
-    }
-
-    void SetGeometryShader(const GeometryShader& _GeometryShader)
-    {
-      Engine::Get<IRenderer>()->SetGeometryShader(_GeometryShader, RenderType::eTexture);
-    }
-
-    void SetPixelShader(const PixelShader& _PixelShader)
-    {
-      assert(!_PixelShader.isEmpty());
-
-      Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eTexture);
     }
   }
 
@@ -459,79 +702,79 @@ namespace vdl
 
       Engine::Get<IRenderer>()->Draw(_SkinnedMesh, _World, _MotionBlendDatas, _Color);
     }
-  }
 
-  namespace RendererStaticMesh
-  {
-    void SetTopology(Topology _Topology)
+    namespace RendererStaticMesh
     {
-      Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eStaticMesh);
+      void SetTopology(TopologyType _Topology)
+      {
+        Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eStaticMesh);
+      }
+
+      void SetVertexShader(const VertexShader& _VertexShader)
+      {
+        assert(!_VertexShader.isEmpty());
+
+        Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, RenderType::eStaticMesh);
+      }
+
+      void SetHullShader(const HullShader& _HullShader)
+      {
+        Engine::Get<IRenderer>()->SetHullShader(_HullShader, RenderType::eStaticMesh);
+      }
+
+      void SetDomainShader(const DomainShader& _DomainShader)
+      {
+        Engine::Get<IRenderer>()->SetDomainShader(_DomainShader, RenderType::eStaticMesh);
+      }
+
+      void SetGeometryShader(const GeometryShader& _GeometryShader)
+      {
+        Engine::Get<IRenderer>()->SetGeometryShader(_GeometryShader, RenderType::eStaticMesh);
+      }
+
+      void SetPixelShader(const PixelShader& _PixelShader)
+      {
+        assert(!_PixelShader.isEmpty());
+
+        Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eStaticMesh);
+      }
     }
 
-    void SetVertexShader(const VertexShader& _VertexShader)
+    namespace RendererSkinnedMesh
     {
-      assert(!_VertexShader.isEmpty());
+      void SetTopology(TopologyType _Topology)
+      {
+        Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eSkinnedMesh);
+      }
 
-      Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, RenderType::eStaticMesh);
-    }
+      void SetVertexShader(const VertexShader& _VertexShader)
+      {
+        assert(!_VertexShader.isEmpty());
 
-    void SetHullShader(const HullShader& _HullShader)
-    {
-      Engine::Get<IRenderer>()->SetHullShader(_HullShader, RenderType::eStaticMesh);
-    }
+        Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, RenderType::eSkinnedMesh);
+      }
 
-    void SetDomainShader(const DomainShader& _DomainShader)
-    {
-      Engine::Get<IRenderer>()->SetDomainShader(_DomainShader, RenderType::eStaticMesh);
-    }
+      void SetHullShader(const HullShader& _HullShader)
+      {
+        Engine::Get<IRenderer>()->SetHullShader(_HullShader, RenderType::eSkinnedMesh);
+      }
 
-    void SetGeometryShader(const GeometryShader& _GeometryShader)
-    {
-      Engine::Get<IRenderer>()->SetGeometryShader(_GeometryShader, RenderType::eStaticMesh);
-    }
+      void SetDomainShader(const DomainShader& _DomainShader)
+      {
+        Engine::Get<IRenderer>()->SetDomainShader(_DomainShader, RenderType::eSkinnedMesh);
+      }
 
-    void SetPixelShader(const PixelShader& _PixelShader)
-    {
-      assert(!_PixelShader.isEmpty());
+      void SetGeometryShader(const GeometryShader& _GeometryShader)
+      {
+        Engine::Get<IRenderer>()->SetGeometryShader(_GeometryShader, RenderType::eSkinnedMesh);
+      }
 
-      Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eStaticMesh);
-    }
-  }
+      void SetPixelShader(const PixelShader& _PixelShader)
+      {
+        assert(!_PixelShader.isEmpty());
 
-  namespace RendererSkinnedMesh
-  {
-    void SetTopology(Topology _Topology)
-    {
-      Engine::Get<IRenderer>()->SetTopology(_Topology, RenderType::eSkinnedMesh);
-    }
-
-    void SetVertexShader(const VertexShader& _VertexShader)
-    {
-      assert(!_VertexShader.isEmpty());
-
-      Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, RenderType::eSkinnedMesh);
-    }
-
-    void SetHullShader(const HullShader& _HullShader)
-    {
-      Engine::Get<IRenderer>()->SetHullShader(_HullShader, RenderType::eSkinnedMesh);
-    }
-
-    void SetDomainShader(const DomainShader& _DomainShader)
-    {
-      Engine::Get<IRenderer>()->SetDomainShader(_DomainShader, RenderType::eSkinnedMesh);
-    }
-
-    void SetGeometryShader(const GeometryShader& _GeometryShader)
-    {
-      Engine::Get<IRenderer>()->SetGeometryShader(_GeometryShader, RenderType::eSkinnedMesh);
-    }
-
-    void SetPixelShader(const PixelShader& _PixelShader)
-    {
-      assert(!_PixelShader.isEmpty());
-
-      Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eSkinnedMesh);
+        Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eSkinnedMesh);
+      }
     }
   }
 }

@@ -11,7 +11,7 @@
 #include <algorithm>
 
 template<class DisplayObject, class InstanceData>
-inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(vdl::Topology _Topology, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
+inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(vdl::TopologyType _Topology, const vdl::BlendState& _BlendState, const vdl::DepthStencilState& _DepthStencilState, const vdl::RasterizerState& _RasterizerState,
   const vdl::Sampler& _Sampler, const vdl::VertexShader& _VertexShader, const vdl::PixelShader& _PixelShader)
 {
   pDevice_ = Engine::Get<IDevice>();
@@ -117,63 +117,69 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
 template<class DisplayObject, class InstanceData>
 inline void RendererCommandList<DisplayObject, InstanceData>::Adjust()
 {
-  Thread_ = std::thread([this]()->void
+  if constexpr (!std::is_same<DisplayObject, Empty>::value)
   {
-    bool canSort = false;
-    vdl::uint StartDrawCallIndex;
-    vdl::uint ContinuousDrawCallNum = 0;
-
-    const vdl::uint CommandNum = static_cast<vdl::uint>(RendererCommands_.size());
-    for (vdl::uint CommandCount = 0; CommandCount < CommandNum; ++CommandCount)
+    Thread_ = std::thread([this]()->void
     {
-      const RendererCommandPair& RendererCommand = RendererCommands_[CommandCount];
-      assert(RendererCommand.first != RendererCommandType::eNum);
+      bool canSort = false;
+      vdl::uint StartDrawCallIndex;
+      vdl::uint ContinuousDrawCallNum = 0;
 
-      switch (RendererCommand.first)
+      const vdl::uint CommandNum = static_cast<vdl::uint>(RendererCommands_.size());
+      for (vdl::uint CommandCount = 0; CommandCount < CommandNum; ++CommandCount)
       {
-      case RendererCommandType::eDraw:
-        //  ソート出来ない時はスルーする
-        if (!canSort)
-        {
-          continue;
-        }
+        const RendererCommandPair& RendererCommand = RendererCommands_[CommandCount];
+        assert(RendererCommand.first != RendererCommandType::eNum);
 
-        //  ドローコールの回数を記録
-        if (ContinuousDrawCallNum++ == 0)
+        switch (RendererCommand.first)
         {
-          StartDrawCallIndex = CommandCount;
-        }
-        break;
-      case RendererCommandType::eSetDepthStencilState:
-        //  Depthがオンの時にソート可能
-        canSort = DepthStencilStates_[RendererCommand.second].DepthEnable;
-        //break;
-      default:
-        //  2つ以上連続でドローコールがある時にソートする
-        if (ContinuousDrawCallNum > 1)
-        {
-          const auto& StartIterator = RendererCommands_.begin() + StartDrawCallIndex;
-          std::sort(StartIterator, StartIterator + ContinuousDrawCallNum,
-            [this](const RendererCommandPair& _Command0, const RendererCommandPair& _Command1)
+        case RendererCommandType::eDraw:
+          //  ソート出来ない時はスルーする
+          if (!canSort)
           {
-            assert(_Command0.first == RendererCommandType::eDraw && _Command1.first == RendererCommandType::eDraw);
+            continue;
+          }
 
-            //  参照するID順にソートする
-            return DisplayObjectIDs_[_Command0.second] < DisplayObjectIDs_[_Command1.second];
-          });
+          //  ドローコールの回数を記録
+          if (ContinuousDrawCallNum++ == 0)
+          {
+            StartDrawCallIndex = CommandCount;
+          }
+          break;
+        case RendererCommandType::eSetDepthStencilState:
+          //  Depthがオンの時にソート可能
+          canSort = DepthStencilStates_[RendererCommand.second].DepthEnable;
+          //break;
+        default:
+          //  2つ以上連続でドローコールがある時にソートする
+          if (ContinuousDrawCallNum > 1)
+          {
+            const auto& StartIterator = RendererCommands_.begin() + StartDrawCallIndex;
+            std::sort(StartIterator, StartIterator + ContinuousDrawCallNum,
+              [this](const RendererCommandPair& _Command0, const RendererCommandPair& _Command1)
+            {
+              assert(_Command0.first == RendererCommandType::eDraw && _Command1.first == RendererCommandType::eDraw);
+
+              //  参照するID順にソートする
+              return DisplayObjectIDs_[_Command0.second] < DisplayObjectIDs_[_Command1.second];
+            });
+          }
+          ContinuousDrawCallNum = 0;
+          break;
         }
-        ContinuousDrawCallNum = 0;
-        break;
       }
-    }
-  });
+    });
+  }
 }
 
 template<class DisplayObject, class InstanceData>
 inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceContext* _pDeviceContext, IBuffer* _pInstanceBuffer)
 {
-  //  ソートが終わるまで待機
-  Thread_.join();
+  if constexpr (!std::is_same<DisplayObject, Empty>::value)
+  {
+    //  ソートが終わるまで待機
+    Thread_.join();
+  }
 
   const vdl::uint RendererCommandNum = static_cast<vdl::uint>(RendererCommands_.size());
   for (vdl::uint RendererCommandCount = 0; RendererCommandCount < RendererCommandNum; ++RendererCommandCount)
@@ -184,95 +190,103 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
     {
     case RendererCommandType::eDraw:
     {
-      enum class DrawStateType
+      if constexpr (std::is_same<DisplayObject, Empty>::value)
       {
-        eContinue,
-        eFlush,
-        eEnd
-      };
-
-      std::vector<InstanceData> Instances;
-      vdl::uint StartDrawCallIndex = RendererCommandCount;
-      vdl::uint ContinuousDrawCallNum = 0;
-      DrawStateType DrawState;
-
-      for (; RendererCommandCount < RendererCommandNum; ++RendererCommandCount)
+        _pDeviceContext->SetVertexBuffer(nullptr);
+        _pDeviceContext->Draw(Instances_[RendererCommand.second], 1, 0, 0);
+      }
+      else
       {
-        DrawState = (++ContinuousDrawCallNum >= kMaxBatchNum ? DrawStateType::eFlush : DrawStateType::eContinue);
-
-        const vdl::ID CurrentDisplayObjectID = DisplayObjectIDs_[RendererCommands_[RendererCommandCount].second];
-        const vdl::uint NextRendererCommandCount = RendererCommandCount + 1;
-
-        if (NextRendererCommandCount == RendererCommandNum)
+        enum class DrawStateType
         {
-          DrawState = DrawStateType::eEnd;
-        }
-        else
-        {
-          const RendererCommandPair& NextRendererCommand = RendererCommands_[NextRendererCommandCount];
+          eContinue,
+          eFlush,
+          eEnd
+        };
 
-          if (NextRendererCommand.first != RendererCommandType::eDraw)
+        std::vector<InstanceData> Instances;
+        vdl::uint StartDrawCallIndex = RendererCommandCount;
+        vdl::uint ContinuousDrawCallNum = 0;
+        DrawStateType DrawState;
+
+        for (; RendererCommandCount < RendererCommandNum; ++RendererCommandCount)
+        {
+          DrawState = (++ContinuousDrawCallNum >= kMaxBatchNum ? DrawStateType::eFlush : DrawStateType::eContinue);
+
+          const vdl::ID CurrentDisplayObjectID = DisplayObjectIDs_[RendererCommands_[RendererCommandCount].second];
+          const vdl::uint NextRendererCommandCount = RendererCommandCount + 1;
+
+          if (NextRendererCommandCount == RendererCommandNum)
           {
             DrawState = DrawStateType::eEnd;
           }
-          else if (CurrentDisplayObjectID != DisplayObjectIDs_[NextRendererCommand.second])
+          else
           {
-            DrawState = DrawStateType::eFlush;
-          }
-        }
+            const RendererCommandPair& NextRendererCommand = RendererCommands_[NextRendererCommandCount];
 
-        if (DrawState != DrawStateType::eContinue)
-        {
-          Instances.resize(ContinuousDrawCallNum);
-          for (vdl::uint InstanceCount = 0; InstanceCount < ContinuousDrawCallNum; ++InstanceCount)
-          {
-            assert(RendererCommands_[StartDrawCallIndex + InstanceCount].first == RendererCommandType::eDraw);
-            Instances[InstanceCount] = std::move(Instances_[RendererCommands_[StartDrawCallIndex + InstanceCount].second]);
-          }
-
-          pDevice_->WriteMemory(_pInstanceBuffer, Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
-          _pDeviceContext->SetInstanceBuffer(_pInstanceBuffer);
-
-          if constexpr (std::is_same<DisplayObject, vdl::Texture>::value)
-          {
-            _pDeviceContext->PSSetTextures(0, 1, &ReservedDisplayObjects_[CurrentDisplayObjectID]);
-
-            _pDeviceContext->Draw(4, ContinuousDrawCallNum, 0, 0);
-          }
-          else if constexpr (std::is_same<DisplayObject, vdl::StaticMesh>::value)
-          {
-            const Mesh* pMesh = pModelManager_->GetMesh(CurrentDisplayObjectID);
-
-            _pDeviceContext->SetVertexBuffer(pMesh->pVertexBuffer.get());
-            _pDeviceContext->SetIndexBuffer(pMesh->pIndexBuffer.get());
-
-            for (auto& Material : pMesh->Materials)
+            if (NextRendererCommand.first != RendererCommandType::eDraw)
             {
-              _pDeviceContext->PSSetTextures(0, 1, &Material.Diffuse);
-
-              _pDeviceContext->DrawIndexed(Material.IndexCount, ContinuousDrawCallNum, Material.IndexStart, 0, 0);
+              DrawState = DrawStateType::eEnd;
+            }
+            else if (CurrentDisplayObjectID != DisplayObjectIDs_[NextRendererCommand.second])
+            {
+              DrawState = DrawStateType::eFlush;
             }
           }
-          else if constexpr (std::is_same<DisplayObject, vdl::SkinnedMesh>::value)
-          {
-            //  TODO
-          }
 
-          if (DrawState == DrawStateType::eEnd)
+          if (DrawState != DrawStateType::eContinue)
           {
-            break;
-          }
+            Instances.resize(ContinuousDrawCallNum);
+            for (vdl::uint InstanceCount = 0; InstanceCount < ContinuousDrawCallNum; ++InstanceCount)
+            {
+              assert(RendererCommands_[StartDrawCallIndex + InstanceCount].first == RendererCommandType::eDraw);
+              Instances[InstanceCount] = std::move(Instances_[RendererCommands_[StartDrawCallIndex + InstanceCount].second]);
+            }
 
-          ContinuousDrawCallNum = 0;
-          StartDrawCallIndex = NextRendererCommandCount;
-          //Instances.clear();
+            pDevice_->WriteMemory(_pInstanceBuffer, Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
+            _pDeviceContext->SetInstanceBuffer(_pInstanceBuffer);
+
+            if constexpr (std::is_same<DisplayObject, vdl::Texture>::value)
+            {
+              _pDeviceContext->PSSetTextures(0, 1, &ReservedDisplayObjects_[CurrentDisplayObjectID]);
+
+              _pDeviceContext->Draw(4, ContinuousDrawCallNum, 0, 0);
+            }
+            else if constexpr (std::is_same<DisplayObject, vdl::StaticMesh>::value)
+            {
+              const Mesh* pMesh = pModelManager_->GetMesh(CurrentDisplayObjectID);
+
+              _pDeviceContext->SetVertexBuffer(pMesh->pVertexBuffer.get());
+              _pDeviceContext->SetIndexBuffer(pMesh->pIndexBuffer.get());
+
+              for (auto& Material : pMesh->Materials)
+              {
+                _pDeviceContext->PSSetTextures(0, 1, &Material.Diffuse);
+
+                _pDeviceContext->DrawIndexed(Material.IndexCount, ContinuousDrawCallNum, Material.IndexStart, 0, 0);
+              }
+            }
+            else if constexpr (std::is_same<DisplayObject, vdl::SkinnedMesh>::value)
+            {
+              //  TODO
+            }
+
+            if (DrawState == DrawStateType::eEnd)
+            {
+              break;
+            }
+
+            ContinuousDrawCallNum = 0;
+            StartDrawCallIndex = NextRendererCommandCount;
+            //Instances.clear();
+          }
         }
       }
     }
     break;
     case RendererCommandType::eSetTopology:
     {
-      const vdl::Topology& Topology = Topologys_[RendererCommand.second];
+      const vdl::TopologyType& Topology = Topologys_[RendererCommand.second];
 
       _pDeviceContext->SetTopology(Topology);
     }
@@ -626,6 +640,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
         if (TempConstantBuffers.size() < CurrentConstantBufferNum)
         {
           TempConstantBuffers.resize(CurrentConstantBufferNum);
+          StateChangeFlags_.Set(_RendererCommandType);
         }
 
         size_t ConstantBufferCount = 0;
@@ -636,7 +651,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
           const vdl::Detail::ConstantBufferData& BeforeConstantBuffer = TempConstantBuffers[ConstantBufferCount];
 
           if (CurrentConstantBuffer != LastConstantBuffer
-            || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetSize()) != 0)
+            || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetBufferSize()) != 0)
           {
             TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
             StateChangeFlags_.Set(_RendererCommandType);
@@ -676,16 +691,24 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
 
   //  Draw
   {
-    const vdl::ID DiplayObjectID = _DisplayObject.GetID();
-
-    if (ReservedDisplayObjects_.find(DiplayObjectID) == ReservedDisplayObjects_.end())
+    if constexpr (std::is_same<DisplayObject, Empty>::value)
     {
-      ReservedDisplayObjects_.insert(std::make_pair(DiplayObjectID, _DisplayObject));
+      RendererCommands_.emplace_back(RendererCommandType::eDraw, static_cast<vdl::uint>(DisplayObjectIDs_.size()));
+      Instances_.emplace_back(_InstanceData);
     }
+    else
+    {
+      const vdl::ID DiplayObjectID = _DisplayObject.GetID();
 
-    RendererCommands_.emplace_back(RendererCommandType::eDraw, static_cast<vdl::uint>(DisplayObjectIDs_.size()));
-    DisplayObjectIDs_.push_back(DiplayObjectID);
-    Instances_.emplace_back(_InstanceData);
+      if (ReservedDisplayObjects_.find(DiplayObjectID) == ReservedDisplayObjects_.end())
+      {
+        ReservedDisplayObjects_.insert(std::make_pair(DiplayObjectID, _DisplayObject));
+      }
+
+      RendererCommands_.emplace_back(RendererCommandType::eDraw, static_cast<vdl::uint>(DisplayObjectIDs_.size()));
+      DisplayObjectIDs_.push_back(DiplayObjectID);
+      Instances_.emplace_back(_InstanceData);
+    }
   }
 }
 
@@ -698,7 +721,7 @@ if (!StateChangeFlags_.Has(RendererCommandType) && Current##StateName##_ != _##S
 Current##StateName##_ = _##StateName;\
 
 template<class DisplayObject, class InstanceData>
-inline void RendererCommandList<DisplayObject, InstanceData>::PushTopology(const vdl::Topology& _Topology)
+inline void RendererCommandList<DisplayObject, InstanceData>::PushTopology(const vdl::TopologyType& _Topology)
 {
   SetState(RendererCommandType::eSetTopology, Topology)
 }

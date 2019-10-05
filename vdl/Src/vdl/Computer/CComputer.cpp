@@ -79,9 +79,9 @@ else\
   }\
 }
 
-void CComputer::SetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
+void CComputer::SetShaderResource(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
-  SetShaderState(Texture)
+  SetShaderState(ShaderResource)
 }
 
 void CComputer::SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -94,10 +94,17 @@ void CComputer::SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBuff
   SetShaderState(ConstantBuffer)
 }
 
+void CComputer::SetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint _UnorderedAccessObjectNum, const vdl::UnorderedAccessObject _UnorderedAccessObjects[])
+{
+  SetShaderState(UnorderedAccessObject)
+}
+
 #undef SetShaderState
 
 void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ)
 {
+  StateChangeFlags_.Cancel(ComputerCommandType::eSetConstantBuffer);
+
   if (!StateChangeFlags_.isEmpty())
   {
     if (StateChangeFlags_.Has(ComputerCommandType::eSetShader))
@@ -106,29 +113,36 @@ void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::
       pDeviceContext_->CSSetShader(CurrentShader_);
     }
 
-    if (StateChangeFlags_.Has(ComputerCommandType::eSetTexture))
+    if (StateChangeFlags_.Has(ComputerCommandType::eSetShaderResource))
     {
-      PreviousTextures_ = CurrentTextures_;
-      pDeviceContext_->CSSetTextures(0, static_cast<vdl::uint>(CurrentTextures_.size()), CurrentTextures_.data());
+      PreviousShaderResources_ = CurrentShaderResources_;
+      pDeviceContext_->CSSetShaderResources(0, static_cast<vdl::uint>(PreviousShaderResources_.size()), PreviousShaderResources_.data());
     }
 
     if (StateChangeFlags_.Has(ComputerCommandType::eSetSampler))
     {
       PreviousSamplers_ = CurrentSamplers_;
-      pDeviceContext_->CSSetSamplers(0, static_cast<vdl::uint>(CurrentSamplers_.size()), CurrentSamplers_.data());
+      pDeviceContext_->CSSetSamplers(0, static_cast<vdl::uint>(PreviousSamplers_.size()), PreviousSamplers_.data());
+    }
+
+    if (StateChangeFlags_.Has(ComputerCommandType::eSetUnorderedAccessObject))
+    {
+      PreviousUnorderedAccessObjects_ = CurrentUnorderedAccessObjects_;
+      pDeviceContext_->CSSetUnorderedAccessObjects(0, static_cast<vdl::uint>(PreviousUnorderedAccessObjects_.size()), PreviousUnorderedAccessObjects_.data());
     }
   }
 
   //  SetConstantBuffer
   {
-    ConstantBuffers TempConstantBuffer = PreviousConstantBuffers_;
+    ConstantBuffers TempConstantBuffers = PreviousConstantBuffers_;
     {
       const size_t CurrentConstantBufferNum = CurrentConstantBuffers_.size();
       const size_t PreviousConstantBufferNum = PreviousConstantBuffers_.size();
 
       if (PreviousConstantBufferDatas_.size() < CurrentConstantBufferNum)
       {
-        TempConstantBuffer.resize(CurrentConstantBufferNum);
+        TempConstantBuffers.resize(CurrentConstantBufferNum);
+        StateChangeFlags_.Set(ComputerCommandType::eSetConstantBuffer);
       }
 
       size_t ConstantBufferCount = 0;
@@ -139,22 +153,22 @@ void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::
         const vdl::Detail::ConstantBufferData& PreviousConstantBufferData = PreviousConstantBufferDatas_[ConstantBufferCount];
 
         if (CurrentConstantBuffer != PreviousConstantBuffer
-          || ::memcmp(CurrentConstantBuffer.GetData(), PreviousConstantBufferData.GetData(), CurrentConstantBuffer.GetSize()))
+          || ::memcmp(CurrentConstantBuffer.GetData(), PreviousConstantBufferData.GetData(), CurrentConstantBuffer.GetBufferSize()))
         {
-          TempConstantBuffer[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
+          TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
           StateChangeFlags_.Set(ComputerCommandType::eSetConstantBuffer);
         }
       }
       for (; ConstantBufferCount < CurrentConstantBufferNum; ++ConstantBufferCount)
       {
-        TempConstantBuffer[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffers_[ConstantBufferCount]);
+        TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffers_[ConstantBufferCount]);
         StateChangeFlags_.Set(ComputerCommandType::eSetConstantBuffer);
       }
 
       if (StateChangeFlags_.Has(ComputerCommandType::eSetConstantBuffer))
       {
         PreviousConstantBuffers_ = CurrentConstantBuffers_;
-        PreviousConstantBufferDatas_ = std::move(TempConstantBuffer);
+        PreviousConstantBufferDatas_ = std::move(TempConstantBuffers);
 
         pDeviceContext_->CSSetConstantBuffers(0, static_cast<vdl::uint>(PreviousConstantBufferDatas_.size()), PreviousConstantBufferDatas_.data());
       }

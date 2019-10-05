@@ -80,5 +80,5 @@ namespace Constants
 
   constexpr vdl::uint kBackBufferNum = 3;
 
-  constexpr vdl::Format kTextureFormat = vdl::Format::eR8G8B8A8_Unorm;
+  constexpr vdl::FormatType kTextureFormat = vdl::FormatType::eR8G8B8A8_Unorm;
 }

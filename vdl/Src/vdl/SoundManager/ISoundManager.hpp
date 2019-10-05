@@ -1,5 +1,5 @@
 #pragma once
-#include <vdl/ID.hpp>
+#include <vdl/Fwd.hpp>
 
 class ISoundManager
 {

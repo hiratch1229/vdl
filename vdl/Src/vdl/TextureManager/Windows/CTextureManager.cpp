@@ -62,7 +62,7 @@ vdl::ID CTextureManager::Load(const vdl::Image& _Image)
   return Textures_.Add(pTexture);
 }
 
-vdl::ID CTextureManager::CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::Format _Format)
+vdl::ID CTextureManager::CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
   ITexture* pRenderTexture;
   pDevice_->CreateRenderTexture(&pRenderTexture, _TextureSize, _Format);
@@ -70,10 +70,18 @@ vdl::ID CTextureManager::CreateRenderTexture(const vdl::uint2& _TextureSize, vdl
   return Textures_.Add(pRenderTexture);
 }
 
-vdl::ID CTextureManager::CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::Format _Format)
+vdl::ID CTextureManager::CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
   ITexture* pDepthStencilTexture;
   pDevice_->CreateDepthStecilTexture(&pDepthStencilTexture, _TextureSize, _Format);
 
   return Textures_.Add(pDepthStencilTexture);
+}
+
+vdl::ID CTextureManager::CreateUnorderedAccessTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format)
+{
+  ITexture* pUnorderedAccessTexture;
+  pDevice_->CreateUnorderedAccessTexture(&pUnorderedAccessTexture, _TextureSize, _Format);
+
+  return Textures_.Add(pUnorderedAccessTexture);
 }

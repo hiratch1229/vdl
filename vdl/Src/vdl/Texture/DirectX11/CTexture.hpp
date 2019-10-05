@@ -37,7 +37,6 @@ public:
 
 struct CUnorderedAccessTexture : public CTexture
 {
-  Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pShaderResourceView;
   Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> pUnorderedAccessView;
 public:
   CUnorderedAccessTexture() = default;

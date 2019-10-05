@@ -46,6 +46,7 @@
     <ClInclude Include="..\..\Include\vdl\Collision2D.hpp" />
     <ClInclude Include="..\..\Include\vdl\Collision3D.hpp" />
     <ClInclude Include="..\..\Include\vdl\Color.hpp" />
+    <ClInclude Include="..\..\Include\vdl\Computer.hpp" />
     <ClInclude Include="..\..\Include\vdl\ConstantBuffer.hpp" />
     <ClInclude Include="..\..\Include\vdl\Constants.hpp" />
     <ClInclude Include="..\..\Include\vdl\DepthStencilState.hpp" />
@@ -129,6 +130,7 @@
     <ClCompile Include="..\..\Src\vdl\Camera\Camera.cpp" />
     <ClCompile Include="..\..\Src\vdl\Collision2D\Collision2D.cpp" />
     <ClCompile Include="..\..\Src\vdl\Computer\CComputer.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Computer\Computer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Computer\ComputerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
@@ -161,6 +163,7 @@
     <ClCompile Include="..\..\Src\vdl\System\SystemFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\TextureManager\TextureManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Texture\Texture.cpp" />
+    <ClCompile Include="..\..\Src\vdl\UnorderedAccessBuffer\UnorederedAccessBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Window\Window.cpp" />
     <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp" />
   </ItemGroup>

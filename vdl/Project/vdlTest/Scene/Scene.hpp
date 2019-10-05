@@ -5,6 +5,7 @@ enum class SceneType : vdl::uint
 {
   eMultiRenderTexture,
   eTessellation,
+  eGPUParticle,
 
   eNum
 };

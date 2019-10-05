@@ -292,25 +292,46 @@ void CDevice::CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _Buffe
   (*_ppConstantBuffer) = std::move(pConstantBuffer);
 }
 
-void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _BufferSize)
+void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer)
 {
   assert(_ppUnorderedAccessBuffer);
 
-  CUnordererdAccessBuffer* pUnordererdAccessBuffer = new CUnordererdAccessBuffer(_BufferSize);
+  CUnordererdAccessBuffer* pUnordererdAccessBuffer = new CUnordererdAccessBuffer(_Stride, _BufferSize);
 
   HRESULT hr = S_OK;
 
   D3D11_BUFFER_DESC BufferDesc;
   {
     BufferDesc.ByteWidth = _BufferSize;
-    BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    BufferDesc.Usage = D3D11_USAGE_DEFAULT;
     BufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
-    BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    BufferDesc.MiscFlags = 0;
-    BufferDesc.StructureByteStride = 0;
+    BufferDesc.CPUAccessFlags = 0;
+    BufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    BufferDesc.StructureByteStride = _Stride;
   }
 
-  hr = pD3D11Device_->CreateBuffer(&BufferDesc, nullptr, pUnordererdAccessBuffer->pBuffer.GetAddressOf());
+  if (_Buffer)
+  {
+    D3D11_SUBRESOURCE_DATA InitialData;
+    {
+      InitialData.pSysMem = _Buffer;
+      InitialData.SysMemPitch = _Stride;
+      InitialData.SysMemSlicePitch = 0;
+    }
+
+    hr = pD3D11Device_->CreateBuffer(&BufferDesc, &InitialData, pUnordererdAccessBuffer->pBuffer.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  }
+  else
+  {
+    hr = pD3D11Device_->CreateBuffer(&BufferDesc, nullptr, pUnordererdAccessBuffer->pBuffer.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  }
+
+  hr = pD3D11Device_->CreateShaderResourceView(pUnordererdAccessBuffer->pBuffer.Get(), nullptr, pUnordererdAccessBuffer->pShaderResourceView.GetAddressOf());
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+  hr = pD3D11Device_->CreateUnorderedAccessView(pUnordererdAccessBuffer->pBuffer.Get(), nullptr, pUnordererdAccessBuffer->pUnorderedAccessView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppUnorderedAccessBuffer) = std::move(pUnordererdAccessBuffer);
@@ -369,7 +390,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
   (*_ppTexture) = std::move(pTexture);
 }
 
-void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)
+void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
   assert(_ppRenderTexture);
 
@@ -408,7 +429,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
   (*_ppRenderTexture) = std::move(pRenderTexture);
 }
 
-void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)
+void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
   assert(_ppDepthStecilTexture);
 
@@ -447,7 +468,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
   (*_ppDepthStecilTexture) = std::move(pDepthStencilTexture);
 }
 
-void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::Format _Format)
+void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
   assert(_ppUnorderedAccessTexture);
 
@@ -465,7 +486,7 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
     UnorderedAccessTextureDesc.Format = Cast(_Format);
     UnorderedAccessTextureDesc.SampleDesc.Count = 1;
     UnorderedAccessTextureDesc.SampleDesc.Quality = 0;
-    UnorderedAccessTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    UnorderedAccessTextureDesc.Usage = D3D11_USAGE_DEFAULT;
     UnorderedAccessTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
     UnorderedAccessTextureDesc.CPUAccessFlags = 0;
     UnorderedAccessTextureDesc.MiscFlags = 0;
@@ -548,13 +569,28 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   {
     ID3D11Buffer* pBuffer = static_cast<CUnordererdAccessBuffer*>(_pDstBuffer)->pBuffer.Get();
 
-    D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
-    hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
+    Microsoft::WRL::ComPtr<ID3D11Buffer> pCopyBuffer;
+
+    D3D11_BUFFER_DESC BufferDesc;
+    {
+      pBuffer->GetDesc(&BufferDesc);
+
+      BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+      BufferDesc.BindFlags = 0;
+      BufferDesc.MiscFlags = 0;
+    }
+
+    D3D11_SUBRESOURCE_DATA InitialData;
+    {
+      InitialData.pSysMem = _pSrcBuffer;
+      InitialData.SysMemPitch = BufferDesc.StructureByteStride;
+      InitialData.SysMemSlicePitch = 0;
+    }
+
+    hr = pD3D11Device_->CreateBuffer(&BufferDesc, nullptr, pCopyBuffer.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
-    ::memcpy(MappedSubresorce.pData, _pSrcBuffer, _BufferSize);
-
-    pD3D11ImmediateContext_->Unmap(pBuffer, 0);
+    pD3D11ImmediateContext_->CopyResource(pBuffer, pCopyBuffer.Get());
   }
   break;
   default: assert(false);
@@ -746,7 +782,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   }
 }
 
-void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath, const char* _EntryPoint, vdl::InputLayout _InputLayout)
+void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath, const char* _EntryPoint, vdl::InputLayoutType _InputLayout)
 {
   assert(_ppVertexShader);
 
@@ -775,7 +811,7 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath,
   }
 }
 
-void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout)
+void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayoutType _InputLayout)
 {
   assert(_ppVertexShader);
 

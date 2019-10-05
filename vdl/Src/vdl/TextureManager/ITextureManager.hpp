@@ -1,6 +1,5 @@
 #pragma once
 #include <vdl/Fwd.hpp>
-#include <vdl/ID.hpp>
 
 #include <vdl/Texture/ITexture.hpp>
 
@@ -19,9 +18,11 @@ public:
 
   [[nodiscard]] virtual vdl::ID Load(const vdl::Image& _Image) = 0;
 
-  [[nodiscard]] virtual vdl::ID CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::Format _Format) = 0;
+  [[nodiscard]] virtual vdl::ID CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
 
-  [[nodiscard]] virtual vdl::ID CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::Format _Format) = 0;
+  [[nodiscard]] virtual vdl::ID CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
+
+  [[nodiscard]] virtual vdl::ID CreateUnorderedAccessTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
 
   virtual void AddRef(const vdl::ID& _ID) = 0;
 

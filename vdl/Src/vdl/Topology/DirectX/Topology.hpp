@@ -4,83 +4,83 @@
 #include <d3dcommon.h>
 #include <assert.h>
 
-inline constexpr D3D_PRIMITIVE_TOPOLOGY Cast(vdl::Topology _Topology)
+inline constexpr D3D_PRIMITIVE_TOPOLOGY Cast(vdl::TopologyType _Topology)
 {
   switch (_Topology)
   {
-  case vdl::Topology::ePointList:
+  case vdl::TopologyType::ePointList:
     return D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
-  case vdl::Topology::eLineList:
+  case vdl::TopologyType::eLineList:
     return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
-  case vdl::Topology::eLineStrip:
+  case vdl::TopologyType::eLineStrip:
     return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
-  case vdl::Topology::eTriangleList:
+  case vdl::TopologyType::eTriangleList:
     return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-  case vdl::Topology::eTriangleStrip:
+  case vdl::TopologyType::eTriangleStrip:
     return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-  case vdl::Topology::ePatchList1ControlPoint:
+  case vdl::TopologyType::ePatchList1ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList2ControlPoint:
+  case vdl::TopologyType::ePatchList2ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList3ControlPoint:
+  case vdl::TopologyType::ePatchList3ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList4ControlPoint:
+  case vdl::TopologyType::ePatchList4ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList5ControlPoint:
+  case vdl::TopologyType::ePatchList5ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_5_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList6ControlPoint:
+  case vdl::TopologyType::ePatchList6ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_6_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList7ControlPoint:
+  case vdl::TopologyType::ePatchList7ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_7_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList8ControlPoint:
+  case vdl::TopologyType::ePatchList8ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList9ControlPoint:
+  case vdl::TopologyType::ePatchList9ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_9_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList10ControlPoint:
+  case vdl::TopologyType::ePatchList10ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList11ControlPoint:
+  case vdl::TopologyType::ePatchList11ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_11_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList12ControlPoint:
+  case vdl::TopologyType::ePatchList12ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList13ControlPoint:
+  case vdl::TopologyType::ePatchList13ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_13_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList14ControlPoint:
+  case vdl::TopologyType::ePatchList14ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_14_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList15ControlPoint:
+  case vdl::TopologyType::ePatchList15ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_15_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList16ControlPoint:
+  case vdl::TopologyType::ePatchList16ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList17ControlPoint:
+  case vdl::TopologyType::ePatchList17ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_17_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList18ControlPoint:
+  case vdl::TopologyType::ePatchList18ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_18_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList19ControlPoint:
+  case vdl::TopologyType::ePatchList19ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_19_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList20ControlPoint:
+  case vdl::TopologyType::ePatchList20ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_20_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList21ControlPoint:
+  case vdl::TopologyType::ePatchList21ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_21_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList22ControlPoint:
+  case vdl::TopologyType::ePatchList22ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_22_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList23ControlPoint:
+  case vdl::TopologyType::ePatchList23ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_23_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList24ControlPoint:
+  case vdl::TopologyType::ePatchList24ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_24_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList25ControlPoint:
+  case vdl::TopologyType::ePatchList25ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_25_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList26ControlPoint:
+  case vdl::TopologyType::ePatchList26ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_26_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList27ControlPoint:
+  case vdl::TopologyType::ePatchList27ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_27_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList28ControlPoint:
+  case vdl::TopologyType::ePatchList28ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_28_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList29ControlPoint:
+  case vdl::TopologyType::ePatchList29ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_29_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList30ControlPoint:
+  case vdl::TopologyType::ePatchList30ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_30_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList31ControlPoint:
+  case vdl::TopologyType::ePatchList31ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_31_CONTROL_POINT_PATCHLIST;
-  case vdl::Topology::ePatchList32ControlPoint:
+  case vdl::TopologyType::ePatchList32ControlPoint:
     return D3D_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST;
   default: assert(false);
   }

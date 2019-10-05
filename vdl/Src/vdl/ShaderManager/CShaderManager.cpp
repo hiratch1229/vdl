@@ -20,7 +20,7 @@ vdl::ID CShaderManager::LoadFromFile(const char* _FilePath, const char* _EntryPo
   return Shaders_.Add(pShader);
 }
 
-vdl::ID CShaderManager::LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::InputLayout _InputLayout)
+vdl::ID CShaderManager::LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::InputLayoutType _InputLayout)
 {
   IVertexShader* pVertexShader;
   pDevice_->LoadShader(&pVertexShader, _FilePath, _EntryPoint, _InputLayout);
@@ -36,7 +36,7 @@ vdl::ID CShaderManager::LoadFromMemory(const char* _Source, vdl::uint _DataSize,
   return Shaders_.Add(pShader);
 }
 
-vdl::ID CShaderManager::LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout)
+vdl::ID CShaderManager::LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayoutType _InputLayout)
 {
   IVertexShader* pVertexShader;
   pDevice_->LoadShader(&pVertexShader, _Source, _DataSize, _EntryPoint, _InputLayout);

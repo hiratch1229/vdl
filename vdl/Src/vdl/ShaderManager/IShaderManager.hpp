@@ -1,5 +1,5 @@
 #pragma once
-#include <vdl/ID.hpp>
+#include <vdl/Fwd.hpp>
 #include <vdl/InputLayout.hpp>
 
 #include <vdl/Shader/IShader.hpp>
@@ -18,12 +18,12 @@ public:
   [[nodiscard]] virtual vdl::ID LoadFromFile(const char* _FilePath, const char* _EntryPoint, ShaderType _Type) = 0;
 
   //  頂点シェーダー用
-  [[nodiscard]] virtual vdl::ID LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::InputLayout _InputLayout) = 0;
+  [[nodiscard]] virtual vdl::ID LoadFromFile(const char* _FilePath, const char* _EntryPoint, vdl::InputLayoutType _InputLayout) = 0;
 
   [[nodiscard]] virtual vdl::ID LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, ShaderType _Type) = 0;
 
   //  頂点シェーダー用
-  [[nodiscard]] virtual vdl::ID LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayout _InputLayout) = 0;
+  [[nodiscard]] virtual vdl::ID LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayoutType _InputLayout) = 0;
 
   virtual void AddRef(const vdl::ID& _ID) = 0;
 

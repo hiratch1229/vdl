@@ -6,19 +6,19 @@ void SceneMultiRenderTexture::Initialize()
 {
   for (uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)
   {
-    RenderTextures_[RenderTextureCount] = vdl::RenderTexture(kRenderTextureSize, Format::eSwapChain);
+    RenderTextures_[RenderTextureCount] = vdl::RenderTexture(kRenderTextureSize, FormatType::eSwapChain);
   }
 
   Model_ = vdl::Model("Data/danbo_atk.fbx");
 
-  RendererStaticMesh::SetVertexShader(VertexShader("Shader/MultiRenderTexture/MultiRenderTextureVS.hlsl", InputLayout::eStaticMesh));
-  RendererStaticMesh::SetPixelShader(PixelShader("Shader/MultiRenderTexture/MultiRenderTexturePS.hlsl"));
+  Renderer3D::RendererStaticMesh::SetVertexShader(VertexShader("Shader/MultiRenderTexture/MultiRenderTextureVS.hlsl", InputLayoutType::eStaticMesh));
+  Renderer3D::RendererStaticMesh::SetPixelShader(PixelShader("Shader/MultiRenderTexture/MultiRenderTexturePS.hlsl"));
 }
 
 SceneMultiRenderTexture::~SceneMultiRenderTexture()
 {
-  RendererStaticMesh::SetShaders(VertexShader("ShaderStaticMesh/StaticMeshVS.hlsl", InputLayout::eStaticMesh),
-    PixelShader("ShaderStaticMesh/StaticMeshPS.hlsl"));
+  Renderer3D::RendererStaticMesh::SetShaders(VertexShader("Shader/StaticMesh/StaticMeshVS.hlsl", InputLayoutType::eStaticMesh),
+    PixelShader("Shader/StaticMesh/StaticMeshPS.hlsl"));
 }
 
 void SceneMultiRenderTexture::Update()

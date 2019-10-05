@@ -69,6 +69,7 @@ private:
   std::unique_ptr<CameraData> pSkinnedMeshCameraData_;
 private:
   OutputManager OutputManager_;
+  RendererCommandList<Empty, vdl::uint> EmptyRendererCommandList_;
   RendererCommandList<vdl::Texture, TextureInstanceData> TextureRendererCommandList_;
   RendererCommandList<vdl::StaticMesh, StaticMeshInstanceData> StaticMeshRendererCommandList_;
   RendererCommandList<vdl::SkinnedMesh, SkinnedMeshinstanceData> SkinnedMeshRendererCommandList_;
@@ -85,7 +86,7 @@ public:
 
   void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)override;
 
-  void SetTopology(vdl::Topology _Topology, RenderType _Type)override;
+  void SetTopology(vdl::TopologyType _Topology, RenderType _Type)override;
 
   void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type)override;
 
@@ -113,6 +114,8 @@ public:
 
   void SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[], ShaderType _Stage, RenderType _Type)override;
 
+  void Draw(vdl::uint _VertexCount)override;
+
   void Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::ColorF& _Color)override;
 
   void Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _World, const vdl::ColorF& _Color)override;
@@ -122,6 +125,8 @@ public:
   void Clear(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)override;
 
   void Clear(const vdl::DepthStencilTexture& _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil)override;
+  
+  void Clear(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)override;
 
   void Flush()override;
 };

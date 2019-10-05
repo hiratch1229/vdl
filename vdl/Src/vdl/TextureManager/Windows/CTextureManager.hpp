@@ -16,9 +16,11 @@ public:
 
   vdl::ID Load(const vdl::Image& _Image)override;
 
-  vdl::ID CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::Format _Format)override;
+  vdl::ID CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
-  vdl::ID CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::Format _Format)override;
+  vdl::ID CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
+
+  vdl::ID CreateUnorderedAccessTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
   void AddRef(const vdl::ID& _ID)override { Textures_.Get(_ID).AddRef(); }
 

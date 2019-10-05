@@ -5,6 +5,7 @@
 #include <vdl/Texture.hpp>
 #include <vdl/Sampler.hpp>
 #include <vdl/ConstantBuffer.hpp>
+#include <vdl/UnorderedAccessBuffer.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 
@@ -17,9 +18,10 @@ class IBufferManager;
 enum class ComputerCommandType : vdl::uint8_t
 {
   eSetShader,
-  eSetTexture,
+  eSetShaderResource,
   eSetSampler,
   eSetConstantBuffer,
+  eSetUnorderedAccessObject,
 
   eNum
 };
@@ -37,16 +39,17 @@ public:
 
   [[nodiscard]] bool Has(ComputerCommandType _Command)const { return Flags_ & (1 << static_cast<vdl::uint>(_Command)); }
 
-  void Set(ComputerCommandType _Command) { Flags_ |= 1 << static_cast<vdl::uint>(_Command); }
+  void Set(ComputerCommandType _Command) { Flags_ |= (1 << static_cast<vdl::uint>(_Command)); }
 
-  void Cancel(ComputerCommandType _Command) { Flags_ &= ~static_cast<vdl::uint>(_Command); }
+  void Cancel(ComputerCommandType _Command) { Flags_ &= ~(1 << static_cast<vdl::uint>(_Command)); }
 };
 
 class CComputer : public IComputer
 {
   using Samplers = std::vector<vdl::Sampler>;
-  using Textures = std::vector<vdl::Texture>;
+  using ShaderResources = std::vector<vdl::ShaderResource>;
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
+  using UnorderedAccessObjects = std::vector<vdl::UnorderedAccessObject>;
 private:
   IDevice* pDevice_;
   IDeviceContext* pDeviceContext_;
@@ -55,15 +58,17 @@ private:
   StateChangeFlags StateChangeFlags_;
 
   vdl::ComputeShader PreviousShader_;
-  Textures PreviousTextures_;
+  ShaderResources PreviousShaderResources_;
   Samplers PreviousSamplers_;
-  ConstantBuffers PreviousConstantBufferDatas_;
   ConstantBuffers PreviousConstantBuffers_;
+  ConstantBuffers PreviousConstantBufferDatas_;
+  UnorderedAccessObjects PreviousUnorderedAccessObjects_;
 
   vdl::ComputeShader CurrentShader_;
-  Textures CurrentTextures_;
+  ShaderResources CurrentShaderResources_;
   Samplers CurrentSamplers_;
   ConstantBuffers CurrentConstantBuffers_;
+  UnorderedAccessObjects CurrentUnorderedAccessObjects_;
 public:
   CComputer() = default;
 
@@ -71,11 +76,13 @@ public:
 
   void SetShader(const vdl::ComputeShader& _ComputeShader)override;
 
-  void SetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])override;
+  void SetShaderResource(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])override;
 
   void SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override;
 
   void SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])override;
+
+  void SetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint _UnorderedAccessObjectNum, const vdl::UnorderedAccessObject _UnorderedAccessObjects[])override;
 
   void Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ)override;
 };

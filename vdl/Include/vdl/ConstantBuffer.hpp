@@ -20,18 +20,20 @@ namespace vdl
       ~ConstantBufferData();
     public:
       ConstantBufferData& operator=(const ConstantBufferData& _ConstantBufferData);
-      
+
       ConstantBufferData& operator=(ConstantBufferData&& _ConstantBufferData)noexcept;
 
-      [[nodiscard]] constexpr bool operator==(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ == _ConstantBufferData.ID_; }
+      [[nodiscard]] bool operator==(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ == _ConstantBufferData.ID_; }
 
-      [[nodiscard]] constexpr bool operator!=(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ != _ConstantBufferData.ID_; }
+      [[nodiscard]] bool operator!=(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ != _ConstantBufferData.ID_; }
     public:
       [[nodiscard]] ID GetID()const noexcept { return ID_; }
 
+      [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
+
       [[nodiscard]] void* GetData()const;
 
-      [[nodiscard]] uint GetSize()const;
+      [[nodiscard]] uint GetBufferSize()const;
     };
   }
 
@@ -58,8 +60,6 @@ namespace vdl
   public:
     [[nodiscard]] T& GetData()const { return *reinterpret_cast<T*>(Data_.GetData()); }
 
-    [[nodiscard]] const void* GetPtr()const { return Data_.GetData(); }
-
-    [[nodiscard]] Detail::ConstantBufferData GetDetail()const { return Data_; }
+    [[nodiscard]] const Detail::ConstantBufferData& GetDetail()const { return Data_; }
   };
 }

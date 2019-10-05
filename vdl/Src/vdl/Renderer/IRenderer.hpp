@@ -35,7 +35,7 @@ public:
 
   virtual void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture) = 0;
 
-  virtual void SetTopology(vdl::Topology _Topology, RenderType _Type) = 0;
+  virtual void SetTopology(vdl::TopologyType _Topology, RenderType _Type) = 0;
 
   virtual void SetScissor(const vdl::Scissor& _Scissor, RenderType _Type) = 0;
 
@@ -56,12 +56,14 @@ public:
   virtual void SetGeometryShader(const vdl::GeometryShader& _GeometryShader, RenderType _Type) = 0;
 
   virtual void SetPixelShader(const vdl::PixelShader& _PixelShader, RenderType _Type) = 0;
-  
+
   virtual void SetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[], ShaderType _Stage, RenderType _Type) = 0;
 
   virtual void SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[], ShaderType _Stage, RenderType _Type) = 0;
 
   virtual void SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[], ShaderType _Stage, RenderType _Type) = 0;
+
+  virtual void Draw(vdl::uint _VertexCount) = 0;
 
   virtual void Draw(const vdl::Texture& _Texture, const vdl::float2& _DstLeftTop, const vdl::float2& _DstSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::ColorF& _Color) = 0;
 
@@ -73,7 +75,7 @@ public:
 
   virtual void Clear(const vdl::DepthStencilTexture& _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil) = 0;
 
-  virtual void Flush() = 0;
+  virtual void Clear(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor) = 0;
 
-  //virtual void SetComputeShader(const vdl::ComputeShader& _ComputeShader) = 0;
+  virtual void Flush() = 0;
 };

@@ -29,7 +29,7 @@ struct IConstantBuffer : public IBuffer
 {
   IConstantBuffer() = default;
 
-  [[nodiscard]] virtual void* GetData() = 0;
+  [[nodiscard]] virtual void* GetBuffer()const = 0;
 
-  [[nodiscard]] virtual vdl::uint GetSize() = 0;
+  [[nodiscard]] virtual vdl::uint GetBufferSize()const = 0;
 };

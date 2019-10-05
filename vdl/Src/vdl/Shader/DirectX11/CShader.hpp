@@ -7,13 +7,13 @@
 struct CVertexShader : public IVertexShader
 {
   Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
-  vdl::InputLayout InputLayout;
+  vdl::InputLayoutType InputLayout;
 public:
   CVertexShader() = default;
 
   ShaderType GetType()const override final { return ShaderType::eVertexShader; }
 
-  vdl::InputLayout GetInputLayout()const override final { return InputLayout; }
+  vdl::InputLayoutType GetInputLayout()const override final { return InputLayout; }
 };
 
 struct CHullShader : public IShader

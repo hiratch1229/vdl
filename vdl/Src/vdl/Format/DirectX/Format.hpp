@@ -4,211 +4,211 @@
 #include <dxgi.h>
 #include <assert.h>
 
-inline constexpr DXGI_FORMAT Cast(vdl::Format _Format)
+inline constexpr DXGI_FORMAT Cast(vdl::FormatType _Format)
 {
   switch (_Format)
   {
-  case vdl::Format::eUnknown:
+  case vdl::FormatType::eUnknown:
     return DXGI_FORMAT_UNKNOWN;
-  case vdl::Format::eR32G32B32A32_Typeless:
+  case vdl::FormatType::eR32G32B32A32_Typeless:
     return DXGI_FORMAT_R32G32B32A32_TYPELESS;
-  case vdl::Format::eR32G32B32A32_Float:
+  case vdl::FormatType::eR32G32B32A32_Float:
     return DXGI_FORMAT_R32G32B32A32_FLOAT;
-  case vdl::Format::eR32G32B32A32_Uint:
+  case vdl::FormatType::eR32G32B32A32_Uint:
     return DXGI_FORMAT_R32G32B32A32_UINT;
-  case vdl::Format::eR32G32B32A32_Sint:
+  case vdl::FormatType::eR32G32B32A32_Sint:
     return DXGI_FORMAT_R32G32B32A32_SINT;
-  case vdl::Format::eR32G32B32_Typeless:
+  case vdl::FormatType::eR32G32B32_Typeless:
     return DXGI_FORMAT_R32G32B32_TYPELESS;
-  case vdl::Format::eR32G32B32_Float:
+  case vdl::FormatType::eR32G32B32_Float:
     return DXGI_FORMAT_R32G32B32_FLOAT;
-  case vdl::Format::eR32G32B32_Uint:
+  case vdl::FormatType::eR32G32B32_Uint:
     return DXGI_FORMAT_R32G32B32_UINT;
-  case vdl::Format::eR32G32B32_Sint:
+  case vdl::FormatType::eR32G32B32_Sint:
     return DXGI_FORMAT_R32G32B32_SINT;
-  case vdl::Format::eR16G16B16A16_Typeless:
+  case vdl::FormatType::eR16G16B16A16_Typeless:
     return DXGI_FORMAT_R16G16B16A16_TYPELESS;
-  case vdl::Format::eR16G16B16A16_Float:
+  case vdl::FormatType::eR16G16B16A16_Float:
     return DXGI_FORMAT_R16G16B16A16_FLOAT;
-  case vdl::Format::eR16G16B16A16_Unorm:
+  case vdl::FormatType::eR16G16B16A16_Unorm:
     return DXGI_FORMAT_R16G16B16A16_UNORM;
-  case vdl::Format::eR16G16B16A16_Uint:
+  case vdl::FormatType::eR16G16B16A16_Uint:
     return DXGI_FORMAT_R16G16B16A16_UINT;
-  case vdl::Format::eR16G16B16A16_Snorm:
+  case vdl::FormatType::eR16G16B16A16_Snorm:
     return DXGI_FORMAT_R16G16B16A16_SNORM;
-  case vdl::Format::eR16G16B16A16_Sint:
+  case vdl::FormatType::eR16G16B16A16_Sint:
     return DXGI_FORMAT_R16G16B16A16_SINT;
-  case vdl::Format::eR32G32_Typeless:
+  case vdl::FormatType::eR32G32_Typeless:
     return DXGI_FORMAT_R32G32_TYPELESS;
-  case vdl::Format::eR32G32_Float:
+  case vdl::FormatType::eR32G32_Float:
     return DXGI_FORMAT_R32G32_FLOAT;
-  case vdl::Format::eR32G32_Uint:
+  case vdl::FormatType::eR32G32_Uint:
     return DXGI_FORMAT_R32G32_UINT;
-  case vdl::Format::eR32G32_Sint:
+  case vdl::FormatType::eR32G32_Sint:
     return DXGI_FORMAT_R32G32_SINT;
-  case vdl::Format::eR32G8X24_Typeless:
+  case vdl::FormatType::eR32G8X24_Typeless:
     return DXGI_FORMAT_R32G8X24_TYPELESS;
-  case vdl::Format::eD32_Float_S8X24_Uint:
+  case vdl::FormatType::eD32_Float_S8X24_Uint:
     return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-  case vdl::Format::eR32_Float_X8X24_Typeless:
+  case vdl::FormatType::eR32_Float_X8X24_Typeless:
     return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
-  case vdl::Format::eX32_Typeless_G8X24_Uint:
+  case vdl::FormatType::eX32_Typeless_G8X24_Uint:
     return DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
-  case vdl::Format::eR10G10B10A2_Typeless:
+  case vdl::FormatType::eR10G10B10A2_Typeless:
     return DXGI_FORMAT_R10G10B10A2_TYPELESS;
-  case vdl::Format::eR10G10B10A2_Unorm:
+  case vdl::FormatType::eR10G10B10A2_Unorm:
     return DXGI_FORMAT_R10G10B10A2_UNORM;
-  case vdl::Format::eR10G10B10A2_Uint:
+  case vdl::FormatType::eR10G10B10A2_Uint:
     return DXGI_FORMAT_R10G10B10A2_UINT;
-  case vdl::Format::eR11G11B10_Float:
+  case vdl::FormatType::eR11G11B10_Float:
     return DXGI_FORMAT_R11G11B10_FLOAT;
-  case vdl::Format::eR8G8B8A8_Typeless:
+  case vdl::FormatType::eR8G8B8A8_Typeless:
     return DXGI_FORMAT_R8G8B8A8_TYPELESS;
-  case vdl::Format::eR8G8B8A8_Unorm:
+  case vdl::FormatType::eR8G8B8A8_Unorm:
     return DXGI_FORMAT_R8G8B8A8_UNORM;
-  case vdl::Format::eR8G8B8A8_Unorm_SRGB:
+  case vdl::FormatType::eR8G8B8A8_Unorm_SRGB:
     return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-  case vdl::Format::eR8G8B8A8_Uint:
+  case vdl::FormatType::eR8G8B8A8_Uint:
     return DXGI_FORMAT_R8G8B8A8_UINT;
-  case vdl::Format::eR8G8B8A8_Snorm:
+  case vdl::FormatType::eR8G8B8A8_Snorm:
     return DXGI_FORMAT_R8G8B8A8_SNORM;
-  case vdl::Format::eR8G8B8A8_Sint:
+  case vdl::FormatType::eR8G8B8A8_Sint:
     return DXGI_FORMAT_R8G8B8A8_SINT;
-  case vdl::Format::eR16G16_Typeless:
+  case vdl::FormatType::eR16G16_Typeless:
     return DXGI_FORMAT_R16G16_TYPELESS;
-  case vdl::Format::eR16G16_Float:
+  case vdl::FormatType::eR16G16_Float:
     return DXGI_FORMAT_R16G16_FLOAT;
-  case vdl::Format::eR16G16_Unorm:
+  case vdl::FormatType::eR16G16_Unorm:
     return DXGI_FORMAT_R16G16_UNORM;
-  case vdl::Format::eR16G16_Uint:
+  case vdl::FormatType::eR16G16_Uint:
     return DXGI_FORMAT_R16G16_UINT;
-  case vdl::Format::eR16G16_Snorm:
+  case vdl::FormatType::eR16G16_Snorm:
     return DXGI_FORMAT_R16G16_SNORM;
-  case vdl::Format::eR16G16_Sint:
+  case vdl::FormatType::eR16G16_Sint:
     return DXGI_FORMAT_R16G16_SINT;
-  case vdl::Format::eR32_Typeless:
+  case vdl::FormatType::eR32_Typeless:
     return DXGI_FORMAT_R32_TYPELESS;
-  case vdl::Format::eD32_Float:
+  case vdl::FormatType::eD32_Float:
     return DXGI_FORMAT_D32_FLOAT;
-  case vdl::Format::eR32_Float:
+  case vdl::FormatType::eR32_Float:
     return DXGI_FORMAT_R32_FLOAT;
-  case vdl::Format::eR32_Uint:
+  case vdl::FormatType::eR32_Uint:
     return DXGI_FORMAT_R32_UINT;
-  case vdl::Format::eR32_Sint:
+  case vdl::FormatType::eR32_Sint:
     return DXGI_FORMAT_R32_SINT;
-  case vdl::Format::eR24G8_Typeless:
+  case vdl::FormatType::eR24G8_Typeless:
     return DXGI_FORMAT_R24G8_TYPELESS;
-  case vdl::Format::eD24_Unorm_S8_Uint:
+  case vdl::FormatType::eD24_Unorm_S8_Uint:
     return DXGI_FORMAT_D24_UNORM_S8_UINT;
-  case vdl::Format::eR24_Unorm_X8_Typeless:
+  case vdl::FormatType::eR24_Unorm_X8_Typeless:
     return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-  case vdl::Format::eX24_Typeless_G8_Uint:
+  case vdl::FormatType::eX24_Typeless_G8_Uint:
     return DXGI_FORMAT_X24_TYPELESS_G8_UINT;
-  case vdl::Format::eR8G8_Typeless:
+  case vdl::FormatType::eR8G8_Typeless:
     return DXGI_FORMAT_R8G8_TYPELESS;
-  case vdl::Format::eR8G8_Unorm:
+  case vdl::FormatType::eR8G8_Unorm:
     return DXGI_FORMAT_R8G8_UNORM;
-  case vdl::Format::eR8G8_Uint:
+  case vdl::FormatType::eR8G8_Uint:
     return DXGI_FORMAT_R8G8_UINT;
-  case vdl::Format::eR8G8_Snorm:
+  case vdl::FormatType::eR8G8_Snorm:
     return DXGI_FORMAT_R8G8_SNORM;
-  case vdl::Format::eR8G8_Sint:
+  case vdl::FormatType::eR8G8_Sint:
     return DXGI_FORMAT_R8G8_SINT;
-  case vdl::Format::eR16_Typeless:
+  case vdl::FormatType::eR16_Typeless:
     return DXGI_FORMAT_R16_TYPELESS;
-  case vdl::Format::eR16_Float:
+  case vdl::FormatType::eR16_Float:
     return DXGI_FORMAT_R16_FLOAT;
-  case vdl::Format::eD16_Unorm:
+  case vdl::FormatType::eD16_Unorm:
     return DXGI_FORMAT_D16_UNORM;
-  case vdl::Format::eR16_Unorm:
+  case vdl::FormatType::eR16_Unorm:
     return DXGI_FORMAT_R16_UNORM;
-  case vdl::Format::eR16_Uint:
+  case vdl::FormatType::eR16_Uint:
     return DXGI_FORMAT_R16_UINT;
-  case vdl::Format::eR16_Snorm:
+  case vdl::FormatType::eR16_Snorm:
     return DXGI_FORMAT_R16_SNORM;
-  case vdl::Format::eR16_Sint:
+  case vdl::FormatType::eR16_Sint:
     return DXGI_FORMAT_R16_SINT;
-  case vdl::Format::eR8_Typeless:
+  case vdl::FormatType::eR8_Typeless:
     return DXGI_FORMAT_R8_TYPELESS;
-  case vdl::Format::eR8_Unorm:
+  case vdl::FormatType::eR8_Unorm:
     return DXGI_FORMAT_R8_UNORM;
-  case vdl::Format::eR8_Uint:
+  case vdl::FormatType::eR8_Uint:
     return DXGI_FORMAT_R8_UINT;
-  case vdl::Format::eR8_Snorm:
+  case vdl::FormatType::eR8_Snorm:
     return DXGI_FORMAT_R8_SNORM;
-  case vdl::Format::eR8_Sint:
+  case vdl::FormatType::eR8_Sint:
     return DXGI_FORMAT_R8_SINT;
-  case vdl::Format::eA8_Unorm:
+  case vdl::FormatType::eA8_Unorm:
     return DXGI_FORMAT_A8_UNORM;
-  case vdl::Format::eR1_Unorm:
+  case vdl::FormatType::eR1_Unorm:
     return DXGI_FORMAT_R1_UNORM;
-  case vdl::Format::eR9G9B9E5_SharedExp:
+  case vdl::FormatType::eR9G9B9E5_SharedExp:
     return DXGI_FORMAT_R9G9B9E5_SHAREDEXP;
-  case vdl::Format::eR8G8_B8G8_Unorm:
+  case vdl::FormatType::eR8G8_B8G8_Unorm:
     return DXGI_FORMAT_R8G8_B8G8_UNORM;
-  case vdl::Format::eG8R8_G8B8_Unorm:
+  case vdl::FormatType::eG8R8_G8B8_Unorm:
     return DXGI_FORMAT_G8R8_G8B8_UNORM;
-  case vdl::Format::eBC1_Typeless:
+  case vdl::FormatType::eBC1_Typeless:
     return DXGI_FORMAT_BC1_TYPELESS;
-  case vdl::Format::eBC1_Unorm:
+  case vdl::FormatType::eBC1_Unorm:
     return DXGI_FORMAT_BC1_UNORM;
-  case vdl::Format::eBC1_Unorm_SRGB:
+  case vdl::FormatType::eBC1_Unorm_SRGB:
     return DXGI_FORMAT_BC1_UNORM_SRGB;
-  case vdl::Format::eBC2_Typeless:
+  case vdl::FormatType::eBC2_Typeless:
     return DXGI_FORMAT_BC2_TYPELESS;
-  case vdl::Format::eBC2_Unorm:
+  case vdl::FormatType::eBC2_Unorm:
     return DXGI_FORMAT_BC2_UNORM;
-  case vdl::Format::eBC2_Unorm_SRGB:
+  case vdl::FormatType::eBC2_Unorm_SRGB:
     return DXGI_FORMAT_BC2_UNORM_SRGB;
-  case vdl::Format::eBC3_Typeless:
+  case vdl::FormatType::eBC3_Typeless:
     return DXGI_FORMAT_BC3_TYPELESS;
-  case vdl::Format::eBC3_Unorm:
+  case vdl::FormatType::eBC3_Unorm:
     return DXGI_FORMAT_BC3_UNORM;
-  case vdl::Format::eBC3_Unorm_SRGB:
+  case vdl::FormatType::eBC3_Unorm_SRGB:
     return DXGI_FORMAT_BC3_UNORM_SRGB;
-  case vdl::Format::eBC4_Typeless:
+  case vdl::FormatType::eBC4_Typeless:
     return DXGI_FORMAT_BC4_TYPELESS;
-  case vdl::Format::eBC4_Unorm:
+  case vdl::FormatType::eBC4_Unorm:
     return DXGI_FORMAT_BC4_UNORM;
-  case vdl::Format::eBC4_Snorm:
+  case vdl::FormatType::eBC4_Snorm:
     return DXGI_FORMAT_BC4_SNORM;
-  case vdl::Format::eBC5_Typeless:
+  case vdl::FormatType::eBC5_Typeless:
     return DXGI_FORMAT_BC5_TYPELESS;
-  case vdl::Format::eBC5_Unorm:
+  case vdl::FormatType::eBC5_Unorm:
     return DXGI_FORMAT_BC5_UNORM;
-  case vdl::Format::eBC5_Snorm:
+  case vdl::FormatType::eBC5_Snorm:
     return DXGI_FORMAT_BC5_SNORM;
-  case vdl::Format::eB5G6R5_Unorm:
+  case vdl::FormatType::eB5G6R5_Unorm:
     return DXGI_FORMAT_B5G6R5_UNORM;
-  case vdl::Format::eB5G5R5A1_Unorm:
+  case vdl::FormatType::eB5G5R5A1_Unorm:
     return DXGI_FORMAT_B5G5R5A1_UNORM;
-  case vdl::Format::eB8G8R8A8_Unorm:
+  case vdl::FormatType::eB8G8R8A8_Unorm:
     return DXGI_FORMAT_B8G8R8A8_UNORM;
-  case vdl::Format::eB8G8R8X8_Unorm:
+  case vdl::FormatType::eB8G8R8X8_Unorm:
     return DXGI_FORMAT_B8G8R8X8_UNORM;
-  case vdl::Format::eR10G10B10_XR_BIAS_A2_Unorm:
+  case vdl::FormatType::eR10G10B10_XR_BIAS_A2_Unorm:
     return DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM;
-  case vdl::Format::eB8G8R8A8_Typeless:
+  case vdl::FormatType::eB8G8R8A8_Typeless:
     return DXGI_FORMAT_B8G8R8A8_TYPELESS;
-  case vdl::Format::eB8G8R8A8_Unorm_SRGB:
+  case vdl::FormatType::eB8G8R8A8_Unorm_SRGB:
     return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
-  case vdl::Format::eB8G8R8X8_Typeless:
+  case vdl::FormatType::eB8G8R8X8_Typeless:
     return DXGI_FORMAT_B8G8R8X8_TYPELESS;
-  case vdl::Format::eB8G8R8X8_Unorm_SRGB:
+  case vdl::FormatType::eB8G8R8X8_Unorm_SRGB:
     return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
-  case vdl::Format::eBC6H_Typeless:
+  case vdl::FormatType::eBC6H_Typeless:
     return DXGI_FORMAT_BC6H_TYPELESS;
-  case vdl::Format::eBC6H_UF16:
+  case vdl::FormatType::eBC6H_UF16:
     return DXGI_FORMAT_BC6H_UF16;
-  case vdl::Format::eBC6H_SF16:
+  case vdl::FormatType::eBC6H_SF16:
     return DXGI_FORMAT_BC6H_SF16;
-  case vdl::Format::eBC7_Typeless:
+  case vdl::FormatType::eBC7_Typeless:
     return DXGI_FORMAT_BC7_TYPELESS;
-  case vdl::Format::eBC7_Unorm:
+  case vdl::FormatType::eBC7_Unorm:
     return DXGI_FORMAT_BC7_UNORM;
-  case vdl::Format::eBC7_Unorm_SRGB:
+  case vdl::FormatType::eBC7_Unorm_SRGB:
     return DXGI_FORMAT_BC7_UNORM_SRGB;
-  case vdl::Format::eB4G4R4A4_Unorm:
+  case vdl::FormatType::eB4G4R4A4_Unorm:
     return DXGI_FORMAT_B4G4R4A4_UNORM;
   default: assert(false);
   }

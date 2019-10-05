@@ -339,14 +339,14 @@ void CDeviceContext::SetIndexBuffer(const IBuffer* _pIndexBuffer)
   pD3D11ImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), (pIndexBuffer->IndexType == IndexType::eUint16 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT), kOffset);
 }
 
-void CDeviceContext::SetInputLayout(vdl::InputLayout _InputLayout)
+void CDeviceContext::SetInputLayout(vdl::InputLayoutType _InputLayout)
 {
   assert(isFoundInputLayout(_InputLayout));
 
   pD3D11ImmediateContext_->IASetInputLayout(InputLayouts_[_InputLayout].Get());
 }
 
-void CDeviceContext::SetTopology(vdl::Topology _Topology)
+void CDeviceContext::SetTopology(vdl::TopologyType _Topology)
 {
   pD3D11ImmediateContext_->IASetPrimitiveTopology(Cast(_Topology));
 }
@@ -363,7 +363,7 @@ void CDeviceContext::SetViewport(const vdl::Viewport& _Viewport)
 
 void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)
 {
-  auto GetRenderTargetView = [&](const vdl::RenderTexture& _RenderTexture)->ID3D11RenderTargetView*
+  auto GetRenderTargetView = [&](const vdl::RenderTexture& _RenderTexture)->ID3D11RenderTargetView *
   {
     assert(!_RenderTexture.isEmpty());
 
@@ -502,9 +502,16 @@ void CDeviceContext::SetRasterizerState(const vdl::RasterizerState& _RasterizerS
 
 void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
 {
-  assert(_VertexShader.GetID() != std::nullopt && pShaderManager_->GetShader(_VertexShader.GetID())->GetType() == ShaderType::eVertexShader);
+  ID3D11VertexShader* pVertexShader = nullptr;
+  {
+    if (_VertexShader.isEmpty())
+    {
+      assert(pShaderManager_->GetShader(_VertexShader.GetID())->GetType() == ShaderType::eVertexShader);
+      pVertexShader = static_cast<CVertexShader*>(pShaderManager_->GetShader(_VertexShader.GetID()))->pVertexShader.Get();
+    }
+  }
 
-  pD3D11ImmediateContext_->VSSetShader(static_cast<CVertexShader*>(pShaderManager_->GetShader(_VertexShader.GetID()))->pVertexShader.Get(), nullptr, 0);
+  pD3D11ImmediateContext_->VSSetShader(pVertexShader, nullptr, 0);
 }
 
 void CDeviceContext::VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
@@ -513,7 +520,7 @@ void CDeviceContext::VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, 
   {
     for (vdl::uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
     {
-      assert(_Textures[TextureCount].GetID() != std::nullopt);
+      assert(!_Textures[TextureCount].isEmpty());
 
       pShaderResources[TextureCount] = static_cast<CTexture*>(pTextureManager_->GetTexture(_Textures[TextureCount].GetID()))->pShaderResourceView.Get();
     }
@@ -541,10 +548,7 @@ void CDeviceContext::VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   {
     for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < _ConstantBufferNum; ++ConstantBufferCount)
     {
-      assert(_ConstantBuffers[ConstantBufferCount].GetID() != std::nullopt &&
-        pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eConstantBuffer);
-
-      pConstantBuffers[ConstantBufferCount] = static_cast<CConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID()))->pBuffer.Get();
+      pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(_ConstantBuffers[ConstantBufferCount]);
     }
   }
 
@@ -554,13 +558,12 @@ void CDeviceContext::VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
 void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
 {
   ID3D11HullShader* pHullShader = nullptr;
-
-  if (const vdl::ID ID = _HullShader.GetID();
-    ID != std::nullopt)
   {
-    assert(pShaderManager_->GetShader(ID)->GetType() == ShaderType::eHullShader);
-
-    pHullShader = static_cast<CHullShader*>(pShaderManager_->GetShader(ID))->pHullShader.Get();
+    if (!_HullShader.isEmpty())
+    {
+      assert(pShaderManager_->GetShader(_HullShader.GetID())->GetType() == ShaderType::eHullShader);
+      pHullShader = static_cast<CHullShader*>(pShaderManager_->GetShader(_HullShader.GetID()))->pHullShader.Get();
+    }
   }
 
   pD3D11ImmediateContext_->HSSetShader(pHullShader, nullptr, 0);
@@ -600,10 +603,7 @@ void CDeviceContext::HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   {
     for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < _ConstantBufferNum; ++ConstantBufferCount)
     {
-      assert(_ConstantBuffers[ConstantBufferCount].GetID() != std::nullopt &&
-        pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eConstantBuffer);
-
-      pConstantBuffers[ConstantBufferCount] = static_cast<CConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID()))->pBuffer.Get();
+      pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(_ConstantBuffers[ConstantBufferCount]);
     }
   }
 
@@ -613,13 +613,12 @@ void CDeviceContext::HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
 void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
 {
   ID3D11DomainShader* pDomainShader = nullptr;
-
-  if (const vdl::ID ID = _DomainShader.GetID();
-    ID != std::nullopt)
   {
-    assert(pShaderManager_->GetShader(ID)->GetType() == ShaderType::eDomainShader);
-
-    pDomainShader = static_cast<CDomainShader*>(pShaderManager_->GetShader(ID))->pDomainShader.Get();
+    if (!_DomainShader.isEmpty())
+    {
+      assert(pShaderManager_->GetShader(_DomainShader.GetID())->GetType() == ShaderType::eDomainShader);
+      pDomainShader = static_cast<CDomainShader*>(pShaderManager_->GetShader(_DomainShader.GetID()))->pDomainShader.Get();
+    }
   }
 
   pD3D11ImmediateContext_->DSSetShader(pDomainShader, nullptr, 0);
@@ -659,10 +658,7 @@ void CDeviceContext::DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   {
     for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < _ConstantBufferNum; ++ConstantBufferCount)
     {
-      assert(_ConstantBuffers[ConstantBufferCount].GetID() != std::nullopt &&
-        pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eConstantBuffer);
-
-      pConstantBuffers[ConstantBufferCount] = static_cast<CConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID()))->pBuffer.Get();
+      pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(_ConstantBuffers[ConstantBufferCount]);
     }
   }
 
@@ -672,13 +668,12 @@ void CDeviceContext::DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
 void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
 {
   ID3D11GeometryShader* pGeometryShader = nullptr;
-
-  if (const vdl::ID ID = _GeometryShader.GetID();
-    ID != std::nullopt)
   {
-    assert(pShaderManager_->GetShader(ID)->GetType() == ShaderType::eGeometryShader);
-
-    pGeometryShader = static_cast<CGeometryShader*>(pShaderManager_->GetShader(ID))->pGeometryShader.Get();
+    if (!_GeometryShader.isEmpty())
+    {
+      assert(pShaderManager_->GetShader(_GeometryShader.GetID())->GetType() == ShaderType::eGeometryShader);
+      pGeometryShader = static_cast<CGeometryShader*>(pShaderManager_->GetShader(_GeometryShader.GetID()))->pGeometryShader.Get();
+    }
   }
 
   pD3D11ImmediateContext_->GSSetShader(pGeometryShader, nullptr, 0);
@@ -718,10 +713,7 @@ void CDeviceContext::GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   {
     for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < _ConstantBufferNum; ++ConstantBufferCount)
     {
-      assert(_ConstantBuffers[ConstantBufferCount].GetID() != std::nullopt &&
-        pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eConstantBuffer);
-
-      pConstantBuffers[ConstantBufferCount] = static_cast<CConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID()))->pBuffer.Get();
+      pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(_ConstantBuffers[ConstantBufferCount]);
     }
   }
 
@@ -730,9 +722,16 @@ void CDeviceContext::GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
 
 void CDeviceContext::PSSetShader(const vdl::PixelShader& _PixelShader)
 {
-  assert(_PixelShader.GetID() != std::nullopt && pShaderManager_->GetShader(_PixelShader.GetID())->GetType() == ShaderType::ePixelShader);
+  ID3D11PixelShader* pPixelShader = nullptr;
+  {
+    if (!_PixelShader.isEmpty())
+    {
+      assert(pShaderManager_->GetShader(_PixelShader.GetID())->GetType() == ShaderType::ePixelShader);
+      pPixelShader = static_cast<CPixelShader*>(pShaderManager_->GetShader(_PixelShader.GetID()))->pPixelShader.Get();
+    }
+  }
 
-  pD3D11ImmediateContext_->PSSetShader(static_cast<CPixelShader*>(pShaderManager_->GetShader(_PixelShader.GetID()))->pPixelShader.Get(), nullptr, 0);
+  pD3D11ImmediateContext_->PSSetShader(pPixelShader, nullptr, 0);
 }
 
 void CDeviceContext::PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
@@ -770,14 +769,77 @@ void CDeviceContext::PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   {
     for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < _ConstantBufferNum; ++ConstantBufferCount)
     {
-      assert(_ConstantBuffers[ConstantBufferCount].GetID() != std::nullopt &&
-        pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eConstantBuffer);
-
-      pConstantBuffers[ConstantBufferCount] = static_cast<CConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffers[ConstantBufferCount].GetID()))->pBuffer.Get();
+      pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(_ConstantBuffers[ConstantBufferCount]);
     }
   }
 
   pD3D11ImmediateContext_->PSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
+}
+
+void CDeviceContext::CSSetShader(const vdl::ComputeShader& _ComputeShader)
+{
+  ID3D11ComputeShader* pComputeShader = nullptr;
+  {
+    if (_ComputeShader.isEmpty())
+    {
+      assert(pShaderManager_->GetShader(_ComputeShader.GetID())->GetType() == ShaderType::eComputeShader);
+      pComputeShader = static_cast<CComputeShader*>(pShaderManager_->GetShader(_ComputeShader.GetID()))->pComputeShader.Get();
+    }
+  }
+
+  pD3D11ImmediateContext_->CSSetShader(pComputeShader, nullptr, 0);
+}
+
+void CDeviceContext::CSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+{
+  std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
+  {
+    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
+    {
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
+    }
+  }
+
+  pD3D11ImmediateContext_->CSSetShaderResources(_StartSlot, _ShaderResourceNum, pShaderResources.data());
+}
+
+void CDeviceContext::CSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
+{
+  std::vector<ID3D11SamplerState*> pSamplers(_SamplerNum);
+  {
+    for (vdl::uint SamplerCount = 0; SamplerCount < _SamplerNum; ++SamplerCount)
+    {
+      pSamplers[SamplerCount] = GetSamplerState(_Samplers[SamplerCount]);
+    }
+  }
+
+  pD3D11ImmediateContext_->CSSetSamplers(_StartSlot, _SamplerNum, pSamplers.data());
+}
+
+void CDeviceContext::CSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])
+{
+  std::vector<ID3D11Buffer*> pConstantBuffers(_ConstantBufferNum);
+  {
+    for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < _ConstantBufferNum; ++ConstantBufferCount)
+    {
+      pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(_ConstantBuffers[ConstantBufferCount]);
+    }
+  }
+
+  pD3D11ImmediateContext_->CSSetConstantBuffers(_StartSlot, _ConstantBufferNum, pConstantBuffers.data());
+}
+
+void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint _UnorderedAccessObjectNum, const vdl::UnorderedAccessObject _UnorderedAccessObjects[])
+{
+  std::vector<ID3D11UnorderedAccessView*> pUnorderedAccessBuffers(_UnorderedAccessObjectNum);
+  {
+    for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < _UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
+    {
+      pUnorderedAccessBuffers[UnorderedAccessObjectCount] = GetUnorderedAccessView(_UnorderedAccessObjects[UnorderedAccessObjectCount]);
+    }
+  }
+
+  pD3D11ImmediateContext_->CSSetUnorderedAccessViews(_StartSlot, _UnorderedAccessObjectNum, pUnorderedAccessBuffers.data(), nullptr);
 }
 
 void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)
@@ -816,6 +878,14 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   pD3D11ImmediateContext_->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, _ClearDepth, _ClearStencil);
 }
 
+void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)
+{
+  assert(!_UnorderedAccessTexture.isEmpty());
+  assert(pTextureManager_->GetTexture(_UnorderedAccessTexture.GetID())->GetType() == TextureType::eUnorderedAccessTexture);
+
+  pD3D11ImmediateContext_->ClearUnorderedAccessViewFloat(static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(_UnorderedAccessTexture.GetID()))->pUnorderedAccessView.Get(), &_ClearColor.Red);
+}
+
 void CDeviceContext::Draw(vdl::uint _VertexCount, vdl::uint _InstanceCount, vdl::uint _FirstVertex, vdl::uint _FirstInstance)
 {
   pD3D11ImmediateContext_->DrawInstanced(_VertexCount, _InstanceCount, _FirstVertex, _FirstInstance);
@@ -826,9 +896,14 @@ void CDeviceContext::DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount
   pD3D11ImmediateContext_->DrawIndexedInstanced(_IndexCount, _InstanceCount, _FirstIndex, _VertexOffset, _FirstInstance);
 }
 
+void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ)
+{
+  pD3D11ImmediateContext_->Dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
+}
+
 //--------------------------------------------------
 
-void CDeviceContext::RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode)
+void CDeviceContext::RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _pCode)
 {
   HRESULT hr = S_OK;
 
@@ -838,9 +913,9 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode
 
     switch (_Key)
     {
-      //case vdl::InputLayout::eNone:
-      //  break;
-    case vdl::InputLayout::eTexture:
+    case vdl::InputLayoutType::eNone:
+      break;
+    case vdl::InputLayoutType::eTexture:
     {
       InputElementDesc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
       InputElementDesc.push_back({ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
@@ -854,7 +929,7 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode
       InputElementDesc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
     }
     break;
-    case vdl::InputLayout::eStaticMesh:
+    case vdl::InputLayoutType::eStaticMesh:
     {
       InputElementDesc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
       InputElementDesc.push_back({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
@@ -868,7 +943,7 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode
       InputElementDesc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
     }
     break;
-    case vdl::InputLayout::eSkinnedMesh:
+    case vdl::InputLayoutType::eSkinnedMesh:
     {
       InputElementDesc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
       InputElementDesc.push_back({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
@@ -884,7 +959,7 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode
       InputElementDesc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
     }
     break;
-    case vdl::InputLayout::eGUI:
+    case vdl::InputLayoutType::eGUI:
     {
       InputElementDesc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,   0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
       InputElementDesc.push_back({ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,   0, D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0 });
@@ -899,6 +974,35 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayout _Key, ID3DBlob* _pCode
   }
 
   InputLayouts_.insert(std::make_pair(_Key, pInputLayout));
+}
+
+ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::ShaderResource& _ShaderResource)
+{
+  ID3D11ShaderResourceView* pShaderResourceView = nullptr;
+  {
+    //  Texture
+    if (std::get_if<vdl::Texture>(&_ShaderResource))
+    {
+      const vdl::Texture& Texture = std::get<vdl::Texture>(_ShaderResource);
+      if (!Texture.isEmpty())
+      {
+        pShaderResourceView = static_cast<CTexture*>(pTextureManager_->GetTexture(Texture.GetID()))->pShaderResourceView.Get();
+      }
+    }
+    //  UnorderedAccessBuffer
+    else
+    {
+      const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(_ShaderResource);
+
+      if (!UnorderedAccessBuffer.isEmpty())
+      {
+        assert(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID())->GetType() == BufferType::eUnorderedAccessBuffer);
+        pShaderResourceView = static_cast<CUnordererdAccessBuffer*>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()))->pShaderResourceView.Get();
+      }
+    }
+  }
+
+  return pShaderResourceView;
 }
 
 ID3D11SamplerState* CDeviceContext::GetSamplerState(const vdl::Sampler& _Sampler)
@@ -931,4 +1035,49 @@ ID3D11SamplerState* CDeviceContext::GetSamplerState(const vdl::Sampler& _Sampler
   }
 
   return Samplers_.at(_Sampler).Get();
+}
+
+ID3D11Buffer* CDeviceContext::GetConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
+{
+  ID3D11Buffer* pConstantBuffer = nullptr;
+  {
+    if (!_ConstantBuffer.isEmpty())
+    {
+      assert(pBufferManager_->GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
+      pConstantBuffer = static_cast<CConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()))->pBuffer.Get();
+    }
+  }
+
+  return pConstantBuffer;
+}
+
+ID3D11UnorderedAccessView* CDeviceContext::GetUnorderedAccessView(const vdl::UnorderedAccessObject& _UnorderedAccessObject)
+{
+  ID3D11UnorderedAccessView* pUnorderedAccessView = nullptr;
+  {
+    //  UnorderedAccessTexture
+    if (std::get_if<vdl::UnorderedAccessTexture>(&_UnorderedAccessObject))
+    {
+      const vdl::UnorderedAccessTexture& UnorderedAccessTexture = std::get<vdl::UnorderedAccessTexture>(_UnorderedAccessObject);
+
+      if (!UnorderedAccessTexture.isEmpty())
+      {
+        assert(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID())->GetType() == TextureType::eUnorderedAccessTexture);
+        pUnorderedAccessView = static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()))->pUnorderedAccessView.Get();
+      }
+    }
+    //  UnorderedAccessBuffer
+    else
+    {
+      const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(_UnorderedAccessObject);
+
+      if (!UnorderedAccessBuffer.isEmpty())
+      {
+        assert(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID())->GetType() == BufferType::eUnorderedAccessBuffer);
+        pUnorderedAccessView = static_cast<CUnordererdAccessBuffer*>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()))->pUnorderedAccessView.Get();
+      }
+    }
+  }
+
+  return pUnorderedAccessView;
 }

@@ -69,6 +69,8 @@ namespace vdl
 
   Matrix StaticMesh::GetGlobalTransform()const
   {
+    assert(!isEmpty());
+
     return Engine::Get<IModelManager>()->GetMesh(ID_)->GlobalTransform;
   }
 

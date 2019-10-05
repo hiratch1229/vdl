@@ -34,5 +34,5 @@ struct IVertexShader : public IShader
 {
   IVertexShader() = default;
 
-  [[nodiscard]] virtual vdl::InputLayout GetInputLayout()const = 0;
+  [[nodiscard]] virtual vdl::InputLayoutType GetInputLayout()const = 0;
 };

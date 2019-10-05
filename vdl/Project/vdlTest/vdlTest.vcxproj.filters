@@ -24,6 +24,9 @@
     <Filter Include="シェーダーファイル\StaticMesh">
       <UniqueIdentifier>{b0fb5ff3-7b22-4250-8200-cb2dd52c593f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\GPUParticle">
+      <UniqueIdentifier>{f0c8144e-47e7-4970-af39-d9274d91a8ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -35,6 +38,9 @@
     <ClCompile Include="Scene\SceneTessellation.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\SceneGPUParticle.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Scene.hpp">
@@ -44,6 +50,9 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\SceneTessellation.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneGPUParticle.hpp">
       <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
@@ -72,6 +81,9 @@
     <FxCompile Include="Shader\Tessellation\TessellationDS.hlsl">
       <Filter>シェーダーファイル\Tessellation</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\GPUParticle\GPUParticleInitCS.hlsl">
+      <Filter>シェーダーファイル\GPUParticle</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">
@@ -82,6 +94,9 @@
     </None>
     <None Include="Shader\Tessellation\Tessellation.hlsli">
       <Filter>シェーダーファイル\Tessellation</Filter>
+    </None>
+    <None Include="Shader\GPUParticle\GPUParticle.hlsli">
+      <Filter>シェーダーファイル\GPUParticle</Filter>
     </None>
   </ItemGroup>
 </Project>

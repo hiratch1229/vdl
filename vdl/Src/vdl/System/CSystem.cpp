@@ -15,6 +15,7 @@
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <Vdl/ShaderManager/IShaderManager.hpp>
 #include <vdl/Renderer/IRenderer.hpp>
+#include <vdl/Computer/IComputer.hpp>
 #include <vdl/GUI/IGUI.hpp>
 #include <vdl/Constants/Constants.hpp>
 
@@ -50,6 +51,7 @@ void CSystem::Initialize()
   Engine::Get<IShaderManager>()->Initialize();
 
   pRenderer_->Initialize();
+  Engine::Get<IComputer>()->Initialize();
   pGUI_->Initialize();
 
   //  フレームレートを設定

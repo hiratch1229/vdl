@@ -121,6 +121,9 @@
     <Filter Include="Src\Computer">
       <UniqueIdentifier>{b2052662-ce0e-4c2b-b29c-9189f40d2ea9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\UnorderedAccessBuffer">
+      <UniqueIdentifier>{036639f6-c28c-46c2-9f3a-70c5a5b638f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -387,6 +390,9 @@
     <ClInclude Include="..\..\Src\vdl\Computer\CComputer.hpp">
       <Filter>Src\Computer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\Computer.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -501,6 +507,12 @@
       <Filter>Src\Computer</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Computer\CComputer.cpp">
+      <Filter>Src\Computer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\UnorderedAccessBuffer\UnorederedAccessBuffer.cpp">
+      <Filter>Src\UnorderedAccessBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Computer\Computer.cpp">
       <Filter>Src\Computer</Filter>
     </ClCompile>
   </ItemGroup>

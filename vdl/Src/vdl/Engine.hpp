@@ -15,6 +15,7 @@ class IModelManager;
 class IBufferManager;
 class IShaderManager;
 class IRenderer;
+class IComputer;
 class IGUI;
 
 template <class Interface>
@@ -54,6 +55,7 @@ private:
   Component<IBufferManager> pBufferManager_;
   Component<IShaderManager> pShaderManager_;
   Component<IRenderer> pRenderer_;
+  Component<IComputer> pComputer_;
   Component<IGUI> pGUI_;
 public:
   Engine();
@@ -75,5 +77,6 @@ public:
   template<> [[nodiscard]] static IBufferManager* Get() { return pEngine->pBufferManager_.Get(); }
   template<> [[nodiscard]] static IShaderManager* Get() { return pEngine->pShaderManager_.Get(); }
   template<> [[nodiscard]] static IRenderer* Get() { return pEngine->pRenderer_.Get(); }
+  template<> [[nodiscard]] static IComputer* Get() { return pEngine->pComputer_.Get(); }
   template<> [[nodiscard]] static IGUI* Get() { return pEngine->pGUI_.Get(); }
 };

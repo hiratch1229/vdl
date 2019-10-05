@@ -15,6 +15,7 @@
 #include "BufferManager/IBufferManager.hpp"
 #include "ShaderManager/IShaderManager.hpp"
 #include "Renderer/IRenderer.hpp"
+#include "Computer/IComputer.hpp"
 #include "GUI/IGUI.hpp"
 
 #include <assert.h>
@@ -33,6 +34,7 @@ Engine::Engine()
 Engine::~Engine()
 {
   pGUI_.Release();
+  pComputer_.Release();
   pRenderer_.Release();
   pShaderManager_.Release();
   pBufferManager_.Release();

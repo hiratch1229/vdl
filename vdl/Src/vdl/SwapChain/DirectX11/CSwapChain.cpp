@@ -17,8 +17,8 @@ void CSwapChain::Initialize()
 
   const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
 
-  constexpr DXGI_FORMAT kSwapChainFormat = Cast(vdl::Format::eSwapChain);
-  constexpr DXGI_FORMAT kDepthStencilFormat = Cast(vdl::Format::eDepthStencil);
+  constexpr DXGI_FORMAT kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
+  constexpr DXGI_FORMAT kDepthStencilFormat = Cast(vdl::FormatType::eDepthStencil);
 
   //  エラーチェック用
   HRESULT hr = S_OK;

@@ -52,19 +52,21 @@ public:
 
   BufferType GetType()const override final { return BufferType::eConstantBuffer; }
 
-  void* GetData() override final { return Buffer; }
+  void* GetBuffer()const override final { return Buffer; }
 
-  vdl::uint GetSize() override final { return BufferSize; }
+  vdl::uint GetBufferSize()const override final { return BufferSize; }
 };
 
 struct CUnordererdAccessBuffer : public IBuffer
 {
   Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
-  void* Buffer;
+  Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> pUnorderedAccessView;
+  Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pShaderResourceView;
+  vdl::uint Stride;
   vdl::uint BufferSize;
 public:
-  CUnordererdAccessBuffer(vdl::uint _BufferSize)
-    : Buffer(new char[_BufferSize]), BufferSize(_BufferSize) {}
+  CUnordererdAccessBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+    : Stride(_Stride), BufferSize(_BufferSize) {}
 
   BufferType GetType()const override final { return BufferType::eUnorderedAccessBuffer; }
 };

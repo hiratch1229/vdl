@@ -7,12 +7,12 @@
 
 namespace vdl
 {
-  VertexShader::VertexShader(const char* _FilePath, InputLayout _InputLayout, const char* _EntryPoint)
+  VertexShader::VertexShader(const char* _FilePath, InputLayoutType _InputLayout, const char* _EntryPoint)
   {
     ID_ = Engine::Get<IShaderManager>()->LoadFromFile(_FilePath, _EntryPoint, _InputLayout);
   }
 
-  VertexShader::VertexShader(const char* _Source, uint _DataSize, InputLayout _InputLayout, const char* _EntryPoint)
+  VertexShader::VertexShader(const char* _Source, uint _DataSize, InputLayoutType _InputLayout, const char* _EntryPoint)
   {
     ID_ = Engine::Get<IShaderManager>()->LoadFromMemory(_Source, _DataSize, _EntryPoint, _InputLayout);
   }
@@ -47,7 +47,7 @@ namespace vdl
 
     return *this;
   }
-  
+
   VertexShader& VertexShader::operator=(VertexShader&& _VertexShader)noexcept
   {
     if (ID_)
@@ -69,10 +69,10 @@ namespace vdl
     }
   }
 
-  InputLayout VertexShader::GetInputLayout()const
+  InputLayoutType VertexShader::GetInputLayout()const
   {
+    assert(!isEmpty());
     assert(Engine::Get<IShaderManager>()->GetShader(ID_)->GetType() == ShaderType::eVertexShader);
-
     return static_cast<IVertexShader*>(Engine::Get<IShaderManager>()->GetShader(ID_))->GetInputLayout();
   }
 

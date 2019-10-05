@@ -3,6 +3,8 @@
 #include <vdl/Engine.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 
+#include <assert.h>
+
 namespace vdl::Detail
 {
   ConstantBufferData::ConstantBufferData(uint _BufferSize)
@@ -20,7 +22,7 @@ namespace vdl::Detail
 
   ConstantBufferData::ConstantBufferData(ConstantBufferData&& _ConstantBufferData)noexcept
   {
-    ID_ = std::move(_ConstantBufferData.ID_);
+    ID_ = _ConstantBufferData.ID_;
     _ConstantBufferData.ID_ = std::nullopt;
   }
 
@@ -67,11 +69,15 @@ namespace vdl::Detail
 
   void* ConstantBufferData::GetData()const
   {
-    return static_cast<IConstantBuffer*>(Engine::Get<IBufferManager>()->GetBuffer(ID_))->GetData();
+    assert(!isEmpty());
+
+    return Engine::Get<IBufferManager>()->GetBuffer(*this);
   }
 
-  uint ConstantBufferData::GetSize()const
+  uint ConstantBufferData::GetBufferSize()const
   {
-    return static_cast<IConstantBuffer*>(Engine::Get<IBufferManager>()->GetBuffer(ID_))->GetSize();
+    assert(!isEmpty());
+
+    return Engine::Get<IBufferManager>()->GetBufferSize(*this);
   }
 }

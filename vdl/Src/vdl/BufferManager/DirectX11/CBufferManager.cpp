@@ -2,7 +2,6 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Device/DirectX11/CDevice.hpp>
-
 #include <vdl/Buffer/DirectX11/CBuffer.hpp>
 
 #include <vdl/Misc/Windows/Misc.hpp>
@@ -25,35 +24,59 @@ vdl::ID CBufferManager::CreateConstantBuffer(vdl::uint _BufferSize)
   return Buffers_.Add(pBuffer);
 }
 
-vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBufferData)
+vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
-  const vdl::uint BufferSize = _ConstantBufferData.GetSize();
-  vdl::Detail::ConstantBufferData ConstantBuffer(BufferSize);
-  assert(Buffers_.Get(ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
+  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
 
-  ::memcpy(ConstantBuffer.GetData(), _ConstantBufferData.GetData(), BufferSize);
+  const CConstantBuffer* pSrcConstantBuffer = static_cast<CConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()));
 
-  HRESULT hr = S_OK;
-
-  D3D11_BUFFER_DESC BufferDesc;
+  vdl::Detail::ConstantBufferData ConstantBuffer(pSrcConstantBuffer->BufferSize);
   {
-    BufferDesc.ByteWidth = BufferSize;
-    BufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-    BufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    BufferDesc.CPUAccessFlags = 0;
-    BufferDesc.MiscFlags = 0;
-    BufferDesc.StructureByteStride = 0;
+    CConstantBuffer* pDestConstantBuffer = static_cast<CConstantBuffer*>(GetBuffer(ConstantBuffer.GetID()));
+    ::memcpy(pDestConstantBuffer->Buffer, pSrcConstantBuffer->Buffer, pDestConstantBuffer->BufferSize);
+
+    HRESULT hr = S_OK;
+
+    D3D11_BUFFER_DESC BufferDesc;
+    {
+      BufferDesc.ByteWidth = pDestConstantBuffer->BufferSize;
+      BufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+      BufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+      BufferDesc.CPUAccessFlags = 0;
+      BufferDesc.MiscFlags = 0;
+      BufferDesc.StructureByteStride = 0;
+    }
+
+    D3D11_SUBRESOURCE_DATA InitialData;
+    {
+      InitialData.pSysMem = pDestConstantBuffer->Buffer;
+      InitialData.SysMemPitch = 0;
+      InitialData.SysMemSlicePitch = 0;
+    }
+
+    hr = pD3D11Device_->CreateBuffer(&BufferDesc, &InitialData, pDestConstantBuffer->pBuffer.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-  D3D11_SUBRESOURCE_DATA InitialData;
-  {
-    InitialData.pSysMem = _ConstantBufferData.GetData();
-    InitialData.SysMemPitch = 0;
-    InitialData.SysMemSlicePitch = 0;
-  }
-
-  hr = pD3D11Device_->CreateBuffer(&BufferDesc, &InitialData, static_cast<CConstantBuffer*>(Buffers_.Get(ConstantBuffer.GetID()).Get())->pBuffer.GetAddressOf());
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-  
   return ConstantBuffer;
+}
+
+void* CBufferManager::GetBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
+{
+  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
+  return static_cast<CConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()))->GetBuffer();
+}
+
+vdl::uint CBufferManager::GetBufferSize(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
+{
+  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
+  return static_cast<CConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()))->GetBufferSize();
+}
+
+vdl::ID CBufferManager::CreateUnorderedAccessBuffer(vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer)
+{
+  IBuffer* pBuffer;
+  pDevice_->CreateUnorderedAccessBuffer(&pBuffer, _Stride, _BufferSize, _Buffer);
+
+  return Buffers_.Add(pBuffer);
 }
