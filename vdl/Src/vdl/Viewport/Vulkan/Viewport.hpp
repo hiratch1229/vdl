@@ -1,6 +1,7 @@
 #pragma once
 #include <vdl/Viewport.hpp>
 
+#define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.hpp>
 
 inline vk::Viewport Cast(const vdl::Viewport& _Viewport)

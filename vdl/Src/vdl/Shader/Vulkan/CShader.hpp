@@ -1,6 +1,7 @@
 #pragma once
 #include "../IShader.hpp"
 
+#define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.hpp>
 
 struct ShaderData
@@ -87,7 +88,7 @@ enum class DescriptorType : vdl::uint8_t
   eUnorderedAccessObject,
 
   eNum,
-  eGraphicsNum = Num - 1,
+  eGraphicsNum = eNum - 1,
 };
 static constexpr vdl::uint kGraphicsDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eGraphicsNum);
 static constexpr vdl::uint kComputeDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eNum);

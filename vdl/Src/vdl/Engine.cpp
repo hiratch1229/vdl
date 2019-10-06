@@ -33,6 +33,8 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+  pDevice_->WaitIdle();
+
   pGUI_.Release();
   pComputer_.Release();
   pRenderer_.Release();

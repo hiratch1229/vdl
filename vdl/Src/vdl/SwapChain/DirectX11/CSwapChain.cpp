@@ -15,6 +15,7 @@ void CSwapChain::Initialize()
   pWindow_ = Engine::Get<IWindow>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
 
+  ID3D11Device* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>())->GetDevice();
   const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
 
   constexpr DXGI_FORMAT kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
@@ -42,7 +43,6 @@ void CSwapChain::Initialize()
     SwapChainDesc.Flags = 0;
   }
 
-  ID3D11Device* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>())->GetDevice();
   //  ALT+ENTER無効にしてスワップチェーンを作成
   {
     Microsoft::WRL::ComPtr<IDXGIDevice> pDXGIDevice;

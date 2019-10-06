@@ -1,6 +1,7 @@
 #pragma once
 #include <vdl/Format.hpp>
 
+#define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.hpp>
 
 inline constexpr vk::Format Cast(vdl::FormatType _Format)

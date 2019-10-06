@@ -1,6 +1,7 @@
 #pragma once
 #include "../IBuffer.hpp"
 
+#define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.hpp>
 
 struct BufferData

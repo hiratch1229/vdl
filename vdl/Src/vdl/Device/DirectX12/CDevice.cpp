@@ -35,7 +35,7 @@ void CDevice::CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _Buffe
 
 }
 
-void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer)
+void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, const void* _Buffer)
 {
 
 }

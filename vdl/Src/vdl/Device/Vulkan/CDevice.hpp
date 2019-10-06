@@ -9,33 +9,39 @@
 class CDevice : public IDevice
 {
   vk::UniqueInstance Instance_;
-  vk::UniqueDevice Device_;
+  vk::UniqueDevice VkDevice_;
   vk::PhysicalDevice PhysicalDevice_;
   vk::UniqueCommandPool CommandPool_;
   vk::UniqueCommandBuffer CommandBuffer_;
   vk::Queue GraphicsQueue_;
   vk::Queue ComputeQueue_;
-  vk::Queue CopyQueue_;
 private:
   vdl::uint GraphicsQueueIndex_;
   vdl::uint ComputeQueueIndex_;
-  vdl::uint CopyQueueIndex_;
 private:
 #if defined(DEBUG) | defined(_DEBUG)
   PFN_vkDestroyDebugReportCallbackEXT	DestroyReportFunction_;
   vk::DebugReportCallbackEXT DebugReportCallBack_;
 #endif
 public:
+  [[nodiscard]] const vk::Instance& GetInstance()const { return Instance_.get(); }
+  [[nodiscard]] const vk::Device& GetDevice()const { return VkDevice_.get(); }
+  [[nodiscard]] const vk::PhysicalDevice& GetPhysicalDevice()const { return PhysicalDevice_; }
+  [[nodiscard]] const vk::Queue& GetGraphicsQueue()const { return GraphicsQueue_; }
+  [[nodiscard]] const vk::Queue& GetComputeQueue()const { return ComputeQueue_; }
   [[nodiscard]] const vk::CommandBuffer& GetCommandBuffer()const { return CommandBuffer_.get(); }
+  [[nodiscard]] vdl::uint GetGrapchisQueueIndex()const { return GraphicsQueueIndex_; }
+  [[nodiscard]] vdl::uint GetComputeQueueIndex()const { return ComputeQueueIndex_; }
+public:
+  [[nodiscard]] vdl::uint FindQueue(vk::QueueFlags _QueueFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const { return FindQueue(_QueueFlag, vk::QueueFlags(), _Surface); }
+  [[nodiscard]] vdl::uint GetMemoryTypeIndex(vdl::uint _MemoryTypeBits, const vk::MemoryPropertyFlags& _MemoryPropertys)const;
+  void SubmitAndWait(vk::SubmitInfo _SubmitInfo)const;
 private:
-  vdl::uint FindQueue(vk::QueueFlags _QueueFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const;
-  vdl::uint GetMemoryTypeIndex(vdl::uint _MemoryTypeBits, const vk::MemoryPropertyFlags& _MemoryPropertys)const;
+  [[nodiscard]] vdl::uint FindQueue(vk::QueueFlags _QueueFlag, vk::QueueFlags _NotFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const;
   void CreateBuffer(BufferData* _pBuffer, vk::DeviceSize _BufferSize, vk::BufferUsageFlags _Usage, vk::MemoryPropertyFlags _Properties)const;
   void CreateStagingBuffer(BufferData* _pStagingBuffer, const void* _Buffer, vdl::uint _BufferSize)const;
   void CopyBuffer(vk::Buffer _SrcBuffer, vk::Buffer _DstBuffer, vdl::uint _BufferSize)const;
   void WriteMemory(BufferData* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const;
-public:
-  void SubmitAndWait(vk::SubmitInfo _SubmitInfo, vk::QueueFlags _QueueFlag)const;
 public:
   CDevice() = default;
 
@@ -74,4 +80,6 @@ public:
   void LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath, const char* _EntryPoint, vdl::InputLayoutType _InputLayout)override;
 
   void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayoutType _InputLayout)override;
+
+  void WaitIdle()override;
 };

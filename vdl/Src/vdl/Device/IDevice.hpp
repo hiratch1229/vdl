@@ -48,4 +48,6 @@ public:
   virtual void LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath, const char* _EntryPoint, vdl::InputLayoutType _InputLayout) = 0;
 
   virtual void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayoutType _InputLayout) = 0;
+
+  virtual void WaitIdle() = 0;
 };

@@ -10,6 +10,8 @@
 #include <vdl/Image.hpp>
 #include <vdl/Macro.hpp>
 
+#undef min
+#undef max
 #include <glslang/SPIRV/GlslangToSpv.h>
 #include <glslang/StandAlone/DirStackFileIncluder.h>
 #include <glslang/StandAlone/ResourceLimits.hpp>
@@ -258,10 +260,10 @@ void CDevice::Initialize()
     vk::InstanceCreateInfo InstanceInfo;
     {
       InstanceInfo.pApplicationInfo = &ApplicationInfo;
-      InstanceInfo.enabledExtensionCount = vdl::Macro::ArraySize(Extensions);
+      InstanceInfo.enabledExtensionCount = static_cast<vdl::uint>(vdl::Macro::ArraySize(Extensions));
       InstanceInfo.ppEnabledExtensionNames = Extensions;
 #if defined DEBUG | _DEBUG
-      InstanceInfo.enabledLayerCount = vdl::Macro::ArraySize(Layers);
+      InstanceInfo.enabledLayerCount = static_cast<vdl::uint>(vdl::Macro::ArraySize(Layers));
       InstanceInfo.ppEnabledLayerNames = Layers;
 #endif
     }
@@ -272,16 +274,16 @@ void CDevice::Initialize()
 
   //  物理デバイスの取得
   {
-    std::vector<vk::PhysicalDevice> PhysicalDevices = std::move(Instance_->enumeratePhysicalDevices());
+    std::vector<vk::PhysicalDevice> PhysicalDevices = Instance_->enumeratePhysicalDevices();
     assert(!PhysicalDevices.empty());
 
     //  TODO:MultiGPU
     PhysicalDevice_ = PhysicalDevices[0];
   }
 
-  GraphicsQueueIndex_ = FindQueue(vk::QueueFlagBits::eGraphics);
-  ComputeQueueIndex_ = FindQueue(vk::QueueFlagBits::eCompute);
-  CopyQueueIndex_ = FindQueue(vk::QueueFlagBits::eTransfer);
+  GraphicsQueueIndex_ = FindQueue(vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eCompute);
+  assert(GraphicsQueueIndex_ != UINT_MAX);
+  ComputeQueueIndex_ = FindQueue(vk::QueueFlagBits::eCompute, vk::QueueFlagBits::eGraphics);
 
   //  論理デバイスの作成
   {
@@ -289,21 +291,33 @@ void CDevice::Initialize()
       VK_KHR_SWAPCHAIN_EXTENSION_NAME,
     };
 
-    const float QueuePriorities[] = { 1.0f };
+    constexpr float GraphicsQueuePriorities[] = { 1.0f, 0.5f };
+    constexpr float ComputeQueuePriorities[] = { 0.5f };
 
-    std::vector<vk::DeviceQueueCreateInfo> DeviceQueueInfos(3);
+    std::vector<vk::DeviceQueueCreateInfo> DeviceQueueInfos(1);
     {
+      vdl::uint GraphicsQueueCount = 1;
+
+      if (ComputeQueueIndex_ == UINT_MAX)
+      {
+        ++GraphicsQueueCount;
+        ComputeQueueIndex_ = GraphicsQueueIndex_;
+      }
+      else
+      {
+        vk::DeviceQueueCreateInfo DeviceQueueInfo;
+        {
+          DeviceQueueInfo.queueFamilyIndex = ComputeQueueIndex_;
+          DeviceQueueInfo.queueCount = 1;
+          DeviceQueueInfo.pQueuePriorities = ComputeQueuePriorities;
+        }
+
+        DeviceQueueInfos.emplace_back(std::move(DeviceQueueInfo));
+      }
+
       DeviceQueueInfos[0].queueFamilyIndex = GraphicsQueueIndex_;
-      DeviceQueueInfos[0].queueCount = 1;
-      DeviceQueueInfos[0].pQueuePriorities = QueuePriorities;
-
-      DeviceQueueInfos[1].queueFamilyIndex = ComputeQueueIndex_;
-      DeviceQueueInfos[1].queueCount = 1;
-      DeviceQueueInfos[1].pQueuePriorities = QueuePriorities;
-
-      DeviceQueueInfos[2].queueFamilyIndex = CopyQueueIndex_;
-      DeviceQueueInfos[2].queueCount = 1;
-      DeviceQueueInfos[2].pQueuePriorities = QueuePriorities;
+      DeviceQueueInfos[0].queueCount = GraphicsQueueCount;
+      DeviceQueueInfos[0].pQueuePriorities = GraphicsQueuePriorities;
     }
 
     vk::PhysicalDeviceFeatures EnabledFeatures = PhysicalDevice_.getFeatures();
@@ -314,28 +328,28 @@ void CDevice::Initialize()
 
     vk::DeviceCreateInfo DeviceInfo;
     {
-      DeviceInfo.queueCreateInfoCount = DeviceQueueInfos.size();
+      DeviceInfo.queueCreateInfoCount = static_cast<vdl::uint>(DeviceQueueInfos.size());
       DeviceInfo.pQueueCreateInfos = DeviceQueueInfos.data();
-      DeviceInfo.enabledLayerCount = vdl::Macro::ArraySize(Layers);
+      DeviceInfo.enabledLayerCount = static_cast<vdl::uint>(vdl::Macro::ArraySize(Layers));
       DeviceInfo.ppEnabledLayerNames = Layers;
-      DeviceInfo.enabledExtensionCount = vdl::Macro::ArraySize(Extensions);
+      DeviceInfo.enabledExtensionCount = static_cast<vdl::uint>(vdl::Macro::ArraySize(Extensions));
       DeviceInfo.ppEnabledExtensionNames = Extensions;
       DeviceInfo.pEnabledFeatures = &EnabledFeatures;
     }
 
-    Device_ = PhysicalDevice_.createDeviceUnique(DeviceInfo);
-    assert(Device_);
+    VkDevice_ = PhysicalDevice_.createDeviceUnique(DeviceInfo);
+    assert(VkDevice_);
   }
 
   //  コマンドプールの作成
   {
     vk::CommandPoolCreateInfo CommandPoolInfo;
     {
-      CommandPoolInfo.queueFamilyIndex = CopyQueueIndex_;
+      CommandPoolInfo.queueFamilyIndex = GraphicsQueueIndex_;
       CommandPoolInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
     }
 
-    CommandPool_ = Device_->createCommandPoolUnique(CommandPoolInfo);
+    CommandPool_ = VkDevice_->createCommandPoolUnique(CommandPoolInfo);
     assert(CommandPool_);
   }
 
@@ -348,19 +362,16 @@ void CDevice::Initialize()
       CommandBufferAllocateInfo.commandBufferCount = 1;
     }
 
-    CommandBuffer_ = std::move(Device_->allocateCommandBuffersUnique(CommandBufferAllocateInfo).front());
+    CommandBuffer_ = std::move(VkDevice_->allocateCommandBuffersUnique(CommandBufferAllocateInfo).front());
   }
 
   //  キューの取得
   {
-    GraphicsQueue_ = Device_->getQueue(GraphicsQueueIndex_, 0);
+    GraphicsQueue_ = VkDevice_->getQueue(GraphicsQueueIndex_, 0);
     assert(GraphicsQueue_);
 
-    ComputeQueue_ = Device_->getQueue(ComputeQueueIndex_, 0);
+    ComputeQueue_ = VkDevice_->getQueue(ComputeQueueIndex_, (GraphicsQueueIndex_ == ComputeQueueIndex_ ? 1 : 0));
     assert(ComputeQueue_);
-
-    CopyQueue_ = Device_->getQueue(CopyQueueIndex_, 0);
-    assert(CopyQueue_);
   }
 
 #if defined(DEBUG) | defined(_DEBUG)
@@ -499,13 +510,13 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
 
-    pTexture->Image = Device_->createImageUnique(ImageInfo);
+    pTexture->Image = VkDevice_->createImageUnique(ImageInfo);
     assert(pTexture->Image);
   }
 
   //  メモリの確保
   {
-    vk::MemoryRequirements MemoryRequirement = Device_->getImageMemoryRequirements(pTexture->Image.get());
+    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(pTexture->Image.get());
 
     vk::MemoryAllocateInfo MemoryAllocateInfo;
     {
@@ -513,9 +524,9 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
       MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
     }
 
-    pTexture->Memory = Device_->allocateMemoryUnique(MemoryAllocateInfo);
+    pTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
     assert(pTexture->Memory);
-    Device_->bindImageMemory(pTexture->Image.get(), pTexture->Memory.get(), 0);
+    VkDevice_->bindImageMemory(pTexture->Image.get(), pTexture->Memory.get(), 0);
   }
 
   //  メモリのコピー
@@ -555,7 +566,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
       SubmitInfo.commandBufferCount = 1;
       SubmitInfo.pCommandBuffers = &CommandBuffer_.get();
     }
-    SubmitAndWait(SubmitInfo, vk::QueueFlagBits::eTransfer);
+    SubmitAndWait(SubmitInfo);
   }
 
   //  ビューの作成
@@ -576,7 +587,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
       ImageViewInfo.subresourceRange.levelCount = 1;
     }
 
-    pTexture->View = Device_->createImageViewUnique(ImageViewInfo);
+    pTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
     assert(pTexture->View);
   }
 
@@ -608,13 +619,13 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
 
-    pRenderTexture->Image = Device_->createImageUnique(ImageInfo);
+    pRenderTexture->Image = VkDevice_->createImageUnique(ImageInfo);
     assert(pRenderTexture->Image);
   }
 
   //  メモリの確保
   {
-    vk::MemoryRequirements MemoryRequirement = Device_->getImageMemoryRequirements(pRenderTexture->Image.get());
+    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(pRenderTexture->Image.get());
 
     vk::MemoryAllocateInfo MemoryAllocateInfo;
     {
@@ -622,9 +633,9 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
       MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
     }
 
-    pRenderTexture->Memory = Device_->allocateMemoryUnique(MemoryAllocateInfo);
+    pRenderTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
     assert(pRenderTexture->Memory);
-    Device_->bindImageMemory(pRenderTexture->Image.get(), pRenderTexture->Memory.get(), 0);
+    VkDevice_->bindImageMemory(pRenderTexture->Image.get(), pRenderTexture->Memory.get(), 0);
   }
 
   //  ビューの作成
@@ -645,7 +656,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
       ImageViewInfo.subresourceRange.levelCount = 1;
     }
 
-    pRenderTexture->View = Device_->createImageViewUnique(ImageViewInfo);
+    pRenderTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
     assert(pRenderTexture->View);
   }
 
@@ -670,7 +681,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
       SubmitInfo.pCommandBuffers = &CommandBuffer_.get();
     }
 
-    SubmitAndWait(SubmitInfo, vk::QueueFlagBits::eTransfer);
+    SubmitAndWait(SubmitInfo);
   }
 
   (*_ppRenderTexture) = std::move(pRenderTexture);
@@ -701,13 +712,13 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
 
-    pDepthStencilTexture->Image = Device_->createImageUnique(ImageInfo);
+    pDepthStencilTexture->Image = VkDevice_->createImageUnique(ImageInfo);
     assert(pDepthStencilTexture->Image);
   }
 
   //  メモリの確保
   {
-    vk::MemoryRequirements MemoryRequirement = Device_->getImageMemoryRequirements(pDepthStencilTexture->Image.get());
+    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(pDepthStencilTexture->Image.get());
 
     vk::MemoryAllocateInfo MemoryAllocateInfo;
     {
@@ -715,9 +726,9 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
       MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
     }
 
-    pDepthStencilTexture->Memory = Device_->allocateMemoryUnique(MemoryAllocateInfo);
+    pDepthStencilTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
     assert(pDepthStencilTexture->Memory);
-    Device_->bindImageMemory(pDepthStencilTexture->Image.get(), pDepthStencilTexture->Memory.get(), 0);
+    VkDevice_->bindImageMemory(pDepthStencilTexture->Image.get(), pDepthStencilTexture->Memory.get(), 0);
   }
 
   //  ビューの作成
@@ -738,7 +749,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
       ImageViewInfo.subresourceRange.levelCount = 1;
     }
 
-    pDepthStencilTexture->View = Device_->createImageViewUnique(ImageViewInfo);
+    pDepthStencilTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
     assert(pDepthStencilTexture->View);
   }
 
@@ -763,7 +774,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
       SubmitInfo.pCommandBuffers = &CommandBuffer_.get();
     }
 
-    SubmitAndWait(SubmitInfo, vk::QueueFlagBits::eTransfer);
+    SubmitAndWait(SubmitInfo);
   }
 
   (*_ppDepthStecilTexture) = std::move(pDepthStencilTexture);
@@ -794,13 +805,13 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
 
-    pUnorderedAccessTexture->Image = Device_->createImageUnique(ImageInfo);
+    pUnorderedAccessTexture->Image = VkDevice_->createImageUnique(ImageInfo);
     assert(pUnorderedAccessTexture->Image);
   }
 
   //  メモリの確保
   {
-    vk::MemoryRequirements MemoryRequirement = Device_->getImageMemoryRequirements(pUnorderedAccessTexture->Image.get());
+    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(pUnorderedAccessTexture->Image.get());
 
     vk::MemoryAllocateInfo MemoryAllocateInfo;
     {
@@ -808,9 +819,9 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
       MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
     }
 
-    pUnorderedAccessTexture->Memory = Device_->allocateMemoryUnique(MemoryAllocateInfo);
+    pUnorderedAccessTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
     assert(pUnorderedAccessTexture->Memory);
-    Device_->bindImageMemory(pUnorderedAccessTexture->Image.get(), pUnorderedAccessTexture->Memory.get(), 0);
+    VkDevice_->bindImageMemory(pUnorderedAccessTexture->Image.get(), pUnorderedAccessTexture->Memory.get(), 0);
   }
 
   //  ビューの作成
@@ -831,7 +842,7 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
       ImageViewInfo.subresourceRange.levelCount = 1;
     }
 
-    pUnorderedAccessTexture->View = Device_->createImageViewUnique(ImageViewInfo);
+    pUnorderedAccessTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
     assert(pUnorderedAccessTexture->View);
   }
 
@@ -856,7 +867,7 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
       SubmitInfo.pCommandBuffers = &CommandBuffer_.get();
     }
 
-    SubmitAndWait(SubmitInfo, vk::QueueFlagBits::eTransfer);
+    SubmitAndWait(SubmitInfo);
   }
 
   (*_ppUnorderedAccessTexture) = std::move(pUnorderedAccessTexture);
@@ -906,7 +917,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   {
     CHullShader* pHullShader = new CHullShader;
     pHullShader->ShaderData.EntryPoint = _EntryPoint;
-    pHullShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pHullShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pHullShader);
   }
@@ -915,7 +926,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   {
     CDomainShader* pDomainShader = new CDomainShader;
     pDomainShader->ShaderData.EntryPoint = _EntryPoint;
-    pDomainShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pDomainShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pDomainShader);
   }
@@ -924,7 +935,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   {
     CGeometryShader* pGeometryShader = new CGeometryShader;
     pGeometryShader->ShaderData.EntryPoint = _EntryPoint;
-    pGeometryShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pGeometryShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pGeometryShader);
   }
@@ -933,7 +944,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   {
     CPixelShader* pPixelShader = new CPixelShader;
     pPixelShader->ShaderData.EntryPoint = _EntryPoint;
-    pPixelShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pPixelShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pPixelShader);
   }
@@ -942,7 +953,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   {
     CComputeShader* pComputeShader = new CComputeShader;
     pComputeShader->ShaderData.EntryPoint = _EntryPoint;
-    pComputeShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pComputeShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pComputeShader);
   }
@@ -972,7 +983,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   {
     CHullShader* pHullShader = new CHullShader;
     pHullShader->ShaderData.EntryPoint = _EntryPoint;
-    pHullShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pHullShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pHullShader);
   }
@@ -981,7 +992,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   {
     CDomainShader* pDomainShader = new CDomainShader;
     pDomainShader->ShaderData.EntryPoint = _EntryPoint;
-    pDomainShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pDomainShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pDomainShader);
   }
@@ -990,7 +1001,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   {
     CGeometryShader* pGeometryShader = new CGeometryShader;
     pGeometryShader->ShaderData.EntryPoint = _EntryPoint;
-    pGeometryShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pGeometryShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pGeometryShader);
   }
@@ -999,7 +1010,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   {
     CPixelShader* pPixelShader = new CPixelShader;
     pPixelShader->ShaderData.EntryPoint = _EntryPoint;
-    pPixelShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pPixelShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pPixelShader);
   }
@@ -1008,7 +1019,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   {
     CComputeShader* pComputeShader = new CComputeShader;
     pComputeShader->ShaderData.EntryPoint = _EntryPoint;
-    pComputeShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+    pComputeShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
     (*_ppShader) = std::move(pComputeShader);
   }
@@ -1034,7 +1045,7 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath,
   }
 
   pVertexShader->ShaderData.EntryPoint = _EntryPoint;
-  pVertexShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+  pVertexShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
   (*_ppVertexShader) = std::move(pVertexShader);
 }
@@ -1056,32 +1067,26 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, v
   }
 
   pVertexShader->ShaderData.EntryPoint = _EntryPoint;
-  pVertexShader->ShaderData.Module = Device_->createShaderModuleUnique(ShaderModuleInfo);
+  pVertexShader->ShaderData.Module = VkDevice_->createShaderModuleUnique(ShaderModuleInfo);
 
   (*_ppVertexShader) = std::move(pVertexShader);
 }
 
-//--------------------------------------------------
-
-void CDevice::SubmitAndWait(vk::SubmitInfo _SubmitInfo, vk::QueueFlags _QueueFlag)const
+void CDevice::WaitIdle()
 {
-  assert(_QueueFlag & vk::QueueFlagBits::eGraphics || _QueueFlag & vk::QueueFlagBits::eCompute || _QueueFlag & vk::QueueFlagBits::eTransfer);
-
-  const vk::Queue& Queue = (_QueueFlag & vk::QueueFlagBits::eGraphics ? GraphicsQueue_ : _QueueFlag & vk::QueueFlagBits::eCompute ? ComputeQueue_ : CopyQueue_);
-  Queue.submit(_SubmitInfo, vk::Fence());
-  Queue.waitIdle();
+  VkDevice_->waitIdle();
 }
 
 //--------------------------------------------------
 
-vdl::uint CDevice::FindQueue(vk::QueueFlags _QueueFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const
+vdl::uint CDevice::FindQueue(vk::QueueFlags _QueueFlag, vk::QueueFlags _NotFlag, const vk::SurfaceKHR& _Surface)const
 {
   std::vector<vk::QueueFamilyProperties> QueueFamilyProperties = PhysicalDevice_.getQueueFamilyProperties();
-  const vdl::uint QueueFamiliyNum = QueueFamilyProperties.size();
+  const vdl::uint QueueFamiliyNum = static_cast<vdl::uint>(QueueFamilyProperties.size());
 
   for (vdl::uint QueueFamiliyCount = 0; QueueFamiliyCount < QueueFamiliyNum; ++QueueFamiliyCount)
   {
-    if (QueueFamilyProperties[QueueFamiliyCount].queueFlags & _QueueFlag)
+    if (QueueFamilyProperties[QueueFamiliyCount].queueFlags & _QueueFlag && !(QueueFamilyProperties[QueueFamiliyCount].queueFlags & _NotFlag))
     {
       //  サーフェスのサポートがされていない時は続ける
       if (_Surface && !PhysicalDevice_.getSurfaceSupportKHR(QueueFamiliyCount, _Surface))
@@ -1093,9 +1098,9 @@ vdl::uint CDevice::FindQueue(vk::QueueFlags _QueueFlag, const vk::SurfaceKHR& _S
     }
   }
 
-  _ASSERT_EXPR_A(false, "Not Found.");
+  //_ASSERT_EXPR_A(false, "Not Found.");
 
-  return 0;
+  return UINT_MAX;
 }
 
 vdl::uint CDevice::GetMemoryTypeIndex(vdl::uint _MemoryTypeBits, const vk::MemoryPropertyFlags& _MemoryPropertys)const
@@ -1132,29 +1137,29 @@ void CDevice::CreateBuffer(BufferData* _pBuffer, vk::DeviceSize _BufferSize, vk:
       BufferInfo.pQueueFamilyIndices = nullptr;
     }
 
-    _pBuffer->Buffer = Device_->createBufferUnique(BufferInfo);
+    _pBuffer->Buffer = VkDevice_->createBufferUnique(BufferInfo);
     assert(_pBuffer->Buffer);
   }
 
   //  メモリの確保
   {
-    const vk::MemoryRequirements MemoryRequirement = Device_->getBufferMemoryRequirements(_pBuffer->Buffer.get());
+    const vk::MemoryRequirements MemoryRequirement = VkDevice_->getBufferMemoryRequirements(_pBuffer->Buffer.get());
 
     vk::MemoryAllocateInfo MemoryAllocateInfo;
     {
       MemoryAllocateInfo.allocationSize = MemoryRequirement.size;
       MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, _Properties);
     }
-    _pBuffer->Memory = Device_->allocateMemoryUnique(MemoryAllocateInfo);
+    _pBuffer->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
     assert(_pBuffer->Memory);
 
-    Device_->bindBufferMemory(_pBuffer->Buffer.get(), _pBuffer->Memory.get(), 0);
+    VkDevice_->bindBufferMemory(_pBuffer->Buffer.get(), _pBuffer->Memory.get(), 0);
   }
 
   //  ステージングしない時ポインタを取得する
   if (!(_Properties & vk::MemoryPropertyFlagBits::eDeviceLocal))
   {
-    _pBuffer->pData = Device_->mapMemory(_pBuffer->Memory.get(), 0, _BufferSize);
+    _pBuffer->pData = VkDevice_->mapMemory(_pBuffer->Memory.get(), 0, _BufferSize);
   }
 }
 
@@ -1191,11 +1196,17 @@ void CDevice::CopyBuffer(vk::Buffer _SrcBuffer, vk::Buffer _DstBuffer, vdl::uint
       SubmitInfo.pCommandBuffers = &CommandBuffer_.get();
     }
 
-    SubmitAndWait(SubmitInfo, vk::QueueFlagBits::eTransfer);
+    SubmitAndWait(SubmitInfo);
   }
 }
 
 void CDevice::WriteMemory(BufferData* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const
 {
   ::memcpy(_pDstBuffer->pData, _pSrcBuffer, _BufferSize);
+}
+
+void CDevice::SubmitAndWait(vk::SubmitInfo _SubmitInfo)const
+{
+  GraphicsQueue_.submit(_SubmitInfo, vk::Fence());
+  GraphicsQueue_.waitIdle();
 }
