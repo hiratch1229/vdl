@@ -69,7 +69,7 @@ public:
 
   void VSSetShader(const vdl::VertexShader& _VertexShader)override;
 
-  void VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])override;
+  void VSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])override;
 
   void VSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override;
 
@@ -77,7 +77,7 @@ public:
 
   void HSSetShader(const vdl::HullShader& _HullShader)override;
 
-  void HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])override;
+  void HSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])override;
 
   void HSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override;
 
@@ -85,7 +85,7 @@ public:
 
   void DSSetShader(const vdl::DomainShader& _DomainShader)override;
 
-  void DSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])override;
+  void DSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])override;
 
   void DSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override;
 
@@ -93,7 +93,7 @@ public:
 
   void GSSetShader(const vdl::GeometryShader& _GeometryShader)override;
 
-  void GSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])override;
+  void GSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])override;
 
   void GSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override;
 
@@ -101,7 +101,7 @@ public:
 
   void PSSetShader(const vdl::PixelShader& _PixelShader)override;
 
-  void PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])override;
+  void PSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])override;
 
   void PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])override;
 

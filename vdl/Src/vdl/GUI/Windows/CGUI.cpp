@@ -834,7 +834,7 @@ void CGUI::Draw()
 
   pDeviceContext_->PSSetShader(PixelShader_);
   pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
-  pDeviceContext_->PSSetTextures(0, 1, &Font_);
+  pDeviceContext_->PSSetShaderResources(0, 1, &Font_);
 
   pDeviceContext_->HSSetShader(vdl::HullShader());
 

@@ -20,7 +20,7 @@ namespace vdl::Constants
 
   constexpr uint kMaxSamplerNum = 16;
 
-  constexpr uint kMaxTextureNum = 128;
+  constexpr uint kMaxShaderResourceNum = 128;
 
   constexpr uint kMaxConstantBufferNum = 14;
 

@@ -2,10 +2,12 @@
 #include "Fwd.hpp"
 #include "Type2.hpp"
 #include "Angle.hpp"
+#include "Color.hpp"
 #include "GraphicsState.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "ConstantBuffer.hpp"
+#include "UnorderedAccessBuffer.hpp"
 
 namespace vdl::Renderer2D
 {
@@ -74,15 +76,217 @@ namespace vdl::Renderer2D
     SetPixelShader(_PixelShader);
   }
 
-  void SetVertexStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[]);
+  void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[]);
 
-  void SetHullStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[]);
+  inline void SetVertexStageShaderResources(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_TextureNum);
+    {
+      for (uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+      {
+        ShaderResources[TextureCount] = _Textures[TextureCount];
+      }
+    }
 
-  void SetDomainStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[]);
+    SetVertexStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
 
-  void SetGeometryStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[]);
+  inline void SetVertexStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
+    {
+      for (uint UnorderedAccessBufferDataCount = 0; UnorderedAccessBufferDataCount < _UnorderedAccessBufferDataNum; ++UnorderedAccessBufferDataCount)
+      {
+        ShaderResources[UnorderedAccessBufferDataCount] = _UnorderedAccessBufferDatas[UnorderedAccessBufferDataCount];
+      }
+    }
 
-  void SetPixelStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[]);
+    SetVertexStageShaderResources(0, _UnorderedAccessBufferDataNum, ShaderResources.data());
+  }
+
+  template<class T>
+  inline void SetVertexStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferNum, const UnorderedAccessBuffer<T> _UnorderedAccessBuffers[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferNum);
+    {
+      for (uint UnorderedAccessBufferCount = 0; UnorderedAccessBufferCount < _UnorderedAccessBufferNum; ++UnorderedAccessBufferCount)
+      {
+        ShaderResources[UnorderedAccessBufferCount] = _UnorderedAccessBuffers[UnorderedAccessBufferCount].GetDetail();
+      }
+    }
+
+    SetVertexStageShaderResources(_StartSlot, _UnorderedAccessBufferNum, ShaderResources.data());
+  }
+
+  void SetHullStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[]);
+
+  inline void SetHullStageShaderResources(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_TextureNum);
+    {
+      for (uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+      {
+        ShaderResources[TextureCount] = _Textures[TextureCount];
+      }
+    }
+
+    SetHullStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetHullStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
+    {
+      for (uint UnorderedAccessBufferDataCount = 0; UnorderedAccessBufferDataCount < _UnorderedAccessBufferDataNum; ++UnorderedAccessBufferDataCount)
+      {
+        ShaderResources[UnorderedAccessBufferDataCount] = _UnorderedAccessBufferDatas[UnorderedAccessBufferDataCount];
+      }
+    }
+
+    SetHullStageShaderResources(0, _UnorderedAccessBufferDataNum, ShaderResources.data());
+  }
+
+  template<class T>
+  inline void SetHullStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferNum, const UnorderedAccessBuffer<T> _UnorderedAccessBuffers[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferNum);
+    {
+      for (uint UnorderedAccessBufferCount = 0; UnorderedAccessBufferCount < _UnorderedAccessBufferNum; ++UnorderedAccessBufferCount)
+      {
+        ShaderResources[UnorderedAccessBufferCount] = _UnorderedAccessBuffers[UnorderedAccessBufferCount].GetDetail();
+      }
+    }
+
+    SetHullStageShaderResources(_StartSlot, _UnorderedAccessBufferNum, ShaderResources.data());
+  }
+
+  void SetDomainStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[]);
+
+  inline void SetDomainStageShaderResources(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_TextureNum);
+    {
+      for (uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+      {
+        ShaderResources[TextureCount] = _Textures[TextureCount];
+      }
+    }
+
+    SetDomainStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetDomainStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
+    {
+      for (uint UnorderedAccessBufferDataCount = 0; UnorderedAccessBufferDataCount < _UnorderedAccessBufferDataNum; ++UnorderedAccessBufferDataCount)
+      {
+        ShaderResources[UnorderedAccessBufferDataCount] = _UnorderedAccessBufferDatas[UnorderedAccessBufferDataCount];
+      }
+    }
+
+    SetDomainStageShaderResources(0, _UnorderedAccessBufferDataNum, ShaderResources.data());
+  }
+
+  template<class T>
+  inline void SetDomainStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferNum, const UnorderedAccessBuffer<T> _UnorderedAccessBuffers[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferNum);
+    {
+      for (uint UnorderedAccessBufferCount = 0; UnorderedAccessBufferCount < _UnorderedAccessBufferNum; ++UnorderedAccessBufferCount)
+      {
+        ShaderResources[UnorderedAccessBufferCount] = _UnorderedAccessBuffers[UnorderedAccessBufferCount].GetDetail();
+      }
+    }
+
+    SetDomainStageShaderResources(_StartSlot, _UnorderedAccessBufferNum, ShaderResources.data());
+  }
+
+  void SetGeometryStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[]);
+
+  inline void SetGeometryStageShaderResources(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_TextureNum);
+    {
+      for (uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+      {
+        ShaderResources[TextureCount] = _Textures[TextureCount];
+      }
+    }
+
+    SetGeometryStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetGeometryStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
+    {
+      for (uint UnorderedAccessBufferDataCount = 0; UnorderedAccessBufferDataCount < _UnorderedAccessBufferDataNum; ++UnorderedAccessBufferDataCount)
+      {
+        ShaderResources[UnorderedAccessBufferDataCount] = _UnorderedAccessBufferDatas[UnorderedAccessBufferDataCount];
+      }
+    }
+
+    SetGeometryStageShaderResources(0, _UnorderedAccessBufferDataNum, ShaderResources.data());
+  }
+
+  template<class T>
+  inline void SetGeometryStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferNum, const UnorderedAccessBuffer<T> _UnorderedAccessBuffers[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferNum);
+    {
+      for (uint UnorderedAccessBufferCount = 0; UnorderedAccessBufferCount < _UnorderedAccessBufferNum; ++UnorderedAccessBufferCount)
+      {
+        ShaderResources[UnorderedAccessBufferCount] = _UnorderedAccessBuffers[UnorderedAccessBufferCount].GetDetail();
+      }
+    }
+
+    SetGeometryStageShaderResources(_StartSlot, _UnorderedAccessBufferNum, ShaderResources.data());
+  }
+
+  void SetPixelStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[]);
+
+  inline void SetPixelStageShaderResources(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_TextureNum);
+    {
+      for (uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+      {
+        ShaderResources[TextureCount] = _Textures[TextureCount];
+      }
+    }
+
+    SetPixelStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetPixelStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
+    {
+      for (uint UnorderedAccessBufferDataCount = 0; UnorderedAccessBufferDataCount < _UnorderedAccessBufferDataNum; ++UnorderedAccessBufferDataCount)
+      {
+        ShaderResources[UnorderedAccessBufferDataCount] = _UnorderedAccessBufferDatas[UnorderedAccessBufferDataCount];
+      }
+    }
+
+    SetPixelStageShaderResources(0, _UnorderedAccessBufferDataNum, ShaderResources.data());
+  }
+
+  template<class T>
+  inline void SetPixelStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferNum, const UnorderedAccessBuffer<T> _UnorderedAccessBuffers[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferNum);
+    {
+      for (uint UnorderedAccessBufferCount = 0; UnorderedAccessBufferCount < _UnorderedAccessBufferNum; ++UnorderedAccessBufferCount)
+      {
+        ShaderResources[UnorderedAccessBufferCount] = _UnorderedAccessBuffers[UnorderedAccessBufferCount].GetDetail();
+      }
+    }
+
+    SetPixelStageShaderResources(_StartSlot, _UnorderedAccessBufferNum, ShaderResources.data());
+  }
+
+
 
   void SetVertexStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[]);
 
@@ -95,14 +299,6 @@ namespace vdl::Renderer2D
   void SetPixelStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[]);
 
   void SetVertexStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
-
-  void SetHullStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
-
-  void SetDomainStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
-
-  void SetGeometryStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
-
-  void SetPixelStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
 
   template<class T>
   inline void SetVertexStageConstantBuffers(uint _Slot, uint _BufferNum, const ConstantBuffer<T> _ConstantBuffers[])
@@ -118,6 +314,8 @@ namespace vdl::Renderer2D
     SetVertexStageConstantBuffers(_Slot, _BufferNum, ConstantBuffers.data());
   }
 
+  void SetHullStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
+
   template<class T>
   inline void SetHullStageConstantBuffers(uint _Slot, uint _BufferNum, const ConstantBuffer<T> _ConstantBuffers[])
   {
@@ -131,6 +329,8 @@ namespace vdl::Renderer2D
 
     SetHullStageConstantBuffers(_Slot, _BufferNum, ConstantBuffers.data());
   }
+
+  void SetDomainStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
 
   template<class T>
   inline void SetDomainStageConstantBuffers(uint _Slot, uint _BufferNum, const ConstantBuffer<T> _ConstantBuffers[])
@@ -146,6 +346,8 @@ namespace vdl::Renderer2D
     SetDomainStageConstantBuffers(_Slot, _BufferNum, ConstantBuffers.data());
   }
 
+  void SetGeometryStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
+
   template<class T>
   inline void SetGeometryStageConstantBuffers(uint _Slot, uint _BufferNum, const ConstantBuffer<T> _ConstantBuffers[])
   {
@@ -159,6 +361,8 @@ namespace vdl::Renderer2D
 
     SetGeometryStageConstantBuffers(_Slot, _BufferNum, ConstantBuffers.data());
   }
+
+  void SetPixelStageConstantBuffers(uint _StartSlot, uint _BufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);
 
   template<class T>
   inline void SetPixelStageConstantBuffers(uint _Slot, uint _BufferNum, const ConstantBuffer<T> _ConstantBuffers[])

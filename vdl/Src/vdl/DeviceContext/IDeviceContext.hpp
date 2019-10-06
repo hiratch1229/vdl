@@ -39,7 +39,7 @@ public:
 
   virtual void VSSetShader(const vdl::VertexShader& _VertexShader) = 0;
 
-  virtual void VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
+  virtual void VSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[]) = 0;
 
   virtual void VSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[]) = 0;
 
@@ -47,7 +47,7 @@ public:
 
   virtual void HSSetShader(const vdl::HullShader& _HullShader) = 0;
 
-  virtual void HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
+  virtual void HSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[]) = 0;
 
   virtual void HSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[]) = 0;
 
@@ -55,7 +55,7 @@ public:
 
   virtual void DSSetShader(const vdl::DomainShader& _DomainShader) = 0;
 
-  virtual void DSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
+  virtual void DSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[]) = 0;
 
   virtual void DSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[]) = 0;
 
@@ -63,7 +63,7 @@ public:
 
   virtual void GSSetShader(const vdl::GeometryShader& _GeometryShader) = 0;
 
-  virtual void GSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
+  virtual void GSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[]) = 0;
 
   virtual void GSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[]) = 0;
 
@@ -71,7 +71,7 @@ public:
 
   virtual void PSSetShader(const vdl::PixelShader& _PixelShader) = 0;
 
-  virtual void PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[]) = 0;
+  virtual void PSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[]) = 0;
 
   virtual void PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[]) = 0;
 

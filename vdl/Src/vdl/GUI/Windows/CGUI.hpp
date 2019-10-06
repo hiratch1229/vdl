@@ -1,13 +1,14 @@
 #pragma once
 #include "../IGUI.hpp"
 
-#include <vdl/GraphicsState.hpp>
-#include <vdl/Sampler.hpp>
-#include <vdl/ConstantBuffer.hpp>
-#include <vdl/Shader.hpp>
-#include <vdl/Texture.hpp>
 #include <vdl/Scissor.hpp>
 #include <vdl/Viewport.hpp>
+#include <vdl/GraphicsState.hpp>
+#include <vdl/Shader.hpp>
+#include <vdl/Texture.hpp>
+#include <vdl/Sampler.hpp>
+#include <vdl/ConstantBuffer.hpp>
+#include <vdl/UnorderedAccessBuffer.hpp>
 
 #include <vdl/Buffer/IBuffer.hpp>
 
@@ -42,7 +43,7 @@ private:
   vdl::VertexShader VertexShader_;
   vdl::PixelShader PixelShader_;
   vdl::GraphicsState GraphicsState_;
-  vdl::Texture Font_;
+  vdl::ShaderResource Font_;
   vdl::Sampler Sampler_;
   std::unique_ptr<vdl::ConstantBuffer<ConstantBufferData>> pConstantBuffer_;
   vdl::Scissor Scissor_;

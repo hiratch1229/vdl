@@ -123,64 +123,64 @@ namespace vdl
       Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eNone);
     }
 
-    void SetVertexStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      if (_TextureNum == 0)
+      if (_ShaderResourceNum == 0)
       {
         return;
       }
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eVertexShader, RenderType::eNone);
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eVertexShader, RenderType::eNone);
     }
 
-    void SetHullStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetHullStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      if (_TextureNum == 0)
+      if (_ShaderResourceNum == 0)
       {
         return;
       }
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eHullShader, RenderType::eNone);
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eHullShader, RenderType::eNone);
     }
 
-    void SetDomainStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetDomainStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      if (_TextureNum == 0)
+      if (_ShaderResourceNum == 0)
       {
         return;
       }
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eDomainShader, RenderType::eNone);
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eDomainShader, RenderType::eNone);
     }
 
-    void SetGeometryStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetGeometryStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      if (_TextureNum == 0)
+      if (_ShaderResourceNum == 0)
       {
         return;
       }
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eGeometryShader, RenderType::eNone);
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eGeometryShader, RenderType::eNone);
     }
 
-    void SetPixelStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetPixelStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      if (_TextureNum == 0)
+      if (_ShaderResourceNum == 0)
       {
         return;
       }
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::ePixelShader, RenderType::eNone);
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::ePixelShader, RenderType::eNone);
     }
 
     void SetVertexStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[])
@@ -370,41 +370,66 @@ namespace vdl
       Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, RenderType::eTexture);
     }
 
-    void SetVertexStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eVertexShader, RenderType::eTexture);
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eVertexShader, RenderType::eTexture);
     }
 
-    void SetHullStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetHullStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eHullShader, RenderType::eTexture);
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eHullShader, RenderType::eTexture);
     }
 
-    void SetDomainStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetDomainStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eDomainShader, RenderType::eTexture);
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eDomainShader, RenderType::eTexture);
     }
 
-    void SetGeometryStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetGeometryStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eGeometryShader, RenderType::eTexture);
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eGeometryShader, RenderType::eTexture);
     }
 
-    void SetPixelStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetPixelStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(0 < _StartSlot && _StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
-      Engine::Get<IRenderer>()->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::ePixelShader, RenderType::eTexture);
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::ePixelShader, RenderType::eTexture);
     }
-
+       
     void SetVertexStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[])
     {
       assert(_StartSlot + _SamplerNum - 1 < Constants::kMaxSamplerNum);
@@ -533,54 +558,89 @@ namespace vdl
       pRenderer->SetRasterizerState(_RasterizerState, RenderType::eSkinnedMesh);
     }
 
-    void SetVertexStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
+
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eVertexShader, RenderType::eTexture);
 
       IRenderer* pRenderer = Engine::Get<IRenderer>();
 
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eVertexShader, RenderType::eStaticMesh);
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eVertexShader, RenderType::eSkinnedMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eVertexShader, RenderType::eStaticMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eVertexShader, RenderType::eSkinnedMesh);
     }
 
-    void SetHullStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetHullStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
+
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eHullShader, RenderType::eTexture);
 
       IRenderer* pRenderer = Engine::Get<IRenderer>();
 
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eHullShader, RenderType::eStaticMesh);
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eHullShader, RenderType::eSkinnedMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eHullShader, RenderType::eStaticMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eHullShader, RenderType::eSkinnedMesh);
     }
 
-    void SetDomainStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetDomainStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
+
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eDomainShader, RenderType::eTexture);
 
       IRenderer* pRenderer = Engine::Get<IRenderer>();
 
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eDomainShader, RenderType::eStaticMesh);
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eDomainShader, RenderType::eSkinnedMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eDomainShader, RenderType::eStaticMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eDomainShader, RenderType::eSkinnedMesh);
     }
 
-    void SetGeometryStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetGeometryStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
+
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eGeometryShader, RenderType::eTexture);
 
       IRenderer* pRenderer = Engine::Get<IRenderer>();
 
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eGeometryShader, RenderType::eStaticMesh);
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::eGeometryShader, RenderType::eSkinnedMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eGeometryShader, RenderType::eStaticMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::eGeometryShader, RenderType::eSkinnedMesh);
     }
 
-    void SetPixelStageTextures(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+    void SetPixelStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(0 < _StartSlot && _StartSlot + _TextureNum - 1 < Constants::kMaxTextureNum);
+      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
+
+      if (_ShaderResourceNum == 0)
+      {
+        return;
+      }
+
+      Engine::Get<IRenderer>()->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::ePixelShader, RenderType::eTexture);
 
       IRenderer* pRenderer = Engine::Get<IRenderer>();
 
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::ePixelShader, RenderType::eStaticMesh);
-      pRenderer->SetTextures(_StartSlot, _TextureNum, _Textures, ShaderType::ePixelShader, RenderType::eSkinnedMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::ePixelShader, RenderType::eStaticMesh);
+      pRenderer->SetShaderResources(_StartSlot, _ShaderResourceNum, _ShaderResources, ShaderType::ePixelShader, RenderType::eSkinnedMesh);
     }
 
     void SetVertexStageSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Sampler[])

@@ -29,18 +29,44 @@ namespace vdl::Computer
 
   void SetUnorderedAccessObjects(uint _StartSlot, uint _UnorderedAccessObjectNum, const UnorderedAccessObject _UnorderedAccessObjects[]);
 
-  template<class T>
-  inline void SetUnorderedAccessObjects(uint _StartSlot, uint _UnorderedAccessObjectNum, UnorderedAccessBuffer<T> _UnorderedAccessBuffers[])
+  inline void SetUnorderedAccessObjects(uint _StartSlot, uint _UnorderedAccessTextureNum, const UnorderedAccessTexture _UnorderedAccessTextures[])
   {
-    std::vector<UnorderedAccessObject> UnorderedAccessBuffer(_UnorderedAccessObjectNum);
+    std::vector<UnorderedAccessObject> UnorderedAccessObjects(_UnorderedAccessTextureNum);
     {
-      for (uint UnorderedAccessBufferCount = 0; UnorderedAccessBufferCount < _UnorderedAccessObjectNum; ++UnorderedAccessBufferCount)
+      for (uint UnorderedAccessTextureCount = 0; UnorderedAccessTextureCount < _UnorderedAccessTextureNum; ++UnorderedAccessTextureCount)
       {
-        UnorderedAccessBuffer[UnorderedAccessBufferCount] = _UnorderedAccessBuffers[UnorderedAccessBufferCount].GetDetail();
+        UnorderedAccessObjects[UnorderedAccessTextureCount] = _UnorderedAccessTextures[UnorderedAccessTextureCount];
       }
     }
 
-    SetUnorderedAccessObjects(_StartSlot, _UnorderedAccessObjectNum, UnorderedAccessBuffer.data());
+    SetUnorderedAccessObjects(_StartSlot, _UnorderedAccessTextureNum, UnorderedAccessObjects.data());
+  }
+
+  inline void SetUnorderedAccessObjects(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
+  {
+    std::vector<UnorderedAccessObject> UnorderedAccessObjects(_UnorderedAccessBufferDataNum);
+    {
+      for (uint UnorderedAccessBufferDataCount = 0; UnorderedAccessBufferDataCount < _UnorderedAccessBufferDataNum; ++UnorderedAccessBufferDataCount)
+      {
+        UnorderedAccessObjects[UnorderedAccessBufferDataCount] = _UnorderedAccessBufferDatas[UnorderedAccessBufferDataCount];
+      }
+    }
+
+    SetUnorderedAccessObjects(_StartSlot, _UnorderedAccessBufferDataNum, UnorderedAccessObjects.data());
+  }
+
+  template<class T>
+  inline void SetUnorderedAccessObjects(uint _StartSlot, uint _UnorderedAccessBufferNum, const UnorderedAccessBuffer<T> _UnorderedAccessBuffers[])
+  {
+    std::vector<UnorderedAccessObject> UnorderedAccessObjects(_UnorderedAccessBufferNum);
+    {
+      for (uint UnorderedAccessBufferCount = 0; UnorderedAccessBufferCount < _UnorderedAccessBufferNum; ++UnorderedAccessBufferCount)
+      {
+        UnorderedAccessObjects[UnorderedAccessBufferCount] = _UnorderedAccessBuffers[UnorderedAccessBufferCount].GetDetail();
+      }
+    }
+
+    SetUnorderedAccessObjects(_StartSlot, _UnorderedAccessBufferNum, UnorderedAccessObjects.data());
   }
 
   void SetShader(const ComputeShader& _Shader);

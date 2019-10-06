@@ -504,7 +504,7 @@ void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
 {
   ID3D11VertexShader* pVertexShader = nullptr;
   {
-    if (_VertexShader.isEmpty())
+    if (!_VertexShader.isEmpty())
     {
       assert(pShaderManager_->GetShader(_VertexShader.GetID())->GetType() == ShaderType::eVertexShader);
       pVertexShader = static_cast<CVertexShader*>(pShaderManager_->GetShader(_VertexShader.GetID()))->pVertexShader.Get();
@@ -514,19 +514,17 @@ void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
   pD3D11ImmediateContext_->VSSetShader(pVertexShader, nullptr, 0);
 }
 
-void CDeviceContext::VSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
+void CDeviceContext::VSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
 {
-  std::vector<ID3D11ShaderResourceView*> pShaderResources(_TextureNum);
+  std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
-    for (vdl::uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      assert(!_Textures[TextureCount].isEmpty());
-
-      pShaderResources[TextureCount] = static_cast<CTexture*>(pTextureManager_->GetTexture(_Textures[TextureCount].GetID()))->pShaderResourceView.Get();
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
     }
   }
 
-  pD3D11ImmediateContext_->VSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->VSSetShaderResources(_StartSlot, _ShaderResourceNum, pShaderResources.data());
 }
 
 void CDeviceContext::VSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -569,19 +567,17 @@ void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
   pD3D11ImmediateContext_->HSSetShader(pHullShader, nullptr, 0);
 }
 
-void CDeviceContext::HSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
+void CDeviceContext::HSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
 {
-  std::vector<ID3D11ShaderResourceView*> pShaderResources(_TextureNum);
+  std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
-    for (vdl::uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      assert(_Textures[TextureCount].GetID() != std::nullopt);
-
-      pShaderResources[TextureCount] = static_cast<CTexture*>(pTextureManager_->GetTexture(_Textures[TextureCount].GetID()))->pShaderResourceView.Get();
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
     }
   }
 
-  pD3D11ImmediateContext_->HSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->HSSetShaderResources(_StartSlot, _ShaderResourceNum, pShaderResources.data());
 }
 
 void CDeviceContext::HSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -624,19 +620,17 @@ void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
   pD3D11ImmediateContext_->DSSetShader(pDomainShader, nullptr, 0);
 }
 
-void CDeviceContext::DSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
+void CDeviceContext::DSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
 {
-  std::vector<ID3D11ShaderResourceView*> pShaderResources(_TextureNum);
+  std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
-    for (vdl::uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      assert(_Textures[TextureCount].GetID() != std::nullopt);
-
-      pShaderResources[TextureCount] = static_cast<CTexture*>(pTextureManager_->GetTexture(_Textures[TextureCount].GetID()))->pShaderResourceView.Get();
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
     }
   }
 
-  pD3D11ImmediateContext_->DSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->DSSetShaderResources(_StartSlot, _ShaderResourceNum, pShaderResources.data());
 }
 
 void CDeviceContext::DSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -679,19 +673,17 @@ void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
   pD3D11ImmediateContext_->GSSetShader(pGeometryShader, nullptr, 0);
 }
 
-void CDeviceContext::GSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
+void CDeviceContext::GSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
 {
-  std::vector<ID3D11ShaderResourceView*> pShaderResources(_TextureNum);
+  std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
-    for (vdl::uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      assert(_Textures[TextureCount].GetID() != std::nullopt);
-
-      pShaderResources[TextureCount] = static_cast<CTexture*>(pTextureManager_->GetTexture(_Textures[TextureCount].GetID()))->pShaderResourceView.Get();
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
     }
   }
 
-  pD3D11ImmediateContext_->GSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->GSSetShaderResources(_StartSlot, _ShaderResourceNum, pShaderResources.data());
 }
 
 void CDeviceContext::GSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -734,20 +726,17 @@ void CDeviceContext::PSSetShader(const vdl::PixelShader& _PixelShader)
   pD3D11ImmediateContext_->PSSetShader(pPixelShader, nullptr, 0);
 }
 
-void CDeviceContext::PSSetTextures(vdl::uint _StartSlot, vdl::uint _TextureNum, const vdl::Texture _Textures[])
+void CDeviceContext::PSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
 {
-  std::vector<ID3D11ShaderResourceView*> pShaderResources(_TextureNum);
+  std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
-    for (vdl::uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      if (!_Textures[TextureCount].isEmpty())
-      {
-        pShaderResources[TextureCount] = static_cast<CTexture*>(pTextureManager_->GetTexture(_Textures[TextureCount].GetID()))->pShaderResourceView.Get();
-      }
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
     }
   }
 
-  pD3D11ImmediateContext_->PSSetShaderResources(_StartSlot, _TextureNum, pShaderResources.data());
+  pD3D11ImmediateContext_->PSSetShaderResources(_StartSlot, _ShaderResourceNum, pShaderResources.data());
 }
 
 void CDeviceContext::PSSetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
@@ -780,7 +769,7 @@ void CDeviceContext::CSSetShader(const vdl::ComputeShader& _ComputeShader)
 {
   ID3D11ComputeShader* pComputeShader = nullptr;
   {
-    if (_ComputeShader.isEmpty())
+    if (!_ComputeShader.isEmpty())
     {
       assert(pShaderManager_->GetShader(_ComputeShader.GetID())->GetType() == ShaderType::eComputeShader);
       pComputeShader = static_cast<CComputeShader*>(pShaderManager_->GetShader(_ComputeShader.GetID()))->pComputeShader.Get();
