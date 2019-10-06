@@ -128,7 +128,6 @@ void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::
     if (StateChangeFlags_.Has(ComputerCommandType::eSetUnorderedAccessObject))
     {
       PreviousUnorderedAccessObjects_ = CurrentUnorderedAccessObjects_;
-      pDeviceContext_->CSSetUnorderedAccessObjects(0, static_cast<vdl::uint>(PreviousUnorderedAccessObjects_.size()), PreviousUnorderedAccessObjects_.data());
     }
   }
 
@@ -177,5 +176,11 @@ void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::
 
   StateChangeFlags_.Clear();
 
+  const vdl::uint PreviousUnorderedAccessObjectNum = static_cast<vdl::uint>(PreviousUnorderedAccessObjects_.size());
+  pDeviceContext_->CSSetUnorderedAccessObjects(0, PreviousUnorderedAccessObjectNum, PreviousUnorderedAccessObjects_.data());
+
   pDeviceContext_->Dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
+
+  UnorderedAccessObjects UnorderedAccessObjects(PreviousUnorderedAccessObjectNum);
+  pDeviceContext_->CSSetUnorderedAccessObjects(0, PreviousUnorderedAccessObjectNum, UnorderedAccessObjects.data());
 }

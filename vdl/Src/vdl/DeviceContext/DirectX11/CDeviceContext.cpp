@@ -303,6 +303,11 @@ void CDeviceContext::Initialize()
 
 void CDeviceContext::SetVertexBuffer(const IBuffer* _pVertexBuffer)
 {
+  if (!_pVertexBuffer)
+  {
+    return;
+  }
+
   assert(_pVertexBuffer->GetType() == BufferType::eVertexBuffer);
 
   constexpr vdl::uint kOffset = 0;
@@ -820,6 +825,18 @@ void CDeviceContext::CSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
 
 void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint _UnorderedAccessObjectNum, const vdl::UnorderedAccessObject _UnorderedAccessObjects[])
 {
+  //  TODO:
+  //  シェーダーリソースの全解除
+  {
+    std::vector<ID3D11ShaderResourceView*> pShaderResourceViews(Constants::kMaxShaderResourceNum);
+
+    pD3D11ImmediateContext_->VSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+    pD3D11ImmediateContext_->HSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+    pD3D11ImmediateContext_->DSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+    pD3D11ImmediateContext_->GSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+    pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+  }
+
   std::vector<ID3D11UnorderedAccessView*> pUnorderedAccessBuffers(_UnorderedAccessObjectNum);
   {
     for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < _UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
@@ -958,8 +975,11 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _p
     default: assert(false);
     }
 
-    hr = pD3D11Device_->CreateInputLayout(InputElementDesc.data(), static_cast<vdl::uint>(InputElementDesc.size()), _pCode->GetBufferPointer(), _pCode->GetBufferSize(), pInputLayout.GetAddressOf());
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    if (!InputElementDesc.empty())
+    {
+      hr = pD3D11Device_->CreateInputLayout(InputElementDesc.data(), static_cast<vdl::uint>(InputElementDesc.size()), _pCode->GetBufferPointer(), _pCode->GetBufferSize(), pInputLayout.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    }
   }
 
   InputLayouts_.insert(std::make_pair(_Key, pInputLayout));

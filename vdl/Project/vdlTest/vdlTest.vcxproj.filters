@@ -84,6 +84,18 @@
     <FxCompile Include="Shader\GPUParticle\GPUParticleInitCS.hlsl">
       <Filter>シェーダーファイル\GPUParticle</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\GPUParticle\GPUParticleCS.hlsl">
+      <Filter>シェーダーファイル\GPUParticle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\GPUParticle\GPUParticleVS.hlsl">
+      <Filter>シェーダーファイル\GPUParticle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\GPUParticle\GPUParticlePS.hlsl">
+      <Filter>シェーダーファイル\GPUParticle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\GPUParticle\GPUParticleGS.hlsl">
+      <Filter>シェーダーファイル\GPUParticle</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">

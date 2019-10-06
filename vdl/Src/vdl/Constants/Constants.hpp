@@ -24,7 +24,7 @@ namespace Constants
 
   constexpr vdl::uint kMaxSamplerNum = vdl::Constants::kMaxSamplerNum;
 
-  constexpr vdl::uint kMaxTextureNum = vdl::Constants::kMaxShaderResourceNum;
+  constexpr vdl::uint kMaxShaderResourceNum = vdl::Constants::kMaxShaderResourceNum;
 
   constexpr vdl::uint kMaxConstantBufferNum = vdl::Constants::kMaxConstantBufferNum;
 
