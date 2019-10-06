@@ -23,8 +23,13 @@
     <ClInclude Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\Vulkan\CDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\Vulkan\CDevice.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Format\Vulkan\Format.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Scissor\Vulkan\Scissor.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\Vulkan\CShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\Vulkan\CSwapChain.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Texture\Vulkan\CTexture.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Topology\Vulkan\Topology.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Viewport\Vulkan\Viewport.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\Vulkan\CBufferManager.cpp" />
@@ -108,7 +113,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -166,7 +171,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>

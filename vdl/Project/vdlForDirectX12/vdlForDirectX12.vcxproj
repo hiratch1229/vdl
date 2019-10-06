@@ -33,7 +33,9 @@
     <ClInclude Include="..\..\Src\vdl\Scissor\DirectX\Scissor.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\DirectX12\CShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Texture\DirectX12\CTexture.hpp" />
     <ClInclude Include="..\..\Src\vdl\Topology\DirectX\Topology.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Viewport\DirectX12\Viewport.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

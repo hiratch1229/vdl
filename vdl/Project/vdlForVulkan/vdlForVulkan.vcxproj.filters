@@ -57,6 +57,21 @@
     <ClInclude Include="..\..\Src\vdl\SwapChain\Vulkan\CSwapChain.hpp">
       <Filter>Src\SwapChain</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Texture\Vulkan\CTexture.hpp">
+      <Filter>Src\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Topology\Vulkan\Topology.hpp">
+      <Filter>Src\Topology</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Viewport\Vulkan\Viewport.hpp">
+      <Filter>Src\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Format\Vulkan\Format.hpp">
+      <Filter>Src\Format</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Scissor\Vulkan\Scissor.hpp">
+      <Filter>Src\Scissor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\Vulkan\CBufferManager.cpp">

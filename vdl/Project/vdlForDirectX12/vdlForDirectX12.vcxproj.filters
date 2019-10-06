@@ -80,5 +80,11 @@
     <ClInclude Include="..\..\Src\vdl\Topology\DirectX\Topology.hpp">
       <Filter>Src\Topology</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Texture\DirectX12\CTexture.hpp">
+      <Filter>Src\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Viewport\DirectX12\Viewport.hpp">
+      <Filter>Src\Viewport</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
