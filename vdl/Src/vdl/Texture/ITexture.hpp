@@ -1,4 +1,5 @@
 #pragma once
+#include <vdl/Fwd.hpp>
 #include <vdl/Type2.hpp>
 
 enum class TextureType

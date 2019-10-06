@@ -3,7 +3,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-inline vk::Format Cast(vdl::FormatType _Format)
+inline constexpr vk::Format Cast(vdl::FormatType _Format)
 {
   switch (_Format)
   {

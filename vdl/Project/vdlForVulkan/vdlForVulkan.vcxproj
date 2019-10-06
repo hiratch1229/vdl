@@ -37,6 +37,7 @@
     <ClCompile Include="..\..\Src\vdl\Device\Vulkan\CDevice.cpp" />
     <ClCompile Include="..\..\Src\vdl\Shader\Vulkan\CShader.cpp" />
     <ClCompile Include="..\..\Src\vdl\SwapChain\Vulkan\CSwapChain.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Texture\Vulkan\CTexture.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -113,7 +114,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -171,7 +172,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>

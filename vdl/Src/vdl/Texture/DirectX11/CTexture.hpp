@@ -12,7 +12,7 @@ struct CTexture : public ITexture
 public:
   CTexture() = default;
 
-  TextureType GetType()const { return TextureType::eTexture; }
+  TextureType GetType()const override { return TextureType::eTexture; }
 
   vdl::uint2 GetSize()const final { return TextureSize; }
 };
@@ -32,7 +32,7 @@ struct CDepthStencilTexture : public CTexture
 public:
   CDepthStencilTexture() = default;
 
-  TextureType GetType()const { return TextureType::eDepthStencilTexture; }
+  TextureType GetType()const final { return TextureType::eDepthStencilTexture; }
 };
 
 struct CUnorderedAccessTexture : public CTexture
@@ -41,5 +41,5 @@ struct CUnorderedAccessTexture : public CTexture
 public:
   CUnorderedAccessTexture() = default;
 
-  TextureType GetType()const { return TextureType::eUnorderedAccessTexture; }
+  TextureType GetType()const final { return TextureType::eUnorderedAccessTexture; }
 };

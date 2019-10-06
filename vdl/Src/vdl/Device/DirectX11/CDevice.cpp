@@ -292,7 +292,7 @@ void CDevice::CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _Buffe
   (*_ppConstantBuffer) = std::move(pConstantBuffer);
 }
 
-void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer)
+void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, const void* _Buffer)
 {
   assert(_ppUnorderedAccessBuffer);
 
@@ -622,7 +622,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   case ShaderType::eDomainShader:
@@ -637,7 +637,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   case ShaderType::eGeometryShader:
@@ -652,7 +652,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   case ShaderType::ePixelShader:
@@ -667,7 +667,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   case ShaderType::eComputeShader:
@@ -682,7 +682,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   default: assert(false);
@@ -715,7 +715,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   case ShaderType::eDomainShader:
@@ -730,7 +730,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   case ShaderType::eGeometryShader:
@@ -745,7 +745,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   case ShaderType::ePixelShader:
@@ -775,7 +775,7 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
       _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    *_ppShader = std::move(pShader);
+    (*_ppShader) = std::move(pShader);
   }
   break;
   default: assert(false);
@@ -802,7 +802,7 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath,
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-  *_ppVertexShader = std::move(pShader);
+  (*_ppVertexShader) = std::move(pShader);
 
   //  インプットレイアウトの登録
   if (!pDeviceContext_->isFoundInputLayout(_InputLayout))
@@ -831,7 +831,7 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, v
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-  *_ppVertexShader = std::move(pShader);
+  (*_ppVertexShader) = std::move(pShader);
 
   //  インプットレイアウトの登録
   if (!pDeviceContext_->isFoundInputLayout(_InputLayout))

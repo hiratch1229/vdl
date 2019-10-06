@@ -89,5 +89,8 @@
     <ClCompile Include="..\..\Src\vdl\SwapChain\Vulkan\CSwapChain.cpp">
       <Filter>Src\SwapChain</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Texture\Vulkan\CTexture.cpp">
+      <Filter>Src\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

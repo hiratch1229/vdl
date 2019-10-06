@@ -11,9 +11,9 @@ struct CVertexShader : public IVertexShader
 public:
   CVertexShader() = default;
 
-  ShaderType GetType()const override final { return ShaderType::eVertexShader; }
+  ShaderType GetType()const final { return ShaderType::eVertexShader; }
 
-  vdl::InputLayoutType GetInputLayout()const override final { return InputLayout; }
+  vdl::InputLayoutType GetInputLayout()const final { return InputLayout; }
 };
 
 struct CHullShader : public IShader
@@ -22,7 +22,7 @@ struct CHullShader : public IShader
 public:
   CHullShader() = default;
 
-  ShaderType GetType()const override final { return ShaderType::eHullShader; }
+  ShaderType GetType()const final { return ShaderType::eHullShader; }
 };
 
 struct CDomainShader : public IShader
@@ -31,7 +31,7 @@ struct CDomainShader : public IShader
 public:
   CDomainShader() = default;
 
-  ShaderType GetType()const override final { return ShaderType::eDomainShader; }
+  ShaderType GetType()const final { return ShaderType::eDomainShader; }
 };
 
 struct CGeometryShader : public IShader
@@ -40,7 +40,7 @@ struct CGeometryShader : public IShader
 public:
   CGeometryShader() = default;
 
-  ShaderType GetType()const override final { return ShaderType::eGeometryShader; }
+  ShaderType GetType()const final { return ShaderType::eGeometryShader; }
 };
 
 struct CPixelShader : public IShader
@@ -49,7 +49,7 @@ struct CPixelShader : public IShader
 public:
   CPixelShader() = default;
 
-  ShaderType GetType()const override final { return ShaderType::ePixelShader; }
+  ShaderType GetType()const final { return ShaderType::ePixelShader; }
 };
 
 struct CComputeShader : public IShader
@@ -58,5 +58,5 @@ struct CComputeShader : public IShader
 public:
   CComputeShader() = default;
 
-  ShaderType GetType()const override final { return ShaderType::eComputeShader; }
+  ShaderType GetType()const final { return ShaderType::eComputeShader; }
 };

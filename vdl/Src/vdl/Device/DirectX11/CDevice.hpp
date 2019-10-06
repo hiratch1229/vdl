@@ -32,7 +32,7 @@ public:
 
   void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize)override;
 
-  void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer)override;
+  void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, const void* _Buffer)override;
 
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 
