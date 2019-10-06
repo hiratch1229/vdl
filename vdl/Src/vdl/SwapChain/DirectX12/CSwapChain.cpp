@@ -17,10 +17,10 @@ void CSwapChain::Present()
 
 void CSwapChain::ChangeWindowMode()
 {
-
+  //  TODO
 }
 
 void CSwapChain::ScreenShot()
 {
-
+  //  TODO
 }

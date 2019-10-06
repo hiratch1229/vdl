@@ -166,6 +166,8 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

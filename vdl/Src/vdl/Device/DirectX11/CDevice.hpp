@@ -16,6 +16,8 @@ public:
   [[nodiscard]] ID3D11Device* GetDevice()const { return pD3D11Device_.Get(); }
   [[nodiscard]] ID3D11DeviceContext* GetImmediateContext()const { return pD3D11ImmediateContext_.Get(); }
 public:
+  CDevice() = default;
+
   void Initialize()override;
 
   void CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _Stride, vdl::uint _BufferSize)override;

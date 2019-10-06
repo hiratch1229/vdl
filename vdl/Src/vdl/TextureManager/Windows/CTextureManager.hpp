@@ -10,6 +10,8 @@ class CTextureManager : public ITextureManager
   IDevice* pDevice_;
   ReferenceCounts<ITexture> Textures_;
 public:
+  CTextureManager() = default;
+
   void Initialize()override;
 
   vdl::ID Load(const char* _FilePath, bool _isSerialize)override;

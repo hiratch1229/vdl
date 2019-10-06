@@ -4,6 +4,8 @@
 class CSwapChain : public ISwapChain
 {
 public:
+  CSwapChain() = default;
+
   void Initialize()override;
 
   void ScreenClear()override;

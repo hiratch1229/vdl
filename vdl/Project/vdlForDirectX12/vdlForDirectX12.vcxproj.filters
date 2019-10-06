@@ -34,6 +34,9 @@
     <Filter Include="Src\Topology">
       <UniqueIdentifier>{58abaa40-53b7-45cd-87f1-5a931e27e3e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Texture">
+      <UniqueIdentifier>{16301419-7e73-4984-8bd7-6c9ad0dacec0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.cpp">

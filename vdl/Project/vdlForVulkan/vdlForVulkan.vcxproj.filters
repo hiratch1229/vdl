@@ -22,6 +22,21 @@
     <Filter Include="Src\SwapChain">
       <UniqueIdentifier>{f376c5df-0115-4d3a-b5a3-b4b2473a4433}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Format">
+      <UniqueIdentifier>{b9595e12-fde2-4be6-a8bf-2f7f59ea2b20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scissor">
+      <UniqueIdentifier>{1cfaf4ea-dd31-44a5-8ab5-a264a6ff305e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Texture">
+      <UniqueIdentifier>{b64028df-b107-4416-8d12-94a4419541ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Topology">
+      <UniqueIdentifier>{f9a765c2-d862-4d88-aa80-7562ef94b424}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Viewport">
+      <UniqueIdentifier>{492eced0-ff43-463e-8ad9-1366c24395cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.hpp">

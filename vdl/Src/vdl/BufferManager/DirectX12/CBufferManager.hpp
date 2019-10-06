@@ -16,11 +16,17 @@ public:
 
   vdl::ID CreateConstantBuffer(vdl::uint _BufferSize)override;
 
-  vdl::Detail::ConstantBufferData CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBufferData)override;
-  
+  vdl::Detail::ConstantBufferData CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)override;
+
+  void* GetBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)override;
+
+  vdl::uint GetBufferSize(const vdl::Detail::ConstantBufferData& _ConstantBuffer)override;
+
+  vdl::ID CreateUnorderedAccessBuffer(vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer)override;
+
   void AddRef(const vdl::ID& _ID)override { Buffers_.Get(_ID).AddRef(); }
 
   void Release(const vdl::ID& _ID) override { Buffers_.Get(_ID).Release(); }
-  
+
   IBuffer* GetBuffer(const vdl::ID& _ID)override { return Buffers_.Get(_ID).Get(); }
 };
