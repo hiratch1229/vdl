@@ -47,7 +47,7 @@ void CSwapChain::Initialize()
       std::vector<vk::SurfaceFormatKHR> SurfaceFormats = PhysicalDevice.getSurfaceFormatsKHR(Surface_.get());
       assert(!SurfaceFormats.empty());
      
-      Format = (SurfaceFormats[0].format == vk::Format::eUndefined) ? vk::Format::eB8G8R8A8Unorm : SurfaceFormats[0].format;
+      Format = (SurfaceFormats[0].format == vk::Format::eUndefined ? vk::Format::eB8G8R8A8Unorm : SurfaceFormats[0].format);
       for (auto& SurfaceFormat : SurfaceFormats)
       {
         if (SurfaceFormat.format == kSwapChainFormat)

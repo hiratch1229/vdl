@@ -138,8 +138,6 @@ inline constexpr DXGI_FORMAT Cast(vdl::FormatType _Format)
     return DXGI_FORMAT_B8G8R8A8_UNORM;
   case vdl::FormatType::eB8G8R8X8_Unorm:
     return DXGI_FORMAT_B8G8R8X8_UNORM;
-  case vdl::FormatType::eR10G10B10_XR_BIAS_A2_Unorm:
-    return DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM;
   case vdl::FormatType::eB8G8R8A8_Unorm_SRGB:
     return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
   case vdl::FormatType::eB8G8R8X8_Unorm_SRGB:

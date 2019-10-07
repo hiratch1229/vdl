@@ -12,14 +12,104 @@
 
 #undef min
 #undef max
+#pragma warning(disable:26495)
 #include <glslang/SPIRV/GlslangToSpv.h>
 #include <glslang/StandAlone/DirStackFileIncluder.h>
 #include <glslang/StandAlone/ResourceLimits.hpp>
+#pragma warning(default:26495)
 
 #include <sstream>
 
 namespace
 {
+  class IntermTraverser : public glslang::TIntermTraverser
+  {
+    const ShaderType Type_;
+  public:
+    IntermTraverser(ShaderType _Type)
+      : Type_(_Type) {}
+  public:
+    void visitSymbol(glslang::TIntermSymbol* _pSymbol)override
+    {
+      const glslang::TBasicType Type = _pSymbol->getBasicType();
+
+      vdl::uint LayoutSet = 0;
+      if (Type == glslang::TBasicType::EbtSampler)
+      {
+        const glslang::TSampler& Sampler = _pSymbol->getType().getSampler();
+
+        //  Sampler
+        if (Sampler.type == glslang::EbtVoid && Sampler.dim == glslang::EsdNone)
+        {
+          if (Type_ == ShaderType::eComputeShader)
+          {
+            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + 0;
+          }
+          else
+          {
+            LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eSampler) + static_cast<vdl::uint>(Type_);
+          }
+        }
+        //  Texture
+        else if (_pSymbol->getQualifier().layoutFormat == glslang::TLayoutFormat::ElfNone)
+        {
+          if (Type_ == ShaderType::eComputeShader)
+          {
+            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eShaderResouce);
+          }
+          else
+          {
+            LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eShaderResouce) + static_cast<vdl::uint>(Type_);
+          }
+        }
+        //  RWTexture
+        else
+        {
+          assert(Type_ == ShaderType::eComputeShader);
+          LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject);
+        }
+      }
+      else if (Type == glslang::TBasicType::EbtBlock)
+      {
+        const glslang::TQualifier& Qualifier = _pSymbol->getQualifier();
+
+        //  ConstantBuffer
+        if (Qualifier.storage == glslang::TStorageQualifier::EvqUniform)
+        {
+          if (Type_ == ShaderType::eComputeShader)
+          {
+            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eConstantBuffer);
+          }
+          else
+          {
+            LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eConstantBuffer) + static_cast<vdl::uint>(Type_);
+          }
+        }
+        //  RWStructuredBuffer
+        else
+        {
+          if (Type_ == ShaderType::eComputeShader)
+          {
+            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject);
+          }
+          else
+          {
+            LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject) + static_cast<vdl::uint>(Type_);
+          }
+        }
+      }
+      else
+      {
+        return;
+      }
+
+      _pSymbol->getWritableType().getQualifier().layoutSet = LayoutSet;
+    }
+  };
+
+  constexpr EShMessages kControls = static_cast<EShMessages>(EShMsgCascadingErrors | EShMsgReadHlsl
+    | EShMsgSpvRules | EShMsgKeepUncalled | EShMsgVulkanRules);
+
   inline constexpr EShLanguage Cast(ShaderType _Type)
   {
     switch (_Type)
@@ -44,9 +134,6 @@ namespace
 
   inline void ComplineShader(std::vector<vdl::uint>* _pCode, ShaderType _Type, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint)
   {
-    constexpr EShMessages kControls = static_cast<EShMessages>(EShMsgCascadingErrors | EShMsgReadHlsl
-      | EShMsgSpvRules | EShMsgKeepUncalled | EShMsgVulkanRules);
-
     const EShLanguage Stage = Cast(_Type);
 
     bool Result = true;
@@ -56,15 +143,14 @@ namespace
     //  シェーダーファイルのコンパイル
     glslang::TShader Shader(Stage);
     {
-      Shader.setStringsWithLengths(&_Source, reinterpret_cast<int*>(&_DataSize), 1);
-      Shader.setEntryPoint(_EntryPoint);
+      Shader.setStrings(&_Source, 1);
+      Shader.setSourceEntryPoint(_EntryPoint);
       Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, 110);
       Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_1);
       Shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
 
-      DirStackFileIncluder Includer;
-      Result = Shader.parse(&glslang::DefaultTBuiltInResource, 110, false, kControls, Includer);
-      _ASSERT_EXPR_A(Result, "コンパイルに失敗");
+      Result = Shader.parse(&glslang::DefaultTBuiltInResource, 110, false, kControls);
+      _ASSERT_EXPR_A(Result, "コンパイル失敗");
     }
 
     //  シェーダーファイルのリンク
@@ -75,92 +161,7 @@ namespace
       Result = Program.link(kControls);
       _ASSERT_EXPR_A(Result, "シェーダーファイルのリンクに失敗");
     }
-
-    class IntermTraverser : public glslang::TIntermTraverser
-    {
-      const ShaderType Type_;
-    public:
-      IntermTraverser(ShaderType _Type)
-        : Type_(_Type) {}
-    public:
-      void visitSymbol(glslang::TIntermSymbol* _pSymbol)override
-      {
-        const glslang::TBasicType Type = _pSymbol->getBasicType();
-
-        vdl::uint LayoutSet = 0;
-        if (Type == glslang::TBasicType::EbtSampler)
-        {
-          const glslang::TSampler& Sampler = _pSymbol->getType().getSampler();
-
-          //  Sampler
-          if (Sampler.type == glslang::EbtVoid && Sampler.dim == glslang::EsdNone)
-          {
-            if (Type_ == ShaderType::eComputeShader)
-            {
-              LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + 0;
-            }
-            else
-            {
-              LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eSampler) + static_cast<vdl::uint>(Type_);
-            }
-          }
-          //  Texture
-          else if (_pSymbol->getQualifier().layoutFormat == glslang::TLayoutFormat::ElfNone)
-          {
-            if (Type_ == ShaderType::eComputeShader)
-            {
-              LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eShaderResouce);
-            }
-            else
-            {
-              LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eShaderResouce) + static_cast<vdl::uint>(Type_);
-            }
-          }
-          //  RWTexture
-          else
-          {
-            assert(Type_ == ShaderType::eComputeShader);
-            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject);
-          }
-        }
-        else if (Type == glslang::TBasicType::EbtBlock)
-        {
-          const glslang::TQualifier& Qualifier = _pSymbol->getQualifier();
-
-          //  ConstantBuffer
-          if (Qualifier.storage == glslang::TStorageQualifier::EvqUniform)
-          {
-            if (Type_ == ShaderType::eComputeShader)
-            {
-              LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eConstantBuffer);
-            }
-            else
-            {
-              LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eConstantBuffer) + static_cast<vdl::uint>(Type_);
-            }
-          }
-          //  RWStructuredBuffer
-          else
-          {
-            if (Type_ == ShaderType::eComputeShader)
-            {
-              LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject);
-            }
-            else
-            {
-              LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject) + static_cast<vdl::uint>(Type_);
-            }
-          }
-        }
-        else
-        {
-          return;
-        }
-
-        _pSymbol->getWritableType().getQualifier().layoutSet = LayoutSet;
-      }
-    };
-
+    
     IntermTraverser IntermTraverser(_Type);
     Program.buildReflection();
 
@@ -174,6 +175,10 @@ namespace
 
   inline void ComplineShader(std::vector<vdl::uint>* _pCode, ShaderType _Type, const char* _FilePath, const char* _EntryPoint)
   {
+    const EShLanguage Stage = Cast(_Type);
+
+    bool Result = true;
+
     //  シェーダーファイルのロード
     std::string Data;
     {
@@ -186,7 +191,43 @@ namespace
       Data.assign(std::istreambuf_iterator<char>(IStream), std::istreambuf_iterator<char>());
     }
 
-    ::ComplineShader(_pCode, _Type, Data.data(), static_cast<vdl::uint>(Data.size()), _EntryPoint);
+    glslang::InitializeProcess();
+
+    const char* pData = Data.data();
+    const int DataSize = static_cast<int>(Data.size());
+
+    //  シェーダーファイルのコンパイル
+    glslang::TShader Shader(Stage);
+    {
+      Shader.setStringsWithLengthsAndNames(&pData, &DataSize, &_FilePath, 1);
+      Shader.setEntryPoint(_EntryPoint);
+      Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, 110);
+      Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_1);
+      Shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
+
+      DirStackFileIncluder Includer;
+      Result = Shader.parse(&glslang::DefaultTBuiltInResource, 110, false, kControls, Includer);
+      _ASSERT_EXPR_A(Result, "コンパイル失敗");
+    }
+
+    //  シェーダーファイルのリンク
+    glslang::TProgram Program;
+    {
+      Program.addShader(&Shader);
+
+      Result = Program.link(kControls);
+      _ASSERT_EXPR_A(Result, "シェーダーファイルのリンクに失敗");
+    }
+
+    IntermTraverser IntermTraverser(_Type);
+    Program.buildReflection();
+
+    glslang::TIntermediate* pIntermediate = Program.getIntermediate(Stage);
+    pIntermediate->getTreeRoot()->traverse(&IntermTraverser);
+
+    glslang::GlslangToSpv(*pIntermediate, *_pCode);
+
+    glslang::FinalizeProcess();
   }
 
   // デバッグ時のメッセージコールバック
