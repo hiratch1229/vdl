@@ -24,6 +24,8 @@ namespace vdl::Constants
 
   constexpr uint kMaxConstantBufferNum = 14;
 
+  constexpr uint kMaxUnorderedAccessObjectNum = 8;
+
   constexpr const char kDefaultTextureVertexShaderCode[] = {
     "struct VS_IN"
     "{"

@@ -66,7 +66,7 @@ namespace
         else
         {
           assert(Type_ == ShaderType::eComputeShader);
-          LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject);
+          LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessTexture);
         }
       }
       else if (Type == glslang::TBasicType::EbtBlock)
@@ -88,14 +88,8 @@ namespace
         //  RWStructuredBuffer
         else
         {
-          if (Type_ == ShaderType::eComputeShader)
-          {
-            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject);
-          }
-          else
-          {
-            LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eUnorderedAccessObject) + static_cast<vdl::uint>(Type_);
-          }
+          assert(Type_ == ShaderType::eComputeShader);
+          LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessBuffer);
         }
       }
       else
@@ -132,7 +126,7 @@ namespace
     return EShLanguage();
   }
 
-  inline void ComplineShader(std::vector<vdl::uint>* _pCode, ShaderType _Type, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint)
+  inline void ComplineShader(std::vector<vdl::uint>* _pCode, ShaderType _Type, const char* _Source, vdl::uint /*_DataSize*/, const char* _EntryPoint)
   {
     const EShLanguage Stage = Cast(_Type);
 
@@ -161,7 +155,7 @@ namespace
       Result = Program.link(kControls);
       _ASSERT_EXPR_A(Result, "シェーダーファイルのリンクに失敗");
     }
-    
+
     IntermTraverser IntermTraverser(_Type);
     Program.buildReflection();
 
@@ -228,6 +222,20 @@ namespace
     glslang::GlslangToSpv(*pIntermediate, *_pCode);
 
     glslang::FinalizeProcess();
+  }
+
+  inline vk::IndexType Cast(IndexType _Type)
+  {
+    switch (_Type)
+    {
+    case IndexType::eUint16:
+      return vk::IndexType::eUint16;
+    case IndexType::eUint32:
+      return vk::IndexType::eUint32;
+    default: assert(false);
+    }
+
+    return vk::IndexType::eUint16;
   }
 
   // デバッグ時のメッセージコールバック
@@ -465,7 +473,8 @@ void CDevice::CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint, vdl::
   assert(_ppInstanceBuffer);
 
   CInstanceBuffer* pInstanceBuffer = new CInstanceBuffer;
-  CreateBuffer(&pInstanceBuffer->BufferData, _BufferSize, vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+  pInstanceBuffer->BufferSize = _BufferSize * kInstanceBufferSizeMultiple;
+  CreateBuffer(&pInstanceBuffer->BufferData, pInstanceBuffer->BufferSize, vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 
   (*_ppInstanceBuffer) = std::move(pInstanceBuffer);
 }
@@ -475,6 +484,7 @@ void CDevice::CreateIndexBuffer(IBuffer** _ppIndexBuffer, vdl::uint _BufferSize,
   assert(_ppIndexBuffer);
 
   CIndexBuffer* pIndexBuffer = new CIndexBuffer;
+  pIndexBuffer->IndexType = Cast(_IndexType);
   CreateBuffer(&pIndexBuffer->BufferData, _BufferSize, vk::BufferUsageFlagBits::eIndexBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 
   (*_ppIndexBuffer) = std::move(pIndexBuffer);
@@ -485,7 +495,7 @@ void CDevice::CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, 
   assert(_ppIndexBuffer);
 
   CIndexBuffer* pIndexBuffer = new CIndexBuffer;
-  pIndexBuffer->IndexType = _IndexType;
+  pIndexBuffer->IndexType = Cast(_IndexType);
   CreateBuffer(&pIndexBuffer->BufferData, _BufferSize, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vk::MemoryPropertyFlagBits::eDeviceLocal);
 
   BufferData StagingBuffer;
@@ -501,7 +511,7 @@ void CDevice::CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _Buffe
 
   CConstantBuffer* pConstantBuffer = new CConstantBuffer;
   pConstantBuffer->BufferSize = _BufferSize;
-  CreateBuffer(&pConstantBuffer->BufferData, _BufferSize, vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+  CreateBuffer(&pConstantBuffer->BufferData, pConstantBuffer->BufferSize, vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 
   (*_ppConstantBuffer) = std::move(pConstantBuffer);
 }
@@ -531,6 +541,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
 
   CTexture* pTexture = new CTexture;
   pTexture->TextureSize = _Image.GetSize();
+  pTexture->Format = kTextureFormat;
 
   BufferData StagingBuffer;
   CreateStagingBuffer(&StagingBuffer, _Image.Buffer(), _Image.BufferSize());
@@ -540,7 +551,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
     vk::ImageCreateInfo ImageInfo;
     {
       ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = kTextureFormat;
+      ImageInfo.format = pTexture->Format;
       ImageInfo.extent = { pTexture->TextureSize.x, pTexture->TextureSize.y, 1 };
       ImageInfo.mipLevels = 1;
       ImageInfo.arrayLayers = 1;
@@ -616,7 +627,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
     {
       ImageViewInfo.image = pTexture->Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = kTextureFormat;
+      ImageViewInfo.format = pTexture->Format;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
@@ -639,17 +650,16 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
 {
   assert(_ppRenderTexture);
 
-  const vk::Format Format = Cast(_Format);
-
   CRenderTexture* pRenderTexture = new CRenderTexture;
   pRenderTexture->TextureSize = _TextureSize;
+  pRenderTexture->Format = Cast(_Format);
 
   //  イメージ作成
   {
     vk::ImageCreateInfo ImageInfo;
     {
       ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = Format;
+      ImageInfo.format = pRenderTexture->Format;
       ImageInfo.extent = { pRenderTexture->TextureSize.x, pRenderTexture->TextureSize.y, 1 };
       ImageInfo.mipLevels = 1;
       ImageInfo.arrayLayers = 1;
@@ -685,7 +695,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
     {
       ImageViewInfo.image = pRenderTexture->Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = Format;
+      ImageViewInfo.format = pRenderTexture->Format;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
@@ -732,17 +742,16 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
 {
   assert(_ppDepthStecilTexture);
 
-  const vk::Format Format = Cast(_Format);
-
   CDepthStencilTexture* pDepthStencilTexture = new CDepthStencilTexture;
   pDepthStencilTexture->TextureSize = _TextureSize;
+  pDepthStencilTexture->Format = Cast(_Format);
 
   //  イメージ作成
   {
     vk::ImageCreateInfo ImageInfo;
     {
       ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = Format;
+      ImageInfo.format = pDepthStencilTexture->Format;
       ImageInfo.extent = { pDepthStencilTexture->TextureSize.x, pDepthStencilTexture->TextureSize.y, 1 };
       ImageInfo.mipLevels = 1;
       ImageInfo.arrayLayers = 1;
@@ -778,7 +787,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     {
       ImageViewInfo.image = pDepthStencilTexture->Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = Format;
+      ImageViewInfo.format = pDepthStencilTexture->Format;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
@@ -825,17 +834,16 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
 {
   assert(_ppUnorderedAccessTexture);
 
-  const vk::Format Format = Cast(_Format);
-
   CUnorderedAccessTexture* pUnorderedAccessTexture = new CUnorderedAccessTexture;
   pUnorderedAccessTexture->TextureSize = _TextureSize;
+  pUnorderedAccessTexture->Format = Cast(_Format);
 
   //  イメージ作成
   {
     vk::ImageCreateInfo ImageInfo;
     {
       ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = Format;
+      ImageInfo.format = pUnorderedAccessTexture->Format;
       ImageInfo.extent = { pUnorderedAccessTexture->TextureSize.x, pUnorderedAccessTexture->TextureSize.y, 1 };
       ImageInfo.mipLevels = 1;
       ImageInfo.arrayLayers = 1;
@@ -871,7 +879,7 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
     {
       ImageViewInfo.image = pUnorderedAccessTexture->Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = Format;
+      ImageViewInfo.format = pUnorderedAccessTexture->Format;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
@@ -919,20 +927,42 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   switch (_pDstBuffer->GetType())
   {
   case BufferType::eVertexBuffer:
-    WriteMemory(&static_cast<CVertexBuffer*>(_pDstBuffer)->BufferData, _pSrcBuffer, _BufferSize);
-    break;
+  {
+    CVertexBuffer* pVertexBuffer = static_cast<CVertexBuffer*>(_pDstBuffer);
+    ::memcpy(pVertexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
+  }
+  break;
   case BufferType::eInstanceBuffer:
-    WriteMemory(&static_cast<CInstanceBuffer*>(_pDstBuffer)->BufferData, _pSrcBuffer, _BufferSize);
-    break;
+  {
+    CInstanceBuffer* pInstanceBuffer = static_cast<CInstanceBuffer*>(_pDstBuffer);
+    if (pInstanceBuffer->Offset + _BufferSize > pInstanceBuffer->BufferSize)
+    {
+      pInstanceBuffer->Offset = 0;
+    }
+    ::memcpy(static_cast<vdl::uint8_t*>(pInstanceBuffer->BufferData.pData) + pInstanceBuffer->Offset, _pSrcBuffer, _BufferSize);
+
+    pInstanceBuffer->PreviousOffset = pInstanceBuffer->Offset;
+    pInstanceBuffer->Offset += _BufferSize;
+  }
+  break;
   case BufferType::eIndexBuffer:
-    WriteMemory(&static_cast<CIndexBuffer*>(_pDstBuffer)->BufferData, _pSrcBuffer, _BufferSize);
-    break;
+  {
+    CIndexBuffer* pIndexBuffer = static_cast<CIndexBuffer*>(_pDstBuffer);
+    ::memcpy(pIndexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
+  }
+  break;
   case BufferType::eConstantBuffer:
-    WriteMemory(&static_cast<CConstantBuffer*>(_pDstBuffer)->BufferData, _pSrcBuffer, _BufferSize);
-    break;
-  case BufferType::eUnorderedAccessBuffer:
-    WriteMemory(&static_cast<CUnordererdAccessBuffer*>(_pDstBuffer)->BufferData, _pSrcBuffer, _BufferSize);
-    break;
+  {
+    CConstantBuffer* pConstantBuffer = static_cast<CConstantBuffer*>(_pDstBuffer);
+    if (pConstantBuffer->Offset + _BufferSize > pConstantBuffer->BufferSize)
+    {
+      pConstantBuffer->Offset = 0;
+    }
+    ::memcpy(static_cast<vdl::uint8_t*>(pConstantBuffer->BufferData.pData) + pConstantBuffer->Offset, _pSrcBuffer, _BufferSize);
+
+    pConstantBuffer->Offset += _BufferSize;
+  }
+  break;
   default: assert(false);
   }
 }
@@ -1211,7 +1241,7 @@ void CDevice::CreateStagingBuffer(BufferData* _pStagingBuffer, const void* _Buff
   CreateBuffer(_pStagingBuffer, _BufferSize, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 
   //  メモリへ書き込み
-  WriteMemory(_pStagingBuffer, _Buffer, _BufferSize);
+  ::memcpy(_pStagingBuffer->pData, _Buffer, _BufferSize);
 }
 
 void CDevice::CopyBuffer(vk::Buffer _SrcBuffer, vk::Buffer _DstBuffer, vdl::uint _BufferSize)const
@@ -1239,11 +1269,6 @@ void CDevice::CopyBuffer(vk::Buffer _SrcBuffer, vk::Buffer _DstBuffer, vdl::uint
 
     SubmitAndWait(SubmitInfo);
   }
-}
-
-void CDevice::WriteMemory(BufferData* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const
-{
-  ::memcpy(_pDstBuffer->pData, _pSrcBuffer, _BufferSize);
 }
 
 void CDevice::SubmitAndWait(vk::SubmitInfo _SubmitInfo)const

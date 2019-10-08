@@ -1,6 +1,6 @@
 #pragma once
 #include "Fwd.hpp"
-#include "GraphicsState.hpp"
+#include "GraphicsStates.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "ConstantBuffer.hpp"
@@ -13,6 +13,11 @@ namespace vdl::Renderer
   inline void SetRenderTexture(const RenderTexture& _RenderTexture, const DepthStencilTexture& _DepthStencilTexture)
   {
     SetRenderTextures({ _RenderTexture }, _DepthStencilTexture);
+  }
+
+  inline void SetOutputManager(const OutputManager& _OutputManager)
+  {
+    SetRenderTextures(_OutputManager.RenderTextures, _OutputManager.DepthStencilTexture);
   }
 
   void Clear(const RenderTexture& _RenderTexure, const ColorF& _ClearColor = Palette::Black);
@@ -33,11 +38,11 @@ namespace vdl::Renderer
 
   void SetRasterizerState(const RasterizerState& _RasterizerState);
 
-  inline void SetGraphicsState(const GraphicsState& _GraphicsState)
+  inline void SetGraphicsStates(const GraphicsStates& _GraphicsStates)
   {
-    SetBlendState(_GraphicsState.BlendState);
-    SetDepthStencilState(_GraphicsState.DepthSteniclState);
-    SetRasterizerState(_GraphicsState.RasterizerState);
+    SetBlendState(_GraphicsStates.BlendState);
+    SetDepthStencilState(_GraphicsStates.DepthSteniclState);
+    SetRasterizerState(_GraphicsStates.RasterizerState);
   }
 
   void SetVertexShader(const VertexShader& _VertexShader);
@@ -84,6 +89,15 @@ namespace vdl::Renderer
     SetDomainShader(_DomainShader);
     SetGeometryShader(_GeometryShader);
     SetPixelShader(_PixelShader);
+  }
+
+  inline void SetGraphicsShaders(const GraphicsShaders& _GraphicsShaders)
+  {
+    SetVertexShader(_GraphicsShaders.VertexShader);
+    SetHullShader(_GraphicsShaders.HullShader);
+    SetDomainShader(_GraphicsShaders.DomainShader);
+    SetGeometryShader(_GraphicsShaders.GeometryShader);
+    SetPixelShader(_GraphicsShaders.PixelShader);
   }
 
   void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[]);

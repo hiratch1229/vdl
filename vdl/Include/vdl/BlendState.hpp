@@ -19,8 +19,6 @@ namespace vdl
     eDestColor,
     eInvDestColor,
     eSrcAlphaSat,
-    eBlendFactor,
-    eInvBlendFactor,
     eSrc1Color,
     eInvSrc1Color,
     eSrc1Alpha,

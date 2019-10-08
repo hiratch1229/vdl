@@ -15,7 +15,6 @@ void CSwapChain::Initialize()
   pWindow_ = Engine::Get<IWindow>();
 
   CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
-  Instance_ = pDevice->GetInstance();
   VkDevice_ = pDevice->GetDevice();
 
   const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
@@ -37,7 +36,7 @@ void CSwapChain::Initialize()
         SurfaceInfo.hwnd = hWnd;
       }
 
-      Surface_ = Instance_.createWin32SurfaceKHRUnique(SurfaceInfo);
+      Surface_ = pDevice->GetInstance().createWin32SurfaceKHRUnique(SurfaceInfo);
       assert(Surface_);
     }
 
@@ -46,7 +45,7 @@ void CSwapChain::Initialize()
     {
       std::vector<vk::SurfaceFormatKHR> SurfaceFormats = PhysicalDevice.getSurfaceFormatsKHR(Surface_.get());
       assert(!SurfaceFormats.empty());
-     
+
       Format = (SurfaceFormats[0].format == vk::Format::eUndefined ? vk::Format::eB8G8R8A8Unorm : SurfaceFormats[0].format);
       for (auto& SurfaceFormat : SurfaceFormats)
       {
@@ -138,20 +137,23 @@ void CSwapChain::Initialize()
 
     const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
 
-    RenderTextures_.resize(SwapChainImageNum);
+    VkRenderTextures_.resize(SwapChainImageNum);
     for (vdl::uint i = 0; i < SwapChainImageNum; ++i)
     {
-      CRenderTexture& RenderTarget = RenderTextures_[i];
-      RenderTarget.Image = vk::UniqueImage(Images[i]);
-      ImageViewInfo.image = RenderTarget.Image.get();
-      RenderTarget.View = VkDevice_.createImageViewUnique(ImageViewInfo);
+      CRenderTexture& VkRenderTexture = VkRenderTextures_[i];
+      VkRenderTexture.Image = vk::UniqueImage(Images[i]);
+      ImageViewInfo.image = VkRenderTexture.Image.get();
+      VkRenderTexture.View = VkDevice_.createImageViewUnique(ImageViewInfo);
+      VkRenderTexture.Format = Format;
 
-      RenderTarget.SetImageLayout(CommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
+      VkRenderTexture.SetImageLayout(CommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
     }
   }
 
   //  深度ステンシルバッファの作成
   {
+    VkDepthStencilTexture_.Format = kDepthStencilFormat;
+
     vk::ImageTiling ImageTiling;
     {
       vk::FormatProperties FormatProperties = PhysicalDevice.getFormatProperties(kDepthStencilFormat);
@@ -171,7 +173,7 @@ void CSwapChain::Initialize()
       vk::ImageCreateInfo ImageInfo;
       {
         ImageInfo.imageType = vk::ImageType::e2D;
-        ImageInfo.format = kDepthStencilFormat;
+        ImageInfo.format = VkDepthStencilTexture_.Format;
         ImageInfo.extent = vk::Extent3D(Constants::kDefaultWindowSize.x, Constants::kDefaultWindowSize.y, 1);
         ImageInfo.mipLevels = 1;
         ImageInfo.arrayLayers = 1;
@@ -184,13 +186,13 @@ void CSwapChain::Initialize()
         ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
       }
 
-      DepthStencilTexture_.Image = VkDevice_.createImageUnique(ImageInfo);
-      assert(DepthStencilTexture_.Image);
+      VkDepthStencilTexture_.Image = VkDevice_.createImageUnique(ImageInfo);
+      assert(VkDepthStencilTexture_.Image);
     }
 
     //  メモリの確保
     {
-      vk::MemoryRequirements MemoryRequirement = VkDevice_.getImageMemoryRequirements(DepthStencilTexture_.Image.get());
+      vk::MemoryRequirements MemoryRequirement = VkDevice_.getImageMemoryRequirements(VkDepthStencilTexture_.Image.get());
 
       vk::MemoryAllocateInfo MemoryAllocateInfo;
       {
@@ -198,10 +200,10 @@ void CSwapChain::Initialize()
         MemoryAllocateInfo.memoryTypeIndex = pDevice->GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
       }
 
-      DepthStencilTexture_.Memory = VkDevice_.allocateMemoryUnique(MemoryAllocateInfo);
-      assert(DepthStencilTexture_.Memory);
+      VkDepthStencilTexture_.Memory = VkDevice_.allocateMemoryUnique(MemoryAllocateInfo);
+      assert(VkDepthStencilTexture_.Memory);
 
-      VkDevice_.bindImageMemory(DepthStencilTexture_.Image.get(), DepthStencilTexture_.Memory.get(), 0);
+      VkDevice_.bindImageMemory(VkDepthStencilTexture_.Image.get(), VkDepthStencilTexture_.Memory.get(), 0);
     }
 
     vk::ImageSubresourceRange SubresourceRange;
@@ -217,9 +219,9 @@ void CSwapChain::Initialize()
     {
       vk::ImageViewCreateInfo ImageViewCreateInfo;
       {
-        ImageViewCreateInfo.image = DepthStencilTexture_.Image.get();
+        ImageViewCreateInfo.image = VkDepthStencilTexture_.Image.get();
         ImageViewCreateInfo.viewType = vk::ImageViewType::e2D;
-        ImageViewCreateInfo.format = kDepthStencilFormat;
+        ImageViewCreateInfo.format = VkDepthStencilTexture_.Format;
         ImageViewCreateInfo.components.r = vk::ComponentSwizzle::eR;
         ImageViewCreateInfo.components.g = vk::ComponentSwizzle::eG;
         ImageViewCreateInfo.components.b = vk::ComponentSwizzle::eB;
@@ -227,14 +229,12 @@ void CSwapChain::Initialize()
         ImageViewCreateInfo.subresourceRange = SubresourceRange;
       }
 
-      DepthStencilTexture_.View = VkDevice_.createImageViewUnique(ImageViewCreateInfo);
-      assert(DepthStencilTexture_.View);
+      VkDepthStencilTexture_.View = VkDevice_.createImageViewUnique(ImageViewCreateInfo);
+      assert(VkDepthStencilTexture_.View);
     }
 
-    //  テクスチャ
-    {
-      DepthStencilTexture_.SetImageLayout(CommandBuffer, vk::ImageLayout::eDepthStencilAttachmentOptimal, SubresourceRange);
-    }
+    //  レイアウトの変更
+    VkDepthStencilTexture_.SetImageLayout(CommandBuffer, vk::ImageLayout::eDepthStencilAttachmentOptimal, SubresourceRange);
   }
 
   CommandBuffer.end();
@@ -253,7 +253,7 @@ void CSwapChain::Initialize()
   {
     vk::CommandPoolCreateInfo CommandPoolInfo;
     {
-      CommandPoolInfo.queueFamilyIndex = pDevice->GetGrapchisQueueIndex();
+      CommandPoolInfo.queueFamilyIndex = pDevice->GetGraphicsQueueIndex();
       CommandPoolInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
     }
 
@@ -287,12 +287,46 @@ void CSwapChain::Initialize()
 
 void CSwapChain::ScreenClear()
 {
+  vk::ResultValue Result = VkDevice_.acquireNextImageKHR(VkSwapChain_.get(), UINT64_MAX, PresentSemaphore_.get(), vk::Fence());
+  assert(Result.result == vk::Result::eSuccess);
 
+  isFirstAfterPresent_ = true;
+  NextBufferNumber_ = Result.value;
+
+  pDeviceContext_->ClearRenderTexture(RenderTextures_[0], pWindow_->GetScreenClearColor());
+  pDeviceContext_->ClearDepthStencilTexture(DepthStencilTexture_, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
+  pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
 }
 
 void CSwapChain::Present()
 {
+  std::vector<vk::CommandBuffer> CommandBuffers = pDeviceContext_->GetCommandBuffers();
+  {
+    const vk::CommandBuffer& CommandBuffer = CommandBuffers_[NextBufferNumber_].get();
 
+    CommandBuffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources);
+    CommandBuffer.begin(vk::CommandBufferBeginInfo());
+
+    const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
+
+    GetRenderTexture()->SetImageLayout(CommandBuffer, vk::ImageLayout::ePresentSrcKHR, SubresourceRange);
+
+    CommandBuffer.end();
+
+    CommandBuffers.push_back(CommandBuffer);
+  }
+  pDeviceContext_->Flush(CommandBuffers, RenderSemaphore_.get());
+
+  //  Present
+  {
+    PresentInfo_.waitSemaphoreCount = 1;
+    PresentInfo_.pWaitSemaphores = &RenderSemaphore_.get();
+    PresentInfo_.pImageIndices = &NextBufferNumber_;
+
+    vk::Result Result = vk::Result::eSuccess;
+    Result = GraphicsQueue_.presentKHR(PresentInfo_);
+    assert(Result == vk::Result::eSuccess);
+  }
 }
 
 void CSwapChain::ChangeWindowMode()

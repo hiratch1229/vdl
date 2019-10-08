@@ -65,7 +65,7 @@ void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
 
 }
 
-void CDeviceContext::VSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::VSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
 
 }
@@ -85,7 +85,7 @@ void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
 
 }
 
-void CDeviceContext::HSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::HSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
 
 }
@@ -105,7 +105,7 @@ void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
 
 }
 
-void CDeviceContext::DSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::DSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
 
 }
@@ -125,7 +125,7 @@ void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
 
 }
 
-void CDeviceContext::GSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::GSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
 
 }
@@ -145,7 +145,7 @@ void CDeviceContext::PSSetShader(const vdl::PixelShader& _PixelShader)
 
 }
 
-void CDeviceContext::PSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::PSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
 
 }
@@ -165,7 +165,7 @@ void CDeviceContext::CSSetShader(const vdl::ComputeShader& _ComputeShader)
 
 }
 
-void CDeviceContext::CSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::CSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
 
 }

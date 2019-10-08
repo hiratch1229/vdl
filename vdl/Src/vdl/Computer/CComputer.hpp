@@ -7,6 +7,7 @@
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/UnorderedAccessBuffer.hpp>
 
+#include <vdl/StateChangeFlags/StateChangeFlags.hpp>
 #include <vdl/Constants/Constants.hpp>
 
 #include <vector>
@@ -27,23 +28,6 @@ enum class ComputerCommandType : vdl::uint8_t
 };
 static_assert(static_cast<vdl::uint>(ComputerCommandType::eNum) <= sizeof(vdl::uint8_t) * 8);
 
-class StateChangeFlags
-{
-  vdl::uint8_t Flags_;
-public:
-  StateChangeFlags() = default;
-
-  void Clear() { Flags_ = 0; }
-
-  [[nodiscard]] bool isEmpty()const { return Flags_ == 0; }
-
-  [[nodiscard]] bool Has(ComputerCommandType _Command)const { return Flags_ & (1 << static_cast<vdl::uint>(_Command)); }
-
-  void Set(ComputerCommandType _Command) { Flags_ |= (1 << static_cast<vdl::uint>(_Command)); }
-
-  void Cancel(ComputerCommandType _Command) { Flags_ &= ~(1 << static_cast<vdl::uint>(_Command)); }
-};
-
 class CComputer : public IComputer
 {
   using Samplers = std::vector<vdl::Sampler>;
@@ -55,7 +39,7 @@ private:
   IDeviceContext* pDeviceContext_;
   IBufferManager* pBufferManager_;
 private:
-  StateChangeFlags StateChangeFlags_;
+  StateChangeFlags<ComputerCommandType, vdl::uint8_t> StateChangeFlags_;
 
   vdl::ComputeShader PreviousShader_;
   ShaderResources PreviousShaderResources_;

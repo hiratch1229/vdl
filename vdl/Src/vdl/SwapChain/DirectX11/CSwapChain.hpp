@@ -18,6 +18,9 @@ class CSwapChain : public ISwapChain
 private:
   IWindow* pWindow_;
   IDeviceContext* pDeviceContext_;
+private:
+  vdl::RenderTextures RenderTextures_;
+  vdl::DepthStencilTexture DepthStencilTexture_;
 public:
   ID3D11RenderTargetView* GetRenderTargetView()const { return pRenderTargetView_.Get(); }
   ID3D11DepthStencilView* GetDepthStencilView()const { return pDepthStencilView_.Get(); }

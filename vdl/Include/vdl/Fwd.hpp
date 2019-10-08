@@ -113,9 +113,9 @@ namespace vdl
   struct RasterizerState;
 
   //-------------------------
-  //  GraphicsState.hpp
+  //  GraphicsStates.hpp
   //-------------------------
-  struct GraphicsState;
+  struct GraphicsStates;
 
   //-------------------------
   //  Shader.hpp
@@ -126,6 +126,7 @@ namespace vdl
   class GeometryShader;
   class PixelShader;
   class ComputeShader;
+  struct GraphicsShaders;
 
   //-------------------------
   //  Image.hpp
@@ -146,6 +147,7 @@ namespace vdl
   using RenderTextures = std::array<RenderTexture, Constants::kMaxRenderTextureNum>;
   class DepthStencilTexture;
   class UnorderedAccessTexture;
+  struct OutputManager;
 
   //-------------------------
   //  Sampler.hpp

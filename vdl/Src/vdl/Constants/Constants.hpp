@@ -28,6 +28,8 @@ namespace Constants
 
   constexpr vdl::uint kMaxConstantBufferNum = vdl::Constants::kMaxConstantBufferNum;
 
+  constexpr vdl::uint kMaxUnorderedAccessObjectNum = vdl::Constants::kMaxUnorderedAccessObjectNum;
+
   constexpr const char* kDefaultTextureVertexShaderCode = vdl::Constants::kDefaultTextureVertexShaderCode;
 
   constexpr vdl::uint kDefaultTextureVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultTextureVertexShaderCode));

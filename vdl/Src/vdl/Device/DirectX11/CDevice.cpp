@@ -54,6 +54,18 @@ namespace
       _EntryPoint, _Target, CompileFlag, 0, _ppCode, pError.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), static_cast<const char*>(pError->GetBufferPointer()));
   }
+
+  inline DXGI_FORMAT Cast(IndexType _Type)
+  {
+    switch (_Type)
+    {
+    case IndexType::eUint16:
+      return DXGI_FORMAT_R16_UINT;
+    case IndexType::eUint32:
+      return DXGI_FORMAT_R32_UINT;
+    default: assert(false);
+    }
+  }
 }
 
 void CDevice::Initialize()
@@ -231,7 +243,7 @@ void CDevice::CreateIndexBuffer(IBuffer** _ppIndexBuffer, vdl::uint _BufferSize,
   assert(_ppIndexBuffer);
 
   CIndexBuffer* pIndexBuffer = new CIndexBuffer;
-  pIndexBuffer->IndexType = _IndexType;
+  pIndexBuffer->IndexFormat = Cast(_IndexType);
 
   HRESULT hr = S_OK;
 
@@ -256,7 +268,7 @@ void CDevice::CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, 
   assert(_ppIndexBuffer);
 
   CIndexBuffer* pIndexBuffer = new CIndexBuffer;
-  pIndexBuffer->IndexType = _IndexType;
+  pIndexBuffer->IndexFormat = Cast(_IndexType);
 
   HRESULT hr = S_OK;
 
@@ -563,34 +575,6 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     ::memcpy(MappedSubresorce.pData, _pSrcBuffer, _BufferSize);
 
     pD3D11ImmediateContext_->Unmap(pBuffer, 0);
-  }
-  break;
-  case BufferType::eUnorderedAccessBuffer:
-  {
-    ID3D11Buffer* pBuffer = static_cast<CUnordererdAccessBuffer*>(_pDstBuffer)->pBuffer.Get();
-
-    Microsoft::WRL::ComPtr<ID3D11Buffer> pCopyBuffer;
-
-    D3D11_BUFFER_DESC BufferDesc;
-    {
-      pBuffer->GetDesc(&BufferDesc);
-
-      BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-      BufferDesc.BindFlags = 0;
-      BufferDesc.MiscFlags = 0;
-    }
-
-    D3D11_SUBRESOURCE_DATA InitialData;
-    {
-      InitialData.pSysMem = _pSrcBuffer;
-      InitialData.SysMemPitch = BufferDesc.StructureByteStride;
-      InitialData.SysMemSlicePitch = 0;
-    }
-
-    hr = pD3D11Device_->CreateBuffer(&BufferDesc, nullptr, pCopyBuffer.GetAddressOf());
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-
-    pD3D11ImmediateContext_->CopyResource(pBuffer, pCopyBuffer.Get());
   }
   break;
   default: assert(false);

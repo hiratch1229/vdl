@@ -56,13 +56,15 @@ inline vk::PrimitiveTopology Cast(vdl::TopologyType _Topology)
   default: assert(false);
   }
 
-
+  return vk::PrimitiveTopology::ePointList;
 }
 
-inline vk::PipelineTessellationStateCreateInfo GetTessellationStateInfo(vdl::TopologyType _Topology)
+inline vdl::uint GetPatchControlPoints(vdl::TopologyType _Topology)
 {
-  assert(Cast(_Topology) == vk::PrimitiveTopology::ePatchList);
+  if (Cast(_Topology) != vk::PrimitiveTopology::ePatchList)
+  {
+    return 0;
+  }
 
-  return vk::PipelineTessellationStateCreateInfo(vk::PipelineTessellationStateCreateFlags(),
-    static_cast<vdl::uint32_t>(_Topology) - static_cast<vdl::uint32_t>(vdl::TopologyType::ePatchList1ControlPoint) + 1);
+  return static_cast<vdl::uint32_t>(_Topology) - static_cast<vdl::uint32_t>(vdl::TopologyType::ePatchList1ControlPoint) + 1);
 }

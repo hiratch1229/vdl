@@ -36,3 +36,6 @@ struct IVertexShader : public IShader
 
   [[nodiscard]] virtual vdl::InputLayoutType GetInputLayout()const = 0;
 };
+
+static constexpr vdl::uint kGraphicsShaderStageNum = static_cast<vdl::uint>(ShaderType::eGraphicsNum);
+static constexpr vdl::uint kShaderStageNum = static_cast<vdl::uint>(ShaderType::eNum);

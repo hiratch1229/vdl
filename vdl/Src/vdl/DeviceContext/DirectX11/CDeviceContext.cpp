@@ -51,10 +51,6 @@ namespace
       return D3D11_BLEND_INV_DEST_COLOR;
     case vdl::BlendType::eSrcAlphaSat:
       return D3D11_BLEND_SRC_ALPHA_SAT;
-    case vdl::BlendType::eBlendFactor:
-      return D3D11_BLEND_BLEND_FACTOR;
-    case vdl::BlendType::eInvBlendFactor:
-      return D3D11_BLEND_INV_BLEND_FACTOR;
     case vdl::BlendType::eSrc1Color:
       return D3D11_BLEND_SRC1_COLOR;
     case vdl::BlendType::eInvSrc1Color:
@@ -290,6 +286,7 @@ namespace
 
 void CDeviceContext::Initialize()
 {
+  pSwapChain_ = static_cast<CSwapChain*>(Engine::Get<ISwapChain>());
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
@@ -297,8 +294,6 @@ void CDeviceContext::Initialize()
   CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
   pD3D11Device_ = pDevice->GetDevice();
   pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
-
-  pSwapChain_ = static_cast<CSwapChain*>(Engine::Get<ISwapChain>());
 }
 
 void CDeviceContext::SetVertexBuffer(const IBuffer* _pVertexBuffer)
@@ -341,7 +336,7 @@ void CDeviceContext::SetIndexBuffer(const IBuffer* _pIndexBuffer)
 
   const CIndexBuffer* pIndexBuffer = static_cast<const CIndexBuffer*>(_pIndexBuffer);
 
-  pD3D11ImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), (pIndexBuffer->IndexType == IndexType::eUint16 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT), kOffset);
+  pD3D11ImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), pIndexBuffer->IndexFormat, kOffset);
 }
 
 void CDeviceContext::SetInputLayout(vdl::InputLayoutType _InputLayout)
@@ -375,10 +370,10 @@ void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures
     return static_cast<CRenderTexture*>(pTextureManager_->GetTexture(_RenderTexture.GetID()))->pRenderTargetView.Get();
   };
 
-  std::vector<ID3D11RenderTargetView*> pRenderTeargetViews;
+  std::vector<ID3D11RenderTargetView*> pRenderTeargetViews(1);
   ID3D11DepthStencilView* pDepthStencilView;
 
-  pRenderTeargetViews.push_back((_RenderTextures[0].isEmpty() ? pSwapChain_->GetRenderTargetView() : GetRenderTargetView(_RenderTextures[0])));
+  pRenderTeargetViews[0] = (_RenderTextures[0].isEmpty() ? pSwapChain_->GetRenderTargetView() : GetRenderTargetView(_RenderTextures[0]));
 
   for (vdl::uint RenderTextureCount = 1; RenderTextureCount < Constants::kMaxRenderTextureNum; ++RenderTextureCount)
   {
@@ -519,13 +514,13 @@ void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
   pD3D11ImmediateContext_->VSSetShader(pVertexShader, nullptr, 0);
 }
 
-void CDeviceContext::VSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::VSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
   std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
     for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResources[ShaderResourceCount]);
     }
   }
 
@@ -572,13 +567,13 @@ void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
   pD3D11ImmediateContext_->HSSetShader(pHullShader, nullptr, 0);
 }
 
-void CDeviceContext::HSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::HSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
   std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
     for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResources[ShaderResourceCount]);
     }
   }
 
@@ -625,13 +620,13 @@ void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
   pD3D11ImmediateContext_->DSSetShader(pDomainShader, nullptr, 0);
 }
 
-void CDeviceContext::DSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::DSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
   std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
     for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResources[ShaderResourceCount]);
     }
   }
 
@@ -678,13 +673,13 @@ void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
   pD3D11ImmediateContext_->GSSetShader(pGeometryShader, nullptr, 0);
 }
 
-void CDeviceContext::GSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::GSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
   std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
     for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResources[ShaderResourceCount]);
     }
   }
 
@@ -731,13 +726,13 @@ void CDeviceContext::PSSetShader(const vdl::PixelShader& _PixelShader)
   pD3D11ImmediateContext_->PSSetShader(pPixelShader, nullptr, 0);
 }
 
-void CDeviceContext::PSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::PSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
   std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
     for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResources[ShaderResourceCount]);
     }
   }
 
@@ -784,13 +779,13 @@ void CDeviceContext::CSSetShader(const vdl::ComputeShader& _ComputeShader)
   pD3D11ImmediateContext_->CSSetShader(pComputeShader, nullptr, 0);
 }
 
-void CDeviceContext::CSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResource[])
+void CDeviceContext::CSSetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
 {
   std::vector<ID3D11ShaderResourceView*> pShaderResources(_ShaderResourceNum);
   {
     for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResource[ShaderResourceCount]);
+      pShaderResources[ShaderResourceCount] = GetShaderResourceView(_ShaderResources[ShaderResourceCount]);
     }
   }
 

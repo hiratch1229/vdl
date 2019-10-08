@@ -29,7 +29,7 @@ namespace vdl
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
 
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ ==std::nullopt; }
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
 
     [[nodiscard]] InputLayoutType GetInputLayout()const;
   };
@@ -41,7 +41,7 @@ namespace vdl
     HullShader() = default;
 
     HullShader(const char* _FilePath, const char* _EntryPoint = "main");
-    
+
     HullShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
 
     HullShader(const HullShader& _HullShader);
@@ -126,7 +126,7 @@ namespace vdl
     ID ID_;
   public:
     PixelShader() = default;
-    
+
     PixelShader(const char* _FilePath, const char* _EntryPoint = "main");
 
     PixelShader(const char* _Source, uint _DataSize, const char* _EntryPoint = "main");
@@ -177,5 +177,24 @@ namespace vdl
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
 
     [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
+  };
+
+  struct GraphicsShaders
+  {
+    VertexShader VertexShader;
+    HullShader HullShader;
+    DomainShader DomainShader;
+    GeometryShader GeometryShader;
+    PixelShader PixelShader;
+  public:
+    [[nodiscard]] bool operator==(const GraphicsShaders& _GraphicsShaders)const noexcept {
+      return VertexShader == _GraphicsShaders.VertexShader && HullShader == _GraphicsShaders.HullShader
+        && DomainShader == _GraphicsShaders.DomainShader && GeometryShader == _GraphicsShaders.GeometryShader && PixelShader == _GraphicsShaders.PixelShader;
+    }
+
+    [[nodiscard]] bool operator!=(const GraphicsShaders& _GraphicsShaders)const noexcept {
+      return VertexShader != _GraphicsShaders.VertexShader || HullShader != _GraphicsShaders.HullShader
+        || DomainShader != _GraphicsShaders.DomainShader || GeometryShader != _GraphicsShaders.GeometryShader || PixelShader != _GraphicsShaders.PixelShader;
+    }
   };
 }

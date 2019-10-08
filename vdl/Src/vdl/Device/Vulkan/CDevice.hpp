@@ -8,6 +8,8 @@
 
 class CDevice : public IDevice
 {
+  static constexpr vdl::uint kInstanceBufferSizeMultiple = 5;
+private:
   vk::UniqueInstance Instance_;
   vk::UniqueDevice VkDevice_;
   vk::PhysicalDevice PhysicalDevice_;
@@ -30,7 +32,7 @@ public:
   [[nodiscard]] const vk::Queue& GetGraphicsQueue()const { return GraphicsQueue_; }
   [[nodiscard]] const vk::Queue& GetComputeQueue()const { return ComputeQueue_; }
   [[nodiscard]] const vk::CommandBuffer& GetCommandBuffer()const { return CommandBuffer_.get(); }
-  [[nodiscard]] vdl::uint GetGrapchisQueueIndex()const { return GraphicsQueueIndex_; }
+  [[nodiscard]] vdl::uint GetGraphicsQueueIndex()const { return GraphicsQueueIndex_; }
   [[nodiscard]] vdl::uint GetComputeQueueIndex()const { return ComputeQueueIndex_; }
 public:
   [[nodiscard]] vdl::uint FindQueue(vk::QueueFlags _QueueFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const { return FindQueue(_QueueFlag, vk::QueueFlags(), _Surface); }
@@ -41,7 +43,6 @@ private:
   void CreateBuffer(BufferData* _pBuffer, vk::DeviceSize _BufferSize, vk::BufferUsageFlags _Usage, vk::MemoryPropertyFlags _Properties)const;
   void CreateStagingBuffer(BufferData* _pStagingBuffer, const void* _Buffer, vdl::uint _BufferSize)const;
   void CopyBuffer(vk::Buffer _SrcBuffer, vk::Buffer _DstBuffer, vdl::uint _BufferSize)const;
-  void WriteMemory(BufferData* _pDstBuffer, const void* _pSrcBuffer, vdl::uint _BufferSize)const;
 public:
   CDevice() = default;
 

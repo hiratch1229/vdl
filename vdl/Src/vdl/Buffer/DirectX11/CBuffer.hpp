@@ -29,7 +29,7 @@ public:
 struct CIndexBuffer : public IBuffer
 {
   Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
-  IndexType IndexType;
+  DXGI_FORMAT IndexFormat;
 public:
   CIndexBuffer() = default;
 

@@ -37,6 +37,9 @@ public:
 struct CInstanceBuffer : public IBuffer
 {
   BufferData BufferData;
+  vdl::uint BufferSize;
+  vdl::uint PreviousOffset;
+  vdl::uint Offset;
 public:
   CInstanceBuffer() = default;
 
@@ -46,7 +49,7 @@ public:
 struct CIndexBuffer : public IBuffer
 {
   BufferData BufferData;
-  IndexType IndexType;
+  vk::IndexType IndexType;
 public:
   CIndexBuffer() = default;
 
@@ -57,6 +60,7 @@ struct CConstantBuffer : public IConstantBuffer
 {
   BufferData BufferData;
   vdl::uint BufferSize;
+  vdl::uint Offset;
 public:
   CConstantBuffer() = default;
 

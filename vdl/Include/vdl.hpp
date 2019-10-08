@@ -46,7 +46,7 @@
 #include <vdl/BlendState.hpp>
 #include <vdl/DepthStencilState.hpp>
 #include <vdl/RasterizerState.hpp>
-#include <vdl/GraphicsState.hpp>
+#include <vdl/GraphicsStates.hpp>
 #include <vdl/Shader.hpp>
 #include <vdl/Format.hpp>
 #include <vdl/Image.hpp>

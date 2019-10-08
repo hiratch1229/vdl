@@ -10,6 +10,7 @@ struct CTexture : public ITexture
   vk::UniqueImageView View;
   vk::UniqueDeviceMemory Memory;
   vk::ImageLayout CurrentLayout = vk::ImageLayout::eUndefined;
+  vk::Format Format;
   vdl::uint2 TextureSize;
 public:
   CTexture() = default;

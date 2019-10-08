@@ -84,7 +84,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
   PixelShaders_ = { std::move(PixelShaders_.back()) };
   StateChangeFlags_.Set(RendererCommandType::eSetPixelShader);
 
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kShaderTypes; ++ShaderTypeCount)
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
   {
     auto& ShaderResources = ShaderResources_[ShaderTypeCount];
 
@@ -92,7 +92,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
     StateChangeFlags_.Set(static_cast<RendererCommandType>(static_cast<vdl::uint>(RendererCommandType::eSetVertexStageShaderResource) + ShaderTypeCount));
   }
 
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kShaderTypes; ++ShaderTypeCount)
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
   {
     auto& Samplers = Samplers_[ShaderTypeCount];
 
@@ -100,7 +100,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
     StateChangeFlags_.Set(static_cast<RendererCommandType>(static_cast<vdl::uint>(RendererCommandType::eSetVertexStageSampler) + ShaderTypeCount));
   }
 
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kShaderTypes; ++ShaderTypeCount)
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
   {
     auto& ConstantBuffers = ConstantBuffers_[ShaderTypeCount];
 
@@ -471,6 +471,71 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
 template<class DisplayObject, class InstanceData>
 inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData)
 {
+  //  SetConstantBuffer
+  {
+    auto IssueRendererCommandSetConstantBuffer = [this](RendererCommandType _RendererCommandType, ShaderType _ShaderType)->void
+    {
+      ConstantBuffers TempConstantBuffers;
+      auto& CurrentConstantBuffers = CurrentConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
+      auto& ConstantBuffers = ConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
+      auto& LastConstantBuffers = LastConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
+
+      TempConstantBuffers = ConstantBuffers.back();
+      {
+        const size_t CurrentConstantBufferNum = CurrentConstantBuffers.size();
+        const size_t LastConstantBufferNum = LastConstantBuffers.size();
+
+        if (TempConstantBuffers.size() < CurrentConstantBufferNum)
+        {
+          TempConstantBuffers.resize(CurrentConstantBufferNum);
+          StateChangeFlags_.Set(_RendererCommandType);
+        }
+
+        size_t ConstantBufferCount = 0;
+        while (ConstantBufferCount < LastConstantBufferNum)
+        {
+          const vdl::Detail::ConstantBufferData& CurrentConstantBuffer = CurrentConstantBuffers[ConstantBufferCount];
+          const vdl::Detail::ConstantBufferData& LastConstantBuffer = LastConstantBuffers[ConstantBufferCount];
+          const vdl::Detail::ConstantBufferData& BeforeConstantBuffer = TempConstantBuffers[ConstantBufferCount];
+
+          if (CurrentConstantBuffer != LastConstantBuffer
+            || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetBufferSize()) != 0)
+          {
+            TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
+            StateChangeFlags_.Set(_RendererCommandType);
+          }
+
+          ++ConstantBufferCount;
+        }
+        while (ConstantBufferCount < CurrentConstantBufferNum)
+        {
+          TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffers[ConstantBufferCount]);
+          StateChangeFlags_.Set(_RendererCommandType);
+
+          ++ConstantBufferCount;
+        }
+      }
+
+      if (StateChangeFlags_.Has(_RendererCommandType))
+      {
+        RendererCommands_.emplace_back(_RendererCommandType, static_cast<vdl::uint>(ConstantBuffers.size()));
+        LastConstantBuffers = CurrentConstantBuffers;
+        ConstantBuffers.emplace_back(std::move(TempConstantBuffers));
+        StateChangeFlags_.Cancel(_RendererCommandType);
+      }
+    };
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader);
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetHullStageConstantBuffer, ShaderType::eHullShader);
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader);
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader);
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetPixelStageConstantBuffer, ShaderType::ePixelShader);
+  }
+
   if (!StateChangeFlags_.isEmpty())
   {
     if (StateChangeFlags_.Has(RendererCommandType::eSetTopology))
@@ -618,70 +683,6 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
       RendererCommands_.emplace_back(RendererCommandType::eSetPixelStageSampler, static_cast<vdl::uint>(Sampler.size()));
       Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)]);
     }
-  }
-
-  //  SetConstantBuffer
-  {
-    auto IssueRendererCommandSetConstantBuffer = [this](RendererCommandType _RendererCommandType, ShaderType _ShaderType)->void
-    {
-      ConstantBuffers TempConstantBuffers;
-      auto& CurrentConstantBuffers = CurrentConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
-      auto& ConstantBuffers = ConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
-      auto& LastConstantBuffers = LastConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
-
-      TempConstantBuffers = ConstantBuffers.back();
-      {
-        const size_t CurrentConstantBufferNum = CurrentConstantBuffers.size();
-        const size_t LastConstantBufferNum = LastConstantBuffers.size();
-
-        if (TempConstantBuffers.size() < CurrentConstantBufferNum)
-        {
-          TempConstantBuffers.resize(CurrentConstantBufferNum);
-          StateChangeFlags_.Set(_RendererCommandType);
-        }
-
-        size_t ConstantBufferCount = 0;
-        while (ConstantBufferCount < LastConstantBufferNum)
-        {
-          const vdl::Detail::ConstantBufferData& CurrentConstantBuffer = CurrentConstantBuffers[ConstantBufferCount];
-          const vdl::Detail::ConstantBufferData& LastConstantBuffer = LastConstantBuffers[ConstantBufferCount];
-          const vdl::Detail::ConstantBufferData& BeforeConstantBuffer = TempConstantBuffers[ConstantBufferCount];
-
-          if (CurrentConstantBuffer != LastConstantBuffer
-            || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetBufferSize()) != 0)
-          {
-            TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
-            StateChangeFlags_.Set(_RendererCommandType);
-          }
-
-          ++ConstantBufferCount;
-        }
-        while (ConstantBufferCount < CurrentConstantBufferNum)
-        {
-          TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffers[ConstantBufferCount]);
-          StateChangeFlags_.Set(_RendererCommandType);
-
-          ++ConstantBufferCount;
-        }
-      }
-
-      if (StateChangeFlags_.Has(_RendererCommandType))
-      {
-        RendererCommands_.emplace_back(_RendererCommandType, static_cast<vdl::uint>(ConstantBuffers.size()));
-        LastConstantBuffers = CurrentConstantBuffers;
-        ConstantBuffers.emplace_back(std::move(TempConstantBuffers));
-      }
-    };
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader);
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetHullStageConstantBuffer, ShaderType::eHullShader);
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader);
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader);
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetPixelStageConstantBuffer, ShaderType::ePixelShader);
   }
 
   StateChangeFlags_.Clear();

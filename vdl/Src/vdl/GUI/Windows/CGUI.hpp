@@ -3,7 +3,7 @@
 
 #include <vdl/Scissor.hpp>
 #include <vdl/Viewport.hpp>
-#include <vdl/GraphicsState.hpp>
+#include <vdl/GraphicsStates.hpp>
 #include <vdl/Shader.hpp>
 #include <vdl/Texture.hpp>
 #include <vdl/Sampler.hpp>
@@ -41,8 +41,13 @@ private:
   HWND hWnd_;
 private:
   vdl::VertexShader VertexShader_;
+  vdl::HullShader HullShader_;
+  vdl::DomainShader DomainShader_;
+  vdl::GeometryShader GeometryShader_;
   vdl::PixelShader PixelShader_;
-  vdl::GraphicsState GraphicsState_;
+  vdl::GraphicsStates GraphicsStates_;
+  vdl::RenderTextures RenderTextures_;
+  vdl::DepthStencilTexture DepthStencilTexture_;
   vdl::ShaderResource Font_;
   vdl::Sampler Sampler_;
   std::unique_ptr<vdl::ConstantBuffer<ConstantBufferData>> pConstantBuffer_;

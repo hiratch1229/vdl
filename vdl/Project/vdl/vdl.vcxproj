@@ -61,7 +61,7 @@
     <ClInclude Include="..\..\Include\vdl\Format.hpp" />
     <ClInclude Include="..\..\Include\vdl\Fwd.hpp" />
     <ClInclude Include="..\..\Include\vdl\Gamepad.hpp" />
-    <ClInclude Include="..\..\Include\vdl\GraphicsState.hpp" />
+    <ClInclude Include="..\..\Include\vdl\GraphicsStates.hpp" />
     <ClInclude Include="..\..\Include\vdl\GUI.hpp" />
     <ClInclude Include="..\..\Include\vdl\Half.hpp" />
     <ClInclude Include="..\..\Include\vdl\Hash.hpp" />
@@ -116,6 +116,7 @@
     <ClInclude Include="..\..\Src\vdl\Input\Keyboard\IKeyboard.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Mouse\IMouse.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\XInput\IXInput.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Instance\Instance.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\IModelManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Mesh.hpp" />
     <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="..\..\Src\vdl\ShaderManager\IShaderManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\IShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SoundManager\ISoundManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\StateChangeFlags\StateChangeFlags.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\ISwapChain.hpp" />
     <ClInclude Include="..\..\Src\vdl\System\CSystem.hpp" />
     <ClInclude Include="..\..\Src\vdl\System\ISystem.hpp" />

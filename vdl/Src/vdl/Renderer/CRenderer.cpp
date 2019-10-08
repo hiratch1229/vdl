@@ -96,7 +96,7 @@ void CRenderer::SetCamera(const vdl::Camera& _Camera, RenderType _Type)
 
 void CRenderer::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)
 {
-  OutputManager OutputManager{ _RenderTextures, _DepthStencilTexture };
+  vdl::OutputManager OutputManager{ _RenderTextures, _DepthStencilTexture };
 
   if (OutputManager_ != OutputManager)
   {

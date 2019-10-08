@@ -3,7 +3,7 @@
 #include "Type2.hpp"
 #include "Angle.hpp"
 #include "Color.hpp"
-#include "GraphicsState.hpp"
+#include "GraphicsStates.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "ConstantBuffer.hpp"
@@ -23,11 +23,11 @@ namespace vdl::Renderer2D
 
   void SetRasterizerState(const RasterizerState& _RasterizerState);
 
-  inline void SetGraphicsState(const GraphicsState& _GraphicsState)
+  inline void SetGraphicsStates(const GraphicsStates& _GraphicsStates)
   {
-    SetBlendState(_GraphicsState.BlendState);
-    SetDepthStencilState(_GraphicsState.DepthSteniclState);
-    SetRasterizerState(_GraphicsState.RasterizerState);
+    SetBlendState(_GraphicsStates.BlendState);
+    SetDepthStencilState(_GraphicsStates.DepthSteniclState);
+    SetRasterizerState(_GraphicsStates.RasterizerState);
   }
 
   void SetVertexShader(const VertexShader& _VertexShader);
@@ -74,6 +74,15 @@ namespace vdl::Renderer2D
     SetDomainShader(_DomainShader);
     SetGeometryShader(_GeometryShader);
     SetPixelShader(_PixelShader);
+  }
+
+  inline void SetGraphicsShaders(const GraphicsShaders& _GraphicsShaders)
+  {
+    SetVertexShader(_GraphicsShaders.VertexShader);
+    SetHullShader(_GraphicsShaders.HullShader);
+    SetDomainShader(_GraphicsShaders.DomainShader);
+    SetGeometryShader(_GraphicsShaders.GeometryShader);
+    SetPixelShader(_GraphicsShaders.PixelShader);
   }
 
   void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[]);

@@ -102,6 +102,11 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
 
 void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange& _SubresourceRange)
 {
+  if (_NewImageLayout == CurrentLayout)
+  {
+    return;
+  }
+
   CTexture::SetImageLayout(_CommandBuffer, Image.get(), CurrentLayout, _NewImageLayout, _SubresourceRange);
   CurrentLayout = _NewImageLayout;
 }

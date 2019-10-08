@@ -686,10 +686,10 @@ void CGUI::Initialize()
 
   //  ステートの設定
   {
-    GraphicsState_.BlendState = vdl::BlendState(false, false, { true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd });
+    GraphicsStates_.BlendState = vdl::BlendState(false, false, { true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd });
     vdl::DepthStencilOpState DepthStencilOpState(vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::ComparisonFuncType::eAlways);
-    GraphicsState_.DepthSteniclState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState);
-    GraphicsState_.RasterizerState = vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, false, 0, true);
+    GraphicsStates_.DepthSteniclState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState);
+    GraphicsStates_.RasterizerState = vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, false, 0, true);
     Viewport_ = { 0.0f, 0.0f };
   }
 }
@@ -823,24 +823,24 @@ void CGUI::Draw()
   pDeviceContext_->SetTopology(vdl::TopologyType::eTriangleList);
 
   pDeviceContext_->SetViewport(Viewport_);
-  pDeviceContext_->SetRenderTextures({ vdl::RenderTexture() }, vdl::DepthStencilTexture());
+  pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
 
-  pDeviceContext_->SetBlendState(GraphicsState_.BlendState);
-  pDeviceContext_->SetDepthStencilState(GraphicsState_.DepthSteniclState);
-  pDeviceContext_->SetRasterizerState(GraphicsState_.RasterizerState);
+  pDeviceContext_->SetBlendState(GraphicsStates_.BlendState);
+  pDeviceContext_->SetDepthStencilState(GraphicsStates_.DepthSteniclState);
+  pDeviceContext_->SetRasterizerState(GraphicsStates_.RasterizerState);
 
   pDeviceContext_->VSSetShader(VertexShader_);
   pDeviceContext_->VSSetConstantBuffers(0, 1, &pBufferManager_->CloneConstantBuffer(pConstantBuffer_->GetDetail()));
 
+  pDeviceContext_->HSSetShader(HullShader_);
+
+  pDeviceContext_->DSSetShader(DomainShader_);
+
+  pDeviceContext_->GSSetShader(GeometryShader_);
+
   pDeviceContext_->PSSetShader(PixelShader_);
   pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
   pDeviceContext_->PSSetShaderResources(0, 1, &Font_);
-
-  pDeviceContext_->HSSetShader(vdl::HullShader());
-
-  pDeviceContext_->DSSetShader(vdl::DomainShader());
-
-  pDeviceContext_->GSSetShader(vdl::GeometryShader());
 
   // Render command lists
   // (Because we merged all buffers into a single one, we maintain our own offset into them)

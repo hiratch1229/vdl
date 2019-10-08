@@ -124,6 +124,12 @@
     <Filter Include="Src\UnorderedAccessBuffer">
       <UniqueIdentifier>{036639f6-c28c-46c2-9f3a-70c5a5b638f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\StateChangeFlags">
+      <UniqueIdentifier>{93635aff-8966-4c98-99d5-0218a40a6187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Instance">
+      <UniqueIdentifier>{6cef4ef4-1aa3-4822-898c-156d86c90132}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -285,9 +291,6 @@
     <ClInclude Include="..\..\Include\vdl\RasterizerState.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\GraphicsState.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\vdl\Mouse.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
@@ -392,6 +395,15 @@
     </ClInclude>
     <ClInclude Include="..\..\Include\vdl\Computer.hpp">
       <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\StateChangeFlags\StateChangeFlags.hpp">
+      <Filter>Src\StateChangeFlags</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\GraphicsStates.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Instance\Instance.hpp">
+      <Filter>Src\Instance</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

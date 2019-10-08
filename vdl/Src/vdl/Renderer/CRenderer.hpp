@@ -6,6 +6,7 @@
 #include <vdl/ConstantBuffer.hpp>
 
 #include <vdl/Buffer/IBuffer.hpp>
+#include <vdl/Instance/Instance.hpp>
 
 #include <memory>
 
@@ -22,31 +23,6 @@ class CRenderer : public IRenderer
   { { -0.5f, +0.5f }, { 0.0f, 1.0f } },
   { { +0.5f, +0.5f }, { 1.0f, 1.0f } } };
 private:
-  struct OutputManager
-  {
-    vdl::RenderTextures RenderTextures;
-    vdl::DepthStencilTexture DepthStencilTexture;
-  public:
-    [[nodiscard]] bool operator==(const OutputManager& _OutputManager)const { return RenderTextures == _OutputManager.RenderTextures && DepthStencilTexture == _OutputManager.DepthStencilTexture; }
-
-    [[nodiscard]] bool operator!=(const OutputManager& _OutputManager)const { return RenderTextures != _OutputManager.RenderTextures || DepthStencilTexture != _OutputManager.DepthStencilTexture; }
-  };
-  struct TextureInstanceData
-  {
-    vdl::Matrix NDCTransform;
-    vdl::float2 TexcoordScale;
-    vdl::float2 TexcoordTranslate;
-    vdl::ColorF Color;
-  };
-  struct StaticMeshInstanceData
-  {
-    vdl::Matrix World;
-    vdl::ColorF Color;
-  };
-  struct SkinnedMeshinstanceData : public StaticMeshInstanceData
-  {
-    //  TODO
-  };
   struct ConstantBufferData
   {
     vdl::Matrix ViewProjection;
@@ -68,7 +44,7 @@ private:
   std::unique_ptr<CameraData> pStaticMeshCameraData_;
   std::unique_ptr<CameraData> pSkinnedMeshCameraData_;
 private:
-  OutputManager OutputManager_;
+  vdl::OutputManager OutputManager_;
   RendererCommandList<Empty, vdl::uint> EmptyRendererCommandList_;
   RendererCommandList<vdl::Texture, TextureInstanceData> TextureRendererCommandList_;
   RendererCommandList<vdl::StaticMesh, StaticMeshInstanceData> StaticMeshRendererCommandList_;
