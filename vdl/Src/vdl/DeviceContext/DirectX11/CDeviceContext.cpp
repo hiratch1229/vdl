@@ -994,7 +994,7 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
       }
     }
     //  UnorderedAccessBuffer
-    else
+    else if(std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_ShaderResource))
     {
       const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(_ShaderResource);
 
@@ -1071,7 +1071,7 @@ ID3D11UnorderedAccessView* CDeviceContext::GetUnorderedAccessView(const vdl::Uno
       }
     }
     //  UnorderedAccessBuffer
-    else
+    else if(std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_UnorderedAccessObject))
     {
       const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(_UnorderedAccessObject);
 

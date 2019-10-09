@@ -59,6 +59,7 @@ public:
 struct CConstantBuffer : public IConstantBuffer
 {
   BufferData BufferData;
+  vk::Buffer ParentBuffer;
   vdl::uint BufferSize;
   vdl::uint Offset;
 public:
@@ -74,6 +75,7 @@ public:
 struct CUnordererdAccessBuffer : public IBuffer
 {
   BufferData BufferData;
+  vdl::uint BufferSize;
 public:
   CUnordererdAccessBuffer() = default;
 

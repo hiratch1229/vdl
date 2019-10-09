@@ -41,32 +41,18 @@ namespace
         //  Sampler
         if (Sampler.type == glslang::EbtVoid && Sampler.dim == glslang::EsdNone)
         {
-          if (Type_ == ShaderType::eComputeShader)
-          {
-            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + 0;
-          }
-          else
-          {
-            LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eSampler) + static_cast<vdl::uint>(Type_);
-          }
+          LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eSampler);
         }
-        //  Texture
+        //  ShaderResource
         else if (_pSymbol->getQualifier().layoutFormat == glslang::TLayoutFormat::ElfNone)
         {
-          if (Type_ == ShaderType::eComputeShader)
-          {
-            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eShaderResouce);
-          }
-          else
-          {
-            LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eShaderResouce) + static_cast<vdl::uint>(Type_);
-          }
+          LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eShaderResource);
         }
         //  RWTexture
         else
         {
           assert(Type_ == ShaderType::eComputeShader);
-          LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessTexture);
+          LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eUnorderedAccessTexture);
         }
       }
       else if (Type == glslang::TBasicType::EbtBlock)
@@ -76,20 +62,13 @@ namespace
         //  ConstantBuffer
         if (Qualifier.storage == glslang::TStorageQualifier::EvqUniform)
         {
-          if (Type_ == ShaderType::eComputeShader)
-          {
-            LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eConstantBuffer);
-          }
-          else
-          {
-            LayoutSet = kGraphicsShaderStageNum * static_cast<vdl::uint>(DescriptorType::eConstantBuffer) + static_cast<vdl::uint>(Type_);
-          }
+          LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eConstantBuffer);
         }
         //  RWStructuredBuffer
         else
         {
           assert(Type_ == ShaderType::eComputeShader);
-          LayoutSet = kGraphicsShaderStageNum * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(DescriptorType::eUnorderedAccessBuffer);
+          LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eUnorderedAccessBuffer);
         }
       }
       else
@@ -292,6 +271,7 @@ void CDevice::Initialize()
     const char* Extensions[] = {
       VK_KHR_SURFACE_EXTENSION_NAME,
       VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+      VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME,
 #if defined DEBUG | _DEBUG
       VK_EXT_DEBUG_REPORT_EXTENSION_NAME, //  デバッグレポート用
 #endif
@@ -521,13 +501,14 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
   assert(_ppUnorderedAccessBuffer);
 
   CUnordererdAccessBuffer* pUnorderedAccessBuffer = new CUnordererdAccessBuffer;
-  CreateBuffer(&pUnorderedAccessBuffer->BufferData, _BufferSize, vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst, vk::MemoryPropertyFlagBits::eDeviceLocal);
+  pUnorderedAccessBuffer->BufferSize = _BufferSize;
+  CreateBuffer(&pUnorderedAccessBuffer->BufferData, pUnorderedAccessBuffer->BufferSize, vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst, vk::MemoryPropertyFlagBits::eDeviceLocal);
 
   if (_Buffer)
   {
     BufferData StagingBuffer;
-    CreateStagingBuffer(&StagingBuffer, _Buffer, _BufferSize);
-    CopyBuffer(StagingBuffer.Buffer.get(), pUnorderedAccessBuffer->BufferData.Buffer.get(), _BufferSize);
+    CreateStagingBuffer(&StagingBuffer, _Buffer, pUnorderedAccessBuffer->BufferSize);
+    CopyBuffer(StagingBuffer.Buffer.get(), pUnorderedAccessBuffer->BufferData.Buffer.get(), pUnorderedAccessBuffer->BufferSize);
   }
 
   (*_ppUnorderedAccessBuffer) = std::move(pUnorderedAccessBuffer);

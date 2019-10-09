@@ -50,7 +50,7 @@ namespace
     {
     case DescriptorType::eSampler:
       return vk::DescriptorType::eSampler;
-    case DescriptorType::eShaderResouce:
+    case DescriptorType::eShaderResource:
       return vk::DescriptorType::eSampledImage;
     case DescriptorType::eConstantBuffer:
       return vk::DescriptorType::eUniformBuffer;
@@ -70,7 +70,7 @@ namespace
     {
     case DescriptorType::eSampler:
       return Constants::kMaxSamplerNum;
-    case DescriptorType::eShaderResouce:
+    case DescriptorType::eShaderResource:
       return Constants::kMaxShaderResourceNum;
     case DescriptorType::eConstantBuffer:
       return Constants::kMaxConstantBufferNum;
@@ -83,7 +83,7 @@ namespace
     return 0;
   }
 
-  inline vk::ClearColorValue Cast(const vdl::ColorF& _Color)
+  inline vk::ClearColorValue Cast(const vdl::ColorF & _Color)
   {
     return std::array<float, 4>({ _Color.Red, _Color.Blue, _Color.Green, _Color.Alpha });
   }
@@ -170,7 +170,7 @@ namespace
     return vk::StencilOp::eKeep;
   }
 
-  inline vk::StencilOpState Cast(const vdl::DepthStencilOpState& _StencilOpState)
+  inline vk::StencilOpState Cast(const vdl::DepthStencilOpState & _StencilOpState)
   {
     return { Cast(_StencilOpState.StencilFailOp), Cast(_StencilOpState.StencilPassOp),
       Cast(_StencilOpState.StencilDepthFailOp), Cast(_StencilOpState.StencilFunc), 0, 0, 1 };
@@ -254,6 +254,153 @@ namespace
     }
 
     return vk::ColorComponentFlagBits::eR;
+  }
+
+  inline vk::Filter GetMag(vdl::FilterType _Type)
+  {
+    switch (_Type)
+    {
+    case vdl::FilterType::eMinMagMipPoint:
+    case vdl::FilterType::eMinMagPointMipLinear:
+    case vdl::FilterType::eMinLinearMagMipPoint:
+    case vdl::FilterType::eMinLinearMagPointMipLinear:
+    case vdl::FilterType::eComparisonMinMagMipPoint:
+    case vdl::FilterType::eComparisonMinMagPointMipLinear:
+    case vdl::FilterType::eComparisonMinLinearMagMipPoint:
+    case vdl::FilterType::eComparisonMinLinearMagPointMipLinear:
+      return vk::Filter::eNearest;
+    case vdl::FilterType::eMinPointMagLinearMipPoint:
+    case vdl::FilterType::eMinPointMagMipLinear:
+    case vdl::FilterType::eMinMagLinearMipPoint:
+    case vdl::FilterType::eMinMagMipLinear:
+    case vdl::FilterType::eComparisonMinPointMagLinearMipPoint:
+    case vdl::FilterType::eComparisonMinPointMagMipLinear:
+    case vdl::FilterType::eComparisonMinMagLinearMipPoint:
+    case vdl::FilterType::eComparisonMinMagMipLinear:
+      return vk::Filter::eLinear;
+    case vdl::FilterType::eAnisotropic:
+    case vdl::FilterType::eComparisonAnisotropic:
+      break;
+    default: assert(false);
+    }
+
+    return vk::Filter::eNearest;
+  }
+
+  inline vk::Filter GetMin(vdl::FilterType _Type)
+  {
+    switch (_Type)
+    {
+    case vdl::FilterType::eMinMagMipPoint:
+    case vdl::FilterType::eMinMagPointMipLinear:
+    case vdl::FilterType::eMinPointMagLinearMipPoint:
+    case vdl::FilterType::eMinPointMagMipLinear:
+    case vdl::FilterType::eComparisonMinMagMipPoint:
+    case vdl::FilterType::eComparisonMinMagPointMipLinear:
+    case vdl::FilterType::eComparisonMinPointMagLinearMipPoint:
+    case vdl::FilterType::eComparisonMinPointMagMipLinear:
+      return vk::Filter::eNearest;
+    case vdl::FilterType::eMinLinearMagMipPoint:
+    case vdl::FilterType::eMinLinearMagPointMipLinear:
+    case vdl::FilterType::eMinMagLinearMipPoint:
+    case vdl::FilterType::eMinMagMipLinear:
+    case vdl::FilterType::eComparisonMinLinearMagMipPoint:
+    case vdl::FilterType::eComparisonMinLinearMagPointMipLinear:
+    case vdl::FilterType::eComparisonMinMagLinearMipPoint:
+    case vdl::FilterType::eComparisonMinMagMipLinear:
+      return vk::Filter::eLinear;
+    case vdl::FilterType::eAnisotropic:
+    case vdl::FilterType::eComparisonAnisotropic:
+      break;
+    default: assert(false);
+    }
+
+    return vk::Filter::eNearest;
+  }
+
+  inline vk::SamplerMipmapMode GetMimap(vdl::FilterType _Type)
+  {
+    switch (_Type)
+    {
+    case vdl::FilterType::eMinMagMipPoint:
+    case vdl::FilterType::eMinPointMagLinearMipPoint:
+    case vdl::FilterType::eMinLinearMagMipPoint:
+    case vdl::FilterType::eMinMagLinearMipPoint:
+    case vdl::FilterType::eComparisonMinMagMipPoint:
+    case vdl::FilterType::eComparisonMinPointMagLinearMipPoint:
+    case vdl::FilterType::eComparisonMinLinearMagMipPoint:
+    case vdl::FilterType::eComparisonMinMagLinearMipPoint:
+      return vk::SamplerMipmapMode::eNearest;
+    case vdl::FilterType::eMinMagPointMipLinear:
+    case vdl::FilterType::eMinPointMagMipLinear:
+    case vdl::FilterType::eMinLinearMagPointMipLinear:
+    case vdl::FilterType::eMinMagMipLinear:
+    case vdl::FilterType::eComparisonMinMagPointMipLinear:
+    case vdl::FilterType::eComparisonMinPointMagMipLinear:
+    case vdl::FilterType::eComparisonMinLinearMagPointMipLinear:
+    case vdl::FilterType::eComparisonMinMagMipLinear:
+      return vk::SamplerMipmapMode::eLinear;
+    case vdl::FilterType::eAnisotropic:
+    case vdl::FilterType::eComparisonAnisotropic:
+      break;
+    default: assert(false);
+    }
+
+    return vk::SamplerMipmapMode::eNearest;
+  }
+
+  inline bool isAnisotropic(vdl::FilterType _Type)
+  {
+    return _Type == vdl::FilterType::eAnisotropic | _Type == vdl::FilterType::eComparisonAnisotropic;
+  }
+
+  inline bool enableComparison(vdl::FilterType _Type)
+  {
+    return _Type == vdl::FilterType::eComparisonMinMagMipPoint
+      || _Type == vdl::FilterType::eComparisonMinMagPointMipLinear
+      || _Type == vdl::FilterType::eComparisonMinPointMagLinearMipPoint
+      || _Type == vdl::FilterType::eComparisonMinPointMagMipLinear
+      || _Type == vdl::FilterType::eComparisonMinLinearMagMipPoint
+      || _Type == vdl::FilterType::eComparisonMinLinearMagPointMipLinear
+      || _Type == vdl::FilterType::eComparisonMinMagLinearMipPoint
+      || _Type == vdl::FilterType::eComparisonMinMagMipLinear
+      || _Type == vdl::FilterType::eComparisonAnisotropic;
+  }
+
+  inline vk::SamplerAddressMode Cast(vdl::AddressModeType _Type)
+  {
+    switch (_Type)
+    {
+    case vdl::AddressModeType::eWrap:
+      return vk::SamplerAddressMode::eRepeat;
+    case vdl::AddressModeType::eMirror:
+      return vk::SamplerAddressMode::eMirroredRepeat;
+    case vdl::AddressModeType::eClamp:
+      return vk::SamplerAddressMode::eClampToEdge;
+    case vdl::AddressModeType::eBorder:
+      return vk::SamplerAddressMode::eClampToBorder;
+    case vdl::AddressModeType::eMirrorOnce:
+      return vk::SamplerAddressMode::eMirrorClampToEdge;
+    default: assert(false);
+    }
+
+    return vk::SamplerAddressMode::eRepeat;
+  }
+
+  inline vk::BorderColor Cast(vdl::BorderColorType _Type)
+  {
+    switch (_Type)
+    {
+    case vdl::BorderColorType::eTransparent:
+      return vk::BorderColor::eFloatTransparentBlack;
+    case vdl::BorderColorType::eBlack:
+      return vk::BorderColor::eFloatOpaqueBlack;
+    case vdl::BorderColorType::eWhite:
+      return vk::BorderColor::eFloatOpaqueWhite;
+    default: assert(false);
+    }
+
+    return vk::BorderColor::eFloatTransparentBlack;
   }
 }
 
@@ -455,9 +602,10 @@ void CDeviceContext::Initialize()
       {
         const vdl::uint PerCountNum = GetPerCount(static_cast<DescriptorType>(i));
         const vk::DescriptorType Type = Cast(static_cast<DescriptorType>(i));
+
         for (vdl::uint j = 0; j < kGraphicsShaderStageNum; ++j)
         {
-          std::vector<vk::DescriptorSetLayoutBinding>& LayoutBining = LayoutBindings[i * kGraphicsShaderStageNum + j];
+          std::vector<vk::DescriptorSetLayoutBinding>& LayoutBining = LayoutBindings[GetDescriptorLayoutOffset(static_cast<ShaderType>(j), static_cast<DescriptorType>(i))];
           LayoutBining.resize(PerCountNum);
           for (vdl::uint k = 0; k < PerCountNum; ++k)
           {
@@ -479,6 +627,36 @@ void CDeviceContext::Initialize()
         GraphicsDescriptorLayouts_[i] = VkDevice_.createDescriptorSetLayoutUnique(DescriptorSetLayoutInfo);
         assert(GraphicsDescriptorLayouts_[i]);
       }
+    }
+
+    //  デスクリプタプールの作成
+    {
+      std::array<vk::DescriptorPoolSize, kGraphicsDescriptorTypeNum> TypeCounts;
+      {
+        auto SetTypeCount = [&TypeCounts, this](DescriptorType _Type)->void
+        {
+          TypeCounts[static_cast<vdl::uint>(_Type)].type = Cast(_Type);
+          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = GetPerCount(_Type);
+        };
+
+        //  テクスチャ
+        SetTypeCount(DescriptorType::eShaderResource);
+        //  サンプラー
+        SetTypeCount(DescriptorType::eSampler);
+        //  定数バッファ
+        SetTypeCount(DescriptorType::eConstantBuffer);
+      }
+
+      vk::DescriptorPoolCreateInfo DescriptorPoolInfo;
+      {
+        DescriptorPoolInfo.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet;
+        DescriptorPoolInfo.maxSets = kGraphicsDescriptorPoolMaxSet;
+        DescriptorPoolInfo.poolSizeCount;
+        DescriptorPoolInfo.pPoolSizes;
+      }
+
+      GraphicsDescriptorPool_ = VkDevice_.createDescriptorPoolUnique(DescriptorPoolInfo);
+      assert(GraphicsDescriptorPool_);
     }
 
     //  パイプラインキャッシュの作成
@@ -608,10 +786,7 @@ void CDeviceContext::Initialize()
 
 #pragma region GraphicsPipeline
 #define SetGraphicsState(GraphicsCommandType, StateName)\
-if (!GraphicsStateChangeFlags_.Has(GraphicsCommandType) && CurrentGraphicsState_.StateName != _##StateName)\
-{\
-  GraphicsStateChangeFlags_.Set(GraphicsCommandType);\
-}\
+GraphicsStateChangeFlags_.Set(GraphicsCommandType);\
 \
 CurrentGraphicsState_.StateName = _##StateName;
 
@@ -622,40 +797,25 @@ if (const vdl::uint RequiredSize = _StartSlot + _##ShaderState##Num;\
   Current##ShaderState##s.size() < RequiredSize)\
 {\
   Current##ShaderState##s.resize(static_cast<size_t>(RequiredSize));\
-  GraphicsStateChangeFlags_.Set(GraphicsCommandType);\
 }\
-\
-if (!GraphicsStateChangeFlags_.Has(GraphicsCommandType))\
-{\
-  for (vdl::uint ShaderState##Count = 0; ShaderState##Count < _##ShaderState##Num; ++ShaderState##Count)\
-  {\
-    auto& Current##ShaderState = Current##ShaderState##s[_StartSlot + ShaderState##Count];\
-    const auto& ShaderState = _##ShaderState##s[ShaderState##Count];\
-    \
-    if (Current##ShaderState != ShaderState)\
-    {\
-      GraphicsStateChangeFlags_.Set(GraphicsCommandType);\
-      break;\
-    }\
-  }\
-}\
+GraphicsStateChangeFlags_.Set(GraphicsCommandType);\
 \
 for (vdl::uint ShaderState##Count = 0; ShaderState##Count < _##ShaderState##Num; ++ShaderState##Count)\
 {\
   Current##ShaderState##s[_StartSlot + ShaderState##Count] = _##ShaderState##s[ShaderState##Count];\
 }
 
-void CDeviceContext::SetVertexBuffer(const IBuffer* _pVertexBuffer)
+void CDeviceContext::SetVertexBuffer(const IBuffer * _pVertexBuffer)
 {
   SetGraphicsState(GraphicsCommandType::eSetVertexBuffer, pVertexBuffer)
 }
 
-void CDeviceContext::SetInstanceBuffer(const IBuffer* _pInstanceBuffer)
+void CDeviceContext::SetInstanceBuffer(const IBuffer * _pInstanceBuffer)
 {
   SetGraphicsState(GraphicsCommandType::eSetInstanceBuffer, pInstanceBuffer)
 }
 
-void CDeviceContext::SetIndexBuffer(const IBuffer* _pIndexBuffer)
+void CDeviceContext::SetIndexBuffer(const IBuffer * _pIndexBuffer)
 {
   SetGraphicsState(GraphicsCommandType::eSetIndexBuffer, pIndexBuffer)
 }
@@ -670,17 +830,17 @@ void CDeviceContext::SetTopology(vdl::TopologyType _Topology)
   SetGraphicsState(GraphicsCommandType::eSetTopology, Topology)
 }
 
-void CDeviceContext::SetScissor(const vdl::Scissor& _Scissor)
+void CDeviceContext::SetScissor(const vdl::Scissor & _Scissor)
 {
   SetGraphicsState(GraphicsCommandType::eSetScissor, Scissor)
 }
 
-void CDeviceContext::SetViewport(const vdl::Viewport& _Viewport)
+void CDeviceContext::SetViewport(const vdl::Viewport & _Viewport)
 {
   SetGraphicsState(GraphicsCommandType::eSetViewport, Viewport)
 }
 
-void CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)
+void CDeviceContext::SetRenderTextures(const vdl::RenderTextures & _RenderTextures, const vdl::DepthStencilTexture & _DepthStenilTexture)
 {
   BeginGraphicsCommandBuffer();
 
@@ -813,28 +973,22 @@ void CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTexture
   GraphicsCommandBufferState_ = CommandBufferState::eBeginRenderPass;
 }
 
-void CDeviceContext::SetBlendState(const vdl::BlendState& _BlendState)
+void CDeviceContext::SetBlendState(const vdl::BlendState & _BlendState)
 {
   SetGraphicsState(GraphicsCommandType::eSetBlendState, BlendState)
 }
 
-void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState)
+void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState & _DepthStencilState)
 {
   SetGraphicsState(GraphicsCommandType::eSetDepthStencilState, DepthStencilState)
 }
 
-void CDeviceContext::SetRasterizerState(const vdl::RasterizerState& _RasterizerState)
+void CDeviceContext::SetRasterizerState(const vdl::RasterizerState & _RasterizerState)
 {
   SetGraphicsState(GraphicsCommandType::eSetRasterizerState, RasterizerState)
-
-    if (!GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetScissor) &&
-      PreviousGraphicsState_.RasterizerState.ScissorEnable != _RasterizerState.ScissorEnable)
-    {
-      GraphicsStateChangeFlags_.Set(GraphicsCommandType::eSetScissor);
-    }
 }
 
-void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
+void CDeviceContext::VSSetShader(const vdl::VertexShader & _VertexShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetVertexShader, VertexShader)
 }
@@ -854,7 +1008,7 @@ void CDeviceContext::VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   SetGraphicsShaderStates(GraphicsCommandType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader, ConstantBuffer)
 }
 
-void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
+void CDeviceContext::HSSetShader(const vdl::HullShader & _HullShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetHullShader, HullShader)
 }
@@ -874,7 +1028,7 @@ void CDeviceContext::HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   SetGraphicsShaderStates(GraphicsCommandType::eSetHullStageConstantBuffer, ShaderType::eHullShader, ConstantBuffer)
 }
 
-void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
+void CDeviceContext::DSSetShader(const vdl::DomainShader & _DomainShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetDomainShader, DomainShader)
 }
@@ -894,7 +1048,7 @@ void CDeviceContext::DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   SetGraphicsShaderStates(GraphicsCommandType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader, ConstantBuffer)
 }
 
-void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
+void CDeviceContext::GSSetShader(const vdl::GeometryShader & _GeometryShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetGeometryShader, GeometryShader)
 }
@@ -914,7 +1068,7 @@ void CDeviceContext::GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   SetGraphicsShaderStates(GraphicsCommandType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader, ConstantBuffer)
 }
 
-void CDeviceContext::PSSetShader(const vdl::PixelShader& _PixelShader)
+void CDeviceContext::PSSetShader(const vdl::PixelShader & _PixelShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetPixelShader, PixelShader)
 }
@@ -939,7 +1093,7 @@ void CDeviceContext::PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
 #pragma endregion
 
 #pragma region ComputePipeline
-void CDeviceContext::CSSetShader(const vdl::ComputeShader& _ComputeShader)
+void CDeviceContext::CSSetShader(const vdl::ComputeShader & _ComputeShader)
 {
 
 }
@@ -965,7 +1119,7 @@ void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint
 }
 #pragma endregion
 
-void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)
+void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture & _RenderTexture, const vdl::ColorF & _ClearColor)
 {
   constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eTransferDstOptimal;
 
@@ -988,7 +1142,7 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
   CurrentGraphicsCommandBuffer.clearColorImage(pTexture->Image.get(), kImageLayout, Cast(_ClearColor), SubresourceRange);
 }
 
-void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil)
+void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture & _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil)
 {
   constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eTransferDstOptimal;
 
@@ -1011,7 +1165,7 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   CurrentGraphicsCommandBuffer.clearDepthStencilImage(pTexture->Image.get(), kImageLayout, { _ClearDepth, _ClearStencil }, SubresourceRange);
 }
 
-void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)
+void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture & _UnorderedAccessTexture, const vdl::ColorF & _ClearColor)
 {
   assert(!_UnorderedAccessTexture.isEmpty());
 
@@ -1067,7 +1221,7 @@ std::vector<vk::CommandBuffer> CDeviceContext::GetCommandBuffers()
 
 }
 
-void CDeviceContext::Flush(const std::vector<vk::CommandBuffer>& _CommandBuffers, const vk::Semaphore& _SingnalSemaphore)
+void CDeviceContext::Flush(const std::vector<vk::CommandBuffer> & _CommandBuffers, const vk::Semaphore & _SingnalSemaphore)
 {
 
 }
@@ -1096,12 +1250,16 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
   //  SetInstanceBuffer
   {
-    PreviousGraphicsState_.pInstanceBuffer = CurrentGraphicsState_.pInstanceBuffer;
-    assert(PreviousGraphicsState_.pInstanceBuffer->GetType() == BufferType::eInstanceBuffer);
+    assert(CurrentGraphicsState_.pInstanceBuffer->GetType() == BufferType::eInstanceBuffer);
 
-    const CInstanceBuffer* pInstanceBuffer = static_cast<const CInstanceBuffer*>(PreviousGraphicsState_.pInstanceBuffer);
+    const CInstanceBuffer* pInstanceBuffer = static_cast<const CInstanceBuffer*>(CurrentGraphicsState_.pInstanceBuffer);
     CurrentGraphicsCommandBuffer.bindVertexBuffers(1, pInstanceBuffer->BufferData.Buffer.get(), pInstanceBuffer->PreviousOffset);
     GraphicsStateChangeFlags_.Cancel(GraphicsCommandType::eSetInstanceBuffer);
+  }
+
+  if (!CurrentGraphicsState_.RasterizerState.ScissorEnable)
+  {
+    GraphicsStateChangeFlags_.Set(GraphicsCommandType::eSetScissor);
   }
 
   if (GraphicsStateChangeFlags_.isEmpty())
@@ -1114,17 +1272,12 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
   {
     if (GraphicsStateChangeFlags_.Has(GraphicsPipelineStateCommand))
     {
-      PreviousGraphicsState_.VertexShader = CurrentGraphicsState_.VertexShader;
-      PreviousGraphicsState_.HullShader = CurrentGraphicsState_.HullShader;
-      PreviousGraphicsState_.DomainShader = CurrentGraphicsState_.DomainShader;
-      PreviousGraphicsState_.GeometryShader = CurrentGraphicsState_.GeometryShader;
-      PreviousGraphicsState_.PixelShader = CurrentGraphicsState_.PixelShader;
       std::vector<vk::PipelineShaderStageCreateInfo> PipelineShaderStageInfos;
       {
-        if (!PreviousGraphicsState_.VertexShader.isEmpty())
+        if (!CurrentGraphicsState_.VertexShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(PreviousGraphicsState_.VertexShader.GetID())->GetType() == ShaderType::eVertexShader);
-          const CVertexShader* pVertexShader = static_cast<CVertexShader*>(pShaderManager_->GetShader(PreviousGraphicsState_.VertexShader.GetID()));
+          assert(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID())->GetType() == ShaderType::eVertexShader);
+          const CVertexShader* pVertexShader = static_cast<CVertexShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
           {
@@ -1136,10 +1289,10 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
           PipelineShaderStageInfos.emplace_back(std::move(PipelineShaderStageInfo));
         }
 
-        if (!PreviousGraphicsState_.HullShader.isEmpty())
+        if (!CurrentGraphicsState_.HullShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(PreviousGraphicsState_.HullShader.GetID())->GetType() == ShaderType::eHullShader);
-          const CHullShader* pHullShader = static_cast<CHullShader*>(pShaderManager_->GetShader(PreviousGraphicsState_.HullShader.GetID()));
+          assert(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID())->GetType() == ShaderType::eHullShader);
+          const CHullShader* pHullShader = static_cast<CHullShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
           {
@@ -1151,10 +1304,10 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
           PipelineShaderStageInfos.emplace_back(std::move(PipelineShaderStageInfo));
         }
 
-        if (!PreviousGraphicsState_.DomainShader.isEmpty())
+        if (!CurrentGraphicsState_.DomainShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(PreviousGraphicsState_.DomainShader.GetID())->GetType() == ShaderType::eHullShader);
-          const CDomainShader* pDomainShader = static_cast<CDomainShader*>(pShaderManager_->GetShader(PreviousGraphicsState_.DomainShader.GetID()));
+          assert(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID())->GetType() == ShaderType::eHullShader);
+          const CDomainShader* pDomainShader = static_cast<CDomainShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
           {
@@ -1166,10 +1319,10 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
           PipelineShaderStageInfos.emplace_back(std::move(PipelineShaderStageInfo));
         }
 
-        if (!PreviousGraphicsState_.GeometryShader.isEmpty())
+        if (!CurrentGraphicsState_.GeometryShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(PreviousGraphicsState_.GeometryShader.GetID())->GetType() == ShaderType::eGeometryShader);
-          const CGeometryShader* pGeometryShader = static_cast<CGeometryShader*>(pShaderManager_->GetShader(PreviousGraphicsState_.GeometryShader.GetID()));
+          assert(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID())->GetType() == ShaderType::eGeometryShader);
+          const CGeometryShader* pGeometryShader = static_cast<CGeometryShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
           {
@@ -1181,10 +1334,10 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
           PipelineShaderStageInfos.emplace_back(std::move(PipelineShaderStageInfo));
         }
 
-        if (!PreviousGraphicsState_.PixelShader.isEmpty())
+        if (!CurrentGraphicsState_.PixelShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(PreviousGraphicsState_.PixelShader.GetID())->GetType() == ShaderType::ePixelShader);
-          const CPixelShader* pPixelShader = static_cast<CPixelShader*>(pShaderManager_->GetShader(PreviousGraphicsState_.PixelShader.GetID()));
+          assert(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID())->GetType() == ShaderType::ePixelShader);
+          const CPixelShader* pPixelShader = static_cast<CPixelShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
           {
@@ -1197,10 +1350,9 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
         }
       }
 
-      PreviousGraphicsState_.InputLayout = CurrentGraphicsState_.InputLayout;
       vk::PipelineVertexInputStateCreateInfo PipelineVertexInputStateInfo;
       {
-        InputLayout& InputLayout = InputLayouts_[PreviousGraphicsState_.InputLayout];
+        InputLayout& InputLayout = InputLayouts_[CurrentGraphicsState_.InputLayout];
 
         PipelineVertexInputStateInfo.vertexBindingDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputBindingDescriptions.size());
         PipelineVertexInputStateInfo.pVertexBindingDescriptions = InputLayout.VertexInputBindingDescriptions.data();
@@ -1208,16 +1360,15 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
         PipelineVertexInputStateInfo.pVertexAttributeDescriptions = InputLayout.VertexInputAttributeDescriptions.data();
       }
 
-      PreviousGraphicsState_.Topology = CurrentGraphicsState_.Topology;
       vk::PipelineInputAssemblyStateCreateInfo PipelineInputAssemblyStateInfo;
       {
-        PipelineInputAssemblyStateInfo.topology = Cast(PreviousGraphicsState_.Topology);
+        PipelineInputAssemblyStateInfo.topology = Cast(CurrentGraphicsState_.Topology);
         PipelineInputAssemblyStateInfo.primitiveRestartEnable = false;
       }
 
       vk::PipelineTessellationStateCreateInfo PipelineTessellationStateInfo;
       {
-        PipelineTessellationStateInfo.patchControlPoints = GetPatchControlPoints(PreviousGraphicsState_.Topology);
+        PipelineTessellationStateInfo.patchControlPoints = GetPatchControlPoints(CurrentGraphicsState_.Topology);
       }
 
       vk::PipelineViewportStateCreateInfo PipelineViewportStateInfo;
@@ -1228,33 +1379,30 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
         PipelineViewportStateInfo.pScissors = nullptr;
       }
 
-      PreviousGraphicsState_.RasterizerState = CurrentGraphicsState_.RasterizerState;
-      const vk::PipelineRasterizationStateCreateInfo& PipelineRasterizationStateInfo = GetPipelineRasterizationStateInfo(PreviousGraphicsState_.RasterizerState);
+      const vk::PipelineRasterizationStateCreateInfo& PipelineRasterizationStateInfo = GetPipelineRasterizationStateInfo(CurrentGraphicsState_.RasterizerState);
 
-      PreviousGraphicsState_.DepthStencilState = CurrentGraphicsState_.DepthStencilState;
-      const vk::PipelineDepthStencilStateCreateInfo& PipelineDepthStencilStateInfo = GetPipelineDepthStencilStateInfo(PreviousGraphicsState_.DepthStencilState);
+      const vk::PipelineDepthStencilStateCreateInfo& PipelineDepthStencilStateInfo = GetPipelineDepthStencilStateInfo(CurrentGraphicsState_.DepthStencilState);
 
-      PreviousGraphicsState_.BlendState = CurrentGraphicsState_.BlendState;
       std::array<vk::PipelineColorBlendAttachmentState, Constants::kMaxRenderTextureNum> PipelineColorBlendAttachmentStates;
       {
-        if (PreviousGraphicsState_.BlendState.IndependentBlendEnable)
+        if (CurrentGraphicsState_.BlendState.IndependentBlendEnable)
         {
           for (vdl::uint i = 0; i < Constants::kMaxRenderTextureNum; ++i)
           {
-            PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(PreviousGraphicsState_.BlendState.RenderTexture[i]);
+            PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
           }
         }
         else
         {
-          PipelineColorBlendAttachmentStates[0] = GetPipelineColorBlendAttachmentState(PreviousGraphicsState_.BlendState.RenderTexture[0]);
+          PipelineColorBlendAttachmentStates[0] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[0]);
           for (vdl::uint i = 1; i < Constants::kMaxRenderTextureNum; ++i)
           {
-            PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(PreviousGraphicsState_.BlendState.RenderTexture[i]);
+            PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
           }
         }
       }
 
-      const vk::PipelineMultisampleStateCreateInfo& PipelineMultisampleStateInfo = GetMultisampleStateInfo(PreviousGraphicsState_.BlendState.AlphaToCoverageEnable);
+      const vk::PipelineMultisampleStateCreateInfo& PipelineMultisampleStateInfo = GetMultisampleStateInfo(CurrentGraphicsState_.BlendState.AlphaToCoverageEnable);
 
       vk::PipelineColorBlendStateCreateInfo PipelineColorBlendStateInfo;
       {
@@ -1319,30 +1467,327 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
   }
 
   //  SetDescriptor
-  for (auto& GraphicsDescriptorCommand : kGraphicsDescriptorCommands)
   {
-    if (GraphicsStateChangeFlags_.Has(GraphicsDescriptorCommand))
+    struct DescriptorImageData
     {
+      vk::DescriptorImageInfo Info;
+      vdl::uint Bind;
+    };
 
+    struct DescriptorBufferData
+    {
+      vk::DescriptorBufferInfo Info;
+      vdl::uint Bind;
+    };
 
-      std::vector<vk::DescriptorSet> DescriptorSets;
-      //for (auto& DescriptorSet : DescriptorSets_)
-      //{
-      //  DescriptorSets.push_back(DescriptorSet.get());
-      //}
+    //  SetShaderResource
+    {
+      auto BindShaderResources = [&](ShaderType _Type)->void
+      {
+        const ShaderResources& ShaderResources = CurrentGraphicsState_.ShaderResources[static_cast<vdl::uint>(_Type)];
 
-      CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), 0, DescriptorSets, nullptr);
+        const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, DescriptorType::eShaderResource);
 
-      break;
+        vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+        {
+          DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+          DescriptorSetAllocateInfo.descriptorSetCount = 1;
+          DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+        }
+
+        vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+        assert(DescriptorSet);
+
+        std::vector<DescriptorImageData> TextureDatas;
+        std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
+
+        //  データの読み込み
+        {
+          const vdl::uint ShaderResourceNum = ShaderResources.size();
+          for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
+          {
+            const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
+
+            //  Texture
+            if (std::get_if<vdl::Texture>(&ShaderResource))
+            {
+              const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
+              if (!Texture.isEmpty())
+              {
+                constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+                CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(Texture.GetID()));
+                if (pTexture->CurrentLayout != kImageLayout)
+                {
+                  pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+                }
+
+                DescriptorImageData& ImageData = TextureDatas.emplace_back();
+                {
+                  ImageData.Info.imageView = pTexture->View.get();
+                  ImageData.Info.imageLayout = kImageLayout;
+                  ImageData.Bind = ShaderResourceCount;
+                }
+              }
+            }
+            //  UnorderedAccessBuffer
+            else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
+            {
+              const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(ShaderResource);
+
+              if (!UnorderedAccessBuffer.isEmpty())
+              {
+                assert(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID())->GetType() == BufferType::eUnorderedAccessBuffer);
+
+                CUnordererdAccessBuffer* pUnorderedAccessBuffer = static_cast<CUnordererdAccessBuffer*>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
+                DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+                {
+                  BufferData.Info.buffer = pUnorderedAccessBuffer->BufferData.Buffer.get();
+                  BufferData.Info.offset = 0;
+                  BufferData.Info.range = pUnorderedAccessBuffer->BufferSize;
+                  BufferData.Bind = ShaderResourceCount;
+                }
+              }
+            }
+          }
+        }
+
+        std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+        {
+          for (auto& TextureData : TextureDatas)
+          {
+            vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+            {
+              WriteDescriptorSet.dstSet = DescriptorSet.get();
+              WriteDescriptorSet.dstBinding = TextureData.Bind;
+              WriteDescriptorSet.dstArrayElement = 0;
+              WriteDescriptorSet.descriptorCount = 1;
+              WriteDescriptorSet.descriptorType = Cast(DescriptorType::eShaderResource);
+              WriteDescriptorSet.pImageInfo = &TextureData.Info;
+            }
+          }
+
+          for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
+          {
+            vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+            {
+              WriteDescriptorSet.dstSet = DescriptorSet.get();
+              WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
+              WriteDescriptorSet.dstArrayElement = 0;
+              WriteDescriptorSet.descriptorCount = 1;
+              WriteDescriptorSet.descriptorType = Cast(DescriptorType::eUnorderedAccessBuffer);
+              WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Info;
+            }
+          }
+        }
+
+        VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+        CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+        DescriptorSets_[GraphicsCommandBufferIndex_].emplace_back(std::move(DescriptorSet));
+      };
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageShaderResource))
+      {
+        BindShaderResources(ShaderType::eVertexShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageShaderResource))
+      {
+        BindShaderResources(ShaderType::eHullShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageShaderResource))
+      {
+        BindShaderResources(ShaderType::eDomainShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageShaderResource))
+      {
+        BindShaderResources(ShaderType::eGeometryShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageShaderResource))
+      {
+        BindShaderResources(ShaderType::ePixelShader);
+      }
+    }
+
+    //  SetSampler
+    {
+      auto BindSamplers = [&](ShaderType _Type)->void
+      {
+        const Samplers& Samplers = CurrentGraphicsState_.Samplers[static_cast<vdl::uint>(_Type)];
+
+        const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, DescriptorType::eSampler);
+
+        vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+        {
+          DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+          DescriptorSetAllocateInfo.descriptorSetCount = 1;
+          DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+        }
+
+        vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+        std::vector<DescriptorImageData> SamplerDatas;
+
+        //  データの読み込み
+        {
+          const vdl::uint SamplerNum = SamplerDatas.size();
+          for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+          {
+            DescriptorImageData& ImageData = SamplerDatas.emplace_back();
+            {
+              ImageData.Info.sampler = GetSampler(Samplers[SamplerCount]);
+              ImageData.Info.imageLayout = vk::ImageLayout::eUndefined;
+              ImageData.Bind = SamplerCount;
+            }
+          }
+        }
+
+        std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+        {
+          for (auto& SamplerData : SamplerDatas)
+          {
+            vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+            {
+              WriteDescriptorSet.dstSet = DescriptorSet.get();
+              WriteDescriptorSet.dstBinding = SamplerData.Bind;
+              WriteDescriptorSet.dstArrayElement = 0;
+              WriteDescriptorSet.descriptorCount = 1;
+              WriteDescriptorSet.descriptorType = Cast(DescriptorType::eSampler);
+              WriteDescriptorSet.pImageInfo = &SamplerData.Info;
+            }
+          }
+        }
+
+        VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+        CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+        DescriptorSets_[GraphicsCommandBufferIndex_].emplace_back(std::move(DescriptorSet));
+      };
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageSampler))
+      {
+        BindSamplers(ShaderType::eVertexShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageSampler))
+      {
+        BindSamplers(ShaderType::eHullShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageSampler))
+      {
+        BindSamplers(ShaderType::eDomainShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageSampler))
+      {
+        BindSamplers(ShaderType::eGeometryShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageSampler))
+      {
+        BindSamplers(ShaderType::ePixelShader);
+      }
+    }
+
+    //  SetConstantBuffer
+    {
+      auto BindConstantBuffers = [&](ShaderType _Type)
+      {
+        const ConstantBuffers& ConstantBuffers = CurrentGraphicsState_.ConstantBuffers[static_cast<vdl::uint>(_Type)];
+
+        const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, DescriptorType::eConstantBuffer);
+
+        vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+        {
+          DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+          DescriptorSetAllocateInfo.descriptorSetCount = 1;
+          DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+        }
+
+        vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+        std::vector<DescriptorBufferData> ConstantBufferDatas;
+
+        //  データの読み込み
+        {
+          const vdl::uint ConstantBufferNum = ConstantBuffers.size();
+          for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+          {
+            assert(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eConstantBuffer);
+            CConstantBuffer* pConstantBuffer = static_cast<CConstantBuffer*>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
+
+            DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
+            {
+              BufferData.Info.buffer = pConstantBuffer->ParentBuffer;
+              BufferData.Info.offset = pConstantBuffer->Offset;
+              BufferData.Info.range = pConstantBuffer->BufferSize;
+              BufferData.Bind = ConstantBufferCount;
+            }
+          }
+        }
+
+        std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+        {
+          for (auto& ConstantBufferData : ConstantBufferDatas)
+          {
+            vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+            {
+              WriteDescriptorSet.dstSet = DescriptorSet.get();
+              WriteDescriptorSet.dstBinding = ConstantBufferData.Bind;
+              WriteDescriptorSet.dstArrayElement = 0;
+              WriteDescriptorSet.descriptorCount = 1;
+              WriteDescriptorSet.descriptorType = Cast(DescriptorType::eShaderResource);
+              WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Info;
+            }
+          }
+        }
+
+        VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+        CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+        DescriptorSets_[GraphicsCommandBufferIndex_].emplace_back(std::move(DescriptorSet));
+      };
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageConstantBuffer))
+      {
+        BindConstantBuffers(ShaderType::eVertexShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageConstantBuffer))
+      {
+        BindConstantBuffers(ShaderType::eHullShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageConstantBuffer))
+      {
+        BindConstantBuffers(ShaderType::eDomainShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageConstantBuffer))
+      {
+        BindConstantBuffers(ShaderType::eGeometryShader);
+      }
+
+      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageConstantBuffer))
+      {
+        BindConstantBuffers(ShaderType::ePixelShader);
+      }
     }
   }
 
   if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexBuffer))
   {
-    PreviousGraphicsState_.pVertexBuffer = CurrentGraphicsState_.pVertexBuffer;
-    assert(PreviousGraphicsState_.pVertexBuffer->GetType() == BufferType::eVertexBuffer);
+    assert(CurrentGraphicsState_.pVertexBuffer->GetType() == BufferType::eVertexBuffer);
 
-    const CVertexBuffer* pVertexBuffer = static_cast<const CVertexBuffer*>(PreviousGraphicsState_.pVertexBuffer);
+    const CVertexBuffer* pVertexBuffer = static_cast<const CVertexBuffer*>(CurrentGraphicsState_.pVertexBuffer);
 
     constexpr vk::DeviceSize kOffset = 0;
     CurrentGraphicsCommandBuffer.bindVertexBuffers(0, pVertexBuffer->BufferData.Buffer.get(), kOffset);
@@ -1350,10 +1795,9 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
   if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetIndexBuffer))
   {
-    PreviousGraphicsState_.pIndexBuffer = CurrentGraphicsState_.pIndexBuffer;
-    assert(PreviousGraphicsState_.pIndexBuffer->GetType() == BufferType::eVertexBuffer);
+    assert(CurrentGraphicsState_.pIndexBuffer->GetType() == BufferType::eVertexBuffer);
 
-    const CIndexBuffer* pIndexBuffer = static_cast<const CIndexBuffer*>(PreviousGraphicsState_.pIndexBuffer);
+    const CIndexBuffer* pIndexBuffer = static_cast<const CIndexBuffer*>(CurrentGraphicsState_.pIndexBuffer);
 
     constexpr vk::DeviceSize kOffset = 0;
     CurrentGraphicsCommandBuffer.bindIndexBuffer(pIndexBuffer->BufferData.Buffer.get(), kOffset, pIndexBuffer->IndexType);
@@ -1361,24 +1805,20 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
   if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetScissor))
   {
-    PreviousGraphicsState_.Scissor = CurrentGraphicsState_.Scissor;
-
     CurrentGraphicsCommandBuffer.setScissor(0,
-      Cast(CurrentGraphicsState_.RasterizerState.ScissorEnable ? PreviousGraphicsState_.Scissor
+      Cast(CurrentGraphicsState_.RasterizerState.ScissorEnable ? CurrentGraphicsState_.Scissor
         : vdl::Scissor(CurrentGraphicsState_.Viewport.LeftTop, CurrentGraphicsState_.Viewport.Size)));
   }
 
   if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetViewport))
   {
-    PreviousGraphicsState_.Viewport = CurrentGraphicsState_.Viewport;
-
-    CurrentGraphicsCommandBuffer.setViewport(0, Cast(PreviousGraphicsState_.Viewport));
+    CurrentGraphicsCommandBuffer.setViewport(0, Cast(CurrentGraphicsState_.Viewport));
   }
 
   GraphicsStateChangeFlags_.Clear();
 }
 
-const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState& _RasterizerState)
+const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState & _RasterizerState)
 {
   if (RasterizerStates_.find(_RasterizerState) == RasterizerStates_.end())
   {
@@ -1402,7 +1842,7 @@ const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRaste
   return RasterizerStates_.at(_RasterizerState);
 }
 
-const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState& _DepthStencilState)
+const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState & _DepthStencilState)
 {
   if (DepthStencilStates_.find(_DepthStencilState) == DepthStencilStates_.end())
   {
@@ -1427,7 +1867,7 @@ const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthS
   return DepthStencilStates_.at(_DepthStencilState);
 }
 
-const vk::PipelineColorBlendAttachmentState& CDeviceContext::GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState& _RenderTextureBlendState)
+const vk::PipelineColorBlendAttachmentState& CDeviceContext::GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState & _RenderTextureBlendState)
 {
   if (RenderTextureBlendStates_.find(_RenderTextureBlendState) == RenderTextureBlendStates_.end())
   {
@@ -1468,4 +1908,36 @@ const vk::PipelineMultisampleStateCreateInfo& CDeviceContext::GetMultisampleStat
   }
 
   return MultisampleStates_.at(_AlphaToCoverageEnable);
+}
+
+const vk::Sampler& CDeviceContext::GetSampler(const vdl::Sampler& _Sampler)
+{
+  if (Samplers_.find(_Sampler) == Samplers_.end())
+  {
+    vk::SamplerCreateInfo SamplerInfo;
+    {
+      SamplerInfo.magFilter = GetMag(_Sampler.Filter);
+      SamplerInfo.minFilter = GetMin(_Sampler.Filter);
+      SamplerInfo.mipmapMode = GetMimap(_Sampler.Filter);
+      SamplerInfo.addressModeU = Cast(_Sampler.AddressModeU);
+      SamplerInfo.addressModeV = Cast(_Sampler.AddressModeV);;
+      SamplerInfo.addressModeW = Cast(_Sampler.AddressModeW);
+      SamplerInfo.mipLodBias = 0.0f;
+      SamplerInfo.anisotropyEnable = isAnisotropic(_Sampler.Filter);
+      SamplerInfo.maxAnisotropy = _Sampler.MaxAnisotropy;
+      SamplerInfo.compareEnable = enableComparison(_Sampler.Filter);
+      SamplerInfo.compareOp = vk::CompareOp::eAlways;
+      SamplerInfo.minLod = 0;
+      SamplerInfo.maxLod = FLT_MAX;
+      SamplerInfo.borderColor = Cast(_Sampler.BorderColor);
+      SamplerInfo.unnormalizedCoordinates = false;
+    }
+
+    vk::UniqueSampler Sampler = VkDevice_.createSamplerUnique(SamplerInfo);
+    assert(Sampler);
+
+    Samplers_.insert(std::make_pair(_Sampler, std::move(Sampler)));
+  }
+
+  return Samplers_.at(_Sampler).get();
 }

@@ -26,9 +26,9 @@ class IShaderManager;
 
 class CDeviceContext : public IDeviceContext
 {
-  static constexpr vdl::uint kGraphicsDescriptorLayoutNum = kGraphicsDescriptorTypeNum * kGraphicsShaderStageNum;
   static constexpr vdl::uint kComputeDescriptorLayoutNum = kComputeDescriptorTypeNum;
   static constexpr vdl::uint kGraphicsCommandBufferNum = 5;
+  static constexpr vdl::uint kGraphicsDescriptorPoolMaxSet = kGraphicsDescriptorLayoutNum * kGraphicsCommandBufferNum * 10;
 private:
   enum class GraphicsCommandType
   {
@@ -69,11 +69,6 @@ private:
   static constexpr GraphicsCommandType kGraphicsPipelineStateCommands[] = {
     GraphicsCommandType::eSetInputLayout, GraphicsCommandType::eSetTopology, GraphicsCommandType::eSetBlendState, GraphicsCommandType::eSetDepthStencilState, GraphicsCommandType::eSetRasterizerState,
     GraphicsCommandType::eSetVertexShader, GraphicsCommandType::eSetHullShader, GraphicsCommandType::eSetDomainShader, GraphicsCommandType::eSetGeometryShader, GraphicsCommandType::eSetPixelShader };
-  static constexpr GraphicsCommandType kGraphicsDescriptorCommands[] = {
-    GraphicsCommandType::eSetVertexStageShaderResource, GraphicsCommandType::eSetHullStageShaderResource, GraphicsCommandType::eSetDomainStageShaderResource, GraphicsCommandType::eSetGeometryStageShaderResource, GraphicsCommandType::eSetPixelStageShaderResource,
-    GraphicsCommandType::eSetVertexStageSampler, GraphicsCommandType::eSetHullStageSampler, GraphicsCommandType::eSetDomainStageSampler, GraphicsCommandType::eSetGeometryStageSampler, GraphicsCommandType::eSetPixelStageSampler,
-    GraphicsCommandType::eSetVertexStageConstantBuffer, GraphicsCommandType::eSetHullStageConstantBuffer, GraphicsCommandType::eSetDomainStageConstantBuffer, GraphicsCommandType::eSetGeometryStageConstantBuffer, GraphicsCommandType::eSetPixelStageConstantBuffer,
-  };
 private:
   using Textures = std::vector<vdl::Texture>;
   using ShaderResources = std::vector<vdl::ShaderResource>;
@@ -132,6 +127,7 @@ private:
   std::unordered_map<bool, vk::PipelineMultisampleStateCreateInfo> MultisampleStates_;
   std::unordered_map<vdl::DepthStencilState, vk::PipelineDepthStencilStateCreateInfo> DepthStencilStates_;
   std::unordered_map<vdl::RenderTextureBlendState, vk::PipelineColorBlendAttachmentState> RenderTextureBlendStates_;
+  std::unordered_map<vdl::Sampler, vk::UniqueSampler> Samplers_;
 private:
   vk::UniquePipelineLayout PipelineLayout_;
 private:
@@ -140,13 +136,14 @@ private:
   vdl::uint GraphicsCommandBufferIndex_ = 0;
   CommandBufferState GraphicsCommandBufferState_ = CommandBufferState::eIdle;
   vk::UniqueCommandPool GraphicsCommandPool_;
+  vk::UniqueDescriptorPool GraphicsDescriptorPool_;
   std::array<vk::UniqueCommandBuffer, kGraphicsCommandBufferNum> GraphicsCommandBuffers_;
   std::array<RenderPassData, kGraphicsCommandBufferNum> RenderPassDatas_;
   std::array<vdl::OutputManager, kGraphicsCommandBufferNum> CurrentOutputManagers_;
   std::array<std::vector<vk::UniquePipeline>, kGraphicsCommandBufferNum> GraphicsPipelines_;
+  std::array<std::vector<vk::UniqueDescriptorSet>, kGraphicsCommandBufferNum> DescriptorSets_;
 
   StateChangeFlags<GraphicsCommandType, vdl::uint32_t> GraphicsStateChangeFlags_;
-  GraphicsState PreviousGraphicsState_;
   GraphicsState CurrentGraphicsState_;
 
   std::unordered_map<vdl::ID, vdl::Texture> ClearTextures_;
@@ -164,6 +161,7 @@ private:
   const vk::PipelineDepthStencilStateCreateInfo& GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState& _DepthStencilState);
   const vk::PipelineColorBlendAttachmentState& GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState& _RenderTextureBlendState);
   const vk::PipelineMultisampleStateCreateInfo& GetMultisampleStateInfo(bool _AlphaToCoverageEnable);
+  const vk::Sampler& GetSampler(const vdl::Sampler& _Sampler);
 public:
   std::vector<vk::CommandBuffer> GetCommandBuffers();
   void Flush(const std::vector<vk::CommandBuffer>& _CommandBuffers, const vk::Semaphore& _SingnalSemaphore);

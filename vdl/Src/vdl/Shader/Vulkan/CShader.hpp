@@ -82,8 +82,8 @@ public:
 
 enum class DescriptorType : vdl::uint8_t
 {
+  eShaderResource,
   eSampler,
-  eShaderResouce,
   eConstantBuffer,
   eUnorderedAccessTexture,
   eUnorderedAccessBuffer,
@@ -93,3 +93,18 @@ enum class DescriptorType : vdl::uint8_t
 };
 static constexpr vdl::uint kGraphicsDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eGraphicsNum);
 static constexpr vdl::uint kComputeDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eNum);
+
+static constexpr vdl::uint kGraphicsDescriptorLayoutNum = kGraphicsDescriptorTypeNum * kGraphicsShaderStageNum;
+
+inline vdl::uint GetDescriptorLayoutOffset(ShaderType _Stage, DescriptorType _Type)
+{
+  if (_Stage == ShaderType::eComputeShader)
+  {
+    return kGraphicsDescriptorLayoutNum + static_cast<vdl::uint>(_Type);
+  }
+  else
+  {
+    assert(_Type != DescriptorType::eUnorderedAccessBuffer && _Type != DescriptorType::eUnorderedAccessTexture);
+    return static_cast<vdl::uint>(_Stage) * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(_Type);
+  }
+}
