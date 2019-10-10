@@ -19,25 +19,38 @@ private:
   CDeviceContext* pDeviceContext_;
   IWindow* pWindow_;
 private:
-  vk::UniqueSwapchainKHR VkSwapChain_;
   vk::UniqueSurfaceKHR Surface_;
+  vk::UniqueSwapchainKHR VkSwapChain_;
   std::vector<CRenderTexture> VkRenderTextures_;
   CDepthStencilTexture VkDepthStencilTexture_;
   vk::UniqueCommandPool CommandPool_;
   std::vector<vk::UniqueCommandBuffer> CommandBuffers_;
-  vk::UniqueSemaphore PresentSemaphore_;
-  vk::UniqueSemaphore RenderSemaphore_;
-  vk::PresentInfoKHR PresentInfo_;
-  vdl::uint NextBufferNumber_ = 0;
-  bool isFirstAfterPresent_;
+  vk::UniqueSemaphore Semaphore_;
+  vdl::uint CurrentBufferIndex_ = 0;
+  bool isAfterPresent_;
 private:
   vdl::RenderTextures RenderTextures_;
   vdl::DepthStencilTexture DepthStencilTexture_;
 public:
-  [[nodiscard]] CRenderTexture* GetRenderTexture() { return &VkRenderTextures_[NextBufferNumber_]; }
+  [[nodiscard]] const vk::SwapchainKHR& GetSwapChain()const { return VkSwapChain_.get(); }
+  [[nodiscard]] const vdl::uint& GetCurrentBufferIndex()const { return CurrentBufferIndex_; }
+  [[nodiscard]] vk::Semaphore GetSemaphore()
+  {
+    if (isAfterPresent_)
+    {
+      isAfterPresent_ = false;
+      return Semaphore_.get();
+    }
+
+    return vk::Semaphore();
+  }
+public:
+  [[nodiscard]] CRenderTexture* GetRenderTexture() { return &VkRenderTextures_[CurrentBufferIndex_]; }
   [[nodiscard]] CDepthStencilTexture* GetDepthStencilTexture() { return &VkDepthStencilTexture_; }
 public:
   CSwapChain() = default;
+
+  ~CSwapChain();
 
   void Initialize()override;
 

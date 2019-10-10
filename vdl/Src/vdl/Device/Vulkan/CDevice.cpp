@@ -117,7 +117,7 @@ namespace
     glslang::TShader Shader(Stage);
     {
       Shader.setStrings(&_Source, 1);
-      Shader.setSourceEntryPoint(_EntryPoint);
+      Shader.setEntryPoint(_EntryPoint);
       Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, 110);
       Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_1);
       Shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
@@ -271,7 +271,7 @@ void CDevice::Initialize()
     const char* Extensions[] = {
       VK_KHR_SURFACE_EXTENSION_NAME,
       VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-      VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME,
+      //VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME,
 #if defined DEBUG | _DEBUG
       VK_EXT_DEBUG_REPORT_EXTENSION_NAME, //  デバッグレポート用
 #endif
@@ -646,7 +646,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
       ImageInfo.arrayLayers = 1;
       ImageInfo.samples = vk::SampleCountFlagBits::e1;
       ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled;
+      ImageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
       ImageInfo.sharingMode = vk::SharingMode::eExclusive;
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
@@ -738,7 +738,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
       ImageInfo.arrayLayers = 1;
       ImageInfo.samples = vk::SampleCountFlagBits::e1;
       ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled;
+      ImageInfo.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
       ImageInfo.sharingMode = vk::SharingMode::eExclusive;
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
@@ -830,7 +830,7 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
       ImageInfo.arrayLayers = 1;
       ImageInfo.samples = vk::SampleCountFlagBits::e1;
       ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eStorage | vk::ImageUsageFlagBits::eSampled;
+      ImageInfo.usage = vk::ImageUsageFlagBits::eStorage | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
       ImageInfo.sharingMode = vk::SharingMode::eExclusive;
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
@@ -930,18 +930,6 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   {
     CIndexBuffer* pIndexBuffer = static_cast<CIndexBuffer*>(_pDstBuffer);
     ::memcpy(pIndexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
-  }
-  break;
-  case BufferType::eConstantBuffer:
-  {
-    CConstantBuffer* pConstantBuffer = static_cast<CConstantBuffer*>(_pDstBuffer);
-    if (pConstantBuffer->Offset + _BufferSize > pConstantBuffer->BufferSize)
-    {
-      pConstantBuffer->Offset = 0;
-    }
-    ::memcpy(static_cast<vdl::uint8_t*>(pConstantBuffer->BufferData.pData) + pConstantBuffer->Offset, _pSrcBuffer, _BufferSize);
-
-    pConstantBuffer->Offset += _BufferSize;
   }
   break;
   default: assert(false);

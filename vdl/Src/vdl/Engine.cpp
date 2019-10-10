@@ -38,6 +38,8 @@ Engine::~Engine()
   pGUI_.Release();
   pComputer_.Release();
   pRenderer_.Release();
+  pSwapChain_.Release();
+  pDeviceContext_.Release();
   pShaderManager_.Release();
   pBufferManager_.Release();
   pModelManager_.Release();
@@ -47,8 +49,6 @@ Engine::~Engine()
   pXInput_.Release();
   pMouse_.Release();
   pKeyboard_.Release();
-  pSwapChain_.Release();
-  pDeviceContext_.Release();
   pDevice_.Release();
   pWindow_.Release();
   pSystem_.Release();

@@ -108,9 +108,6 @@ void CSwapChain::Initialize()
 
     VkSwapChain_ = VkDevice_.createSwapchainKHRUnique(SwapChainInfo);
     assert(VkSwapChain_);
-
-    PresentInfo_.swapchainCount = 1;
-    PresentInfo_.pSwapchains = &VkSwapChain_.get();
   }
 
   const vk::CommandBuffer& CommandBuffer = pDevice->GetCommandBuffer();
@@ -275,23 +272,26 @@ void CSwapChain::Initialize()
 
   //  セマフォの作成
   {
-    vk::SemaphoreCreateInfo SemaphoreInfo;
-
-    PresentSemaphore_ = VkDevice_.createSemaphoreUnique(SemaphoreInfo);
-    assert(PresentSemaphore_);
-
-    RenderSemaphore_ = VkDevice_.createSemaphoreUnique(SemaphoreInfo);
-    assert(RenderSemaphore_);
+    Semaphore_ = VkDevice_.createSemaphoreUnique(vk::SemaphoreCreateInfo());
+    assert(Semaphore_);
   }
+}
+
+CSwapChain::~CSwapChain()
+{
+  for (auto& VkRenderTexture : VkRenderTextures_)
+  {
+    VkRenderTexture.Image.release();
+    VkRenderTexture.View.reset();
+  };
 }
 
 void CSwapChain::ScreenClear()
 {
-  vk::ResultValue Result = VkDevice_.acquireNextImageKHR(VkSwapChain_.get(), UINT64_MAX, PresentSemaphore_.get(), vk::Fence());
+  vk::ResultValue Result = VkDevice_.acquireNextImageKHR(VkSwapChain_.get(), UINT64_MAX, Semaphore_.get(), vk::Fence());
   assert(Result.result == vk::Result::eSuccess);
-
-  isFirstAfterPresent_ = true;
-  NextBufferNumber_ = Result.value;
+  CurrentBufferIndex_ = Result.value;
+  isAfterPresent_ = true;
 
   pDeviceContext_->ClearRenderTexture(RenderTextures_[0], pWindow_->GetScreenClearColor());
   pDeviceContext_->ClearDepthStencilTexture(DepthStencilTexture_, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
@@ -300,33 +300,7 @@ void CSwapChain::ScreenClear()
 
 void CSwapChain::Present()
 {
-  std::vector<vk::CommandBuffer> CommandBuffers = pDeviceContext_->GetCommandBuffers();
-  {
-    const vk::CommandBuffer& CommandBuffer = CommandBuffers_[NextBufferNumber_].get();
-
-    CommandBuffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources);
-    CommandBuffer.begin(vk::CommandBufferBeginInfo());
-
-    const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
-
-    GetRenderTexture()->SetImageLayout(CommandBuffer, vk::ImageLayout::ePresentSrcKHR, SubresourceRange);
-
-    CommandBuffer.end();
-
-    CommandBuffers.push_back(CommandBuffer);
-  }
-  pDeviceContext_->Flush(CommandBuffers, RenderSemaphore_.get());
-
-  //  Present
-  {
-    PresentInfo_.waitSemaphoreCount = 1;
-    PresentInfo_.pWaitSemaphores = &RenderSemaphore_.get();
-    PresentInfo_.pImageIndices = &NextBufferNumber_;
-
-    vk::Result Result = vk::Result::eSuccess;
-    Result = GraphicsQueue_.presentKHR(PresentInfo_);
-    assert(Result == vk::Result::eSuccess);
-  }
+  pDeviceContext_->Present();
 }
 
 void CSwapChain::ChangeWindowMode()

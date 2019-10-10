@@ -59,7 +59,6 @@ public:
 struct CConstantBuffer : public IConstantBuffer
 {
   BufferData BufferData;
-  vk::Buffer ParentBuffer;
   vdl::uint BufferSize;
   vdl::uint Offset;
 public:
@@ -70,6 +69,23 @@ public:
   vdl::uint GetBufferSize()const final { return BufferSize; }
 
   BufferType GetType()const final { return BufferType::eConstantBuffer; }
+};
+
+struct CCopyConstantBuffer : public IConstantBuffer
+{
+  vk::Buffer ParentBuffer;
+  vdl::uint BufferSize;
+  vdl::uint Offset;
+public:
+  CCopyConstantBuffer() = default;
+
+  ~CCopyConstantBuffer();
+
+  void* GetBuffer()const final;
+
+  vdl::uint GetBufferSize()const final { return BufferSize; }
+
+  BufferType GetType()const final { return BufferType::eCopyConstantBuffer; }
 };
 
 struct CUnordererdAccessBuffer : public IBuffer

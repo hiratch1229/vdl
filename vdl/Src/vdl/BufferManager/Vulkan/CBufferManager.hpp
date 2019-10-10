@@ -3,12 +3,24 @@
 
 #include <vdl/ReferenceCount/ReferenceCount.hpp>
 
+#include "ConstantBufferAllocater/ConstantBufferAllocater.hpp"
+
+#include <memory>
+
 class IDevice;
 
 class CBufferManager : public IBufferManager
 {
+  static constexpr vdl::uint kParentConstantBufferSize = 10000;
+private:
+  vk::Device VkDevice_;
+private:
   IDevice* pDevice_;
   ReferenceCounts<IBuffer> Buffers_;
+private:
+  ConstantBufferAllocater ConstantBufferAllocater_;
+public:
+  [[nodiscard]] ConstantBufferAllocater* GetConstantBufferAllocater(){ return &ConstantBufferAllocater_; }
 public:
   CBufferManager() = default;
 

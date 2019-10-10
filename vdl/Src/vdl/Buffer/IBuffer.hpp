@@ -7,6 +7,7 @@ enum class BufferType : vdl::uint8_t
   eInstanceBuffer,
   eIndexBuffer,
   eConstantBuffer,
+  eCopyConstantBuffer,
   eUnorderedAccessBuffer,
 };
 

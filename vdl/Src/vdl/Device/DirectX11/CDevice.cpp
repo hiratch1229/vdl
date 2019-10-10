@@ -564,19 +564,6 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     pD3D11ImmediateContext_->Unmap(pBuffer, 0);
   }
   break;
-  case BufferType::eConstantBuffer:
-  {
-    ID3D11Buffer* pBuffer = static_cast<CConstantBuffer*>(_pDstBuffer)->pBuffer.Get();
-
-    D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
-    hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-
-    ::memcpy(MappedSubresorce.pData, _pSrcBuffer, _BufferSize);
-
-    pD3D11ImmediateContext_->Unmap(pBuffer, 0);
-  }
-  break;
   default: assert(false);
   }
 }

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\BufferManager\Vulkan\CBufferManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\BufferManager\Vulkan\ConstantBufferAllocater\ConstantBufferAllocater.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\Vulkan\CDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\Vulkan\CDevice.hpp" />
@@ -33,6 +34,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\Vulkan\CBufferManager.cpp" />
+    <ClCompile Include="..\..\Src\vdl\BufferManager\Vulkan\ConstantBufferAllocater\ConstantBufferAllocater.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\Vulkan\CDeviceContext.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\Vulkan\CDevice.cpp" />
     <ClCompile Include="..\..\Src\vdl\Shader\Vulkan\CShader.cpp" />

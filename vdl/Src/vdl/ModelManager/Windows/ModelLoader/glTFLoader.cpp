@@ -40,19 +40,19 @@ namespace
   class GLTFStreamReader : public Microsoft::glTF::IStreamReader
   {
   public:
-    GLTFStreamReader(std::experimental::filesystem::path _PathBase)
+    GLTFStreamReader(std::filesystem::path _PathBase)
       : PathBase_(std::move(_PathBase)) {}
 
     std::shared_ptr<std::istream> GetInputStream(const std::string& _FileName)const override
     {
-      const std::experimental::filesystem::path StreamPath = PathBase_ / std::experimental::filesystem::u8path(_FileName);
+      const std::filesystem::path StreamPath = PathBase_ / std::filesystem::u8path(_FileName);
       const std::shared_ptr<std::ifstream> IStream = std::make_shared<std::ifstream>(StreamPath, std::ios_base::binary);
       assert(IStream && *IStream);
 
       return IStream;
     }
   private:
-    std::experimental::filesystem::path PathBase_;
+    std::filesystem::path PathBase_;
   };
 }
 
@@ -101,7 +101,7 @@ Microsoft::glTF::Document glTFLoader::LoadDocument(const char* _FilePath, const 
 {
   std::string JsonData;
 
-  const std::experimental::filesystem::path Path = _FilePath;
+  const std::filesystem::path Path = _FilePath;
 
   std::unique_ptr<GLTFStreamReader> StreamReader = std::make_unique<GLTFStreamReader>(Path.parent_path());
   std::shared_ptr<std::istream> pIStream = StreamReader->GetInputStream(Path.filename().u8string());

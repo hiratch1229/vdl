@@ -66,5 +66,5 @@ inline vdl::uint GetPatchControlPoints(vdl::TopologyType _Topology)
     return 0;
   }
 
-  return static_cast<vdl::uint32_t>(_Topology) - static_cast<vdl::uint32_t>(vdl::TopologyType::ePatchList1ControlPoint) + 1);
+  return static_cast<vdl::uint32_t>(_Topology) - static_cast<vdl::uint32_t>(vdl::TopologyType::ePatchList1ControlPoint) + 1;
 }
