@@ -3,7 +3,7 @@
 
 #include <vdl/ReferenceCount/ReferenceCount.hpp>
 
-#include <d3d11.h>
+#include <vdl/pch/DirectX11/pch.hpp>
 
 class IDevice;
 

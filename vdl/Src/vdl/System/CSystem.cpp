@@ -24,6 +24,8 @@
 #include <vdl/Viewport.hpp>
 #include <vdl/Scissor.hpp>
 
+#include <Windows.h>
+
 void CSystem::Initialize()
 {
   pSwapChain_ = Engine::Get<ISwapChain>();

@@ -4,7 +4,6 @@
 #include <memory>
 #include <vector>
 
-
 class ConstantBufferAllocater
 {
   struct MemorySpace

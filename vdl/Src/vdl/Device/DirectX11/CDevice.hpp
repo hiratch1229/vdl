@@ -1,8 +1,7 @@
 #pragma once
 #include "../IDevice.hpp"
 
-#include <d3d11.h>
-#include <wrl.h>
+#include <vdl/pch/DirectX11/pch.hpp>
 
 class CDeviceContext;
 

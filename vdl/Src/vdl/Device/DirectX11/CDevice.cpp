@@ -65,6 +65,8 @@ namespace
       return DXGI_FORMAT_R32_UINT;
     default: assert(false);
     }
+   
+    return DXGI_FORMAT_R16_UINT;
   }
 }
 

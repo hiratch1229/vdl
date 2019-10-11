@@ -1,8 +1,6 @@
 #pragma once
 #include "ISystem.hpp"
 
-#include <Windows.h>
-
 class ISwapChain;
 class IKeyboard;
 class IMouse;
@@ -59,7 +57,7 @@ public:
   float GetDeltaTime()const override { return static_cast<float>(DeltaTime_); }
   
   vdl::uint GetFPS()const override { return CurrentFPS_; }
-
+  
   void Pause()override { SystemState_ = SystemState::ePause; }
 
   void Resume()override

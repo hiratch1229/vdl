@@ -12,7 +12,8 @@
 
 #include <vdl/Buffer/IBuffer.hpp>
 
-#include <Windows.h>
+#include <vdl/pch/Windows/pch.hpp>
+
 #include <memory>
 
 class ISystem;

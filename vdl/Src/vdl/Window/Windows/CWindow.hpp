@@ -5,7 +5,7 @@
 #include <vdl/Color.hpp>
 #include <vdl/Constants/Constants.hpp>
 
-#include <Windows.h>
+#include <vdl/pch/Windows/pch.hpp>
 
 class CWindow : public IWindow
 {

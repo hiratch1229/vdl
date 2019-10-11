@@ -1,9 +1,7 @@
 #pragma once
 #include "../ITexture.hpp"
 
-#include <d3d11.h>
-#include <wrl.h>
-#include <dxgiformat.h>
+#include <vdl/pch/DirectX11/pch.hpp>
 
 struct CTexture : public ITexture
 {

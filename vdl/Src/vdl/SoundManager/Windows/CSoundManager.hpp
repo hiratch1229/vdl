@@ -3,9 +3,10 @@
 
 #include <vdl/ReferenceCount/ReferenceCount.hpp>
 
-#include <Windows.h>
-#include <wrl.h>
+#include <vdl/pch/Windows/pch.hpp>
+
 #include <mfplay.h>
+#include <wrl.h>
 
 class CSoundManager : public ISoundManager
 {

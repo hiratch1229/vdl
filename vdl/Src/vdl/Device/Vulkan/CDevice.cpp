@@ -704,7 +704,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
     }
 
     CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-    pRenderTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eShaderReadOnlyOptimal, SubresourceRange);
+    pRenderTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
     CommandBuffer_->end();
 
     vk::SubmitInfo SubmitInfo;

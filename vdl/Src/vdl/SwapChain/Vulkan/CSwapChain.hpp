@@ -3,10 +3,9 @@
 
 #include <vdl/Texture.hpp>
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan/vulkan.hpp>
-
 #include <vdl/Texture/Vulkan/CTexture.hpp>
+
+#include <vdl/pch/Vulkan/pch.hpp>
 
 class CDeviceContext;
 class IWindow;

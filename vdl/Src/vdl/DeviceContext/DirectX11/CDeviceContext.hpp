@@ -7,8 +7,7 @@
 #include <vdl/Sampler.hpp>
 #include <vdl/Hash.hpp>
 
-#include <d3d11.h>
-#include <wrl.h>
+#include <vdl/pch/DirectX11/pch.hpp>
 
 #include <unordered_map>
 

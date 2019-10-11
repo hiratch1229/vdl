@@ -37,6 +37,9 @@
     <Filter Include="Src\Texture">
       <UniqueIdentifier>{16301419-7e73-4984-8bd7-6c9ad0dacec0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\pch">
+      <UniqueIdentifier>{8dc518eb-96ed-40e9-8d73-dc994c27e8aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.cpp">

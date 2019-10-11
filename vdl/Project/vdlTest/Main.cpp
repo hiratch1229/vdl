@@ -28,36 +28,36 @@ void Main()
       vdl::System::SetMaxFPS(MaxFPS);
     }
 
-    //  シーンの更新
-    {
-      //pCurrentScene->Update();
-      //
-      //IScene* pNextScene = nullptr;
-      //{
-      //  if (ImGui::Combo("Scene", reinterpret_cast<int*>(&SceneType), kSceneTypes, kSceneTypeNum))
-      //  {
-      //    switch (SceneType)
-      //    {
-      //    case SceneType::eMultiRenderTexture:
-      //      pNextScene = new SceneMultiRenderTexture;
-      //      break;
-      //    case SceneType::eTessellation:
-      //      pNextScene = new SceneTessellation;
-      //      break;
-      //    case SceneType::eGPUParticle:
-      //      pNextScene = new SceneGPUParticle;
-      //      break;
-      //    default: assert(false);
-      //    }
-      //  }
-      //}
-      //
-      //if (pNextScene)
-      //{
-      //  pCurrentScene.reset(pNextScene);
-      //  pCurrentScene->Initialize();
-      //}
-    }
+    ////  シーンの更新
+    //{
+    //  pCurrentScene->Update();
+    //  
+    //  IScene* pNextScene = nullptr;
+    //  {
+    //    if (ImGui::Combo("Scene", reinterpret_cast<int*>(&SceneType), kSceneTypes, kSceneTypeNum))
+    //    {
+    //      switch (SceneType)
+    //      {
+    //      case SceneType::eMultiRenderTexture:
+    //        pNextScene = new SceneMultiRenderTexture;
+    //        break;
+    //      case SceneType::eTessellation:
+    //        pNextScene = new SceneTessellation;
+    //        break;
+    //      case SceneType::eGPUParticle:
+    //        pNextScene = new SceneGPUParticle;
+    //        break;
+    //      default: assert(false);
+    //      }
+    //    }
+    //  }
+    //  
+    //  if (pNextScene)
+    //  {
+    //    pCurrentScene.reset(pNextScene);
+    //    pCurrentScene->Initialize();
+    //  }
+    //}
 
     ImGui::End();
   }

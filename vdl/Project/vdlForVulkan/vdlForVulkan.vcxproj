@@ -25,6 +25,7 @@
     <ClInclude Include="..\..\Src\vdl\DeviceContext\Vulkan\CDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\Vulkan\CDevice.hpp" />
     <ClInclude Include="..\..\Src\vdl\Format\Vulkan\Format.hpp" />
+    <ClInclude Include="..\..\Src\vdl\pch\Vulkan\pch.hpp" />
     <ClInclude Include="..\..\Src\vdl\Scissor\Vulkan\Scissor.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\Vulkan\CShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\Vulkan\CSwapChain.hpp" />
@@ -38,7 +39,11 @@
     <ClCompile Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\Vulkan\CDeviceContext.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\Vulkan\CDevice.cpp" />
-    <ClCompile Include="..\..\Src\vdl\Shader\Vulkan\CShader.cpp" />
+    <ClCompile Include="..\..\Src\vdl\pch\Vulkan\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\Src\vdl\SwapChain\Vulkan\CSwapChain.cpp" />
     <ClCompile Include="..\..\Src\vdl\Texture\Vulkan\CTexture.cpp" />
   </ItemGroup>
@@ -109,17 +114,18 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,11 +181,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>6001;26451;26495;26812;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -187,6 +194,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>vulkan-1.lib;glslang.lib</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\..\Src\ThirdParty\glslang</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,8 +1,7 @@
 #pragma once
 #include "../ITexture.hpp"
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan/vulkan.hpp>
+#include <vdl/pch/Vulkan/pch.hpp>
 
 struct CTexture : public ITexture
 {

@@ -1,10 +1,9 @@
 #pragma once
 #include "../IDevice.hpp"
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan/vulkan.hpp>
-
 #include <vdl/Buffer/Vulkan/CBuffer.hpp>
+
+#include <vdl/pch/Vulkan/pch.hpp>
 
 class CDevice : public IDevice
 {

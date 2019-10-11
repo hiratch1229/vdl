@@ -3,9 +3,7 @@
 
 #include <vdl/Texture.hpp>
 
-#include <d3d11.h>
-#include <dxgi.h>
-#include <wrl.h>
+#include <vdl/pch/DirectX11/pch.hpp>
 
 class IWindow;
 class IDeviceContext;

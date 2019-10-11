@@ -37,6 +37,9 @@
     <Filter Include="Src\Viewport">
       <UniqueIdentifier>{49ab5e31-ec21-46f5-82ce-69148798f9b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\pch">
+      <UniqueIdentifier>{28bc0ef1-1032-4c77-af99-e395331756d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\Buffer\DirectX11\CBuffer.hpp">
@@ -72,6 +75,9 @@
     <ClInclude Include="..\..\Src\vdl\Viewport\DirectX11\Viewport.hpp">
       <Filter>Src\Viewport</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\pch\DirectX11\pch.hpp">
+      <Filter>Src\pch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX11\CBufferManager.cpp">
@@ -85,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\SwapChain\DirectX11\CSwapChain.cpp">
       <Filter>Src\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\pch\DirectX11\pch.cpp">
+      <Filter>Src\pch</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

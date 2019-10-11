@@ -28,6 +28,11 @@
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.cpp" />
+    <ClCompile Include="..\..\Src\vdl\pch\Windows\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\TextureManager\Windows\CTextureManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\TextureManager\Windows\TextureLoader\TextureLoader.cpp" />
@@ -44,6 +49,7 @@
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\MeshData.hpp" />
+    <ClInclude Include="..\..\Src\vdl\pch\Windows\pch.hpp" />
     <ClInclude Include="..\..\Src\vdl\Resource\Windows\Resource.hpp" />
     <ClInclude Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\TextureManager\Windows\CTextureManager.hpp" />
@@ -117,18 +123,19 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;..\..\Src\ThirdParty\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -178,7 +185,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -186,11 +193,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;..\..\Src\ThirdParty\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>6001;26451;26495;26812;</DisableSpecificWarnings>
+      <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

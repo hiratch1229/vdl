@@ -12,11 +12,10 @@
 #include <vdl/UnorderedAccessBuffer.hpp>
 #include <vdl/Hash.hpp>
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan/vulkan.hpp>
-
 #include <vdl/Shader/Vulkan/CShader.hpp>
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
+
+#include <vdl/pch/Vulkan/pch.hpp>
 
 #include <unordered_map>
 

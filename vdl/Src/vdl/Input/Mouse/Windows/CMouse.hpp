@@ -3,7 +3,8 @@
 
 #include <vdl/Input/InputState.hpp>
 
-#include <windows.h>
+#include <vdl/pch/Windows/pch.hpp>
+
 #include <mutex>
 
 class IKeyboard;
