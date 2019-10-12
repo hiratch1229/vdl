@@ -26,8 +26,8 @@
 #endif // _DEBUG
 #elif defined VDL_EXECUTE_VULKAN
 #ifdef _DEBUG
-
+#pragma comment(lib, "vdlForVulkanOnWindows_d.lib")
 #else
-
+#pragma comment(lib, "vdlForVulkanOnWindows.lib")
 #endif // _DEBUG
 #endif

@@ -1033,7 +1033,7 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture & _RenderTextur
 
   pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
   CurrentGraphicsCommandBuffer.clearColorImage(pTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, Cast(_ClearColor), SubresourceRange);
-  pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
+  //pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
 }
 
 void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture & _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil)
@@ -1054,7 +1054,7 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture & _
 
   pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
   CurrentGraphicsCommandBuffer.clearDepthStencilImage(pTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, { _ClearDepth, _ClearStencil }, SubresourceRange);
-  pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eDepthStencilAttachmentOptimal, SubresourceRange);
+  //pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eDepthStencilAttachmentOptimal, SubresourceRange);
 }
 
 void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture & _UnorderedAccessTexture, const vdl::ColorF & _ClearColor)
@@ -1079,7 +1079,7 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
 
   pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
   CurrentGraphicsCommandBuffer.clearColorImage(pTexture->Image.get(), kImageLayout, Cast(_ClearColor), SubresourceRange);
-  pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
+  //pTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
 }
 
 void CDeviceContext::Draw(vdl::uint _VertexCount, vdl::uint _InstanceCount, vdl::uint _FirstVertex, vdl::uint _FirstInstance)
