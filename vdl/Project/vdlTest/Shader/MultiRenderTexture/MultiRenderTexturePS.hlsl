@@ -6,7 +6,6 @@ struct PS_OUT
   float4 Red : SV_TARGET1;
 };
 
-
 SamplerState Sampler : register(s0);
 Texture2D Texture : register(t0);
 

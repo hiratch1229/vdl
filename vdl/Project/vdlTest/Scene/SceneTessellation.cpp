@@ -4,14 +4,14 @@ using namespace vdl;
 
 void SceneTessellation::Initialize()
 {
-  Rectangle_ = StaticMeshData::Rectangle();
+  Rectangle_ = MeshData::Rectangle();
 
-  Renderer3D::RendererStaticMesh::SetShaders(VertexShader("Shader/Tessellation/TessellationVS.hlsl", InputLayoutType::eStaticMesh),
+  Renderer3D::SetShaders(VertexShader("Shader/Tessellation/TessellationVS.hlsl", InputLayoutType::eMesh),
     HullShader("Shader/Tessellation/TessellationHS.hlsl"),
     DomainShader("Shader/Tessellation/TessellationDS.hlsl"),
     PixelShader("Shader/Tessellation/TessellationPS.hlsl"));
 
-  Renderer3D::RendererStaticMesh::SetTopology(TopologyType::ePatchList3ControlPoint);
+  Renderer3D::SetTopology(TopologyType::ePatchList3ControlPoint);
 
   Renderer3D::SetRasterizerState(RasterizerState::kWireframeCullBack);
 
@@ -26,10 +26,10 @@ void SceneTessellation::Initialize()
 
 SceneTessellation::~SceneTessellation()
 {
-  Renderer3D::RendererStaticMesh::SetShaders(VertexShader("Shader/StaticMesh/StaticMeshVS.hlsl", InputLayoutType::eStaticMesh),
-    PixelShader("Shader/StaticMesh/StaticMeshPS.hlsl"));
+  Renderer3D::SetShaders(VertexShader("Shader/Mesh/MeshVS.hlsl", InputLayoutType::eMesh),
+    PixelShader("Shader/Mesh/MeshPS.hlsl"));
 
-  Renderer3D::RendererStaticMesh::SetTopology(TopologyType::eDefaultStaticMesh);
+  Renderer3D::SetTopology(TopologyType::eDefaultMesh);
 
   Renderer3D::SetRasterizerState(RasterizerState::kDefault3D);
 }

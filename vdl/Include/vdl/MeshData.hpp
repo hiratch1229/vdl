@@ -17,20 +17,6 @@ namespace vdl
     uint IndexCount = 0;
   };
 
-  struct StaticMeshData
-  {
-    std::string Name;
-    std::vector<StaticMeshVertex> Vertices;
-    std::vector<IndexType> Indices;
-    std::vector<Material> Materials;
-    Matrix GlobalTransform = Matrix::Identity();
-  public:
-    static StaticMeshData Rectangle(const Texture& _Diffuse = Palette::White);
-    static StaticMeshData Box(const Texture& _Diffuse = Palette::White);
-    static StaticMeshData Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse = Palette::White);
-    //static StaticMeshData Capsule(uint _SliceCount, uint _StackCount, float _Height, const Texture& _Diffuse = Palette::White);
-  };
-
   struct Bone
   {
     Matrix Offset;
@@ -47,13 +33,18 @@ namespace vdl
     std::vector<Skeletal> Skeletals;
   };
 
-  struct SkinnedMeshData 
+  struct MeshData
   {
     std::string Name;
-    std::vector<SkinnedMeshVertex> Vertices;
+    std::vector<Vertex3D> Vertices;
     std::vector<IndexType> Indices;
     std::vector<Material> Materials;
     std::vector<Animation> Animations;
     Matrix GlobalTransform = Matrix::Identity();
+  public:
+    static MeshData Rectangle(const Texture& _Diffuse = Palette::White);
+    static MeshData Box(const Texture& _Diffuse = Palette::White);
+    static MeshData Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse = Palette::White);
+    //static MeshData Capsule(uint _SliceCount, uint _StackCount, float _Height, const Texture& _Diffuse = Palette::White);
   };
 }

@@ -99,7 +99,7 @@ namespace vdl
   }
 
   template<class Archive>
-  inline void serialize(Archive& _Archive, SkinnedMeshVertex& _Vertex)
+  inline void serialize(Archive& _Archive, Vertex3D& _Vertex)
   {
     _Archive(_Vertex.Position, _Vertex.Normal, _Vertex.Tangent, _Vertex.Texcoord, _Vertex.BoneWeights, _Vertex.BoneIndices);
   }

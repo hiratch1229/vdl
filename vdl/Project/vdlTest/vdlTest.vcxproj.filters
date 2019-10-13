@@ -21,11 +21,11 @@
     <Filter Include="シェーダーファイル\MultiRenderTexture">
       <UniqueIdentifier>{be6f7316-5f8d-408c-8f11-773a64c8d68e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="シェーダーファイル\StaticMesh">
-      <UniqueIdentifier>{b0fb5ff3-7b22-4250-8200-cb2dd52c593f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="シェーダーファイル\GPUParticle">
       <UniqueIdentifier>{f0c8144e-47e7-4970-af39-d9274d91a8ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダーファイル\Mesh">
+      <UniqueIdentifier>{3d1edf08-2024-4dee-901c-7673ccd1c9a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,12 +75,6 @@
     <FxCompile Include="Shader\MultiRenderTexture\MultiRenderTextureVS.hlsl">
       <Filter>シェーダーファイル\MultiRenderTexture</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\StaticMesh\StaticMeshPS.hlsl">
-      <Filter>シェーダーファイル\StaticMesh</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\StaticMesh\StaticMeshVS.hlsl">
-      <Filter>シェーダーファイル\StaticMesh</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\Tessellation\TessellationHS.hlsl">
       <Filter>シェーダーファイル\Tessellation</Filter>
     </FxCompile>
@@ -108,19 +102,25 @@
     <FxCompile Include="Shader\GPUParticle\GPUParticleGS.hlsl">
       <Filter>シェーダーファイル\GPUParticle</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Mesh\MeshPS.hlsl">
+      <Filter>シェーダーファイル\Mesh</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Mesh\MeshVS.hlsl">
+      <Filter>シェーダーファイル\Mesh</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">
       <Filter>シェーダーファイル\MultiRenderTexture</Filter>
-    </None>
-    <None Include="Shader\StaticMesh\StaticMesh.hlsli">
-      <Filter>シェーダーファイル\StaticMesh</Filter>
     </None>
     <None Include="Shader\Tessellation\Tessellation.hlsli">
       <Filter>シェーダーファイル\Tessellation</Filter>
     </None>
     <None Include="Shader\GPUParticle\GPUParticle.hlsli">
       <Filter>シェーダーファイル\GPUParticle</Filter>
+    </None>
+    <None Include="Shader\Mesh\Mesh.hlsli">
+      <Filter>シェーダーファイル\Mesh</Filter>
     </None>
   </ItemGroup>
 </Project>

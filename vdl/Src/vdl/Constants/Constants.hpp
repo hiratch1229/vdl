@@ -38,21 +38,13 @@ namespace Constants
 
   constexpr vdl::uint kDefaultTexturePixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultTexturePixelShaderCode));
 
-  constexpr const char* kDefaultStaticMeshVertexShaderCode = vdl::Constants::kDefaultStaticMeshVertexShaderCode;
+  constexpr const char* kDefaultMeshVertexShaderCode = vdl::Constants::kDefaultMeshVertexShaderCode;
 
-  constexpr vdl::uint kDefaultStaticMeshVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultStaticMeshVertexShaderCode));
+  constexpr vdl::uint kDefaultMeshVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultMeshVertexShaderCode));
 
-  constexpr const char* kDefaultStaticMeshPixelShaderCode = vdl::Constants::kDefaultStaticMeshPixelShaderCode;
+  constexpr const char* kDefaultMeshPixelShaderCode = vdl::Constants::kDefaultMeshPixelShaderCode;
 
-  constexpr vdl::uint kDefaultStaticMeshPixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultStaticMeshPixelShaderCode));
-
-  constexpr const char* kDefaultSkinnedMeshVertexShaderCode = vdl::Constants::kDefaultSkinnedMeshVertexShaderCode;
-
-  constexpr vdl::uint kDefaultSkinnedMeshVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultSkinnedMeshVertexShaderCode));
-
-  constexpr const char* kDefaultSkinnedMeshPixelShaderCode = vdl::Constants::kDefaultSkinnedMeshPixelShaderCode;
-
-  constexpr vdl::uint kDefaultSkinnedMeshPixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultSkinnedMeshPixelShaderCode));
+  constexpr vdl::uint kDefaultMeshPixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultMeshPixelShaderCode));
 
   constexpr vdl::uint kAnimationSamplingRate = 24;
 
@@ -62,9 +54,7 @@ namespace Constants
 
   constexpr vdl::uint kMaxTextureBatchNum = 256;
 
-  constexpr vdl::uint kMaxStaticMeshBatchNum = 128;
-
-  constexpr vdl::uint kMaxSkinnedMeshBatchNum = 32;
+  constexpr vdl::uint kMaxMeshBatchNum = 128;
 
   constexpr const char* kBinaryFileDirectory = "Bin/";
 

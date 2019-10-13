@@ -7,22 +7,18 @@
 
 namespace vdl
 {
-  struct TextureVertex
+  struct Vertex2D
   {
     float2 Position;
     float2 Texcoord;
   };
-  
-  struct StaticMeshVertex
+
+  struct Vertex3D
   {
     float3 Position;
     float3 Normal;
     float3 Tangent;
     float2 Texcoord;
-  };
-
-  struct SkinnedMeshVertex : public StaticMeshVertex
-  {
     float BoneWeights[Constants::kMaxBoneInfluence] = { 1.0f };
     uint BoneIndices[Constants::kMaxBoneInfluence] = {};
   };

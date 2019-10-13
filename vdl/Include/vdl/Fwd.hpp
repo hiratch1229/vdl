@@ -63,9 +63,8 @@ namespace vdl
   //-------------------------
   //  Vertex.hpp
   //-------------------------
-  struct TextureVertex;
-  struct StaticMeshVertex;
-  struct SkinnedMeshVertex;
+  struct Vertex2D;
+  struct Vertex3D;
 
   //-------------------------
   //  InputLayout.hpp
@@ -182,17 +181,15 @@ namespace vdl
   //  MeshData.hpp
   //-------------------------
   struct Material;
-  struct StaticMeshData;
   struct Bone;
   struct Skeletal;
   struct Animation;
-  struct SkinnedMeshData;
+  struct MeshData;
 
   //-------------------------
   //  Model.hpp
   //-------------------------
-  class StaticMesh;
-  class SkinnedMesh;
+  class Mesh;
   class Model;
 
   //-------------------------

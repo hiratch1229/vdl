@@ -186,37 +186,19 @@
     <ClCompile Include="..\..\Src\vdl\Window\WindowFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Shader\Mesh\Mesh.hlsli" />
     <None Include="..\..\Shader\Option\Light.hlsli" />
-    <None Include="..\..\Shader\SkinnedMesh\Bone.hlsli" />
-    <None Include="..\..\Shader\SkinnedMesh\SkinnedMesh.hlsli" />
-    <None Include="..\..\Shader\StaticMesh\StaticMesh.hlsli" />
     <None Include="..\..\Shader\Texture\Texture.hlsli" />
     <None Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\Shader\SkinnedMesh\SkinnedMeshPS.hlsl">
+    <FxCompile Include="..\..\Shader\Mesh\MeshPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="..\..\Shader\SkinnedMesh\SkinnedMeshVS.hlsl">
+    <FxCompile Include="..\..\Shader\Mesh\MeshVS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="..\..\Shader\StaticMesh\StaticMeshPS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="..\..\Shader\StaticMesh\StaticMeshVS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>

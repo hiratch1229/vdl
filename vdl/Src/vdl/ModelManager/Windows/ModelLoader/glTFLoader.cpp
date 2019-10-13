@@ -208,7 +208,7 @@ void glTFLoader::FetchVerticesAndIndices(const std::unique_ptr<Microsoft::glTF::
         const vdl::uint PolygonNum = VertexNum / 3;
         for (vdl::uint PolygonCount = 0; PolygonCount < PolygonNum; ++PolygonCount)
         {
-          vdl::SkinnedMeshVertex& Vertex = Vertices[PolygonCount];
+          vdl::Vertex3D& Vertex = Vertices[PolygonCount];
 
           if (hasPositions)
           {

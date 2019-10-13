@@ -85,11 +85,12 @@ bool CSystem::Update()
     const vdl::Viewport Viewport(0.0f, WindowSize);
     const vdl::Scissor Scissor(0, WindowSize);
 
-    for (vdl::uint i = 0; i < static_cast<vdl::uint>(RenderType::eNum); ++i)
-    {
-      pRenderer_->SetViewport(Viewport, static_cast<RenderType>(i));
-      pRenderer_->SetScissor(Scissor, static_cast<RenderType>(i));
-    }
+    pRenderer_->SetViewport(Viewport, vdl::InputLayoutType::eNone);
+    pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eNone);
+    pRenderer_->SetViewport(Viewport, vdl::InputLayoutType::eTexture);
+    pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eTexture);
+    pRenderer_->SetViewport(Viewport, vdl::InputLayoutType::eMesh);
+    pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eMesh);
 
     SystemState_ = SystemState::eRunning;
   }

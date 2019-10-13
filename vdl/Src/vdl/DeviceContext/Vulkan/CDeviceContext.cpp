@@ -459,11 +459,11 @@ void CDeviceContext::Initialize()
         //  頂点データ
         {
           InputLayout.VertexInputBindingDescriptions[0].binding = 0;
-          InputLayout.VertexInputBindingDescriptions[0].stride = sizeof(vdl::TextureVertex);
+          InputLayout.VertexInputBindingDescriptions[0].stride = sizeof(vdl::Vertex2D);
           InputLayout.VertexInputBindingDescriptions[0].inputRate = vk::VertexInputRate::eVertex;
 
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::TextureVertex::Position));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::TextureVertex::Texcoord));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::Vertex2D::Position));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::Vertex2D::Texcoord));
         }
 
         ++BindDescriptionCount;
@@ -472,63 +472,23 @@ void CDeviceContext::Initialize()
         //  インスタンスデータ
         {
           InputLayout.VertexInputBindingDescriptions[1].binding = 1;
-          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(TextureInstanceData);
+          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(Instance2D);
           InputLayout.VertexInputBindingDescriptions[1].inputRate = vk::VertexInputRate::eInstance;
 
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(TextureInstanceData::NDCTransform.r[0]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(TextureInstanceData::NDCTransform.r[1]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(TextureInstanceData::NDCTransform.r[2]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(TextureInstanceData::NDCTransform.r[3]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(TextureInstanceData::TexcoordScale));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(TextureInstanceData::TexcoordTranslate));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(TextureInstanceData::Color));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::NDCTransform.r[0]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::NDCTransform.r[1]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::NDCTransform.r[2]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::NDCTransform.r[3]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(Instance2D::TexcoordScale));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(Instance2D::TexcoordTranslate));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::Color));
         }
       }
 
       InputLayouts_.insert(std::make_pair(vdl::InputLayoutType::eTexture, std::move(InputLayout)));
     }
 
-    //  StaticMesh
-    {
-      Offset = Location = BindDescriptionCount = 0;
-
-      InputLayout InputLayout;
-      {
-        InputLayout.VertexInputBindingDescriptions.resize(2);
-        InputLayout.VertexInputAttributeDescriptions.resize(9);
-
-        //  頂点データ
-        {
-          InputLayout.VertexInputBindingDescriptions[0].binding = 0;
-          InputLayout.VertexInputBindingDescriptions[0].stride = sizeof(vdl::StaticMeshVertex);
-          InputLayout.VertexInputBindingDescriptions[0].inputRate = vk::VertexInputRate::eVertex;
-
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::StaticMeshVertex::Position));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::StaticMeshVertex::Normal));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::StaticMeshVertex::Tangent));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::StaticMeshVertex::Texcoord));
-        }
-
-        ++BindDescriptionCount;
-        Offset = 0;
-
-        //  インスタンスデータ
-        {
-          InputLayout.VertexInputBindingDescriptions[1].binding = 1;
-          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(StaticMeshInstanceData);
-          InputLayout.VertexInputBindingDescriptions[1].inputRate = vk::VertexInputRate::eInstance;
-
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::World.r[0]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::World.r[1]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::World.r[2]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::World.r[3]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::Color));        }
-      }
-
-      InputLayouts_.insert(std::make_pair(vdl::InputLayoutType::eStaticMesh, std::move(InputLayout)));
-    }
-
-    //  SkinnedMesh
+    //  Mesh
     {
       Offset = Location = BindDescriptionCount = 0;
 
@@ -540,15 +500,15 @@ void CDeviceContext::Initialize()
         //  頂点データ
         {
           InputLayout.VertexInputBindingDescriptions[0].binding = 0;
-          InputLayout.VertexInputBindingDescriptions[0].stride = sizeof(vdl::SkinnedMeshVertex);
+          InputLayout.VertexInputBindingDescriptions[0].stride = sizeof(vdl::Vertex3D);
           InputLayout.VertexInputBindingDescriptions[0].inputRate = vk::VertexInputRate::eVertex;
 
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::SkinnedMeshVertex::Position));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::SkinnedMeshVertex::Normal));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::SkinnedMeshVertex::Tangent));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::SkinnedMeshVertex::Texcoord));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::SkinnedMeshVertex::BoneWeights));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Uint, sizeof(vdl::SkinnedMeshVertex::BoneIndices));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::Vertex3D::Position));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::Vertex3D::Normal));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32Sfloat, sizeof(vdl::Vertex3D::Tangent));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::Vertex3D::Texcoord));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::Vertex3D::BoneWeights));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Uint, sizeof(vdl::Vertex3D::BoneIndices));
         }
 
         ++BindDescriptionCount;
@@ -557,17 +517,17 @@ void CDeviceContext::Initialize()
         //  インスタンスデータ
         {
           InputLayout.VertexInputBindingDescriptions[1].binding = 1;
-          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(StaticMeshInstanceData);
+          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(Instance3D);
           InputLayout.VertexInputBindingDescriptions[1].inputRate = vk::VertexInputRate::eInstance;
 
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::World.r[0]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::World.r[1]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::World.r[2]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::World.r[3]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(StaticMeshInstanceData::Color));        }
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance3D::World.r[0]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance3D::World.r[1]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance3D::World.r[2]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance3D::World.r[3]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance3D::Color));        }
       }
 
-      InputLayouts_.insert(std::make_pair(vdl::InputLayoutType::eSkinnedMesh, std::move(InputLayout)));
+      InputLayouts_.insert(std::make_pair(vdl::InputLayoutType::eMesh, std::move(InputLayout)));
     }
 
     //  GUI

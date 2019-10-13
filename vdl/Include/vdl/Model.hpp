@@ -5,31 +5,31 @@
 
 namespace vdl
 {
-  class StaticMesh
+  class Mesh
   {
   protected:
     ID ID_;
   public:
-    StaticMesh() = default;
+    Mesh() = default;
 
     //  静的メッシュデータから作成
-    StaticMesh(const StaticMeshData& _MeshData);
+    Mesh(const MeshData& _MeshData);
 
-    StaticMesh(StaticMeshData&& _MeshData);
+    Mesh(MeshData&& _MeshData);
 
-    StaticMesh(const StaticMesh& _StaticMesh);
+    Mesh(const Mesh& _Mesh);
 
-    StaticMesh(StaticMesh&& _StaticMesh)noexcept;
+    Mesh(Mesh&& _Mesh)noexcept;
     
-    ~StaticMesh();
+    ~Mesh();
   public:
-    StaticMesh& operator=(const StaticMesh& _StaticMesh);
+    Mesh& operator=(const Mesh& _Mesh);
 
-    StaticMesh& operator=(StaticMesh&& _StaticMesh)noexcept;
+    Mesh& operator=(Mesh&& _Mesh)noexcept;
 
-    [[nodiscard]] constexpr bool operator==(const StaticMesh& _Mesh)const noexcept { return ID_ == _Mesh.ID_; }
+    [[nodiscard]] constexpr bool operator==(const Mesh& _Mesh)const noexcept { return ID_ == _Mesh.ID_; }
 
-    [[nodiscard]] constexpr bool operator!=(const StaticMesh& _Mesh)const noexcept { return ID_ != _Mesh.ID_; }
+    [[nodiscard]] constexpr bool operator!=(const Mesh& _Mesh)const noexcept { return ID_ != _Mesh.ID_; }
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
 
@@ -38,46 +38,19 @@ namespace vdl
     [[nodiscard]] Matrix GetGlobalTransform()const;
   };
 
-  class SkinnedMesh : public StaticMesh
-  {
-  public:
-    SkinnedMesh() = default;
-
-    //  スキンメッシュデータから作成
-    SkinnedMesh(const SkinnedMeshData& _MeshData);
-
-    SkinnedMesh(SkinnedMeshData&& _MeshData);
-
-    SkinnedMesh(const SkinnedMesh& _SkinnedMesh);
-
-    SkinnedMesh(SkinnedMesh&& _SkinnedMesh)noexcept;
-  public:
-    SkinnedMesh& operator=(const SkinnedMesh& _SkinnedMesh);
-
-    SkinnedMesh& operator=(SkinnedMesh&& _SkinnedMesh)noexcept;
-
-    [[nodiscard]] constexpr bool operator==(const SkinnedMesh& _Mesh)const noexcept { return ID_ == _Mesh.ID_; }
-
-    [[nodiscard]] constexpr bool operator!=(const SkinnedMesh& _Mesh)const noexcept { return ID_ != _Mesh.ID_; }
-  };
-
   class Model
   {
-    std::vector<SkinnedMesh> Meshes_;
+    std::vector<Mesh> Meshes_;
   public:
     Model() = default;
 
     //  ファイルから作成
     Model(const char* _FilePath, bool _isSerialize = true);
 
-    //  静的メッシュの配列から作成
-    Model(const std::vector<StaticMesh>& _Meshes);
-
-    //  スキンメッシュの配列から作成
-    Model(const std::vector<SkinnedMesh>& _Meshes);
+    Model(const std::vector<Mesh>& _Meshes); 
   public:
     [[nodiscard]] bool isEmpty()const noexcept { return Meshes_.empty(); }
 
-    [[nodiscard]] const std::vector<SkinnedMesh>& GetMeshes()const { return Meshes_; }
+    [[nodiscard]] const std::vector<Mesh>& GetMeshes()const { return Meshes_; }
   };
 }

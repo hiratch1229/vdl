@@ -4,19 +4,16 @@
 #include <vdl/Matrix.hpp>
 #include <vdl/Color.hpp>
 
-struct TextureInstanceData
+struct Instance2D
 {
   vdl::Matrix NDCTransform;
   vdl::float2 TexcoordScale;
   vdl::float2 TexcoordTranslate;
   vdl::ColorF Color;
 };
-struct StaticMeshInstanceData
+struct Instance3D
 {
   vdl::Matrix World;
   vdl::ColorF Color;
-};
-struct SkinnedMeshinstanceData : public StaticMeshInstanceData
-{
-  //  TODO
+  //  TODO:SkinnedMesh
 };

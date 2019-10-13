@@ -267,7 +267,7 @@ void FBXLoader::FetchVertices(fbxsdk::FbxMesh* _pMesh, Vertices* _pVertices, con
     {
       const int VertexIndex = VertexCount + PolygonCount * 3;
 
-      vdl::SkinnedMeshVertex& Vertex = (*_pVertices)[VertexIndex];
+      vdl::Vertex3D& Vertex = (*_pVertices)[VertexIndex];
 
       const int ControlPointIndex = _pMesh->GetPolygonVertex(PolygonCount, VertexCount);
 

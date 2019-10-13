@@ -5,9 +5,9 @@
 
 namespace vdl
 {
-  StaticMeshData StaticMeshData::Rectangle(const Texture& _Diffuse)
+  MeshData MeshData::Rectangle(const Texture& _Diffuse)
   {
-    StaticMeshData MeshData;
+    MeshData MeshData;
     {
       MeshData.Name = "Rectangle";
 
@@ -40,9 +40,9 @@ namespace vdl
     return MeshData;
   }
 
-  StaticMeshData StaticMeshData::Box(const Texture& _Diffuse)
+  MeshData MeshData::Box(const Texture& _Diffuse)
   {
-    StaticMeshData MeshData;
+    MeshData MeshData;
     {
       MeshData.Name = "Box";
 
@@ -136,12 +136,12 @@ namespace vdl
     return MeshData;
   }
 
-  StaticMeshData StaticMeshData::Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse)
+  MeshData MeshData::Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse)
   {
     //  ”¼Œa
     constexpr float kRadius = 0.5f;
 
-    StaticMeshData MeshData;
+    MeshData MeshData;
     {
       MeshData.Name = "Sphere";
 
@@ -160,7 +160,7 @@ namespace vdl
 
           for (uint j = 0; j <= _SliceCount; ++j)
           {
-            StaticMeshVertex& Vertex = MeshData.Vertices[1 + _SliceCount * i + j];
+            Vertex3D& Vertex = MeshData.Vertices[1 + _SliceCount * i + j];
 
             const Radian Theta = ThetaStep * j;
 
@@ -233,9 +233,9 @@ namespace vdl
     return MeshData;
   }
 
-  //StaticMeshData StaticMeshData::Capsule(uint _SliceCount, uint _StackCount, float _Height, const Texture& _Diffuse)
+  //MeshData MeshData::Capsule(uint _SliceCount, uint _StackCount, float _Height, const Texture& _Diffuse)
   //{
-  //  StaticMeshData MeshData;
+  //  MeshData MeshData;
   //  {
   //    MeshData.Name = "Capsule";
   //

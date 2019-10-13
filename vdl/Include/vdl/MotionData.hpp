@@ -37,5 +37,5 @@ namespace vdl
     }
   };
 
-  void UpdateMotion(const SkinnedMesh& _SkinnedMesh, MotionData* _pMotionData, float _DeltaTime, bool _isLoop = true);
+  void UpdateMotion(const Mesh& _Mesh, MotionData* _pMotionData, float _DeltaTime, bool _isLoop = true);
 }
