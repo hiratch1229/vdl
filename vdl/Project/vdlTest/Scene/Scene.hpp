@@ -3,6 +3,8 @@
 
 enum class SceneType : vdl::uint
 {
+  eSprite,
+  eModel,
   eMultiRenderTexture,
   eTessellation,
   eGPUParticle,

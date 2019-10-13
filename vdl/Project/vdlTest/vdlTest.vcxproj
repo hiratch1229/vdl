@@ -53,13 +53,17 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene\SceneGPUParticle.cpp" />
+    <ClCompile Include="Scene\SceneModel.cpp" />
     <ClCompile Include="Scene\SceneMultiRenderTexture.cpp" />
+    <ClCompile Include="Scene\SceneSprite.cpp" />
     <ClCompile Include="Scene\SceneTessellation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\SceneGPUParticle.hpp" />
     <ClInclude Include="Scene\Scene.hpp" />
+    <ClInclude Include="Scene\SceneModel.hpp" />
     <ClInclude Include="Scene\SceneMultiRenderTexture.hpp" />
+    <ClInclude Include="Scene\SceneSprite.hpp" />
     <ClInclude Include="Scene\SceneTessellation.hpp" />
   </ItemGroup>
   <ItemGroup>

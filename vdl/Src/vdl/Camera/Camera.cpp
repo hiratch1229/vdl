@@ -14,11 +14,6 @@ namespace vdl
 {
   void FreeCamera(Camera* _pCamera)
   {
-    if (!Engine::Get<IKeyboard>()->Press(Input::Keyboard::KeyAlt.GetCode()))
-    {
-      return;
-    }
-
     IMouse* pMouse = Engine::Get<IMouse>();
 
     if (pMouse->Press(Input::Mouse::Buttons::eMiddle))

@@ -1,5 +1,6 @@
 x64/
 Lib/
+Bin/
 *.vcxproj.user
 *.VC.db
 *.VC.VC.opendb
