@@ -170,7 +170,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Adjust()
 }
 
 template<class DisplayObject, class InstanceData>
-inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceContext* _pDeviceContext, IBuffer* _pInstanceBuffer)
+inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceContext* _pDeviceContext, const InstanceBuffer& _InstanceBuffer)
 {
   if constexpr (!std::is_same<DisplayObject, Empty>::value)
   {
@@ -189,7 +189,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
     {
       if constexpr (std::is_same<DisplayObject, Empty>::value)
       {
-        _pDeviceContext->SetVertexBuffer(nullptr);
+        _pDeviceContext->SetVertexBuffer(VertexBuffer());
         _pDeviceContext->Draw(Instances_[RendererCommand.second], 1, 0, 0);
       }
       else
@@ -240,8 +240,8 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
               Instances[InstanceCount] = std::move(Instances_[RendererCommands_[StartDrawCallIndex + InstanceCount].second]);
             }
 
-            pDevice_->WriteMemory(_pInstanceBuffer, Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
-            _pDeviceContext->SetInstanceBuffer(_pInstanceBuffer);
+            pDevice_->WriteMemory(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()), Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
+            _pDeviceContext->SetInstanceBuffer(_InstanceBuffer);
 
             if constexpr (std::is_same<DisplayObject, vdl::Texture>::value)
             {
@@ -253,8 +253,8 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
             {
               const Mesh* pMesh = pModelManager_->GetMesh(CurrentDisplayObjectID);
 
-              _pDeviceContext->SetVertexBuffer(pMesh->pVertexBuffer.get());
-              _pDeviceContext->SetIndexBuffer(pMesh->pIndexBuffer.get());
+              _pDeviceContext->SetVertexBuffer(pMesh->VertexBuffer);
+              _pDeviceContext->SetIndexBuffer(pMesh->IndexBuffer);
 
               for (auto& Material : pMesh->Materials)
               {

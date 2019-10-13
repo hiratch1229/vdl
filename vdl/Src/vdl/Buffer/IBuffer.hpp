@@ -11,12 +11,6 @@ enum class BufferType : vdl::uint8_t
   eUnorderedAccessBuffer,
 };
 
-enum class IndexType : vdl::uint8_t
-{
-  eUint16,
-  eUint32,
-};
-
 struct IBuffer
 {
   IBuffer() = default;

@@ -111,6 +111,7 @@
     <ClInclude Include="..\..\Include\vdl\Window.hpp" />
     <ClInclude Include="..\..\Include\vdl\XInput.hpp" />
     <ClInclude Include="..\..\Src\vdl\BufferManager\IBufferManager.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Buffer\Buffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\IBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Computer\CComputer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Computer\IComputer.hpp" />
@@ -145,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Buffer\Buffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Camera\Camera.cpp" />
     <ClCompile Include="..\..\Src\vdl\Collision2D\Collision2D.cpp" />
     <ClCompile Include="..\..\Src\vdl\Computer\CComputer.cpp" />
@@ -195,10 +197,14 @@
     <FxCompile Include="..\..\Shader\Mesh\MeshPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\..\Shader\Mesh\MeshVS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>

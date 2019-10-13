@@ -402,6 +402,9 @@
     <ClInclude Include="..\..\Src\vdl\Instance\Instance.hpp">
       <Filter>Src\Instance</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Buffer\Buffer.hpp">
+      <Filter>Src\Buffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -523,6 +526,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Computer\Computer.cpp">
       <Filter>Src\Computer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Buffer\Buffer.cpp">
+      <Filter>Src\Buffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

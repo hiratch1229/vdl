@@ -64,10 +64,9 @@ namespace
         {
           LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eConstantBuffer);
         }
-        //  RWStructuredBuffer
+        //  StructuredBuffer
         else
         {
-          assert(Type_ == ShaderType::eComputeShader);
           LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eUnorderedAccessBuffer);
         }
       }

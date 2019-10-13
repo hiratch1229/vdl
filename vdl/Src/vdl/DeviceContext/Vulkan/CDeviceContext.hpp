@@ -12,6 +12,8 @@
 #include <vdl/UnorderedAccessBuffer.hpp>
 #include <vdl/Hash.hpp>
 
+#include <vdl/Buffer/Buffer.hpp>
+
 #include <vdl/Shader/Vulkan/CShader.hpp>
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
 
@@ -95,9 +97,9 @@ private:
   };
   struct GraphicsState
   {
-    const IBuffer* pVertexBuffer;
-    const IBuffer* pInstanceBuffer;
-    const IBuffer* pIndexBuffer;
+    VertexBuffer VertexBuffer;
+    InstanceBuffer InstanceBuffer;
+    IndexBuffer IndexBuffer;
     vdl::InputLayoutType InputLayout;
     vdl::TopologyType Topology;
     vdl::Scissor Scissor;
@@ -157,6 +159,9 @@ private:
   StateChangeFlags<GraphicsCommandType, vdl::uint32_t> GraphicsStateChangeFlags_;
   GraphicsState CurrentGraphicsState_;
   
+  std::array<std::vector<VertexBuffer>, kGraphicsCommandBufferNum> ReserveVertexBuffers_;
+  std::array<std::vector<InstanceBuffer>, kGraphicsCommandBufferNum> ReserveInstanceBuffers_;
+  std::array<std::vector<IndexBuffer>, kGraphicsCommandBufferNum> ReserveIndexBuffers_;
   std::array<std::vector<vdl::VertexShader>, kGraphicsCommandBufferNum> ReserveVertexShaders_;
   std::array<std::vector<vdl::HullShader>, kGraphicsCommandBufferNum> ReserveHullShaders_;
   std::array<std::vector<vdl::DomainShader>, kGraphicsCommandBufferNum> ReserveDomainShaders_;
@@ -192,11 +197,11 @@ public:
 
   vdl::Matrix GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const override;
 
-  void SetVertexBuffer(const IBuffer* _pVertexBuffer)override;
+  void SetVertexBuffer(const VertexBuffer& _VertexBuffer)override;
 
-  void SetInstanceBuffer(const IBuffer* _pInstanceBuffer)override;
+  void SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer)override;
 
-  void SetIndexBuffer(const IBuffer* _pIndexBuffer)override;
+  void SetIndexBuffer(const IndexBuffer& _IndexBuffer)override;
 
   void SetInputLayout(vdl::InputLayoutType _InputLayout)override;
 

@@ -3,7 +3,7 @@
 #include <vdl/Types.hpp>
 #include <vdl/Matrix.hpp>
 
-#include <vdl/Buffer/IBuffer.hpp>
+#include <vdl/Buffer/Buffer.hpp>
 
 class IDeviceContext
 {
@@ -18,11 +18,11 @@ public:
 
   [[nodiscard]] virtual vdl::Matrix GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const = 0;
 
-  virtual void SetVertexBuffer(const IBuffer* _pVertexBuffer) = 0;
+  virtual void SetVertexBuffer(const VertexBuffer& _VertexBuffer) = 0;
 
-  virtual void SetInstanceBuffer(const IBuffer* _pInstanceBuffer) = 0;
+  virtual void SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer) = 0;
 
-  virtual void SetIndexBuffer(const IBuffer* _pIndexBuffer) = 0;
+  virtual void SetIndexBuffer(const IndexBuffer& _IndexBuffer) = 0;
 
   virtual void SetInputLayout(vdl::InputLayoutType _InputLayout) = 0;
 

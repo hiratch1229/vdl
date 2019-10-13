@@ -2,8 +2,6 @@
 
 #include <vdl/Model.hpp>
 
-#include <vdl/Engine.hpp>
-#include <vdl/Device/IDevice.hpp>
 #include <vdl/Constants/Constants.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
@@ -19,21 +17,15 @@ namespace
 
 void CModelManager::Initialize()
 {
-  pDevice_ = Engine::Get<IDevice>();
+
 }
 
 vdl::ID CModelManager::Load(const vdl::MeshData& _MeshData)
 {
   Mesh* pMesh = new Mesh;
   {
-    IBuffer* pVertexBuffer;
-    pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)));
-    pMesh->pVertexBuffer.reset(pVertexBuffer);
-
-    IBuffer* pIndexBuffer;
-    pDevice_->CreateIndexBuffer(&pIndexBuffer, _MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
-    pMesh->pIndexBuffer.reset(pIndexBuffer);
-
+    pMesh->VertexBuffer = VertexBuffer(_MeshData.Vertices.data(), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)));
+    pMesh->IndexBuffer = IndexBuffer(_MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
     pMesh->Name = _MeshData.Name;
     pMesh->Materials = _MeshData.Materials;
     pMesh->GlobalTransform = _MeshData.GlobalTransform;
@@ -46,14 +38,8 @@ vdl::ID CModelManager::Load(vdl::MeshData&& _MeshData)
 {
   Mesh* pMesh = new Mesh;
   {
-    IBuffer* pVertexBuffer;
-    pDevice_->CreateVertexBuffer(&pVertexBuffer, _MeshData.Vertices.data(), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)));
-    pMesh->pVertexBuffer.reset(pVertexBuffer);
-
-    IBuffer* pIndexBuffer;
-    pDevice_->CreateIndexBuffer(&pIndexBuffer, _MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
-    pMesh->pIndexBuffer.reset(pIndexBuffer);
-
+    pMesh->VertexBuffer = VertexBuffer(_MeshData.Vertices.data(), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)));
+    pMesh->IndexBuffer = IndexBuffer(_MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
     pMesh->Name = std::move(_MeshData.Name);
     pMesh->Materials = std::move(_MeshData.Materials);
     pMesh->GlobalTransform = std::move(_MeshData.GlobalTransform);

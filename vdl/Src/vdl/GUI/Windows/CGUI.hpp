@@ -10,7 +10,7 @@
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/UnorderedAccessBuffer.hpp>
 
-#include <vdl/Buffer/IBuffer.hpp>
+#include <vdl/Buffer/Buffer.hpp>
 
 #include <vdl/pch/Windows/pch.hpp>
 
@@ -55,10 +55,11 @@ private:
   vdl::Scissor Scissor_;
   vdl::Viewport Viewport_;
 private:
-  std::unique_ptr<IBuffer> pVertexBuffers_[2];
+  VertexBuffer VertexBuffer_;
   vdl::uint VertexBufferSize_ = 0;
-  std::unique_ptr<IBuffer> pIndexBuffers_[2];
+  IndexBuffer IndexBuffer_;
   vdl::uint IndexBufferSize_ = 0;
+  InstanceBuffer InstanceBuffer_;
 public:
   CGUI() = default;
 

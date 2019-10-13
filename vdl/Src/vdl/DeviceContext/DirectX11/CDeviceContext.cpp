@@ -303,46 +303,48 @@ vdl::Matrix CDeviceContext::GetNDCTransform(const vdl::float2& _DestLeftTop, con
     * vdl::Matrix::Scale({ 2.0f / _WindowSize.x, -2.0f / _WindowSize.y, 1.0f }) * vdl::Matrix::Translate({ -1.0f, 1.0f, 0.0f })).Transpose();
 }
 
-void CDeviceContext::SetVertexBuffer(const IBuffer* _pVertexBuffer)
+void CDeviceContext::SetVertexBuffer(const VertexBuffer& _VertexBuffer)
 {
-  if (!_pVertexBuffer)
+  if (_VertexBuffer.isEmpty())
   {
     return;
   }
 
-  assert(_pVertexBuffer->GetType() == BufferType::eVertexBuffer);
+  assert(pBufferManager_->GetBuffer(_VertexBuffer.GetID())->GetType() == BufferType::eVertexBuffer);
+
+  const CVertexBuffer* pVertexBuffer = static_cast<CVertexBuffer*>(pBufferManager_->GetBuffer(_VertexBuffer.GetID()));
 
   constexpr vdl::uint kOffset = 0;
-
-  const CVertexBuffer* pVertexBuffer = static_cast<const CVertexBuffer*>(_pVertexBuffer);
-
   pD3D11ImmediateContext_->IASetVertexBuffers(0, 1, pVertexBuffer->pBuffer.GetAddressOf(), &pVertexBuffer->Stride, &kOffset);
 }
 
-void CDeviceContext::SetInstanceBuffer(const IBuffer* _pInstanceBuffer)
+void CDeviceContext::SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer)
 {
-  if (!_pInstanceBuffer)
+  if (_InstanceBuffer.isEmpty())
   {
     return;
   }
 
-  assert(_pInstanceBuffer->GetType() == BufferType::eInstanceBuffer);
+  assert(pBufferManager_->GetBuffer(_InstanceBuffer.GetID())->GetType() == BufferType::eInstanceBuffer);
+
+  const CInstanceBuffer* pInstanceBuffer = static_cast<CInstanceBuffer*>(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()));
 
   constexpr vdl::uint kOffset = 0;
-
-  const CInstanceBuffer* pInstanceBuffer = static_cast<const CInstanceBuffer*>(_pInstanceBuffer);
-
   pD3D11ImmediateContext_->IASetVertexBuffers(1, 1, pInstanceBuffer->pBuffer.GetAddressOf(), &pInstanceBuffer->Stride, &kOffset);
 }
 
-void CDeviceContext::SetIndexBuffer(const IBuffer* _pIndexBuffer)
+void CDeviceContext::SetIndexBuffer(const IndexBuffer& _IndexBuffer)
 {
-  assert(_pIndexBuffer->GetType() == BufferType::eIndexBuffer);
+  if (_IndexBuffer.isEmpty())
+  {
+    return;
+  }
+
+  assert(pBufferManager_->GetBuffer(_IndexBuffer.GetID())->GetType() == BufferType::eIndexBuffer);
+
+  const CIndexBuffer* pIndexBuffer = static_cast<CIndexBuffer*>(pBufferManager_->GetBuffer(_IndexBuffer.GetID()));
 
   constexpr vdl::uint kOffset = 0;
-
-  const CIndexBuffer* pIndexBuffer = static_cast<const CIndexBuffer*>(_pIndexBuffer);
-
   pD3D11ImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), pIndexBuffer->IndexFormat, kOffset);
 }
 

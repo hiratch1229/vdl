@@ -30,17 +30,9 @@ void CRenderer::Initialize()
 
   //  バッファの作成
   {
-    IBuffer* pTextureVertexBuffer;
-    pDevice_->CreateVertexBuffer(&pTextureVertexBuffer, kRectangle, sizeof(vdl::Vertex2D), static_cast<vdl::uint>(sizeof(vdl::Vertex2D) * vdl::Macro::ArraySize(kRectangle)));
-    pTextureVertexBuffer_.reset(pTextureVertexBuffer);
-
-    IBuffer* pTextureInstanceBuffer;
-    pDevice_->CreateInstanceBuffer(&pTextureInstanceBuffer, sizeof(Instance2D), sizeof(Instance2D) * Constants::kMaxTextureBatchNum);
-    pTextureInstanceBuffer_.reset(pTextureInstanceBuffer);
-
-    IBuffer* pMeshInstanceBuffer;
-    pDevice_->CreateInstanceBuffer(&pMeshInstanceBuffer, sizeof(Instance3D), sizeof(Instance3D) * Constants::kMaxMeshBatchNum);
-    pMeshInstanceBuffer_.reset(pMeshInstanceBuffer);
+    TextureVertexBuffer_ = VertexBuffer(kRectangle, sizeof(vdl::Vertex2D), static_cast<vdl::uint>(sizeof(vdl::Vertex2D) * vdl::Macro::ArraySize(kRectangle)));
+    TextureInstanceBuffer_ = InstanceBuffer(sizeof(Instance2D), sizeof(Instance2D) * Constants::kMaxTextureBatchNum);
+    MeshInstanceBuffer_ = InstanceBuffer(sizeof(Instance3D), sizeof(Instance3D) * Constants::kMaxMeshBatchNum);
   }
 
   //  描画コマンドリストの初期化
@@ -504,20 +496,20 @@ void CRenderer::Flush()
     if (HasStaticMeshDrawCommand)
     {
       pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eMesh);
-      MeshRendererCommandList_.Flush(pDeviceContext_, pMeshInstanceBuffer_.get());
+      MeshRendererCommandList_.Flush(pDeviceContext_, MeshInstanceBuffer_);
       MeshRendererCommandList_.Reset();
     }
     if (HasEmptyDrawCommand)
     {
       pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eNone);
-      EmptyRendererCommandList_.Flush(pDeviceContext_, nullptr);
+      EmptyRendererCommandList_.Flush(pDeviceContext_, NoneInstanceBuffer_);
       EmptyRendererCommandList_.Reset();
     }
     if (HasTextureDrawCommand)
     {
       pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eTexture);
-      pDeviceContext_->SetVertexBuffer(pTextureVertexBuffer_.get());
-      TextureRendererCommandList_.Flush(pDeviceContext_, pTextureInstanceBuffer_.get());
+      pDeviceContext_->SetVertexBuffer(TextureVertexBuffer_);
+      TextureRendererCommandList_.Flush(pDeviceContext_, TextureInstanceBuffer_);
       TextureRendererCommandList_.Reset();
 
       vdl::ShaderResource EmptyTexture = vdl::Texture();

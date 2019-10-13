@@ -13,6 +13,46 @@ void CBufferManager::Initialize()
   ConstantBufferAllocater_.Initialize(kParentConstantBufferSize);
 }
 
+vdl::ID CBufferManager::CreateVertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+{
+  IBuffer* pBuffer;
+  pDevice_->CreateVertexBuffer(&pBuffer, _Stride, _BufferSize);
+
+  return Buffers_.Add(pBuffer);
+}
+
+vdl::ID CBufferManager::CreateVertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)
+{
+  IBuffer* pBuffer;
+  pDevice_->CreateVertexBuffer(&pBuffer, _Vertices, _Stride, _BufferSize);
+
+  return Buffers_.Add(pBuffer);
+}
+
+vdl::ID CBufferManager::CreateInstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+{
+  IBuffer* pBuffer;
+  pDevice_->CreateInstanceBuffer(&pBuffer, _Stride, _BufferSize);
+
+  return Buffers_.Add(pBuffer);
+}
+
+vdl::ID CBufferManager::CreateIndexBuffer(vdl::uint _BufferSize, IndexType _IndexType)
+{
+  IBuffer* pBuffer;
+  pDevice_->CreateIndexBuffer(&pBuffer, _BufferSize, _IndexType);
+
+  return Buffers_.Add(pBuffer);
+}
+
+vdl::ID CBufferManager::CreateIndexBuffer(const void* _Indices, vdl::uint _BufferSize, IndexType _IndexType)
+{
+  IBuffer* pBuffer;
+  pDevice_->CreateIndexBuffer(&pBuffer, _Indices, _BufferSize, _IndexType);
+
+  return Buffers_.Add(pBuffer);
+}
+
 vdl::ID CBufferManager::CreateConstantBuffer(vdl::uint _BufferSize)
 {
   IBuffer* pBuffer;

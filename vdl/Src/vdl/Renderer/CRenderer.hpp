@@ -5,7 +5,7 @@
 #include <vdl/Camera.hpp>
 #include <vdl/ConstantBuffer.hpp>
 
-#include <vdl/Buffer/IBuffer.hpp>
+#include <vdl/Buffer/Buffer.hpp>
 #include <vdl/Instance/Instance.hpp>
 
 #include <memory>
@@ -36,9 +36,11 @@ private:
 private:
   IDevice* pDevice_;
   IDeviceContext* pDeviceContext_;
-  std::unique_ptr<IBuffer> pTextureVertexBuffer_;
-  std::unique_ptr<IBuffer> pTextureInstanceBuffer_;
-  std::unique_ptr<IBuffer> pMeshInstanceBuffer_;
+private:
+  VertexBuffer TextureVertexBuffer_;
+  InstanceBuffer NoneInstanceBuffer_;
+  InstanceBuffer TextureInstanceBuffer_;
+  InstanceBuffer MeshInstanceBuffer_;
 private:
   std::unique_ptr<CameraData> pCameraData_;
 private:

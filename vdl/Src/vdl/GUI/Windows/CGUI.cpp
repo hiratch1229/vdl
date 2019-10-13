@@ -3,7 +3,6 @@
 #include <vdl/Engine.hpp>
 #include <vdl/System/ISystem.hpp>
 #include <vdl/Window/IWindow.hpp>
-#include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
@@ -764,20 +763,12 @@ void CGUI::Draw()
     if (const vdl::uint VertexSize = static_cast<vdl::uint>(pDrawData->TotalVtxCount * sizeof(ImDrawVert));
       VertexBufferSize_ < VertexSize)
     {
-      pVertexBuffers_[1] = std::move(pVertexBuffers_[0]);
-
-      IBuffer* pVertexBuffer;
-      pDevice_->CreateVertexBuffer(&pVertexBuffer, sizeof(ImDrawVert), VertexBufferSize_ = VertexSize);
-      pVertexBuffers_[0].reset(pVertexBuffer);
+      VertexBuffer_ = VertexBuffer(sizeof(ImDrawVert), VertexBufferSize_ = VertexSize);
     }
     if (const vdl::uint IndexSize = static_cast<vdl::uint>(pDrawData->TotalIdxCount * sizeof(ImDrawIdx));
       IndexBufferSize_ < IndexSize)
     {
-      pIndexBuffers_[1] = std::move(pIndexBuffers_[0]);
-
-      IBuffer* pIndexBuffer;
-      pDevice_->CreateIndexBuffer(&pIndexBuffer, IndexBufferSize_ = IndexSize, kIndexType);
-      pIndexBuffers_[0].reset(pIndexBuffer);
+      IndexBuffer_ = IndexBuffer(IndexBufferSize_ = IndexSize, kIndexType);
     }
   }
 
@@ -800,8 +791,8 @@ void CGUI::Draw()
       }
     }
 
-    pDevice_->WriteMemory(pVertexBuffers_[0].get(), VertexDatas.data(), static_cast<vdl::uint>(VertexDatas.size() * sizeof(ImDrawVert)));
-    pDevice_->WriteMemory(pIndexBuffers_[0].get(), IndexDatas.data(), static_cast<vdl::uint>(IndexDatas.size() * sizeof(ImDrawIdx)));
+    pDevice_->WriteMemory(pBufferManager_->GetBuffer(VertexBuffer_.GetID()), VertexDatas.data(), static_cast<vdl::uint>(VertexDatas.size() * sizeof(ImDrawVert)));
+    pDevice_->WriteMemory(pBufferManager_->GetBuffer(IndexBuffer_.GetID()), IndexDatas.data(), static_cast<vdl::uint>(IndexDatas.size() * sizeof(ImDrawIdx)));
   }
 
   // Will project scissor/clipping rectangles into framebuffer space
@@ -816,9 +807,9 @@ void CGUI::Draw()
 
   Viewport_.Size = { pDrawData->DisplaySize.x, pDrawData->DisplaySize.y };
 
-  pDeviceContext_->SetVertexBuffer(pVertexBuffers_[0].get());
-  pDeviceContext_->SetInstanceBuffer(nullptr);
-  pDeviceContext_->SetIndexBuffer(pIndexBuffers_[0].get());
+  pDeviceContext_->SetVertexBuffer(VertexBuffer_);
+  pDeviceContext_->SetInstanceBuffer(InstanceBuffer_);
+  pDeviceContext_->SetIndexBuffer(IndexBuffer_);
   pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eGUI);
   pDeviceContext_->SetTopology(vdl::TopologyType::eTriangleList);
 

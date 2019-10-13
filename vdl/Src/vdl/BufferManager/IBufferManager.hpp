@@ -3,6 +3,8 @@
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/UnorderedAccessBuffer.hpp>
 
+#include <vdl/Buffer/Buffer.hpp>
+
 #include <vdl/Buffer/IBuffer.hpp>
 
 class IBufferManager
@@ -15,6 +17,16 @@ public:
   virtual ~IBufferManager() = default;
 
   virtual void Initialize() = 0;
+
+  [[nodiscard]] virtual vdl::ID CreateVertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+
+  [[nodiscard]] virtual vdl::ID CreateVertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+
+  [[nodiscard]] virtual vdl::ID CreateInstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  
+  [[nodiscard]] virtual vdl::ID CreateIndexBuffer(vdl::uint _BufferSize, IndexType _IndexType) = 0;
+
+  [[nodiscard]] virtual vdl::ID CreateIndexBuffer(const void* _Indices, vdl::uint _BufferSize, IndexType _IndexType) = 0;
 
   [[nodiscard]] virtual vdl::ID CreateConstantBuffer(vdl::uint _BufferSize) = 0;
 

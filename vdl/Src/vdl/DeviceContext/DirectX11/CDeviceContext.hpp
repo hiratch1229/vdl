@@ -46,11 +46,11 @@ public:
 
   vdl::Matrix GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const override;
 
-  void SetVertexBuffer(const IBuffer* _pVertexBuffer)override;
+  void SetVertexBuffer(const VertexBuffer& _VertexBuffer)override;
 
-  void SetInstanceBuffer(const IBuffer* _pInstanceBuffer)override;
+  void SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer)override;
 
-  void SetIndexBuffer(const IBuffer* _pIndexBuffer)override;
+  void SetIndexBuffer(const IndexBuffer& _IndexBuffer)override;
 
   void SetInputLayout(vdl::InputLayoutType _InputLayout)override;
 

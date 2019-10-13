@@ -2,6 +2,8 @@
 #include <vdl/Fwd.hpp>
 #include <vdl/Types.hpp>
 
+#include <vdl/Buffer/Buffer.hpp>
+
 #include <vdl/Shader/IShader.hpp>
 #include <vdl/Buffer/IBuffer.hpp>
 #include <vdl/Texture/ITexture.hpp>

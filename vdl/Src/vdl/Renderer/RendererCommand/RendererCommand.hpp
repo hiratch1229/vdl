@@ -9,6 +9,8 @@
 
 #include <vdl/Model.hpp>
 
+#include <vdl/Buffer/Buffer.hpp>
+
 #include <vdl/Shader/IShader.hpp>
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
 #include <vdl/Constants/Constants.hpp>
@@ -130,7 +132,7 @@ public:
 
   void Adjust();
 
-  void Flush(IDeviceContext* _pDeviceContext, IBuffer* _pInstanceBuffer);
+  void Flush(IDeviceContext* _pDeviceContext, const InstanceBuffer& _InstanceBuffer);
 
   [[nodiscard]] bool HasDrawCommand()const { return !Instances_.empty(); }
 
