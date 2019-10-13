@@ -5,6 +5,13 @@ void CDeviceContext::Initialize()
 
 }
 
+vdl::Matrix CDeviceContext::GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const
+{
+  return vdl::Matrix(DirectX::XMMatrixAffineTransformation2D(DirectX::XMVectorSet(_DestSize.x, _DestSize.y, 0.0f, 0.0f), DirectX::XMVectorZero(),
+    _Angle, DirectX::XMVectorSet(_DestLeftTop.x + _DestSize.x * 0.5f, _DestLeftTop.y + _DestSize.y * 0.5f, 0.0f, 0.0f))
+    * vdl::Matrix::Scale({ 2.0f / _WindowSize.x, -2.0f / _WindowSize.y, 1.0f }) * vdl::Matrix::Translate({ -1.0f, 1.0f, 0.0f })).Transpose();
+}
+
 void CDeviceContext::SetVertexBuffer(const IBuffer* _pVertexBuffer)
 {
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <vdl/Fwd.hpp>
 #include <vdl/Types.hpp>
+#include <vdl/Matrix.hpp>
 
 #include <vdl/Buffer/IBuffer.hpp>
 
@@ -14,6 +15,8 @@ public:
   virtual ~IDeviceContext() = default;
 
   virtual void Initialize() = 0;
+
+  [[nodiscard]] virtual vdl::Matrix GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const = 0;
 
   virtual void SetVertexBuffer(const IBuffer* _pVertexBuffer) = 0;
 

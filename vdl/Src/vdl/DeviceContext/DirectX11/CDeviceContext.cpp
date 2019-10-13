@@ -296,6 +296,13 @@ void CDeviceContext::Initialize()
   pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
 }
 
+vdl::Matrix CDeviceContext::GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const
+{
+  return vdl::Matrix(DirectX::XMMatrixAffineTransformation2D(DirectX::XMVectorSet(_DestSize.x, _DestSize.y, 0.0f, 0.0f), DirectX::XMVectorZero(),
+    _Angle, DirectX::XMVectorSet(_DestLeftTop.x + _DestSize.x * 0.5f, _DestLeftTop.y + _DestSize.y * 0.5f, 0.0f, 0.0f))
+    * vdl::Matrix::Scale({ 2.0f / _WindowSize.x, -2.0f / _WindowSize.y, 1.0f }) * vdl::Matrix::Translate({ -1.0f, 1.0f, 0.0f })).Transpose();
+}
+
 void CDeviceContext::SetVertexBuffer(const IBuffer* _pVertexBuffer)
 {
   if (!_pVertexBuffer)
@@ -980,7 +987,7 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
       }
     }
     //  UnorderedAccessBuffer
-    else if(std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_ShaderResource))
+    else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_ShaderResource))
     {
       const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(_ShaderResource);
 
@@ -1057,7 +1064,7 @@ ID3D11UnorderedAccessView* CDeviceContext::GetUnorderedAccessView(const vdl::Uno
       }
     }
     //  UnorderedAccessBuffer
-    else if(std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_UnorderedAccessObject))
+    else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_UnorderedAccessObject))
     {
       const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(_UnorderedAccessObject);
 
