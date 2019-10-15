@@ -68,7 +68,10 @@ vdl::Matrix CRenderer::GetProjection()const
   }
   else
   {
-    return DirectX::XMMatrixOrthographicLH(Viewport.Size.x, Viewport.Size.y, Camera.Near, Camera.Far);
+    constexpr float kWidth = 16.0f / 2.0f;
+    constexpr float kHeight = 9.0f / 2.0f;
+
+    return DirectX::XMMatrixOrthographicLH(kWidth, kHeight, Camera.Near, Camera.Far);
   }
 }
 

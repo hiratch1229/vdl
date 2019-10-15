@@ -13,6 +13,7 @@ private:
   static constexpr float kTessellationMaxValue = 64.0f;
 private:
   vdl::Mesh Rectangle_;
+  vdl::Camera Camera_;
   vdl::ConstantBuffer<ConstantBufferData> ConstantBuffer_;
 public:
   SceneTessellation() = default;

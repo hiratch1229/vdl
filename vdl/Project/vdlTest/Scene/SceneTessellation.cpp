@@ -5,6 +5,7 @@ using namespace vdl;
 void SceneTessellation::Initialize()
 {
   Rectangle_ = MeshData::Rectangle();
+  Camera_ = { vdl::float3(0.0f, 0.0f, -15.0f) };
 
   Renderer3D::SetShaders(VertexShader("Shader/Tessellation/TessellationVS.hlsl", InputLayoutType::eMesh),
     HullShader("Shader/Tessellation/TessellationHS.hlsl"),
@@ -43,6 +44,9 @@ void SceneTessellation::Update()
     ImGui::SliderFloat("InsideFactor", &Data.InsideFactor, kTessellationMinValue, kTessellationMaxValue);
   }
   ImGui::End();
+
+  FreeCamera(&Camera_);
+  Renderer3D::SetCamera(Camera_);
 
   Renderer3D::Draw(Rectangle_, Matrix::Scale(2.5f));
 }

@@ -28,6 +28,10 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
     ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
     break;
   case vk::ImageLayout::eShaderReadOnlyOptimal:
+    SrcStageMask = vk::PipelineStageFlagBits::eAllGraphics
+      /*vk::PipelineStageFlagBits::eVertexShader | vk::PipelineStageFlagBits::eTessellationControlShader
+      | vk::PipelineStageFlagBits::eTessellationEvaluationShader | vk::PipelineStageFlagBits::eGeometryShader
+      | vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eComputeShader*/;
     ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eShaderRead;
     break;
   case vk::ImageLayout::eTransferDstOptimal:
@@ -50,9 +54,10 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
     ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
     break;
   case vk::ImageLayout::eShaderReadOnlyOptimal:
-    DstStageMask = vk::PipelineStageFlagBits::eVertexShader | vk::PipelineStageFlagBits::eTessellationControlShader
+    DstStageMask = vk::PipelineStageFlagBits::eAllGraphics
+      /*vk::PipelineStageFlagBits::eVertexShader | vk::PipelineStageFlagBits::eTessellationControlShader
       | vk::PipelineStageFlagBits::eTessellationEvaluationShader | vk::PipelineStageFlagBits::eGeometryShader
-      | vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eComputeShader;
+      | vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eComputeShader*/;
     ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
     break;
   case vk::ImageLayout::eTransferDstOptimal:

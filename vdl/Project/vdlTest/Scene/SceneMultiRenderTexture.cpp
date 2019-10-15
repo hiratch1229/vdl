@@ -10,6 +10,7 @@ void SceneMultiRenderTexture::Initialize()
   }
 
   Model_ = vdl::Model("Data/danbo_atk.fbx");
+  Camera_ = { vdl::float3(0.0f, 0.0f, -15.0f) };
 
   Renderer3D::SetVertexShader(VertexShader("Shader/MultiRenderTexture/MultiRenderTextureVS.hlsl", InputLayoutType::eMesh));
   Renderer3D::SetPixelShader(PixelShader("Shader/MultiRenderTexture/MultiRenderTexturePS.hlsl"));
@@ -27,6 +28,9 @@ void SceneMultiRenderTexture::Update()
   {
     Renderer::Clear(RenderTextures_[RenderTextureCount]);
   }
+
+  FreeCamera(&Camera_);
+  Renderer3D::SetCamera(Camera_);
 
   Renderer::SetRenderTextures(RenderTextures_, DepthStencilTexture());
 

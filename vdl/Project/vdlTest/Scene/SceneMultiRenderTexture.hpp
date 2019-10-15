@@ -7,6 +7,7 @@ class SceneMultiRenderTexture : public IScene
   static constexpr vdl::uint2 kRenderTextureSize = vdl::Constants::kDefaultWindowSize;
 private:
   vdl::Model Model_;
+  vdl::Camera Camera_;
   vdl::RenderTextures RenderTextures_;
 public:
   SceneMultiRenderTexture() = default;
