@@ -4,12 +4,14 @@
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
+#include <vdl/Renderer/IRenderer.hpp>
 
 void CComputer::Initialize()
 {
   pDevice_ = Engine::Get<IDevice>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
   pBufferManager_ = Engine::Get<IBufferManager>();
+  pRenderer_ = Engine::Get<IRenderer>();
 }
 
 void CComputer::SetShader(const vdl::ComputeShader& _ComputeShader)
@@ -103,6 +105,8 @@ void CComputer::SetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint _Unord
 
 void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ)
 {
+  pRenderer_->Flush();
+
   StateChangeFlags_.Cancel(ComputerCommandType::eSetConstantBuffer);
 
   if (!StateChangeFlags_.isEmpty())

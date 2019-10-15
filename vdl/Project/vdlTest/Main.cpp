@@ -5,7 +5,7 @@
 #include "Scene/SceneMultiRenderTexture.hpp"
 #include "Scene/SceneTessellation.hpp"
 #include "Scene/SceneGPUParticle.hpp"
-#define INIT_SCENE SceneSprite
+#define INIT_SCENE SceneGPUParticle
 
 #include <memory>
 

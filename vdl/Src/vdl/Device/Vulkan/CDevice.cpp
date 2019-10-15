@@ -43,10 +43,10 @@ namespace
         {
           LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eSampler);
         }
-        //  ShaderResource
+        //  Texture
         else if (_pSymbol->getQualifier().layoutFormat == glslang::TLayoutFormat::ElfNone)
         {
-          LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eShaderResource);
+          LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eTexture);
         }
         //  RWTexture
         else
@@ -67,7 +67,17 @@ namespace
         //  StructuredBuffer
         else
         {
-          LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eUnorderedAccessBuffer);
+          switch (Qualifier.declaredBuiltIn)
+          {
+          case glslang::TBuiltInVariable::EbvRWStructuredBuffer:
+            assert(Type_ == ShaderType::eComputeShader);
+            LayoutSet = GetDescriptorLayoutOffset(ShaderType::eComputeShader, DescriptorType::eUnorderedAccessBuffer);
+            break;
+          case glslang::TBuiltInVariable::EbvStructuredBuffer:
+            LayoutSet = GetDescriptorLayoutOffset(Type_, DescriptorType::eBuffer);
+            break;
+          default: assert(false);
+          }
         }
       }
       else
@@ -239,6 +249,11 @@ namespace
       }
       else if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
       {
+        //if (std::string(pMsg).find_first_not_of("[ UNASSIGNED-CoreValidation-Shader-InterfaceTypeMismatch ]") != std::string::npos)
+        //{
+        //  return true;
+        //}
+
         Buf << "ERROR: ";
       }
       else if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)

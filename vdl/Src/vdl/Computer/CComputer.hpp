@@ -15,6 +15,7 @@
 class IDevice;
 class IDeviceContext;
 class IBufferManager;
+class IRenderer;
 
 enum class ComputerCommandType : vdl::uint8_t
 {
@@ -38,6 +39,7 @@ private:
   IDevice* pDevice_;
   IDeviceContext* pDeviceContext_;
   IBufferManager* pBufferManager_;
+  IRenderer* pRenderer_;
 private:
   StateChangeFlags<ComputerCommandType, vdl::uint8_t> StateChangeFlags_;
 
