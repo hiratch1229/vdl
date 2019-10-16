@@ -9,6 +9,7 @@
 
 #include <vdl/System.hpp>
 
+#include <Windows.h>
 #include <crtdbg.h>
 #include <locale>
 #include <future>

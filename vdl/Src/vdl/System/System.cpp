@@ -41,4 +41,9 @@ namespace vdl::System
   {
     return Engine::Get<ISystem>()->GetFPS();
   }
+
+  float GetCPUUseRate()
+  {
+    return Engine::Get<ISystem>()->GetCPUUseRate();
+  }
 }

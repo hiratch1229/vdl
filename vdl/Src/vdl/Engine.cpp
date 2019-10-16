@@ -5,6 +5,7 @@
 #include "Device/IDevice.hpp"
 #include "DeviceContext/IDeviceContext.hpp"
 #include "SwapChain/ISwapChain.hpp"
+#include "CPUProfiler/ICPUProfiler.hpp"
 #include "Input/Keyboard/IKeyboard.hpp"
 #include "Input/Mouse/IMouse.hpp"
 #include "Input/XInput/IXInput.hpp"
@@ -38,6 +39,7 @@ Engine::~Engine()
   pGUI_.Release();
   pComputer_.Release();
   pRenderer_.Release();
+  pCPUProfiler_.Release();
   pSwapChain_.Release();
   pDeviceContext_.Release();
   pShaderManager_.Release();

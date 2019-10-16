@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.cpp" />
     <ClCompile Include="..\..\Src\vdl\GUI\Windows\CGUI.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="..\..\Src\vdl\Window\Windows\CWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.hpp" />
     <ClInclude Include="..\..\Src\vdl\GUI\Windows\CGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.hpp" />
@@ -142,7 +144,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;mfplay.lib;libfbxsdk-md_d.lib;GLTFSDK_d.lib;ImGui_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib;libfbxsdk-md_d.lib;GLTFSDK_d.lib;ImGui_d.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>..\..\Src\ThirdParty\FBXSDK;..\..\Src\ThirdParty\glTFSDK;..\..\Src\ThirdParty\ImGui</AdditionalLibraryDirectories>
@@ -207,7 +209,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;mfplay.lib;libfbxsdk-md.lib;GLTFSDK.lib;ImGui.lib</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib;libfbxsdk-md.lib;GLTFSDK.lib;ImGui.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\Src\ThirdParty\FBXSDK;..\..\Src\ThirdParty\glTFSDK;..\..\Src\ThirdParty\ImGui</AdditionalLibraryDirectories>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>

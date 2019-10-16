@@ -1,7 +1,10 @@
 #pragma once
 #include "ISystem.hpp"
 
+#include <chrono>
+
 class ISwapChain;
+class ICPUProfiler;
 class IKeyboard;
 class IMouse;
 class IXInput;
@@ -19,6 +22,7 @@ class CSystem : public ISystem
   };
 private:
   ISwapChain* pSwapChain_;
+  ICPUProfiler* pCPUProfiler_;
   IKeyboard* pKeyboard_;
   IMouse* pMouse_;
   IXInput* pXInput_;
@@ -26,19 +30,19 @@ private:
   IRenderer* pRenderer_;
   IGUI* pGUI_;
 private:
+private:
   SystemState SystemState_;
   vdl::uint DefaultActionFlags_ = 0;
   vdl::uint ValidDefaultActions_ = ~0;
-  double SecondsPerFrequency_ = 0.0f;
-  double FrameInterval_ = 0.0;
-  double LastTime_ = 0.0;
-  double DeltaTime_ = 0.0;
+  using Duration = std::chrono::duration<double>;
+  std::chrono::high_resolution_clock::time_point LastTime_;
+  Duration DeltaTime_;
+  Duration FrameInterval_;
+  Duration TimeStamp_;
+  Duration TimeTlapsed_;
   vdl::uint Frames_ = 0;
   vdl::uint CurrentFPS_ = 0;
-  double TimeStamp_ = 0.0;
-  double TimeTlapsed_ = 0.0;
-private:
-  double GetSecond()const;
+  double CurrentCPUUseRate_;
 public:
   CSystem() = default;
 
@@ -52,12 +56,14 @@ public:
 
   void ReportDefaultActions(vdl::uint _DefaultActionFlags)override { DefaultActionFlags_ |= (ValidDefaultActions_ & _DefaultActionFlags); }
 
-  void SetMaxFPS(vdl::uint _MaxFPS)override { FrameInterval_ = (_MaxFPS == 0 ? 0.0 : 1.0 / _MaxFPS); }
+  void SetMaxFPS(vdl::uint _MaxFPS)override { FrameInterval_ = Duration(_MaxFPS == 0 ? 0.0 : 1.0 / _MaxFPS); }
 
-  float GetDeltaTime()const override { return static_cast<float>(DeltaTime_); }
-  
+  float GetDeltaTime()const override { return static_cast<float>(DeltaTime_.count()); }
+
   vdl::uint GetFPS()const override { return CurrentFPS_; }
-  
+
+  float GetCPUUseRate()const override { return static_cast<float>(CurrentCPUUseRate_); }
+
   void Pause()override { SystemState_ = SystemState::ePause; }
 
   void Resume()override
@@ -66,8 +72,8 @@ public:
     {
       return;
     }
-
+    
     SystemState_ = SystemState::eRunning;
-    LastTime_ = GetSecond();
+    LastTime_ = std::chrono::high_resolution_clock::now();
   }
 };

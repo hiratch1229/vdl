@@ -52,6 +52,9 @@
     <Filter Include="Src\pch">
       <UniqueIdentifier>{97de45ad-dfaa-4f18-83c2-3919a798bd00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\CPUProfiler">
+      <UniqueIdentifier>{74faa68e-1d3b-4637-b560-e518c2d080a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\pch\Windows\pch.cpp">
       <Filter>Src\pch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.cpp">
+      <Filter>Src\CPUProfiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\pch\Windows\pch.hpp">
       <Filter>Src\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.hpp">
+      <Filter>Src\CPUProfiler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

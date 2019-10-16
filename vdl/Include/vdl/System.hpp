@@ -32,4 +32,6 @@ namespace vdl::System
   [[nodiscard]] float GetDeltaTime();
 
   [[nodiscard]] uint GetFPS();
+
+  [[nodiscard]] float GetCPUUseRate();
 }

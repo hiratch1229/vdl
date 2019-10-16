@@ -127,6 +127,9 @@
     <Filter Include="Shader\Mesh">
       <UniqueIdentifier>{e2bc3319-67bc-4ff8-9d17-5018242379d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\CPUProfiler">
+      <UniqueIdentifier>{f57b198a-4c11-4c68-9c56-e7ba6b9b1829}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -405,6 +408,9 @@
     <ClInclude Include="..\..\Src\vdl\Buffer\Buffer.hpp">
       <Filter>Src\Buffer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\CPUProfiler\ICPUProfiler.hpp">
+      <Filter>Src\CPUProfiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -529,6 +535,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Buffer\Buffer.cpp">
       <Filter>Src\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\CPUProfiler\CPUProfilerFactory.cpp">
+      <Filter>Src\CPUProfiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

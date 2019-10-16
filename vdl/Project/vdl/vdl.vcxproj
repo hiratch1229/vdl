@@ -116,6 +116,7 @@
     <ClInclude Include="..\..\Src\vdl\Computer\CComputer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Computer\IComputer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Constants\Constants.hpp" />
+    <ClInclude Include="..\..\Src\vdl\CPUProfiler\ICPUProfiler.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\IDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\IDevice.hpp" />
     <ClInclude Include="..\..\Src\vdl\Engine.hpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="..\..\Src\vdl\Computer\Computer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Computer\ComputerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
+    <ClCompile Include="..\..\Src\vdl\CPUProfiler\CPUProfilerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Engine.cpp" />

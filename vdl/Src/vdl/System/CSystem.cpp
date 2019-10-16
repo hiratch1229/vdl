@@ -5,6 +5,7 @@
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/SwapChain/ISwapChain.hpp>
+#include <vdl/CPUProfiler/ICPUProfiler.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
 #include <vdl/Input/Mouse/IMouse.hpp>
 #include <vdl/Input/XInput/IXInput.hpp>
@@ -24,11 +25,13 @@
 #include <vdl/Viewport.hpp>
 #include <vdl/Scissor.hpp>
 
+#include <thread>
 #include <Windows.h>
 
 void CSystem::Initialize()
 {
   pSwapChain_ = Engine::Get<ISwapChain>();
+  pCPUProfiler_ = Engine::Get<ICPUProfiler>();
   pKeyboard_ = Engine::Get<IKeyboard>();
   pMouse_ = Engine::Get<IMouse>();
   pXInput_ = Engine::Get<IXInput>();
@@ -40,6 +43,8 @@ void CSystem::Initialize()
   Engine::Get<IDevice>()->Initialize();
   Engine::Get<IDeviceContext>()->Initialize();
   pSwapChain_->Initialize();
+
+  pCPUProfiler_->Initialize();
 
   pKeyboard_->Initialize();
   pMouse_->Initialize();
@@ -57,19 +62,7 @@ void CSystem::Initialize()
   pGUI_->Initialize();
 
   //  フレームレートを設定
-  {
-    //  周波数を取得
-    {
-      LARGE_INTEGER Frequency;
-      ::QueryPerformanceFrequency(&Frequency);
-      assert(Frequency.QuadPart != 0);
-
-      //  周波数ごとの時間を算出(s)
-      SecondsPerFrequency_ = 1.0 / static_cast<double>(Frequency.QuadPart);
-    }
-
-    SetMaxFPS(Constants::kDefaultMaxFPS);
-  }
+  SetMaxFPS(Constants::kDefaultMaxFPS);
 
   SystemState_ = SystemState::eInitialized;
 }
@@ -93,6 +86,7 @@ bool CSystem::Update()
     pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eMesh);
 
     SystemState_ = SystemState::eRunning;
+    LastTime_ = std::chrono::high_resolution_clock::now();
   }
   else
   {
@@ -130,36 +124,37 @@ bool CSystem::Update()
 
   //  FPS制御
   {
-    double CurrentTime;
-    double DeltaTime;
-    double SleepTime;
-
     ++Frames_;
-    do
+
+    std::chrono::high_resolution_clock::time_point CurrentTime;
+    Duration DeltaTime;
+    Duration SleepTime;
+
+    while (true)
     {
-      CurrentTime = GetSecond();
-      DeltaTime = CurrentTime - LastTime_;
+      CurrentTime = std::chrono::high_resolution_clock::now();
+      DeltaTime = std::chrono::duration(CurrentTime - LastTime_);
       SleepTime = FrameInterval_ - DeltaTime;
 
-      if (SleepTime > 0.0)
+      if (SleepTime.count() > 0.0 || SystemState_ == SystemState::ePause)
       {
-        //  精度を1msにする
-        ::timeBeginPeriod(1);
-        //  停止
-        ::Sleep(static_cast<DWORD>(SleepTime));
-        //  精度を元に戻す
-        ::timeEndPeriod(1);
+        std::this_thread::yield();
+        continue;
       }
-    } while (SleepTime > 0.0 || SystemState_ == SystemState::ePause);
+
+      break;
+    }
 
     LastTime_ = CurrentTime;
     DeltaTime_ = DeltaTime;
 
-    if ((TimeStamp_ += DeltaTime) >= 1.0)
+    if ((TimeStamp_ += DeltaTime).count() >= 1.0)
     {
       CurrentFPS_ = Frames_;
       Frames_ = 0;
-      TimeStamp_ = 0.0;
+      TimeStamp_ = Duration(0.0);
+
+      CurrentCPUUseRate_ = pCPUProfiler_->GetAsyncUseRate();
     }
   }
 
@@ -174,14 +169,4 @@ bool CSystem::Update()
   pGUI_->Update();
 
   return true;
-}
-
-//--------------------------------------------------
-
-double CSystem::GetSecond()const
-{
-  LARGE_INTEGER Counter;
-  ::QueryPerformanceCounter(&Counter);
-
-  return Counter.QuadPart * SecondsPerFrequency_;
 }

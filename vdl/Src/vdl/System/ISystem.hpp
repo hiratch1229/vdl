@@ -26,6 +26,8 @@ public:
 
   [[nodiscard]] virtual vdl::uint GetFPS()const = 0;
 
+  [[nodiscard]] virtual float GetCPUUseRate()const = 0;
+
   virtual void Pause() = 0;
 
   virtual void Resume() = 0;

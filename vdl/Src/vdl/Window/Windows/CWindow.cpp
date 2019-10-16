@@ -11,7 +11,7 @@ void CWindow::Initialize()
   RECT Rect = { 0, 0, static_cast<long>(WindowSize_.x), static_cast<long>(WindowSize_.y) };
   ::AdjustWindowRect(&Rect, kStyle, false);
 
-  hWnd_ = CreateWindowA(Constants::kClassName,
+  hWnd_ = ::CreateWindowA(Constants::kClassName,
     WindowName_,
     kStyle,
     CW_USEDEFAULT,
@@ -27,4 +27,5 @@ void CWindow::Initialize()
 void CWindow::Show(bool _isShow)
 {
   ::ShowWindow(hWnd_, _isShow);
+  ::SetForegroundWindow(hWnd_);
 }
