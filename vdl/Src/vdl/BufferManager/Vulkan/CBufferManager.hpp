@@ -11,7 +11,8 @@ class IDevice;
 
 class CBufferManager : public IBufferManager
 {
-  static constexpr vdl::uint kParentConstantBufferSize = 10000;
+  static constexpr vdl::uint kParentConstantBufferSize = 51200;
+  static_assert(kParentConstantBufferSize % 256 == 0);
 private:
   vk::Device VkDevice_;
 private:
@@ -20,12 +21,12 @@ private:
 private:
   ConstantBufferAllocater ConstantBufferAllocater_;
 public:
-  [[nodiscard]] ConstantBufferAllocater* GetConstantBufferAllocater(){ return &ConstantBufferAllocater_; }
+  [[nodiscard]] ConstantBufferAllocater* GetConstantBufferAllocater() { return &ConstantBufferAllocater_; }
 public:
   CBufferManager() = default;
 
   void Initialize()override;
-  
+
   vdl::ID CreateVertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize)override;
 
   vdl::ID CreateVertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)override;
