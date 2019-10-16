@@ -32,6 +32,7 @@ namespace vdl
       MeshData.Materials.resize(1);
       {
         MeshData.Materials[0].Diffuse = _Diffuse;
+        MeshData.Materials[0].MaterialColor = Palette::White;
         MeshData.Materials[0].IndexStart = 0;
         MeshData.Materials[0].IndexCount = 6;
       }
@@ -128,6 +129,7 @@ namespace vdl
       MeshData.Materials.resize(1);
       {
         MeshData.Materials[0].Diffuse = _Diffuse;
+        MeshData.Materials[0].MaterialColor = Palette::White;
         MeshData.Materials[0].IndexStart = 0;
         MeshData.Materials[0].IndexCount = 36;
       }
@@ -225,6 +227,7 @@ namespace vdl
       MeshData.Materials.resize(1);
       {
         MeshData.Materials[0].Diffuse = _Diffuse;
+        MeshData.Materials[0].MaterialColor = Palette::White;
         MeshData.Materials[0].IndexStart = 0;
         MeshData.Materials[0].IndexCount = static_cast<vdl::IndexType>(IndexNum);
       }

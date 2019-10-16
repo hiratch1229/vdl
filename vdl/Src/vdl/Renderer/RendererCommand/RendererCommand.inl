@@ -240,11 +240,12 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
               Instances[InstanceCount] = std::move(Instances_[RendererCommands_[StartDrawCallIndex + InstanceCount].second]);
             }
 
-            pDevice_->WriteMemory(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()), Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
             _pDeviceContext->SetInstanceBuffer(_InstanceBuffer);
 
             if constexpr (std::is_same<DisplayObject, vdl::Texture>::value)
             {
+              pDevice_->WriteMemory(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()), Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
+
               _pDeviceContext->PSSetShaderResources(0, 1, &vdl::ShaderResource(ReservedDisplayObjects_[CurrentDisplayObjectID]));
 
               _pDeviceContext->Draw(4, ContinuousDrawCallNum, 0, 0);
@@ -258,6 +259,18 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
 
               for (auto& Material : pMesh->Materials)
               {
+                std::vector<InstanceData> TempInstances = Instances;
+                for (auto& TempInstance : TempInstances)
+                {
+                  TempInstance.Color.Red *= Material.MaterialColor.Red;
+                  TempInstance.Color.Green *= Material.MaterialColor.Green;
+                  TempInstance.Color.Blue *= Material.MaterialColor.Blue;
+                  TempInstance.Color.Alpha *= Material.MaterialColor.Alpha;
+                }
+
+                pDevice_->WriteMemory(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()), TempInstances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
+
+
                 _pDeviceContext->PSSetShaderResources(0, 1, &vdl::ShaderResource(Material.Diffuse));
 
                 _pDeviceContext->DrawIndexed(Material.IndexCount, ContinuousDrawCallNum, Material.IndexStart, 0, 0);

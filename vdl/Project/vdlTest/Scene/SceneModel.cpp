@@ -5,7 +5,7 @@ using namespace vdl;
 void SceneModel::Initialize()
 {
   Model_ = Model("Data/danbo_atk.fbx");
-  Camera_ = { vdl::float3(0.0f, 0.0f, -15.0f) };
+  Camera_ = Camera(vdl::float3(0.0f, 0.0f, -15.0f));
 }
 
 SceneModel::~SceneModel()

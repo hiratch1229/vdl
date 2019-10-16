@@ -144,13 +144,22 @@ void glTFLoader::FetchMaterial(const std::unique_ptr<Microsoft::glTF::GLTFResour
       if (!Image.bufferViewId.empty())
       {
         const Microsoft::glTF::BufferView& BufferView = _Document.bufferViews.Get(Image.bufferViewId);
-        //_pProperty->Image = _TextureLoader.LoadFromMemory(_pResourceReader->ReadBinaryData<vdl::uint16_t>(_Document, BufferView));
         _pProperty->CompressionImage = _TextureLoader.LoadFromMemory(_pResourceReader->ReadBinaryData<vdl::uint8_t>(_Document, BufferView));
       }
       else
       {
         _pProperty->CompressionImage = _TextureLoader.LoadFromFile((_Directory + Image.uri).c_str());
       }
+    }
+    else
+    {
+      vdl::Image Image;
+      {
+        Image.Resize(1);
+        Image.Buffer()[0] = vdl::Palette::White;
+      }
+
+      _pProperty->CompressionImage = Image;
     }
 
     _pProperty->Color = Cast(_Color);
@@ -160,7 +169,7 @@ void glTFLoader::FetchMaterial(const std::unique_ptr<Microsoft::glTF::GLTFResour
   {
     Material& Material = (*_pMaterials)[MaterialCount];
 
-    const Microsoft::glTF::Material & GltfMaterial = _Document.materials.Get(_Mesh.primitives[MaterialCount].materialId);
+    const Microsoft::glTF::Material& GltfMaterial = _Document.materials.Get(_Mesh.primitives[MaterialCount].materialId);
 
     GetMaterialBinaryData(&Material.Diffuse, GltfMaterial.metallicRoughness.baseColorTexture.textureId, GltfMaterial.metallicRoughness.baseColorFactor);
     GetMaterialBinaryData(&Material.NormalMap, GltfMaterial.normalTexture.textureId);

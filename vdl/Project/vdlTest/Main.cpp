@@ -5,13 +5,14 @@
 #include "Scene/SceneMultiRenderTexture.hpp"
 #include "Scene/SceneTessellation.hpp"
 #include "Scene/SceneGPUParticle.hpp"
-#define INIT_SCENE SceneGPUParticle
+#include "Scene/SceneDeferred.hpp"
+#define INIT_SCENE SceneSprite
 
 #include <memory>
 
 void Main()
 {
-  static constexpr const char* kSceneTypes[] = { "Sprite", "Model" ,"MultiRenderTexture", "Tessellation", "GPUParticle" };
+  static constexpr const char* kSceneTypes[] = { "Sprite", "Model" ,"MultiRenderTexture", "Tessellation", "GPUParticle", "Deferred" };
   static constexpr vdl::uint kSceneTypeNum = static_cast<vdl::uint>(SceneType::eNum);
   static_assert(kSceneTypeNum == vdl::Macro::ArraySize(kSceneTypes));
 
@@ -54,6 +55,9 @@ void Main()
             break;
           case SceneType::eGPUParticle:
             pNextScene = new SceneGPUParticle;
+            break;
+          case SceneType::eDeferred:
+            pNextScene = new SceneDeferred;
             break;
           default: assert(false);
           }

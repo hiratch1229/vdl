@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Scene\SceneDeferred.cpp" />
     <ClCompile Include="Scene\SceneGPUParticle.cpp" />
     <ClCompile Include="Scene\SceneModel.cpp" />
     <ClCompile Include="Scene\SceneMultiRenderTexture.cpp" />
@@ -59,6 +60,7 @@
     <ClCompile Include="Scene\SceneTessellation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scene\SceneDeferred.hpp" />
     <ClInclude Include="Scene\SceneGPUParticle.hpp" />
     <ClInclude Include="Scene\Scene.hpp" />
     <ClInclude Include="Scene\SceneModel.hpp" />

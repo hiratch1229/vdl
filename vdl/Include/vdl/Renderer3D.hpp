@@ -8,6 +8,8 @@
 #include "ConstantBuffer.hpp"
 #include "UnorderedAccessBuffer.hpp"
 
+#include <assert.h>
+
 namespace vdl::Renderer3D
 {
   void SetCamera(const Camera& _Camera);
@@ -390,6 +392,8 @@ namespace vdl::Renderer3D
 
   inline void Draw(const Model& _Model, const Matrix& _World, const ColorF& _Color = Palette::White)
   {
+    assert(!_Model.isEmpty());
+
     for (auto& Mesh : _Model.GetMeshes())
     {
       Draw(Mesh, _World, _Color);

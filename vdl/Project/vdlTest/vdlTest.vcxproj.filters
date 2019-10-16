@@ -27,6 +27,9 @@
     <Filter Include="シェーダーファイル\Mesh">
       <UniqueIdentifier>{3d1edf08-2024-4dee-901c-7673ccd1c9a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Deferred">
+      <UniqueIdentifier>{d73473ec-887e-40e7-bd0a-e1b61ff7458f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -47,6 +50,9 @@
     <ClCompile Include="Scene\SceneModel.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\SceneDeferred.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Scene.hpp">
@@ -65,6 +71,9 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\SceneModel.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneDeferred.hpp">
       <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>

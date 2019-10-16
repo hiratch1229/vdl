@@ -10,7 +10,7 @@ void SceneMultiRenderTexture::Initialize()
   }
 
   Model_ = vdl::Model("Data/danbo_atk.fbx");
-  Camera_ = { vdl::float3(0.0f, 0.0f, -15.0f) };
+  Camera_ = Camera(vdl::float3(0.0f, 0.0f, -15.0f));
 
   Renderer3D::SetVertexShader(VertexShader("Shader/MultiRenderTexture/MultiRenderTextureVS.hlsl", InputLayoutType::eMesh));
   Renderer3D::SetPixelShader(PixelShader("Shader/MultiRenderTexture/MultiRenderTexturePS.hlsl"));

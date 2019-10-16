@@ -205,6 +205,16 @@ void FBXLoader::FetchMaterials(fbxsdk::FbxMesh* _pMesh, Materials* _pMaterials, 
             _pProperty->CompressionImage = _TextureLoader.LoadFromFile(FileName.c_str());
           }
         }
+        else
+        {
+          vdl::Image Image;
+          {
+            Image.Resize(1);
+            Image.Buffer()[0] = vdl::Palette::White;
+          }
+
+          _pProperty->CompressionImage = Image;
+        }
       }
     };
 

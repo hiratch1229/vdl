@@ -9,6 +9,8 @@ enum class SceneType : vdl::uint
   eTessellation,
   eGPUParticle,
 
+  eDeferred,
+
   eNum
 };
 

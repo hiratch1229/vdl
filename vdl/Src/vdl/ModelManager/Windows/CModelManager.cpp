@@ -117,6 +117,7 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
         vdl::Material& Material = MeshData.Materials[MaterialCount];
 
         Material.Diffuse = vdl::Image(LoadMaterial.Diffuse.CompressionImage);
+        Material.MaterialColor = LoadMaterial.Diffuse.Color;
 
         Material.IndexStart = LoadMaterial.IndexStart;
         Material.IndexCount = LoadMaterial.IndexCount;

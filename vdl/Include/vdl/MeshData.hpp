@@ -13,6 +13,7 @@ namespace vdl
   struct Material
   {
     Texture Diffuse;
+    ColorF MaterialColor;
     uint IndexStart = 0;
     uint IndexCount = 0;
   };
