@@ -20,5 +20,5 @@ struct PS_IN
 
 static const uint2 kWindowSize = uint2(1280, 720);
 static const float2 kWindowHalfSize = kWindowSize * 0.5f;
-static const uint kBufferNum = 1000000;
-static const uint3 kThreadNum = uint3(512, 1, 1);
+static const uint kBufferNum = 2500000;
+static const uint3 kThreadNum = uint3(1024, 1, 1);

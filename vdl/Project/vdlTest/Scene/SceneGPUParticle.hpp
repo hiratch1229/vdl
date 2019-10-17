@@ -4,7 +4,7 @@
 class SceneGPUParticle : public IScene
 {
   static constexpr vdl::uint kBufferNum = 2500000;
-  static constexpr vdl::uint kThreadNum = 512;
+  static constexpr vdl::uint kThreadNum = 1024;
   static constexpr vdl::uint kThreadGroupNum = kBufferNum / kThreadNum + (kBufferNum % kThreadNum == 0 ? 0 : 1);
 private:
   struct CSConstantBufferData

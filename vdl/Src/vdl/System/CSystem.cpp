@@ -47,6 +47,7 @@ void CSystem::Initialize()
   pSwapChain_->Initialize();
 
   pCPUProfiler_->Initialize();
+  pMemoryProfiler_->Initialize();
 
   pKeyboard_->Initialize();
   pMouse_->Initialize();

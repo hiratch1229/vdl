@@ -130,11 +130,11 @@
     <Filter Include="Src\CPUProfiler">
       <UniqueIdentifier>{f57b198a-4c11-4c68-9c56-e7ba6b9b1829}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\MemoryProfiler">
-      <UniqueIdentifier>{c24a26c3-22fe-4d1d-b44c-cf1d61c4aac0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\GPUProfiler">
       <UniqueIdentifier>{1b3dc6da-4fb1-4930-aa65-64503a52f8c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\MemoryProfiler">
+      <UniqueIdentifier>{67560482-aa26-428a-b3a0-7a18ae13768c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
