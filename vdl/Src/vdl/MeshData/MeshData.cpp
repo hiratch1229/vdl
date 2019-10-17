@@ -5,7 +5,7 @@
 
 namespace vdl
 {
-  MeshData MeshData::Rectangle(const Texture& _Diffuse)
+  MeshData MeshData::Rectangle(const Texture& _Diffuse, const Texture& _NormalMap)
   {
     MeshData MeshData;
     {
@@ -29,19 +29,18 @@ namespace vdl
         MeshData.Indices[5] = 2;
       }
 
-      MeshData.Materials.resize(1);
       {
-        MeshData.Materials[0].Diffuse = _Diffuse;
-        MeshData.Materials[0].MaterialColor = Palette::White;
-        MeshData.Materials[0].IndexStart = 0;
-        MeshData.Materials[0].IndexCount = 6;
+        MeshData.Material.Diffuse = _Diffuse;
+        MeshData.Material.MaterialColor = Palette::White;
+        MeshData.Material.NormalMap = _NormalMap;
+        MeshData.Material.IndexNum = 6;
       }
     }
 
     return MeshData;
   }
 
-  MeshData MeshData::Box(const Texture& _Diffuse)
+  MeshData MeshData::Box(const Texture& _Diffuse, const Texture& _NormalMap)
   {
     MeshData MeshData;
     {
@@ -126,19 +125,18 @@ namespace vdl
         MeshData.Indices[35] = 22;
       }
 
-      MeshData.Materials.resize(1);
       {
-        MeshData.Materials[0].Diffuse = _Diffuse;
-        MeshData.Materials[0].MaterialColor = Palette::White;
-        MeshData.Materials[0].IndexStart = 0;
-        MeshData.Materials[0].IndexCount = 36;
+        MeshData.Material.Diffuse = _Diffuse;
+        MeshData.Material.MaterialColor = Palette::White;
+        MeshData.Material.NormalMap = _NormalMap;
+        MeshData.Material.IndexNum = 36;
       }
     }
 
     return MeshData;
   }
 
-  MeshData MeshData::Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse)
+  MeshData MeshData::Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse, const Texture& _NormalMap)
   {
     //  半径
     constexpr float kRadius = 0.5f;
@@ -147,93 +145,175 @@ namespace vdl
     {
       MeshData.Name = "Sphere";
 
-      const size_t VertexNum = 1 + (_StackCount + 1) * (_SliceCount + 1) + 1;
-      MeshData.Vertices.resize(VertexNum);
+      //  頂点情報
       {
-        //  一番上の点
-        MeshData.Vertices[0] = { { 0.0f, +kRadius, 0.0f }, { 0.0f, +1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+        //  一番上の頂点
+        MeshData.Vertices.push_back({ { 0.0f, +kRadius, 0.0f }, { 0.0f, +1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
 
         const Radian PhiStep = Math::kPI / _StackCount;
         const Radian ThetaStep = Math::kTwoPI / _SliceCount;
 
-        for (uint i = 0; i <= _StackCount; ++i)
+        for (uint i = 1; i <= _StackCount - 1; i++)
         {
           const Radian Phi = PhiStep * i;
-
-          for (uint j = 0; j <= _SliceCount; ++j)
+          for (uint j = 0; j <= _SliceCount; j++)
           {
-            Vertex3D& Vertex = MeshData.Vertices[1 + _SliceCount * i + j];
-
-            const Radian Theta = ThetaStep * j;
-
-            Vertex.Position = float3(kRadius * sinf(Phi) * cosf(Theta), kRadius * cosf(Phi), kRadius * sinf(Phi) * sinf(Theta));
-            Vertex.Tangent = float3(-kRadius * sinf(Phi) * sinf(Theta), 0.0f, kRadius * sinf(Phi) * cosf(Theta)).Normalize();
-            Vertex.Normal = Vertex.Position.Normalize();
-            Vertex.Texcoord = float2(Theta / Math::kTwoPI, Phi / Math::kPI);
-          }
-        }
-
-        //  一番下の点
-        MeshData.Vertices[VertexNum - 1] = { { 0.0f, -kRadius, 0.0f }, { 0.0f, -1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } };
-      }
-
-      const size_t IndexNum = _SliceCount + (_StackCount - 1) * _SliceCount + _SliceCount;
-      MeshData.Indices.resize(IndexNum);
-      {
-        //  一番上の点周辺
-        for (uint i = 0; i < _SliceCount; ++i)
-        {
-          const uint BaseIndex = i * 3;
-          MeshData.Indices[BaseIndex + 0] = 0;
-          MeshData.Indices[BaseIndex + 1] = i + 2;
-          MeshData.Indices[BaseIndex + 2] = i + 1;
-        }
-
-        uint BaseIndex = 1;
-        const uint RingVertexCount = _SliceCount + 1;
-        //  中心部分
-        {
-          for (uint i = 0; i < _StackCount - 2; ++i)
-          {
-            for (uint j = 0; j < _SliceCount; ++j)
+            Vertex3D& Vertex = MeshData.Vertices.emplace_back();
             {
-              const uint StartIndex = _SliceCount * 3 + (_SliceCount * i + j) * 6;
+              const Radian Theta = ThetaStep * j;
 
-              MeshData.Indices[StartIndex + 0] = BaseIndex + i * RingVertexCount + j;
-              MeshData.Indices[StartIndex + 1] = BaseIndex + i * RingVertexCount + j + 1;
-              MeshData.Indices[StartIndex + 2] = BaseIndex + (i + 1) * RingVertexCount + j;
-              MeshData.Indices[StartIndex + 4] = BaseIndex + (i + 1) * RingVertexCount + j;
-              MeshData.Indices[StartIndex + 5] = BaseIndex + i * RingVertexCount + j + 1;
-              MeshData.Indices[StartIndex + 6] = BaseIndex + (i + 1) * RingVertexCount + j + 1;
+              Vertex.Position = float3(kRadius * sinf(Phi) * cosf(Theta), kRadius * cosf(Phi), kRadius * sinf(Phi) * sinf(Theta));
+              Vertex.Tangent = float3(-kRadius * sinf(Phi) * sinf(Theta), 0.0f, kRadius * sinf(Phi) * cosf(Theta)).Normalize();
+              Vertex.Normal = Vertex.Position.Normalize();
+              Vertex.Texcoord = float2(Theta / Math::kTwoPI, Phi / Math::kPI);
             }
           }
         }
 
-        //  一番下の点周辺
-        {
-          const uint SouthPoleIndex = static_cast<uint>(VertexNum) - 1;
-          BaseIndex = SouthPoleIndex - RingVertexCount;
+        //  一番下の頂点
+        MeshData.Vertices.push_back({ { 0.0f, -kRadius, 0.0f }, { 0.0f, -1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } });
+      }
 
-          const uint StartIndex = _SliceCount * 3 + (_StackCount - 2) * _SliceCount * 6;
-          for (uint i = 0; i < _SliceCount; ++i)
+      //  インデックス情報
+      {
+        for (uint i = 1; i <= _StackCount; i++)
+        {
+          MeshData.Indices.emplace_back(0);
+          MeshData.Indices.emplace_back(i + 1);
+          MeshData.Indices.emplace_back(i);
+        }
+
+        uint baseIndex = 1;
+        uint ringVertexCount = _StackCount + 1;
+        for (uint i = 0; i < _StackCount - 2; i++)
+        {
+          for (uint j = 0; j < _SliceCount; j++)
           {
-            MeshData.Indices[StartIndex + i * 3 + 0] = SouthPoleIndex;
-            MeshData.Indices[StartIndex + i * 3 + 1] = BaseIndex + i;
-            MeshData.Indices[StartIndex + i * 3 + 2] = BaseIndex + i + 1;
+            MeshData.Indices.emplace_back(baseIndex + i * ringVertexCount + j);
+            MeshData.Indices.emplace_back(baseIndex + i * ringVertexCount + j + 1);
+            MeshData.Indices.emplace_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+            MeshData.Indices.emplace_back(baseIndex + (i + 1) * ringVertexCount + j);
+            MeshData.Indices.emplace_back(baseIndex + i * ringVertexCount + j + 1);
+            MeshData.Indices.emplace_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
           }
+        }
+
+        uint southPoleIndex = static_cast<vdl::uint>(MeshData.Vertices.size()) - 1;
+        baseIndex = southPoleIndex - ringVertexCount;
+
+        for (uint i = 0; i < _SliceCount; i++)
+        {
+          MeshData.Indices.emplace_back(southPoleIndex);
+          MeshData.Indices.emplace_back(baseIndex + i);
+          MeshData.Indices.emplace_back(baseIndex + i + 1);
         }
       }
 
-      MeshData.Materials.resize(1);
       {
-        MeshData.Materials[0].Diffuse = _Diffuse;
-        MeshData.Materials[0].MaterialColor = Palette::White;
-        MeshData.Materials[0].IndexStart = 0;
-        MeshData.Materials[0].IndexCount = static_cast<vdl::IndexType>(IndexNum);
+        MeshData.Material.Diffuse = _Diffuse;
+        MeshData.Material.MaterialColor = Palette::White;
+        MeshData.Material.NormalMap = _NormalMap;
+        MeshData.Material.IndexNum = static_cast<vdl::IndexType>(MeshData.Indices.size());
       }
     }
 
     return MeshData;
+
+    ////  半径
+    //constexpr float kRadius = 0.5f;
+    //
+    //MeshData MeshData;
+    //{
+    //  MeshData.Name = "Sphere";
+    //
+    //  const size_t VertexNum = 1 + (_StackCount + 1) * (_SliceCount + 1) + 1;
+    //  MeshData.Vertices.resize(VertexNum);
+    //  {
+    //    //  一番上の点
+    //    MeshData.Vertices[0] = { { 0.0f, +kRadius, 0.0f }, { 0.0f, +1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+    //
+    //    const Radian PhiStep = Math::kPI / _StackCount;
+    //    const Radian ThetaStep = Math::kTwoPI / _SliceCount;
+    //
+    //    for (uint i = 0; i <= _StackCount; ++i)
+    //    {
+    //      const Radian Phi = PhiStep * i;
+    //
+    //      for (uint j = 0; j <= _SliceCount; ++j)
+    //      {
+    //        Vertex3D& Vertex = MeshData.Vertices[1 + _SliceCount * i + j];
+    //
+    //        const Radian Theta = ThetaStep * j;
+    //
+    //        Vertex.Position = float3(kRadius * sinf(Phi) * cosf(Theta), kRadius * cosf(Phi), kRadius * sinf(Phi) * sinf(Theta));
+    //        Vertex.Tangent = float3(-kRadius * sinf(Phi) * sinf(Theta), 0.0f, kRadius * sinf(Phi) * cosf(Theta)).Normalize();
+    //        Vertex.Normal = Vertex.Position.Normalize();
+    //        Vertex.Texcoord = float2(Theta / Math::kTwoPI, Phi / Math::kPI);
+    //      }
+    //    }
+    //
+    //    //  一番下の点
+    //    MeshData.Vertices[VertexNum - 1] = { { 0.0f, -kRadius, 0.0f }, { 0.0f, -1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } };
+    //  }
+    //
+    //  const size_t IndexNum = _SliceCount + (_StackCount - 1) * _SliceCount + _SliceCount;
+    //  MeshData.Indices.resize(IndexNum);
+    //  {
+    //    //  一番上の点周辺
+    //    for (uint i = 0; i < _SliceCount; ++i)
+    //    {
+    //      const uint BaseIndex = i * 3;
+    //      MeshData.Indices[BaseIndex + 0] = 0;
+    //      MeshData.Indices[BaseIndex + 1] = i + 2;
+    //      MeshData.Indices[BaseIndex + 2] = i + 1;
+    //    }
+    //
+    //    uint BaseIndex = 1;
+    //    const uint RingVertexCount = _SliceCount + 1;
+    //    //  中心部分
+    //    {
+    //      for (uint i = 0; i < _StackCount - 2; ++i)
+    //      {
+    //        for (uint j = 0; j < _SliceCount; ++j)
+    //        {
+    //          const uint StartIndex = _SliceCount * 3 + (_SliceCount * i + j) * 6;
+    //
+    //          MeshData.Indices[StartIndex + 0] = BaseIndex + i * RingVertexCount + j;
+    //          MeshData.Indices[StartIndex + 1] = BaseIndex + i * RingVertexCount + j + 1;
+    //          MeshData.Indices[StartIndex + 2] = BaseIndex + (i + 1) * RingVertexCount + j;
+    //          MeshData.Indices[StartIndex + 4] = BaseIndex + (i + 1) * RingVertexCount + j;
+    //          MeshData.Indices[StartIndex + 5] = BaseIndex + i * RingVertexCount + j + 1;
+    //          MeshData.Indices[StartIndex + 6] = BaseIndex + (i + 1) * RingVertexCount + j + 1;
+    //        }
+    //      }
+    //    }
+    //
+    //    //  一番下の点周辺
+    //    {
+    //      const uint SouthPoleIndex = static_cast<uint>(VertexNum) - 1;
+    //      BaseIndex = SouthPoleIndex - RingVertexCount;
+    //
+    //      const uint StartIndex = _SliceCount * 3 + (_StackCount - 2) * _SliceCount * 6;
+    //      for (uint i = 0; i < _SliceCount; ++i)
+    //      {
+    //        MeshData.Indices[StartIndex + i * 3 + 0] = SouthPoleIndex;
+    //        MeshData.Indices[StartIndex + i * 3 + 1] = BaseIndex + i;
+    //        MeshData.Indices[StartIndex + i * 3 + 2] = BaseIndex + i + 1;
+    //      }
+    //    }
+    //  }
+    //
+    //  MeshData.Materials.resize(1);
+    //  {
+    //    MeshData.Materials[0].Diffuse = _Diffuse;
+    //    MeshData.Materials[0].MaterialColor = Palette::White;
+    //    MeshData.Materials[0].IndexStart = 0;
+    //    MeshData.Materials[0].IndexCount = static_cast<vdl::IndexType>(IndexNum);
+    //  }
+    //}
+    //
+    //return MeshData;
   }
 
   //MeshData MeshData::Capsule(uint _SliceCount, uint _StackCount, float _Height, const Texture& _Diffuse)

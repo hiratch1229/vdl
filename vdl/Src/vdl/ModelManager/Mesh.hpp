@@ -13,8 +13,8 @@ struct Mesh
   std::string Name;
   VertexBuffer VertexBuffer;
   IndexBuffer IndexBuffer;
-  std::vector<vdl::Material> Materials;
   std::vector<vdl::Animation> Animations;
+  vdl::Material Material;
   vdl::Matrix GlobalTransform;
 };
 using Meshes = std::vector<Mesh>;

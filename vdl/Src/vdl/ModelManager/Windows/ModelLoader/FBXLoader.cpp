@@ -177,21 +177,10 @@ void FBXLoader::FetchMaterials(fbxsdk::FbxMesh* _pMesh, Materials* _pMaterials, 
     Material& Material = (*_pMaterials)[MaterialCount];
 
     const fbxsdk::FbxSurfaceMaterial* pSurfaceMaterial = pNode->GetMaterial(MaterialCount);
-    auto FetchMaterialProperty = [&](Material::Property* _pProperty, const char* _PropertyName, const char* _FactorName)->void
+    auto FetchMaterialProperty = [&](vdl::CompressionImage* _pCompressionImage, const char* _PropertyName, const char* _FactorName)->void
     {
       const fbxsdk::FbxProperty Property = pSurfaceMaterial->FindProperty(_PropertyName);
       const fbxsdk::FbxProperty Factor = pSurfaceMaterial->FindProperty(_FactorName);
-
-      if (Property.IsValid() && Factor.IsValid())
-      {
-        const fbxsdk::FbxDouble3 Color = Property.Get<fbxsdk::FbxDouble3>();
-        const double f = Factor.Get<fbxsdk::FbxDouble>();
-
-        _pProperty->Color.Red = static_cast<float>(Color[0] * f);
-        _pProperty->Color.Green = static_cast<float>(Color[1] * f);
-        _pProperty->Color.Blue = static_cast<float>(Color[2] * f);
-        _pProperty->Color.Alpha = 1.0f;
-      }
 
       if (Property.IsValid())
       {
@@ -202,21 +191,24 @@ void FBXLoader::FetchMaterials(fbxsdk::FbxMesh* _pMesh, Materials* _pMaterials, 
           if (fbxsdk::FbxFileTexture * pFileTexture = Property.GetSrcObject<fbxsdk::FbxFileTexture>())
           {
             const std::string FileName = (_FileFormat == "fbx" ? _FileDirectory + pFileTexture->GetRelativeFileName() : pFileTexture->GetFileName());
-            _pProperty->CompressionImage = _TextureLoader.LoadFromFile(FileName.c_str());
+            (*_pCompressionImage) = _TextureLoader.LoadFromFile(FileName.c_str());
           }
-        }
-        else
-        {
-          vdl::Image Image;
-          {
-            Image.Resize(1);
-            Image.Buffer()[0] = vdl::Palette::White;
-          }
-
-          _pProperty->CompressionImage = Image;
         }
       }
     };
+
+    if (const fbxsdk::FbxProperty Property = pSurfaceMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuse),
+      Factor = pSurfaceMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuseFactor);
+      Property.IsValid() && Factor.IsValid())
+    {
+      const fbxsdk::FbxDouble3 Color = Property.Get<fbxsdk::FbxDouble3>();
+      const double f = Factor.Get<fbxsdk::FbxDouble>();
+
+      Material.MaterialColor.Red = static_cast<float>(Color[0] * f);
+      Material.MaterialColor.Green = static_cast<float>(Color[1] * f);
+      Material.MaterialColor.Blue = static_cast<float>(Color[2] * f);
+      Material.MaterialColor.Alpha = 1.0f;
+    }
 
     FetchMaterialProperty(&Material.Diffuse, fbxsdk::FbxSurfaceMaterial::sDiffuse, fbxsdk::FbxSurfaceMaterial::sDiffuseFactor);
     FetchMaterialProperty(&Material.Ambient, fbxsdk::FbxSurfaceMaterial::sAmbient, fbxsdk::FbxSurfaceMaterial::sAmbientFactor);

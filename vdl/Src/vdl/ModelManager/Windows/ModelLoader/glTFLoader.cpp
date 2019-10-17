@@ -134,7 +134,7 @@ void glTFLoader::FetchMaterial(const std::unique_ptr<Microsoft::glTF::GLTFResour
   const vdl::uint MaterialNum = static_cast<vdl::uint>(_Mesh.primitives.size());
   _pMaterials->resize(MaterialNum);
 
-  auto GetMaterialBinaryData = [&](Material::Property* _pProperty, const std::string& _TextureID, const Microsoft::glTF::Color4& _Color = { 1.0f, 1.0f, 1.0f, 1.0f })->void
+  auto GetMaterialBinaryData = [&](vdl::CompressionImage* _pCompressionImage, const std::string& _TextureID)->void
   {
     if (!_TextureID.empty())
     {
@@ -144,25 +144,13 @@ void glTFLoader::FetchMaterial(const std::unique_ptr<Microsoft::glTF::GLTFResour
       if (!Image.bufferViewId.empty())
       {
         const Microsoft::glTF::BufferView& BufferView = _Document.bufferViews.Get(Image.bufferViewId);
-        _pProperty->CompressionImage = _TextureLoader.LoadFromMemory(_pResourceReader->ReadBinaryData<vdl::uint8_t>(_Document, BufferView));
+        (*_pCompressionImage) = _TextureLoader.LoadFromMemory(_pResourceReader->ReadBinaryData<vdl::uint8_t>(_Document, BufferView));
       }
       else
       {
-        _pProperty->CompressionImage = _TextureLoader.LoadFromFile((_Directory + Image.uri).c_str());
+        (*_pCompressionImage) = _TextureLoader.LoadFromFile((_Directory + Image.uri).c_str());
       }
     }
-    else
-    {
-      vdl::Image Image;
-      {
-        Image.Resize(1);
-        Image.Buffer()[0] = vdl::Palette::White;
-      }
-
-      _pProperty->CompressionImage = Image;
-    }
-
-    _pProperty->Color = Cast(_Color);
   };
 
   for (vdl::uint MaterialCount = 0; MaterialCount < MaterialNum; ++MaterialCount)
@@ -171,8 +159,12 @@ void glTFLoader::FetchMaterial(const std::unique_ptr<Microsoft::glTF::GLTFResour
 
     const Microsoft::glTF::Material& GltfMaterial = _Document.materials.Get(_Mesh.primitives[MaterialCount].materialId);
 
-    GetMaterialBinaryData(&Material.Diffuse, GltfMaterial.metallicRoughness.baseColorTexture.textureId, GltfMaterial.metallicRoughness.baseColorFactor);
+    Material.MaterialColor = Cast(GltfMaterial.metallicRoughness.baseColorFactor);
+    GetMaterialBinaryData(&Material.Diffuse, GltfMaterial.metallicRoughness.baseColorTexture.textureId);
     GetMaterialBinaryData(&Material.NormalMap, GltfMaterial.normalTexture.textureId);
+    GetMaterialBinaryData(&Material.MetallicRoughness, GltfMaterial.metallicRoughness.metallicRoughnessTexture.textureId);
+    GetMaterialBinaryData(&Material.Occlusion, GltfMaterial.occlusionTexture.textureId);
+    GetMaterialBinaryData(&Material.Emissive, GltfMaterial.emissiveTexture.textureId);
   }
 }
 

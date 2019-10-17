@@ -6,7 +6,7 @@
 #include "Scene/SceneTessellation.hpp"
 #include "Scene/SceneGPUParticle.hpp"
 #include "Scene/SceneDeferred.hpp"
-#define INIT_SCENE SceneSprite
+#define INIT_SCENE SceneDeferred
 
 #include <memory>
 

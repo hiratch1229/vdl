@@ -8,24 +8,21 @@
 
 struct Material
 {
-  struct Property
-  {
-    vdl::CompressionImage CompressionImage;
-    vdl::ColorF Color;
-
-    CEREAL_SERIALIZE(CompressionImage, Color)
-  };
-
-  Property Diffuse;
-  Property Ambient;
-  Property Specular;
-  Property NormalMap;
-  Property Bump;
+  vdl::ColorF MaterialColor = vdl::Palette::White;
+  vdl::CompressionImage Diffuse;
+  vdl::CompressionImage Ambient;
+  vdl::CompressionImage Specular;
+  vdl::CompressionImage NormalMap;
+  vdl::CompressionImage Bump;
+  vdl::CompressionImage MetallicRoughness;
+  vdl::CompressionImage Occlusion;
+  vdl::CompressionImage Emissive;
   vdl::uint IndexStart = 0;
   vdl::uint IndexCount = 0;
 
-  CEREAL_SERIALIZE(Diffuse, Ambient, Ambient, Specular, NormalMap, Bump, IndexStart, IndexCount)
+  CEREAL_SERIALIZE(MaterialColor, Diffuse, Ambient, Specular, NormalMap, MetallicRoughness, Occlusion, Emissive, Bump, IndexStart, IndexCount)
 };
+
 struct Bone
 {
   std::string Name;
@@ -35,6 +32,7 @@ struct Bone
   CEREAL_SERIALIZE(Name, Offset, Pose)
 };
 using Skeletal = std::vector<Bone>;
+
 struct Animation
 {
   std::string Name;
@@ -42,6 +40,7 @@ struct Animation
 
   CEREAL_SERIALIZE(Name, Skeletals)
 };
+
 using Vertices = std::vector<vdl::Vertex3D>;
 using Indices = std::vector<vdl::IndexType>;
 using Materials = std::vector<Material>;

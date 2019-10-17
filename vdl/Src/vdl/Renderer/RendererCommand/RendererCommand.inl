@@ -257,24 +257,21 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
               _pDeviceContext->SetVertexBuffer(pMesh->VertexBuffer);
               _pDeviceContext->SetIndexBuffer(pMesh->IndexBuffer);
 
-              for (auto& Material : pMesh->Materials)
+              std::vector<InstanceData> TempInstances = Instances;
+              for (auto& TempInstance : TempInstances)
               {
-                std::vector<InstanceData> TempInstances = Instances;
-                for (auto& TempInstance : TempInstances)
-                {
-                  TempInstance.Color.Red *= Material.MaterialColor.Red;
-                  TempInstance.Color.Green *= Material.MaterialColor.Green;
-                  TempInstance.Color.Blue *= Material.MaterialColor.Blue;
-                  TempInstance.Color.Alpha *= Material.MaterialColor.Alpha;
-                }
-
-                pDevice_->WriteMemory(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()), TempInstances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
-
-
-                _pDeviceContext->PSSetShaderResources(0, 1, &vdl::ShaderResource(Material.Diffuse));
-
-                _pDeviceContext->DrawIndexed(Material.IndexCount, ContinuousDrawCallNum, Material.IndexStart, 0, 0);
+                TempInstance.Color.Red *= pMesh->Material.MaterialColor.Red;
+                TempInstance.Color.Green *= pMesh->Material.MaterialColor.Green;
+                TempInstance.Color.Blue *= pMesh->Material.MaterialColor.Blue;
+                TempInstance.Color.Alpha *= pMesh->Material.MaterialColor.Alpha;
               }
+
+              pDevice_->WriteMemory(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()), TempInstances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
+
+              _pDeviceContext->PSSetShaderResources(0, 1, &vdl::ShaderResource(pMesh->Material.Diffuse));
+              _pDeviceContext->PSSetShaderResources(1, 1, &vdl::ShaderResource(pMesh->Material.NormalMap));
+
+              _pDeviceContext->DrawIndexed(pMesh->Material.IndexNum, ContinuousDrawCallNum, 0, 0, 0);
             }
 
             if (DrawState == DrawStateType::eEnd)
