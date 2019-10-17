@@ -5,6 +5,7 @@
 
 class ISwapChain;
 class ICPUProfiler;
+class IMemoryProfiler;
 class IKeyboard;
 class IMouse;
 class IXInput;
@@ -23,6 +24,7 @@ class CSystem : public ISystem
 private:
   ISwapChain* pSwapChain_;
   ICPUProfiler* pCPUProfiler_;
+  IMemoryProfiler* pMemoryProfiler_;
   IKeyboard* pKeyboard_;
   IMouse* pMouse_;
   IXInput* pXInput_;
@@ -43,6 +45,7 @@ private:
   vdl::uint Frames_ = 0;
   vdl::uint CurrentFPS_ = 0;
   double CurrentCPUUseRate_;
+  double CurrentMemoryUseRate_;
 public:
   CSystem() = default;
 
@@ -64,6 +67,8 @@ public:
 
   float GetCPUUseRate()const override { return static_cast<float>(CurrentCPUUseRate_); }
 
+  float GetMemoryUseRate()const override { return static_cast<float>(CurrentMemoryUseRate_); }
+
   void Pause()override { SystemState_ = SystemState::ePause; }
 
   void Resume()override
@@ -72,7 +77,7 @@ public:
     {
       return;
     }
-    
+
     SystemState_ = SystemState::eRunning;
     LastTime_ = std::chrono::high_resolution_clock::now();
   }

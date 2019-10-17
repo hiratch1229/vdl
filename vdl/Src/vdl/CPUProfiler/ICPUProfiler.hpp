@@ -11,5 +11,5 @@ public:
 
   virtual void Initialize() = 0;
 
-  [[nodiscard]] virtual double GetAsyncUseRate()const = 0;
+  [[nodiscard]] virtual double GetUseRate()const = 0;
 };

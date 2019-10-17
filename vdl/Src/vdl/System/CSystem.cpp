@@ -6,6 +6,7 @@
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/SwapChain/ISwapChain.hpp>
 #include <vdl/CPUProfiler/ICPUProfiler.hpp>
+#include <vdl/MemoryProfiler/IMemoryProfiler.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
 #include <vdl/Input/Mouse/IMouse.hpp>
 #include <vdl/Input/XInput/IXInput.hpp>
@@ -32,6 +33,7 @@ void CSystem::Initialize()
 {
   pSwapChain_ = Engine::Get<ISwapChain>();
   pCPUProfiler_ = Engine::Get<ICPUProfiler>();
+  pMemoryProfiler_ = Engine::Get<IMemoryProfiler>();
   pKeyboard_ = Engine::Get<IKeyboard>();
   pMouse_ = Engine::Get<IMouse>();
   pXInput_ = Engine::Get<IXInput>();
@@ -154,7 +156,8 @@ bool CSystem::Update()
       Frames_ = 0;
       TimeStamp_ = Duration(0.0);
 
-      CurrentCPUUseRate_ = pCPUProfiler_->GetAsyncUseRate();
+      CurrentCPUUseRate_ = pCPUProfiler_->GetUseRate();
+      CurrentMemoryUseRate_ = pMemoryProfiler_->GetUseRate();
     }
   }
 

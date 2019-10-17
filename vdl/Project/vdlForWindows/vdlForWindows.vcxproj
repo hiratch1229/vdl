@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\XInput\Windows\CXInput.cpp" />
     <ClCompile Include="..\..\Src\vdl\Main\Windows\WinMain.cpp" />
+    <ClCompile Include="..\..\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.cpp" />
@@ -46,6 +47,7 @@
     <ClInclude Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\XInput\Windows\CXInput.hpp" />
+    <ClInclude Include="..\..\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.hpp" />
     <ClInclude Include="..\..\Src\vdl\Misc\Windows\Misc.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.hpp" />

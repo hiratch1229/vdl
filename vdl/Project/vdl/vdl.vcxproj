@@ -127,6 +127,7 @@
     <ClInclude Include="..\..\Src\vdl\Input\Mouse\IMouse.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\XInput\IXInput.hpp" />
     <ClInclude Include="..\..\Src\vdl\Instance\Instance.hpp" />
+    <ClInclude Include="..\..\Src\vdl\MemoryProfiler\IMemoryProfiler.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\IModelManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Mesh.hpp" />
     <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\MouseFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\XInput\XInput.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\XInput\XInputFactory.cpp" />
+    <ClCompile Include="..\..\Src\vdl\MemoryProfiler\MemoryProfilerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\ModelManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Model\Model.cpp" />

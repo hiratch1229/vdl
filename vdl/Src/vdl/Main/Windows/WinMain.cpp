@@ -54,6 +54,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
   case WM_MOUSEHWHEEL:
     Engine::Get<IMouse>()->Scroll(vdl::int2(GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA, 0));
     break;
+  case WM_ENTERSIZEMOVE:
+    Engine::Get<ISystem>()->Pause();
+    break;
+  case WM_EXITSIZEMOVE:
+    Engine::Get<ISystem>()->Resume();
+    break;
   case WM_CHAR:
     // You can also use ToAscii()+GetKeyboardState() to retrieve characters.
     if (wParam > 0 && wParam < 0x10000)

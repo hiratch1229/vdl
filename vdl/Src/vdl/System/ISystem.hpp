@@ -28,6 +28,8 @@ public:
 
   [[nodiscard]] virtual float GetCPUUseRate()const = 0;
 
+  [[nodiscard]] virtual float GetMemoryUseRate()const = 0;
+
   virtual void Pause() = 0;
 
   virtual void Resume() = 0;

@@ -55,6 +55,9 @@
     <Filter Include="Src\CPUProfiler">
       <UniqueIdentifier>{74faa68e-1d3b-4637-b560-e518c2d080a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\MemoryProfiler">
+      <UniqueIdentifier>{c702c676-e7f4-429f-af48-e501e72332b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.cpp">
@@ -101,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.cpp">
       <Filter>Src\CPUProfiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.cpp">
+      <Filter>Src\MemoryProfiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.hpp">
       <Filter>Src\CPUProfiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.hpp">
+      <Filter>Src\MemoryProfiler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

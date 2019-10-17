@@ -6,6 +6,7 @@ class IDevice;
 class IDeviceContext;
 class ISwapChain;
 class ICPUProfiler;
+class IMemoryProfiler;
 class IKeyboard;
 class IMouse;
 class IXInput;
@@ -47,6 +48,7 @@ private:
   Component<IDeviceContext> pDeviceContext_;
   Component<ISwapChain> pSwapChain_;
   Component<ICPUProfiler> pCPUProfiler_;
+  Component<IMemoryProfiler> pMemoryProfiler_;
   Component<IKeyboard> pKeyboard_;
   Component<IMouse> pMouse_;
   Component<IXInput> pXInput_;
@@ -70,6 +72,7 @@ public:
   template<> [[nodiscard]] static IDeviceContext* Get() { return pEngine->pDeviceContext_.Get(); }
   template<> [[nodiscard]] static ISwapChain* Get() { return pEngine->pSwapChain_.Get(); }
   template<> [[nodiscard]] static ICPUProfiler* Get() { return pEngine->pCPUProfiler_.Get(); }
+  template<> [[nodiscard]] static IMemoryProfiler* Get() { return pEngine->pMemoryProfiler_.Get(); }
   template<> [[nodiscard]] static IKeyboard* Get() { return pEngine->pKeyboard_.Get(); }
   template<> [[nodiscard]] static IMouse* Get() { return pEngine->pMouse_.Get(); }
   template<> [[nodiscard]] static IXInput* Get() { return pEngine->pXInput_.Get(); }

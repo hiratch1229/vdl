@@ -25,8 +25,9 @@ void Main()
   while (vdl::System::Update())
   {
     ImGui::Begin("Information");
-    ImGui::Text("CPU:%.f%%", vdl::System::GetCPUUseRate());
     ImGui::Text("FPS:%d(1 / %f)", vdl::System::GetFPS(), vdl::System::GetDeltaTime());
+    ImGui::Text("CPU:%f%%", vdl::System::GetCPUUseRate());
+    ImGui::Text("Memory:%f%%", vdl::System::GetMemoryUseRate());
     if (ImGui::InputInt("MaxFPS", reinterpret_cast<int*>(&MaxFPS)))
     {
       vdl::System::SetMaxFPS(MaxFPS);

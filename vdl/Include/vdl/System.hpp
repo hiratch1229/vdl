@@ -34,4 +34,6 @@ namespace vdl::System
   [[nodiscard]] uint GetFPS();
 
   [[nodiscard]] float GetCPUUseRate();
+
+  [[nodiscard]] float GetMemoryUseRate();
 }

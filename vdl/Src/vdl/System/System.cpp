@@ -46,4 +46,9 @@ namespace vdl::System
   {
     return Engine::Get<ISystem>()->GetCPUUseRate();
   }
+
+  float GetMemoryUseRate()
+  {
+    return Engine::Get<ISystem>()->GetMemoryUseRate();
+  }
 }
