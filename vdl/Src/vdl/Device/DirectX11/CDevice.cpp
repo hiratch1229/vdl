@@ -65,7 +65,7 @@ namespace
       return DXGI_FORMAT_R32_UINT;
     default: assert(false);
     }
-   
+
     return DXGI_FORMAT_R16_UINT;
   }
 }
@@ -458,7 +458,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     DepthStencilBufferDesc.Height = pDepthStencilTexture->TextureSize.y;
     DepthStencilBufferDesc.MipLevels = 1;
     DepthStencilBufferDesc.ArraySize = 1;
-    DepthStencilBufferDesc.Format = Cast(_Format);
+    DepthStencilBufferDesc.Format = TextureFormatFromDepthStencilFormat(_Format);
     DepthStencilBufferDesc.SampleDesc.Count = 1;
     DepthStencilBufferDesc.SampleDesc.Quality = 0;
     DepthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -473,10 +473,26 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-  hr = pD3D11Device_->CreateShaderResourceView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilTexture->pShaderResourceView.GetAddressOf());
+  D3D11_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+  {
+    ShaderResourceViewDesc.Format = ShaderResourceFormatFromDepthStencilFormat(_Format);
+    ShaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+    ShaderResourceViewDesc.Texture2D.MipLevels = 1;
+  }
+
+  hr = pD3D11Device_->CreateShaderResourceView(pDepthStencilBuffer.Get(), &ShaderResourceViewDesc, pDepthStencilTexture->pShaderResourceView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
-  hr = pD3D11Device_->CreateDepthStencilView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilTexture->pDepthStencilView.GetAddressOf());
+  D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
+  {
+    DepthStencilViewDesc.Format = Cast(_Format);
+    DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    DepthStencilViewDesc.Flags = 0;
+    DepthStencilViewDesc.Texture2D.MipSlice = 0;
+  }
+
+  hr = pD3D11Device_->CreateDepthStencilView(pDepthStencilBuffer.Get(), &DepthStencilViewDesc, pDepthStencilTexture->pDepthStencilView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppDepthStecilTexture) = std::move(pDepthStencilTexture);

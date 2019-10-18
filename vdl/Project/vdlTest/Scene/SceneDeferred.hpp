@@ -22,11 +22,17 @@ private:
   static constexpr float kRectangleScale = 15.0f;
   static constexpr float kRectangleHalfScale = kRectangleScale*0.5f;
   static constexpr vdl::uint kDataNum = 100;
+  static constexpr vdl::uint kUseRenderTextureNum = 2;
 private:
   vdl::Mesh Rectangle_;
   vdl::Mesh Sphere_;
   vdl::Camera Camera_;
   std::array<Data, kDataNum> Datas_;
+private:
+  vdl::VertexShader DeferredVertexShader_;
+  vdl::PixelShader DeferredPixelShader_;
+  vdl::RenderTextures DeferredRenderTextures_;
+  vdl::DepthStencilTexture DeferredDepthTexture_;
 public:
   SceneDeferred() = default;
 

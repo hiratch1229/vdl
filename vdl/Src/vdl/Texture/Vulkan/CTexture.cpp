@@ -27,11 +27,12 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
     SrcStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
     ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
     break;
+  case vk::ImageLayout::eDepthReadOnlyStencilAttachmentOptimal:
+    SrcStageMask = vk::PipelineStageFlagBits::eAllGraphics;
+    ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead;
+    break;
   case vk::ImageLayout::eShaderReadOnlyOptimal:
-    SrcStageMask = vk::PipelineStageFlagBits::eAllGraphics
-      /*vk::PipelineStageFlagBits::eVertexShader | vk::PipelineStageFlagBits::eTessellationControlShader
-      | vk::PipelineStageFlagBits::eTessellationEvaluationShader | vk::PipelineStageFlagBits::eGeometryShader
-      | vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eComputeShader*/;
+    SrcStageMask = vk::PipelineStageFlagBits::eAllGraphics;
     ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eShaderRead;
     break;
   case vk::ImageLayout::eTransferDstOptimal:
@@ -53,11 +54,12 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
     DstStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
     ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
     break;
+  case vk::ImageLayout::eDepthReadOnlyStencilAttachmentOptimal:
+    DstStageMask = vk::PipelineStageFlagBits::eAllGraphics;
+    ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead;
+    break;
   case vk::ImageLayout::eShaderReadOnlyOptimal:
-    DstStageMask = vk::PipelineStageFlagBits::eAllGraphics
-      /*vk::PipelineStageFlagBits::eVertexShader | vk::PipelineStageFlagBits::eTessellationControlShader
-      | vk::PipelineStageFlagBits::eTessellationEvaluationShader | vk::PipelineStageFlagBits::eGeometryShader
-      | vk::PipelineStageFlagBits::eFragmentShader | vk::PipelineStageFlagBits::eComputeShader*/;
+    DstStageMask = vk::PipelineStageFlagBits::eAllGraphics;
     ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
     break;
   case vk::ImageLayout::eTransferDstOptimal:

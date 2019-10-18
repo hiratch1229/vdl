@@ -400,23 +400,23 @@ namespace vdl::Renderer3D
     }
   }
 
-  void Draw(const Mesh& _Mesh, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color = Palette::White);
-
-  void Draw(const Mesh& _Mesh, const Matrix& _World, const MotionBlendDatas& _MotionBlendDatas, const ColorF& _Color = Palette::White);
-
-  inline void Draw(const Model& _Model, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color = Palette::White)
-  {
-    for (auto& Mesh : _Model.GetMeshes())
-    {
-      Draw(Mesh, _World, _MotionData, _Color);
-    }
-  }
-
-  inline void Draw(const Model& _Model, const Matrix& _World, const std::vector<MotionBlendData>& _MotionBlendDatas, const ColorF& _Color = Palette::White)
-  {
-    for (auto& Mesh : _Model.GetMeshes())
-    {
-      Draw(Mesh, _World, _MotionBlendDatas, _Color);
-    }
-  }
+  //void Draw(const Mesh& _Mesh, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color = Palette::White);
+  //
+  //void Draw(const Mesh& _Mesh, const Matrix& _World, const MotionBlendDatas& _MotionBlendDatas, const ColorF& _Color = Palette::White);
+  //
+  //inline void Draw(const Model& _Model, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color = Palette::White)
+  //{
+  //  for (auto& Mesh : _Model.GetMeshes())
+  //  {
+  //    Draw(Mesh, _World, _MotionData, _Color);
+  //  }
+  //}
+  //
+  //inline void Draw(const Model& _Model, const Matrix& _World, const std::vector<MotionBlendData>& _MotionBlendDatas, const ColorF& _Color = Palette::White)
+  //{
+  //  for (auto& Mesh : _Model.GetMeshes())
+  //  {
+  //    Draw(Mesh, _World, _MotionBlendDatas, _Color);
+  //  }
+  //}
 }

@@ -117,6 +117,12 @@
     <FxCompile Include="Shader\Mesh\MeshVS.hlsl">
       <Filter>シェーダーファイル\Mesh</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Deferred\DeferredVS.hlsl">
+      <Filter>シェーダーファイル\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Deferred\DeferredPS.hlsl">
+      <Filter>シェーダーファイル\Deferred</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">
@@ -130,6 +136,9 @@
     </None>
     <None Include="Shader\Mesh\Mesh.hlsli">
       <Filter>シェーダーファイル\Mesh</Filter>
+    </None>
+    <None Include="Shader\Deferred\Deferred.hlsli">
+      <Filter>シェーダーファイル\Deferred</Filter>
     </None>
   </ItemGroup>
 </Project>

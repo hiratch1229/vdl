@@ -96,7 +96,7 @@ namespace vdl
 
     void SetVertexShader(const VertexShader& _VertexShader)
     {
-      assert(!_VertexShader.isEmpty());
+      assert(!_VertexShader.isEmpty() && _VertexShader.GetInputLayout() == InputLayoutType::eNone);
 
       Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, InputLayoutType::eNone);
     }
@@ -343,7 +343,7 @@ namespace vdl
 
     void SetVertexShader(const VertexShader& _VertexShader)
     {
-      assert(!_VertexShader.isEmpty());
+      assert(!_VertexShader.isEmpty() && _VertexShader.GetInputLayout() == InputLayoutType::eTexture);
 
       Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, InputLayoutType::eTexture);
     }
@@ -547,7 +547,7 @@ namespace vdl
 
     void SetVertexShader(const VertexShader& _VertexShader)
     {
-      assert(!_VertexShader.isEmpty());
+      assert(!_VertexShader.isEmpty() && _VertexShader.GetInputLayout() == InputLayoutType::eMesh);
 
       Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, InputLayoutType::eMesh);
     }
@@ -624,7 +624,7 @@ namespace vdl
 
     void SetPixelStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
-      assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
+      assert(1 < _StartSlot && _StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
       {
@@ -708,7 +708,7 @@ namespace vdl
     {
       assert(!_Mesh.isEmpty());
 
-      Engine::Get<IRenderer>()->Draw(_Mesh, _World, {} , _Color);
+      Engine::Get<IRenderer>()->Draw(_Mesh, _World, {}, _Color);
     }
 
     void Draw(const Mesh& _Mesh, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color)

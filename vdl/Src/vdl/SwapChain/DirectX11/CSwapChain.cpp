@@ -89,15 +89,7 @@ void CSwapChain::Initialize()
       _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
-    {
-      DepthStencilViewDesc.Format = kDepthStencilFormat;
-      DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-      DepthStencilViewDesc.Flags = 0;
-      DepthStencilViewDesc.Texture2D.MipSlice = 0;
-    }
-
-    hr = pDevice->CreateDepthStencilView(pDepthStencilBuffer.Get(), &DepthStencilViewDesc, pDepthStencilView_.GetAddressOf());
+    hr = pDevice->CreateDepthStencilView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilView_.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
   }
 }

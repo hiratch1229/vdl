@@ -156,3 +156,39 @@ inline constexpr vk::Format Cast(vdl::FormatType _Format)
 
   return vk::Format::eUndefined;
 }
+
+//inline constexpr vk::Format TextureFormatFromDepthStencilFormat(vdl::FormatType _Format)
+//{
+//  switch (_Format)
+//  {
+//  case vdl::FormatType::eD32_Float_S8X24_Uint:
+//    return vk::Format::;
+//  case vdl::FormatType::eD32_Float:
+//    return vk::Format::eR32Sfloat;
+//  case vdl::FormatType::eD24_Unorm_S8_Uint:
+//    return vk::Format::;
+//  case vdl::FormatType::eD16_Unorm:
+//    return DXGI_FORMAT_R16_TYPELESS;
+//  default: assert(false);
+//  }
+//
+//  return DXGI_FORMAT_UNKNOWN;
+//}
+//
+//inline constexpr vk::Format  ShaderResourceFormatFromDepthStencilFormat(vdl::FormatType _Format)
+//{
+//  switch (_Format)
+//  {
+//  case vdl::FormatType::eD32_Float_S8X24_Uint:
+//    return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+//  case vdl::FormatType::eD32_Float:
+//    return DXGI_FORMAT_R32_FLOAT;
+//  case vdl::FormatType::eD24_Unorm_S8_Uint:
+//    return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+//  case vdl::FormatType::eD16_Unorm:
+//    return DXGI_FORMAT_R16_UNORM;
+//  default: assert(false);
+//  }
+//
+//  return DXGI_FORMAT_UNKNOWN;
+//}

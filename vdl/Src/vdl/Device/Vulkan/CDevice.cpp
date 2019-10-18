@@ -684,6 +684,15 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
     VkDevice_->bindImageMemory(pRenderTexture->Image.get(), pRenderTexture->Memory.get(), 0);
   }
 
+  vk::ImageSubresourceRange SubresourceRange;
+  {
+    SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+    SubresourceRange.baseMipLevel = 0;
+    SubresourceRange.levelCount = 1;
+    SubresourceRange.baseArrayLayer = 0;
+    SubresourceRange.layerCount = 1;
+  }
+
   //  ビューの作成
   {
     vk::ImageViewCreateInfo ImageViewInfo;
@@ -695,11 +704,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
       ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
-      ImageViewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-      ImageViewInfo.subresourceRange.baseArrayLayer = 0;
-      ImageViewInfo.subresourceRange.baseMipLevel = 0;
-      ImageViewInfo.subresourceRange.layerCount = 1;
-      ImageViewInfo.subresourceRange.levelCount = 1;
+      ImageViewInfo.subresourceRange = SubresourceRange;
     }
 
     pRenderTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
@@ -708,15 +713,6 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
 
   //  レイアウトの変更
   {
-    vk::ImageSubresourceRange SubresourceRange;
-    {
-      SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-      SubresourceRange.baseMipLevel = 0;
-      SubresourceRange.levelCount = 1;
-      SubresourceRange.baseArrayLayer = 0;
-      SubresourceRange.layerCount = 1;
-    }
-
     CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
     pRenderTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
     CommandBuffer_->end();
@@ -776,6 +772,15 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     VkDevice_->bindImageMemory(pDepthStencilTexture->Image.get(), pDepthStencilTexture->Memory.get(), 0);
   }
 
+  vk::ImageSubresourceRange SubresourceRange;
+  {
+    SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth /*| vk::ImageAspectFlagBits::eStencil*/;
+    SubresourceRange.baseMipLevel = 0;
+    SubresourceRange.levelCount = 1;
+    SubresourceRange.baseArrayLayer = 0;
+    SubresourceRange.layerCount = 1;
+  }
+
   //  ビューの作成
   {
     vk::ImageViewCreateInfo ImageViewInfo;
@@ -787,11 +792,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
       ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
-      ImageViewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
-      ImageViewInfo.subresourceRange.baseArrayLayer = 0;
-      ImageViewInfo.subresourceRange.baseMipLevel = 0;
-      ImageViewInfo.subresourceRange.layerCount = 1;
-      ImageViewInfo.subresourceRange.levelCount = 1;
+      ImageViewInfo.subresourceRange = SubresourceRange;
     }
 
     pDepthStencilTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
@@ -800,15 +801,6 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
 
   //  レイアウトの変更
   {
-    vk::ImageSubresourceRange SubresourceRange;
-    {
-      SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
-      SubresourceRange.baseMipLevel = 0;
-      SubresourceRange.levelCount = 1;
-      SubresourceRange.baseArrayLayer = 0;
-      SubresourceRange.layerCount = 1;
-    }
-
     CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
     pDepthStencilTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eDepthStencilAttachmentOptimal, SubresourceRange);
     CommandBuffer_->end();
