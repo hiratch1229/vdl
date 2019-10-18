@@ -229,45 +229,59 @@ namespace
   // デバッグ時のメッセージコールバック
   VkBool32 DebugMessageCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t, const char* pLayerPrefix, const char* pMsg, void*)
   {
-    VkBool32 Result = false;
+    std::string Message = pMsg;
+    {
+      constexpr const char* kIgnoreMessages[2] =
+      {
+       " [ UNASSIGNED-CoreValidation-Shader-InterfaceTypeMismatch ] ",  //  glslangによるエラー
+       " [ UNASSIGNED-CoreValidation-Shader-OutputNotConsumed ] ",      //  glslangによるエラー
+      };
+    
+      for (auto& IgnoreMessage : kIgnoreMessages)
+      {
+        std::string Str = IgnoreMessage;
+    
+        if (std::equal(Str.cbegin(), Str.cend(), std::begin(Message)))
+        {
+          return false;
+        }
+      }
+    }
 
-    std::string Message;
+    VkBool32 Result = true;
     {
       std::stringstream Buf;
       if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
       {
-        Buf << "INFORMATION: ";
-        Result = true;
+        Buf << "INFORMATION:";
+        Result = false;
       }
       else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
       {
-        Buf << "WARNING: ";
+        Buf << "WARNING:";
       }
       else if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
       {
-        Buf << "PERFORMANCE_WARNING: ";
+        Buf << "PERFORMANCE_WARNING:";
+        Result = false;
       }
       else if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
       {
-        //if (std::string(pMsg).find_first_not_of("[ UNASSIGNED-CoreValidation-Shader-InterfaceTypeMismatch ]") != std::string::npos)
-        //{
-        //  return true;
-        //}
-
-        Buf << "ERROR: ";
+        Buf << "ERROR:";
       }
       else if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)
       {
-        Buf << "DEBUG: ";
-        Result = true;
+        Buf << "DEBUG:";
+        Result = false;
       }
 
-      Buf << "[" << pLayerPrefix << "] :" << pMsg << std::endl;
+      Buf << "[" << pLayerPrefix << "] :" << Message.c_str() << std::endl;
       Message = Buf.str();
     }
 
     // デバッグウィンドウに出力
-    OutputDebugStringA(Message.c_str());
+    ::OutputDebugStringA(Message.c_str());
+    assert(!Result);
 
     return Result;
   }
@@ -285,7 +299,6 @@ void CDevice::Initialize()
     const char* Extensions[] = {
       VK_KHR_SURFACE_EXTENSION_NAME,
       VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-      //VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME,
 #if defined DEBUG | _DEBUG
       VK_EXT_DEBUG_REPORT_EXTENSION_NAME, //  デバッグレポート用
 #endif
@@ -660,7 +673,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
       ImageInfo.arrayLayers = 1;
       ImageInfo.samples = vk::SampleCountFlagBits::e1;
       ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+      ImageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eTransferDst;
       ImageInfo.sharingMode = vk::SharingMode::eExclusive;
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
@@ -736,6 +749,11 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
   CDepthStencilTexture* pDepthStencilTexture = new CDepthStencilTexture;
   pDepthStencilTexture->TextureSize = _TextureSize;
   pDepthStencilTexture->Format = Cast(_Format);
+  pDepthStencilTexture->ImageAspectFlag = vk::ImageAspectFlagBits::eDepth;
+  if (ContainsStencil(pDepthStencilTexture->Format))
+  {
+    pDepthStencilTexture->ImageAspectFlag |= vk::ImageAspectFlagBits::eStencil;
+  }
 
   //  イメージ作成
   {
@@ -748,7 +766,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
       ImageInfo.arrayLayers = 1;
       ImageInfo.samples = vk::SampleCountFlagBits::e1;
       ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+      ImageInfo.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eTransferDst;
       ImageInfo.sharingMode = vk::SharingMode::eExclusive;
       ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
     }
@@ -774,7 +792,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
 
   vk::ImageSubresourceRange SubresourceRange;
   {
-    SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth /*| vk::ImageAspectFlagBits::eStencil*/;
+    SubresourceRange.aspectMask = pDepthStencilTexture->ImageAspectFlag;
     SubresourceRange.baseMipLevel = 0;
     SubresourceRange.levelCount = 1;
     SubresourceRange.baseArrayLayer = 0;

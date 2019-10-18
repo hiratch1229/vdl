@@ -27,7 +27,7 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
     SrcStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
     ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
     break;
-  case vk::ImageLayout::eDepthReadOnlyStencilAttachmentOptimal:
+  case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
     SrcStageMask = vk::PipelineStageFlagBits::eAllGraphics;
     ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead;
     break;
@@ -54,7 +54,7 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
     DstStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
     ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
     break;
-  case vk::ImageLayout::eDepthReadOnlyStencilAttachmentOptimal:
+  case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
     DstStageMask = vk::PipelineStageFlagBits::eAllGraphics;
     ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead;
     break;

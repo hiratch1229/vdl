@@ -150,6 +150,11 @@ void CSwapChain::Initialize()
   //  深度ステンシルバッファの作成
   {
     VkDepthStencilTexture_.Format = kDepthStencilFormat;
+    VkDepthStencilTexture_.ImageAspectFlag = vk::ImageAspectFlagBits::eDepth;
+    if (ContainsStencil(VkDepthStencilTexture_.Format))
+    {
+      VkDepthStencilTexture_.ImageAspectFlag |= vk::ImageAspectFlagBits::eStencil;;
+    }
 
     vk::ImageTiling ImageTiling;
     {
@@ -205,7 +210,7 @@ void CSwapChain::Initialize()
 
     vk::ImageSubresourceRange SubresourceRange;
     {
-      SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+      SubresourceRange.aspectMask = VkDepthStencilTexture_.ImageAspectFlag;
       SubresourceRange.baseMipLevel = 0;
       SubresourceRange.levelCount = 1;
       SubresourceRange.baseArrayLayer = 0;

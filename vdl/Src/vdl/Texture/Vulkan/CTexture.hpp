@@ -34,6 +34,7 @@ public:
 
 struct CDepthStencilTexture : public CTexture
 {
+  vk::ImageAspectFlags ImageAspectFlag;
 public:
   CDepthStencilTexture() = default;
 
