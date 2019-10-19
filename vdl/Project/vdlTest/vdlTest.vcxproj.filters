@@ -30,6 +30,9 @@
     <Filter Include="シェーダーファイル\Deferred">
       <UniqueIdentifier>{d73473ec-887e-40e7-bd0a-e1b61ff7458f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Texture">
+      <UniqueIdentifier>{55d44ab3-c161-452c-b631-2e7b2987022a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -123,6 +126,18 @@
     <FxCompile Include="Shader\Deferred\GBufferPassVS.hlsl">
       <Filter>シェーダーファイル\Deferred</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Deferred\LightPassPS.hlsl">
+      <Filter>シェーダーファイル\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Texture\TexturePS.hlsl">
+      <Filter>シェーダーファイル\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Texture\TextureVS.hlsl">
+      <Filter>シェーダーファイル\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Deferred\LightPassVS.hlsl">
+      <Filter>シェーダーファイル\Deferred</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">
@@ -138,6 +153,12 @@
       <Filter>シェーダーファイル\Mesh</Filter>
     </None>
     <None Include="Shader\Deferred\GBufferPass.hlsli">
+      <Filter>シェーダーファイル\Deferred</Filter>
+    </None>
+    <None Include="Shader\Texture\Texture.hlsli">
+      <Filter>シェーダーファイル\Texture</Filter>
+    </None>
+    <None Include="Shader\Deferred\LightPass.hlsli">
       <Filter>シェーダーファイル\Deferred</Filter>
     </None>
   </ItemGroup>

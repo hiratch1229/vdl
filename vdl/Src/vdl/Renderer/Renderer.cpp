@@ -510,6 +510,16 @@ namespace vdl
 
   namespace Renderer3D
   {
+    Matrix GetView()
+    {
+      return Engine::Get<IRenderer>()->GetView();
+    }
+
+    Matrix GetProjection()
+    {
+      return Engine::Get<IRenderer>()->GetProjection();
+    }
+
     void SetCamera(const Camera& _Camera)
     {
       Engine::Get<IRenderer>()->SetCamera(_Camera);

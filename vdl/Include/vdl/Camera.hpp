@@ -22,6 +22,10 @@ namespace vdl
       : Position(_Position), Target(_Target), Up(_Up), Near(_Near), Far(_Far), Fov(_Fov), isPerspective(_isPerspective) {}
   public:
     [[nodiscard]] float3 ViewVector()const { return Target - Position; }
+
+    [[nodiscard]] Matrix View()const;
+
+    [[nodiscard]] Matrix Projection(const vdl::float2& _Size)const;
   };
 
   void FreeCamera(Camera* _pCamera);

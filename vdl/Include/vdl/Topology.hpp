@@ -43,6 +43,7 @@ namespace vdl
     ePatchList31ControlPoint,
     ePatchList32ControlPoint,
 
+    eDefaultNone = ePointList,
     eDefaultTexture = eTriangleStrip,
     eDefaultMesh = eTriangleList,
   };

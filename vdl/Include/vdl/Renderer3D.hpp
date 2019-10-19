@@ -1,6 +1,7 @@
 #pragma once
 #include "Fwd.hpp"
 #include "Color.hpp"
+#include "Matrix.hpp"
 #include "Model.hpp"
 #include "MotionData.hpp"
 #include "GraphicsStates.hpp"
@@ -12,6 +13,10 @@
 
 namespace vdl::Renderer3D
 {
+  Matrix GetView();
+
+  Matrix GetProjection();
+
   void SetCamera(const Camera& _Camera);
 
   void SetTopology(TopologyType _Topology);

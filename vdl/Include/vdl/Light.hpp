@@ -27,6 +27,8 @@ namespace vdl
     static constexpr uint kSize = Size;
   public:
     PointLight Lights[kSize];
+  public:
+    PointLight& operator[](vdl::uint i) { return Lights[i]; }
   };
 
   struct SpotLight
@@ -45,5 +47,7 @@ namespace vdl
     static constexpr uint kSize = Size;
   public:
     SpotLight Lights[kSize];
+  public:
+    SpotLight& operator[](vdl::uint i) { return Lights[i]; }
   };
 }

@@ -37,7 +37,7 @@ void CRenderer::Initialize()
 
   //  描画コマンドリストの初期化
   {
-    EmptyRendererCommandList_.Initialize(vdl::TopologyType::ePointList, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
+    EmptyRendererCommandList_.Initialize(vdl::TopologyType::eDefaultNone, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
       vdl::VertexShader(), vdl::PixelShader());
     TextureRendererCommandList_.Initialize(vdl::TopologyType::eDefaultTexture, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault2D, vdl::RasterizerState::kDefault2D, vdl::Sampler::kDefault2D,
       vdl::VertexShader(Constants::kDefaultTextureVertexShaderCode, Constants::kDefaultTextureVertexShaderSize, vdl::InputLayoutType::eTexture),
@@ -50,29 +50,12 @@ void CRenderer::Initialize()
 
 vdl::Matrix CRenderer::GetView()const
 {
-  const vdl::Camera& Camera = pCameraData_->Camera;
-
-  return DirectX::XMMatrixLookAtLH({ Camera.Position.x, Camera.Position.y, Camera.Position.z, 1.0f },
-    { Camera.Target.x, Camera.Target.y, Camera.Target.z, 1.0f }, { Camera.Up.x, Camera.Up.y, Camera.Up.z, 0.0f });
+  return pCameraData_->Camera.View();
 }
 
 vdl::Matrix CRenderer::GetProjection()const
 {
-  const vdl::Camera& Camera = pCameraData_->Camera;
-  const vdl::Viewport& Viewport = MeshRendererCommandList_.GetCurrentViewport();
-
-  if (Camera.isPerspective)
-  {
-    const float Aspect = Viewport.Size.x / Viewport.Size.y;
-    return DirectX::XMMatrixPerspectiveFovLH(vdl::Math::ToRadian(Camera.Fov), Aspect, Camera.Near, Camera.Far);
-  }
-  else
-  {
-    constexpr float kWidth = 16.0f / 2.0f;
-    constexpr float kHeight = 9.0f / 2.0f;
-
-    return DirectX::XMMatrixOrthographicLH(kWidth, kHeight, Camera.Near, Camera.Far);
-  }
+  return pCameraData_->Camera.Projection(MeshRendererCommandList_.GetCurrentViewport().Size);
 }
 
 void CRenderer::SetCamera(const vdl::Camera& _Camera)

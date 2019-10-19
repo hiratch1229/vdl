@@ -12,6 +12,24 @@
 
 namespace vdl
 {
+  Matrix Camera::View()const
+  {
+    return DirectX::XMMatrixLookAtLH({ Position.x, Position.y, Position.z, 1.0f },
+      { Target.x, Target.y, Target.z, 1.0f }, { Up.x, Up.y, Up.z, 0.0f });
+  }
+
+  Matrix Camera::Projection(const vdl::float2& _Size)const
+  {
+    if (isPerspective)
+    {
+      return DirectX::XMMatrixPerspectiveFovLH(vdl::Math::ToRadian(Fov), _Size.x / _Size.y, Near, Far);
+    }
+    else
+    {
+      return DirectX::XMMatrixOrthographicLH(_Size.x, _Size.y, Near, Far);
+    }
+  }
+
   void FreeCamera(Camera* _pCamera)
   {
     IMouse* pMouse = Engine::Get<IMouse>();
