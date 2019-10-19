@@ -5,7 +5,7 @@ Texture2D DiffuseGBuffer : register(t0);
 Texture2D NormalGBuffer : register(t1);
 Texture2D DepthBuffer : register(t2);
 
-static const uint kPointLightNum = 100;
+static const uint kPointLightNum = 200;
 static const uint2 kWindowSize = uint2(1280, 720);
 
 cbuffer LightData : register(b0)
@@ -18,7 +18,6 @@ cbuffer Data : register(b1)
 {
   //float4 EyePosition;
   float4x4 InverseViewProjection;
-  float4x4 InverseView;
 };
 
 float4 main(VS_OUT In) : SV_TARGET
@@ -30,16 +29,16 @@ float4 main(VS_OUT In) : SV_TARGET
 
   float4 Position = mul(InverseViewProjection, float4(P, DepthBuffer.Load(TexCoord).r, 1.0f));
   Position /= Position.w;
-  //return Position;
+
   float4 Diffuse = DiffuseGBuffer.Load(TexCoord);
   float4 Normal = NormalGBuffer.Load(TexCoord);
 
   float4 Color = 0.0f;
  
-  Color += DLight.Calc(Normal.xyz);
+  Color += Calc(DLight, Normal.xyz);
   for (int i = 0; i < kPointLightNum; ++i)
   {
-    Color += PLights[i].Calc(Position.xyz, Normal.xyz);
+    Color += Calc(PLights[i], Position.xyz, Normal.xyz);
   }
   
   Color.rgb += Diffuse.rgb;

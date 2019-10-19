@@ -18,6 +18,8 @@
 #include <vdl/Mouse.hpp>
 #include <vdl/Macro.hpp>
 
+#include <ctype.h>
+
 namespace
 {
   constexpr IndexType kIndexType = (sizeof(ImDrawIdx) == 2 ? IndexType::eUint16 : IndexType::eUint32);
@@ -714,9 +716,14 @@ void CGUI::Update()
 
   //  Read keyboard modifiers inputs
   {
-    for (int i = 0; i < 256; ++i)
+    for (vdl::uint i = 0; i < 256; ++i)
     {
       io.KeysDown[i] = pKeyboard_->Press(i);
+
+      if (pKeyboard_->Pressed(i))
+      {
+        io.AddInputCharacter(::MapVirtualKey(i, MAPVK_VK_TO_CHAR));
+      }
     }
     io.KeyCtrl = pKeyboard_->Press(VK_CONTROL);
     io.KeyShift = pKeyboard_->Press(VK_SHIFT);

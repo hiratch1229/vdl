@@ -1,26 +1,54 @@
 #include <vdl.hpp>
 
-#include "Scene/SceneSprite.hpp"
-#include "Scene/SceneModel.hpp"
-#include "Scene/SceneMultiRenderTexture.hpp"
+//#include "Scene/SceneSprite.hpp"
+//#include "Scene/SceneModel.hpp"
+//#include "Scene/SceneMultiRenderTexture.hpp"
 #include "Scene/SceneTessellation.hpp"
 #include "Scene/SceneGPUParticle.hpp"
 #include "Scene/SceneDeferred.hpp"
-#define INIT_SCENE SceneDeferred
 
 #include <memory>
 
+namespace
+{
+  inline IScene* GetNextScene(vdl::uint i)
+  {
+    switch (i)
+    {
+    case 0:
+      return new SceneTessellation;
+      break;
+    case 1:
+      return new SceneGPUParticle;
+      break;
+    case 2:
+      return new SceneDeferred;
+      break;
+    default: assert(false);
+    }
+
+    return nullptr;
+  }
+}
+
 void Main()
 {
-  static constexpr const char* kSceneTypes[] = { "Sprite", "Model" ,"MultiRenderTexture", "Tessellation", "GPUParticle", "Deferred" };
-  static constexpr vdl::uint kSceneTypeNum = static_cast<vdl::uint>(SceneType::eNum);
-  static_assert(kSceneTypeNum == vdl::Macro::ArraySize(kSceneTypes));
+  static constexpr const char* kSceneTypes[] = {
+    //"Sprite",
+    //"Model" ,
+    //"MultiRenderTexture",
+    "Tessellation",
+    "GPUParticle",
+    "Deferred"
+  };
+  static constexpr vdl::uint kSceneTypeNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kSceneTypes));
 
-  std::unique_ptr<IScene> pCurrentScene(new INIT_SCENE);
-  pCurrentScene->Initialize();
-
-  SceneType SceneType = pCurrentScene->GetType();
+  vdl::uint SceneType = 2;
+  assert(SceneType < kSceneTypeNum);
   vdl::uint MaxFPS = vdl::Constants::kDefaultMaxFPS;
+
+  std::unique_ptr<IScene> pCurrentScene(GetNextScene(SceneType));
+  pCurrentScene->Initialize();
 
   while (vdl::System::Update())
   {
@@ -41,28 +69,7 @@ void Main()
       {
         if (ImGui::Combo("Scene", reinterpret_cast<int*>(&SceneType), kSceneTypes, kSceneTypeNum))
         {
-          switch (SceneType)
-          {
-          case SceneType::eSprite:
-            pNextScene = new SceneSprite;
-            break;
-          case SceneType::eModel:
-            pNextScene = new SceneModel;
-            break;
-          case SceneType::eMultiRenderTexture:
-            pNextScene = new SceneMultiRenderTexture;
-            break;
-          case SceneType::eTessellation:
-            pNextScene = new SceneTessellation;
-            break;
-          case SceneType::eGPUParticle:
-            pNextScene = new SceneGPUParticle;
-            break;
-          case SceneType::eDeferred:
-            pNextScene = new SceneDeferred;
-            break;
-          default: assert(false);
-          }
+          pNextScene = GetNextScene(SceneType);
         }
       }
 

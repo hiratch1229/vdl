@@ -13,7 +13,7 @@ namespace
 void SceneDeferred::Initialize()
 {
   Rectangle_ = MeshData::Rectangle("Data/test1_albedo.png", "Data/test1_normal.png");
-  Sphere_ = MeshData::Box(/*8, 8, */"Data/earthmap.jpg", "Data/earthnormal.jpg");
+  Sphere_ = MeshData::Sphere(12, 12, "Data/earthmap.jpg", "Data/earthnormal.jpg");
   Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));
   PointLightItensity_ = PointLightRange_ = 1.0f;
 
@@ -33,8 +33,8 @@ void SceneDeferred::Initialize()
   Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
 
   GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
-  GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR32G32B32A32_Float);
-  GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
+  GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
+  GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD16_Unorm);
 
   LightPassVertexShader_ = VertexShader("Shader/Deferred/LightPassVS.hlsl", InputLayoutType::eNone);
   LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);

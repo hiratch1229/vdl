@@ -23,7 +23,7 @@ private:
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
   static constexpr float kRectangleScale = 15.0f;
   static constexpr float kRectangleHalfScale = kRectangleScale * 0.5f;
-  static constexpr vdl::uint kDataNum = 100;
+  static constexpr vdl::uint kDataNum = 200;
   static constexpr vdl::uint kUseRenderTextureNum = 2;
   static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 4;
   static constexpr vdl::uint kGBufferLeftPos = kWindowSize.x - kGBufferDisplaySize.x;

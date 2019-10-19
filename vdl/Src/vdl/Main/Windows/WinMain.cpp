@@ -61,11 +61,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     Engine::Get<ISystem>()->Resume();
     break;
   case WM_CHAR:
-    // You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-    if (wParam > 0 && wParam < 0x10000)
-    {
-      ImGui::GetIO().AddInputCharacter(static_cast<vdl::uint>(wParam));
-    }
+    //// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
+    //if (wParam > 0 && wParam < 0x10000)
+    //{
+    //  ImGui::GetIO().AddInputCharacter(static_cast<vdl::uint>(wParam));
+    //}
     break;
   default:
     return DefWindowProc(hwnd, uMsg, wParam, lParam);

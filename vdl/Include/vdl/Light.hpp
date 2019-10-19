@@ -18,8 +18,8 @@ namespace vdl
     float3 Position;
     float Itensity;
     ColorF Color;
-    float Range;
     float3 Padding;
+    float Range;
   };
   template<uint Size>
   struct PointLights

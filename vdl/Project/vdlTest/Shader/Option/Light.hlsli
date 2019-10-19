@@ -13,29 +13,27 @@ class DirectionalLight
   float3 Direction;
   float Itensity;
   float4 Color;
-
-  float4 Calc(float3 _Normal)
-  {
-    return Diffuse(-Direction, _Normal) * Itensity * Color;
-  }
 };
+float4 Calc(DirectionalLight _Light, float3 _Normal)
+{
+  return Diffuse(-_Light.Direction, _Normal) * _Light.Itensity * _Light.Color;
+}
 
 class PointLight
 {
   float3 Position;
   float Itensity;
   float4 Color;
-  float Range;
   float3 Padding;
-
-  float4 Calc(float3 _Position, float3 _Normal)
-  {
-    const float3 Light = Position - _Position;
-    const float Length = length(Light);
-
-    return Diffuse(Light, _Normal) * Attenuation(Range, Length) * Itensity * Color;
-  }
+  float Range;
 };
+float4 Calc(PointLight _Light, float3 _Position, float3 _Normal)
+{
+  const float3 Direction = _Light.Position - _Position;
+  const float Length = length(Direction);
+
+  return Diffuse(Direction, _Normal) * Attenuation(_Light.Range, Length) * _Light.Itensity * _Light.Color;
+}
 
 struct SpotLight
 {
@@ -44,21 +42,20 @@ struct SpotLight
   float3 Direction;
   float Angle;
   float4 Color;
-  float Range;
   float3 Padding;
-
-  float4 Calc(float3 _Position, float3 _Normal)
-  {
-    const float3 Light = Position - _Position;
-    const float Length = length(Light);
-
-    const float MinCos = cos(Angle);
-    const float MaxCos = lerp(MinCos, 1.0f, 0.5f);
-
-    const float cosAngle = dot(-Direction, normalize(Light));
-
-    const float Cone = smoothstep(MinCos, MaxCos, cosAngle);
-
-    return Diffuse(-Direction, _Normal) * Attenuation(Range, Length) * Cone * Itensity * Color;
-  }
+  float Range;
 };
+float4 Calc(SpotLight _Light, float3 _Position, float3 _Normal)
+{
+  const float3 Direction = _Light.Position - _Position;
+  const float Length = length(Direction);
+
+  const float MinCos = cos(_Light.Angle);
+  const float MaxCos = lerp(MinCos, 1.0f, 0.5f);
+
+  const float cosAngle = dot(-_Light.Direction, normalize(Direction));
+
+  const float Cone = smoothstep(MinCos, MaxCos, cosAngle);
+
+  return Diffuse(-_Light.Direction, _Normal) * Attenuation(_Light.Range, Length) * Cone * _Light.Itensity * _Light.Color;
+}

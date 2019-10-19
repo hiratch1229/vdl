@@ -33,6 +33,9 @@
     <Filter Include="シェーダーファイル\Texture">
       <UniqueIdentifier>{55d44ab3-c161-452c-b631-2e7b2987022a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Option">
+      <UniqueIdentifier>{ad1cf31d-9856-457d-9466-37806dfb5798}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -160,6 +163,9 @@
     </None>
     <None Include="Shader\Deferred\LightPass.hlsli">
       <Filter>シェーダーファイル\Deferred</Filter>
+    </None>
+    <None Include="Shader\Option\Light.hlsli">
+      <Filter>シェーダーファイル\Option</Filter>
     </None>
   </ItemGroup>
 </Project>
