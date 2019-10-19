@@ -13,7 +13,7 @@ namespace
 void SceneDeferred::Initialize()
 {
   Rectangle_ = MeshData::Rectangle("Data/test1_albedo.png", "Data/test1_normal.png");
-  Sphere_ = MeshData::Sphere(12, 12, "Data/earthmap.jpg", "Data/earthnormal.jpg");
+  Sphere_ = MeshData::Sphere(8, 8, "Data/earthmap.jpg", "Data/earthnormal.jpg");
   Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));
 
   for (auto& Data : Datas_)
@@ -27,14 +27,10 @@ void SceneDeferred::Initialize()
     Data.Time = Random::Range(5.0f, 15.0f);
   }
 
-  DeferredVertexShader_ = VertexShader("Shader/Deferred/DeferredVS.hlsl", InputLayoutType::eMesh);
-  DeferredPixelShader_ = PixelShader("Shader/Deferred/DeferredPS.hlsl");
-  Renderer3D::SetShaders(DeferredVertexShader_, DeferredPixelShader_);
-
   const uint2 WindowSize = Window::GetWindowSize();
-  DeferredRenderTextures_[0] = RenderTexture(WindowSize, FormatType::eR16G16B16A16_Float);
-  DeferredRenderTextures_[1] = RenderTexture(WindowSize, FormatType::eR16G16B16A16_Float);
-  DeferredDepthTexture_ = DepthStencilTexture(WindowSize, FormatType::eD32_Float);
+  DeferredRenderTextures_[0] = RenderTexture(WindowSize, FormatType::eR8G8B8A8_Unorm);
+  DeferredRenderTextures_[1] = RenderTexture(WindowSize, FormatType::eR32G32B32A32_Float);
+  DeferredDepthTexture_ = DepthStencilTexture(WindowSize, FormatType::eD16_Unorm);
 }
 
 SceneDeferred::~SceneDeferred()
@@ -65,12 +61,17 @@ void SceneDeferred::Update()
   Renderer::Clear(DeferredDepthTexture_);
   Renderer::SetRenderTextures(DeferredRenderTextures_, DeferredDepthTexture_);
   {
-    Renderer3D::Draw(Rectangle_, Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f));
+    GBufferPassVertexShader_ = VertexShader("Shader/Deferred/GBufferPassVS.hlsl", InputLayoutType::eMesh);
+    GBufferPassPixelShader_ = PixelShader("Shader/Deferred/GBufferPassPS.hlsl");
+    Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
 
+    Renderer3D::Draw(Rectangle_, Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f));
     for (auto& Data : Datas_)
     {
       Renderer3D::Draw(Sphere_, Matrix::Translate(float3(QuadraticFunction(Data.Timer, Data.Time, Data.MinRange.x, Data.MaxRange.x), 0.5f, QuadraticFunction(Data.Timer, Data.Time, Data.MinRange.z, Data.MaxRange.z))));
     }
+
+
   }
   Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
 

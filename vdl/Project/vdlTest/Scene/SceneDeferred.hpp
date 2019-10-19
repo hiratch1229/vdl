@@ -29,8 +29,8 @@ private:
   vdl::Camera Camera_;
   std::array<Data, kDataNum> Datas_;
 private:
-  vdl::VertexShader DeferredVertexShader_;
-  vdl::PixelShader DeferredPixelShader_;
+  vdl::VertexShader GBufferPassVertexShader_;
+  vdl::PixelShader GBufferPassPixelShader_;
   vdl::RenderTextures DeferredRenderTextures_;
   vdl::DepthStencilTexture DeferredDepthTexture_;
 public:

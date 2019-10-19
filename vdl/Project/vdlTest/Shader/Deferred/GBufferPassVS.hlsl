@@ -1,4 +1,4 @@
-#include "Deferred.hlsli"
+#include "GBufferPass.hlsli"
 
 #define MAX_BONES 32
 cbuffer CONSTANT_BUFFER : register(b0)
@@ -16,9 +16,9 @@ VS_OUT main(VS_IN In)
   Out.Position = mul(World, ViewProjectionMatrix);
   Out.Texcoord = In.Texcoord;
   Out.Color = In.Color;
-  Out.Normal = mul(World, In.Normal.xyz);
-  Out.Tangent = mul(World, In.Tangent);
-  Out.Binormal = cross(In.Tangent, In.Normal.xyz);
+  Out.Normal = normalize(mul((float3x3)In.World, In.Normal.xyz));
+  Out.Tangent = normalize(mul((float3x3)In.World, In.Tangent));
+  Out.Binormal = cross(Out.Normal, Out.Tangent);
 
   return Out;
 }

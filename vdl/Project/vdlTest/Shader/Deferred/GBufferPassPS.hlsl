@@ -1,4 +1,4 @@
-#include "Deferred.hlsli"
+#include "GBufferPass.hlsli"
 
 SamplerState Sampler : register(s0);
 Texture2D Texture : register(t0);

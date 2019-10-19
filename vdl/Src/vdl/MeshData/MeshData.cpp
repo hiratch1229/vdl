@@ -13,10 +13,10 @@ namespace vdl
 
       MeshData.Vertices.resize(4);
       {
-        MeshData.Vertices[0] = { { -0.5f, +0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
-        MeshData.Vertices[1] = { { +0.5f, +0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } };
-        MeshData.Vertices[2] = { { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } };
-        MeshData.Vertices[3] = { { +0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } };
+        MeshData.Vertices[0] = { { -0.5f, +0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+        MeshData.Vertices[1] = { { +0.5f, +0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { +1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } };
+        MeshData.Vertices[2] = { { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } };
+        MeshData.Vertices[3] = { { +0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { +1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } };
       }
 
       MeshData.Indices.resize(6);

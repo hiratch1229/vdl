@@ -117,10 +117,10 @@
     <FxCompile Include="Shader\Mesh\MeshVS.hlsl">
       <Filter>シェーダーファイル\Mesh</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Deferred\DeferredVS.hlsl">
+    <FxCompile Include="Shader\Deferred\GBufferPassPS.hlsl">
       <Filter>シェーダーファイル\Deferred</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Deferred\DeferredPS.hlsl">
+    <FxCompile Include="Shader\Deferred\GBufferPassVS.hlsl">
       <Filter>シェーダーファイル\Deferred</Filter>
     </FxCompile>
   </ItemGroup>
@@ -137,7 +137,7 @@
     <None Include="Shader\Mesh\Mesh.hlsli">
       <Filter>シェーダーファイル\Mesh</Filter>
     </None>
-    <None Include="Shader\Deferred\Deferred.hlsli">
+    <None Include="Shader\Deferred\GBufferPass.hlsli">
       <Filter>シェーダーファイル\Deferred</Filter>
     </None>
   </ItemGroup>

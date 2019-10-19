@@ -47,7 +47,7 @@ void CCPUProfiler::Initialize()
     char* InstanceName;
     {
       InstanceName = InstanceList.get();
-      for (; InstanceName != '\0'; InstanceName += lstrlenA(InstanceName) + 1)
+      for (; *InstanceName != '\0'; InstanceName += lstrlenA(InstanceName) + 1)
       {
         CounterPathElements.szInstanceName = InstanceName;
 
@@ -83,7 +83,7 @@ void CCPUProfiler::Initialize()
           continue;
         }
 
-        PDH_FMT_COUNTERVALUE	FormatCounterValue;
+        PDH_FMT_COUNTERVALUE FormatCounterValue;
         if (ERROR_SUCCESS != ::PdhGetFormattedCounterValue(hCounter, PDH_FMT_LONG, nullptr, &FormatCounterValue))
         {
           continue;
