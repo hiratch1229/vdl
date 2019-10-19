@@ -3,6 +3,7 @@
 SamplerState Sampler : register(s0);
 Texture2D Texture : register(t0);
 Texture2D NormalMap : register(t1);
+Texture2D SpecularMap : register(t2);
 
 PS_OUT main(VS_OUT In)
 {
@@ -11,6 +12,7 @@ PS_OUT main(VS_OUT In)
   float3 N = NormalMap.Sample(Sampler, In.Texcoord).xyz;
   N = 2 * N - 1.0f;
   Out.Normal = float4(normalize(mul(N, float3x3(In.Tangent, In.Binormal, In.Normal))), 1.0f);
+  Out.Specular = SpecularMap.Sample(Sampler, In.Texcoord);
 
   return Out;
 }

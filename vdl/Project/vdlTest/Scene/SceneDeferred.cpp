@@ -12,10 +12,14 @@ namespace
 
 void SceneDeferred::Initialize()
 {
-  Rectangle_ = MeshData::Rectangle("Data/test1_albedo.png", "Data/test1_normal.png");
+  Rectangle_ = MeshData::Rectangle("Data/asphalt.jpg", "Data/asphalt_normal.jpg");
+  RectangleSpecularMap_ = Texture("Data/asphalt_specular.jpg");
   Sphere_ = MeshData::Sphere(12, 12, "Data/earthmap.jpg", "Data/earthnormal.jpg");
+  SphereSpecularMap_ = Texture("Data/earthspec.jpg");
+
   Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));
-  PointLightItensity_ = PointLightRange_ = 1.0f;
+  PointLightItensity_ = 1.0f;
+  PointLightRange_ = 0.6f;
 
   for (auto& Data : Datas_)
   {
@@ -34,6 +38,7 @@ void SceneDeferred::Initialize()
 
   GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
   GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
+  GBufferRenderTextures_[2] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
   GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD16_Unorm);
 
   LightPassVertexShader_ = VertexShader("Shader/Deferred/LightPassVS.hlsl", InputLayoutType::eNone);
@@ -48,6 +53,11 @@ void SceneDeferred::Initialize()
   Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
   LightConstantBuffer_.GetData().DirectionalLight = { Camera_.ViewVector(), 1.0f, vdl::Palette::White };
   Renderer::SetPixelStageConstantBuffers(0, 1, &LightConstantBuffer_);
+  RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
+  {
+    RenderingData.SpecularPower = 15.0f;
+    RenderingData.Ambient = Palette::White;
+  }
   Renderer::SetPixelStageConstantBuffers(1, 1, &RenderingConstantBuffer_);
   Renderer::SetTopology(TopologyType::eTriangleStrip);
 }
@@ -69,6 +79,12 @@ void SceneDeferred::Update()
 
     LightData& LightData = LightConstantBuffer_.GetData();
 
+    RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
+    {
+      RenderingData.EyePosition = Camera_.Position;
+      RenderingData.InverseViewProjection = (Renderer3D::GetView() * Renderer3D::GetProjection()).Inverse();
+    }
+
     ImGui::Begin("SceneDeferred");
     {
       if (ImGui::Button("Reload LightPassPS"))
@@ -76,6 +92,8 @@ void SceneDeferred::Update()
         LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
         Renderer::SetPixelShader(LightPassPixelShader_);
       }
+      ImGui::InputFloat("SpecularPower", &RenderingData.SpecularPower);
+      ImGui::ColorEdit3("Ambient", &RenderingData.Ambient.Red);
       if (ImGui::TreeNode("DirectionalLight"))
       {
         ImGui::InputFloat3("Direction", &LightData.DirectionalLight.Direction.x);
@@ -122,10 +140,14 @@ void SceneDeferred::Update()
   {
     Renderer::SetRenderTextures(GBufferRenderTextures_, GBufferDepthTexture_);
     {
+      Renderer3D::SetPixelStageShaderResources(2, 1, &RectangleSpecularMap_);
       Renderer3D::Draw(Rectangle_, Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f));
+
+      Renderer3D::SetPixelStageShaderResources(2, 1, &SphereSpecularMap_);
+      const Matrix Scale = Matrix::Scale(kSphereScale);
       for (auto& Data : Datas_)
       {
-        Renderer3D::Draw(Sphere_, Matrix::Translate(Data.Position), Data.Color);
+        Renderer3D::Draw(Sphere_, Scale * Matrix::Translate(Data.Position), Data.Color);
       }
     }
   }
@@ -134,11 +156,6 @@ void SceneDeferred::Update()
   {
     Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
     Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(PixelStageShaderResources_.size()), PixelStageShaderResources_.data());
-
-    RenderingData& Data = RenderingConstantBuffer_.GetData();
-    {
-      Data.InverseViewProjection = (Renderer3D::GetView() * Renderer3D::GetProjection()).Inverse();
-    }
 
     Renderer::Draw(4);
   }

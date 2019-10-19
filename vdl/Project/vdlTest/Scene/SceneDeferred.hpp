@@ -23,8 +23,9 @@ private:
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
   static constexpr float kRectangleScale = 15.0f;
   static constexpr float kRectangleHalfScale = kRectangleScale * 0.5f;
+  static constexpr float kSphereScale = 0.5f;
   static constexpr vdl::uint kDataNum = 200;
-  static constexpr vdl::uint kUseRenderTextureNum = 2;
+  static constexpr vdl::uint kUseRenderTextureNum = 3;
   static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 4;
   static constexpr vdl::uint kGBufferLeftPos = kWindowSize.x - kGBufferDisplaySize.x;
   static constexpr const char* kLigthPassPSFilePath = "Shader/Deferred/LightPassPS.hlsl";
@@ -36,11 +37,16 @@ private:
   };
   struct RenderingData
   {
+    vdl::float3 EyePosition;
+    float SpecularPower;
+    vdl::ColorF Ambient;
     vdl::Matrix InverseViewProjection;
   };
 private:
   vdl::Mesh Rectangle_;
+  vdl::Texture RectangleSpecularMap_;
   vdl::Mesh Sphere_;
+  vdl::Texture SphereSpecularMap_;
   vdl::Camera Camera_;
   float PointLightItensity_;
   float PointLightRange_;

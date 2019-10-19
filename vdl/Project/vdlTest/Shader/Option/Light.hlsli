@@ -3,6 +3,11 @@ float Diffuse(float3 _Direction, float3 _Normal)
   return max(dot(normalize(_Direction), _Normal), 0.0f);
 }
 
+float Specular(float3 _Half, float3 _Normal, float _Power)
+{
+  return pow(saturate(dot(_Half, _Normal)), _Power);
+}
+
 float Attenuation(float _Range, float _Distance)
 {
   return 1.0f - smoothstep(_Range * 0.75f, _Range, _Distance);
@@ -14,9 +19,9 @@ class DirectionalLight
   float Itensity;
   float4 Color;
 };
-float4 Calc(DirectionalLight _Light, float3 _Normal)
+float3 Calc(DirectionalLight _Light, float3 _Normal)
 {
-  return Diffuse(-_Light.Direction, _Normal) * _Light.Itensity * _Light.Color;
+  return Diffuse(-_Light.Direction, _Normal) * _Light.Itensity * _Light.Color.rgb;
 }
 
 class PointLight
@@ -27,12 +32,12 @@ class PointLight
   float3 Padding;
   float Range;
 };
-float4 Calc(PointLight _Light, float3 _Position, float3 _Normal)
+float3 Calc(PointLight _Light, float3 _Position, float3 _Normal)
 {
   const float3 Direction = _Light.Position - _Position;
   const float Length = length(Direction);
 
-  return Diffuse(Direction, _Normal) * Attenuation(_Light.Range, Length) * _Light.Itensity * _Light.Color;
+  return Diffuse(Direction, _Normal) * Attenuation(_Light.Range, Length) * _Light.Itensity * _Light.Color.rgb;
 }
 
 struct SpotLight
@@ -45,7 +50,7 @@ struct SpotLight
   float3 Padding;
   float Range;
 };
-float4 Calc(SpotLight _Light, float3 _Position, float3 _Normal)
+float3 Calc(SpotLight _Light, float3 _Position, float3 _Normal)
 {
   const float3 Direction = _Light.Position - _Position;
   const float Length = length(Direction);
@@ -57,5 +62,5 @@ float4 Calc(SpotLight _Light, float3 _Position, float3 _Normal)
 
   const float Cone = smoothstep(MinCos, MaxCos, cosAngle);
 
-  return Diffuse(-_Light.Direction, _Normal) * Attenuation(_Light.Range, Length) * Cone * _Light.Itensity * _Light.Color;
+  return Diffuse(-_Light.Direction, _Normal) * Attenuation(_Light.Range, Length) * Cone * _Light.Itensity * _Light.Color.rgb;
 }
