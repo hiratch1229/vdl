@@ -1,10 +1,6 @@
 #include "IGUI.hpp"
 
-#include <vdl/Platform.hpp>
-
-#if defined VDL_TARGET_WINDOWS
-#include "Windows/CGUI.hpp"
-#endif
+#include "CGUI.hpp"
 
 IGUI* IGUI::Create()
 {

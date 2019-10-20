@@ -10,12 +10,18 @@
 #include <vdl/Format/DirectX/Format.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
+#include <vdl/Window.hpp>
+#include <vdl/Image.hpp>
+
 void CSwapChain::Initialize()
 {
   pWindow_ = Engine::Get<IWindow>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
 
-  ID3D11Device* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>())->GetDevice();
+  CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
+  pD3D11Device_ = pDevice->GetDevice();
+  pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
+
   const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
 
   constexpr DXGI_FORMAT kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
@@ -46,7 +52,7 @@ void CSwapChain::Initialize()
   //  ALT+ENTER無効にしてスワップチェーンを作成
   {
     Microsoft::WRL::ComPtr<IDXGIDevice> pDXGIDevice;
-    hr = pDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(pDXGIDevice.GetAddressOf()));
+    hr = pD3D11Device_->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(pDXGIDevice.GetAddressOf()));
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
     Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
     hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(pAdapter.GetAddressOf()));
@@ -55,7 +61,7 @@ void CSwapChain::Initialize()
     hr = pAdapter->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void**>(pFactory.GetAddressOf()));
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
 
-    hr = pFactory->CreateSwapChain(pDevice, &SwapChainDesc, pSwapChain_.GetAddressOf());
+    hr = pFactory->CreateSwapChain(pD3D11Device_, &SwapChainDesc, pSwapChain_.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
 
     hr = pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
@@ -69,7 +75,7 @@ void CSwapChain::Initialize()
     hr = pSwapChain_->GetBuffer(0, IID_PPV_ARGS(pBackBuffer.GetAddressOf()));
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
 
-    hr = pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pRenderTargetView_.GetAddressOf());
+    hr = pD3D11Device_->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pRenderTargetView_.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
 
     pBackBuffer->GetDesc(&BackBufferDesc);
@@ -85,11 +91,11 @@ void CSwapChain::Initialize()
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencilBuffer;
     {
-      hr = pDevice->CreateTexture2D(&DepthStencilBufferDesc, nullptr, pDepthStencilBuffer.GetAddressOf());
+      hr = pD3D11Device_->CreateTexture2D(&DepthStencilBufferDesc, nullptr, pDepthStencilBuffer.GetAddressOf());
       _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    hr = pDevice->CreateDepthStencilView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilView_.GetAddressOf());
+    hr = pD3D11Device_->CreateDepthStencilView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilView_.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
   }
 }
@@ -113,5 +119,45 @@ void CSwapChain::ChangeWindowMode()
 
 void CSwapChain::ScreenShot()
 {
-  //  TODO
+  HRESULT hr = S_OK;
+
+  Microsoft::WRL::ComPtr<ID3D11Texture2D> BackBuffer;
+  {
+    hr = pSwapChain_->GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf()));
+    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+  }
+
+
+  vdl::uint2 TextureSize;
+  Microsoft::WRL::ComPtr<ID3D11Texture2D> CopyBuffer;
+  {
+    D3D11_TEXTURE2D_DESC Texture2DDesc;
+    {
+      BackBuffer->GetDesc(&Texture2DDesc);
+      Texture2DDesc.BindFlags = 0;
+      Texture2DDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+      Texture2DDesc.Usage = D3D11_USAGE_STAGING;
+    }
+
+    TextureSize = { Texture2DDesc.Width, Texture2DDesc.Height };
+
+    hr = pD3D11Device_->CreateTexture2D(&Texture2DDesc, nullptr, CopyBuffer.GetAddressOf());
+    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+
+    pD3D11ImmediateContext_->CopyResource(CopyBuffer.Get(), BackBuffer.Get());
+  }
+
+  vdl::Image Image;
+  Image.Resize(TextureSize);
+  {
+    D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
+    hr = pD3D11ImmediateContext_->Map(CopyBuffer.Get(), 0, D3D11_MAP_READ, 0, &MappedSubresorce);
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+    ::memcpy(Image.Buffer(), MappedSubresorce.pData, Image.BufferSize());
+
+    pD3D11ImmediateContext_->Unmap(CopyBuffer.Get(), 0);
+  }
+
+  Image.SavePNG("ScreenShot");
 }

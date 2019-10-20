@@ -1,5 +1,5 @@
 #pragma once
-#include "../IGUI.hpp"
+#include "IGUI.hpp"
 
 #include <vdl/Scissor.hpp>
 #include <vdl/Viewport.hpp>

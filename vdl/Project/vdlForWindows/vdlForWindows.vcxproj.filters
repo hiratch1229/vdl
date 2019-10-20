@@ -40,9 +40,6 @@
     <Filter Include="Src\ModelManager\ModelLoader">
       <UniqueIdentifier>{c4ea93d6-2b77-451c-8c63-848557512372}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\GUI">
-      <UniqueIdentifier>{f129af27-ffd3-473c-a3df-46b21fd7602f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Main">
       <UniqueIdentifier>{9bb82b6e-486a-4238-9db4-767e917f2c0b}</UniqueIdentifier>
     </Filter>
@@ -92,9 +89,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.cpp">
       <Filter>Src\ModelManager\ModelLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\GUI\Windows\CGUI.cpp">
-      <Filter>Src\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Main\Windows\WinMain.cpp">
       <Filter>Src\Main</Filter>
@@ -148,9 +142,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\MeshData.hpp">
       <Filter>Src\ModelManager\ModelLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\GUI\Windows\CGUI.hpp">
-      <Filter>Src\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Resource\Windows\Resource.hpp">
       <Filter>Src\Resource</Filter>

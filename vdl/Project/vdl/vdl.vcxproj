@@ -110,6 +110,12 @@
     <ClInclude Include="..\..\Include\vdl\Viewport.hpp" />
     <ClInclude Include="..\..\Include\vdl\Window.hpp" />
     <ClInclude Include="..\..\Include\vdl\XInput.hpp" />
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imconfig.h" />
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imgui.h" />
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imgui_internal.h" />
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_textedit.h" />
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_truetype.h" />
     <ClInclude Include="..\..\Src\vdl\BufferManager\IBufferManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\Buffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\IBuffer.hpp" />
@@ -120,6 +126,7 @@
     <ClInclude Include="..\..\Src\vdl\DeviceContext\IDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\IDevice.hpp" />
     <ClInclude Include="..\..\Src\vdl\Engine.hpp" />
+    <ClInclude Include="..\..\Src\vdl\GUI\CGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\GUI\IGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Gamepad\IGamepad.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\InputState.hpp" />
@@ -147,6 +154,9 @@
     <ClInclude Include="..\..\Src\vdl\Window\IWindow.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Src\ThirdParty\ImGui\imgui.cpp" />
+    <ClCompile Include="..\..\Src\ThirdParty\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\Src\ThirdParty\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="..\..\Src\vdl\BufferManager\BufferManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Buffer\Buffer.cpp" />
     <ClCompile Include="..\..\Src\vdl\Camera\Camera.cpp" />
@@ -159,6 +169,8 @@
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Engine.cpp" />
+    <ClCompile Include="..\..\Src\vdl\GUI\CGUI.cpp" />
+    <ClCompile Include="..\..\Src\vdl\GUI\GUI.cpp" />
     <ClCompile Include="..\..\Src\vdl\GUI\GUIFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Image\Image.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Button.cpp" />
@@ -428,7 +440,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -452,7 +464,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -578,7 +590,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
@@ -607,7 +619,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_EXECUTE_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
@@ -635,7 +647,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_DIRECTX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>

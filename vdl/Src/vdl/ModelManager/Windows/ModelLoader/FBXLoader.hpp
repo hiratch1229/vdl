@@ -3,7 +3,7 @@
 
 #pragma warning(disable:26451)
 #pragma warning(disable:26495)
-#include <ThirdParty/FBXSDK/include/fbxsdk.h>
+#include <FBXSDK/include/fbxsdk.h>
 #pragma warning(default:26495)
 #pragma warning(default:26451)
 

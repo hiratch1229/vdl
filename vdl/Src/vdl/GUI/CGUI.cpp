@@ -18,6 +18,8 @@
 #include <vdl/Mouse.hpp>
 #include <vdl/Macro.hpp>
 
+#include <ImGui/imgui.h>
+
 #include <ctype.h>
 
 namespace
@@ -616,7 +618,7 @@ void CGUI::Initialize()
 
   ImGuiIO& io = ImGui::GetIO();
 
-  //  日本語フォントの追加
+  //  日本語フォントの追加&作成
   //  TODO:パスを確認
   {
     ImFontConfig Config;
@@ -624,6 +626,19 @@ void CGUI::Initialize()
 
     io.Fonts->AddFontDefault();
     io.Fonts->AddFontFromFileTTF("c:/Windows/Fonts/meiryo.ttc", 18.0f, &Config, kGlyphRangesJapanese);
+
+    vdl::Image Image;
+    {
+      unsigned char* Buffer;
+      vdl::int2 Size;
+      io.Fonts->GetTexDataAsRGBA32(&Buffer, &Size.x, &Size.y);
+
+      Image.Resize(Size);
+      ::memcpy(Image.Buffer(), Buffer, Image.BufferSize());
+    }
+    Font_ = Image;
+    
+    //io.Fonts->TexID = static_cast<ImTextureID>(Font_);
   }
 
   //  ImGuiのフラグの設定
@@ -663,21 +678,6 @@ void CGUI::Initialize()
   {
     VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kVertexShader)), vdl::InputLayoutType::eGUI);
     PixelShader_ = vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kPixelShader)));
-  }
-
-  //  フォントの作成
-  {
-    vdl::Image Image;
-    {
-      unsigned char* Buffer;
-      vdl::int2 Size;
-      io.Fonts->GetTexDataAsRGBA32(&Buffer, &Size.x, &Size.y);
-
-      Image.Resize(Size);
-      ::memcpy(Image.Buffer(), Buffer, Image.BufferSize());
-    }
-
-    Font_ = Image;
   }
 
   //  サンプラーの作成
@@ -844,6 +844,7 @@ void CGUI::Draw()
   // (Because we merged all buffers into a single one, we maintain our own offset into them)
   int VertexOffset = 0;
   int IndexOffset = 0;
+  ImVec4 ClipRect;
   for (int i = 0; i < pDrawData->CmdListsCount; ++i)
   {
     const ImDrawList* pCmdList = pDrawData->CmdLists[i];
@@ -852,7 +853,6 @@ void CGUI::Draw()
       const ImDrawCmd* pCmd = &pCmdList->CmdBuffer[j];
 
       // Project scissor/clipping rectangles into framebuffer space
-      ImVec4 ClipRect;
       {
         ClipRect.x = (pCmd->ClipRect.x - ClipOffset.x) * ClipScale.x;
         ClipRect.y = (pCmd->ClipRect.y - ClipOffset.y) * ClipScale.y;
@@ -872,7 +872,6 @@ void CGUI::Draw()
           Scissor_.Size.x = static_cast<vdl::uint>(ClipRect.z - ClipRect.x);
           Scissor_.Size.y = static_cast<vdl::uint>(ClipRect.w - ClipRect.y);
         }
-
         pDeviceContext_->SetScissor(Scissor_);
 
         // Draw

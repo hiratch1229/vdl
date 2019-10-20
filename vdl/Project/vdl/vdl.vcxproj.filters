@@ -136,6 +136,12 @@
     <Filter Include="Src\MemoryProfiler">
       <UniqueIdentifier>{67560482-aa26-428a-b3a0-7a18ae13768c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\ThirdParty">
+      <UniqueIdentifier>{9cac833d-877a-4fa7-97ac-7795c7c9925a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ThirdParty\ImGui">
+      <UniqueIdentifier>{148242e5-da31-48c9-aa8d-c7eaa3a439d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -420,6 +426,27 @@
     <ClInclude Include="..\..\Src\vdl\MemoryProfiler\IMemoryProfiler.hpp">
       <Filter>Src\MemoryProfiler</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\GUI\CGUI.hpp">
+      <Filter>Src\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imconfig.h">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imgui.h">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imgui_internal.h">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_rectpack.h">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_textedit.h">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_truetype.h">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -550,6 +577,21 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\MemoryProfiler\MemoryProfilerFactory.cpp">
       <Filter>Src\MemoryProfiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\GUI\CGUI.cpp">
+      <Filter>Src\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\ThirdParty\ImGui\imgui.cpp">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\ThirdParty\ImGui\imgui_draw.cpp">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\ThirdParty\ImGui\imgui_widgets.cpp">
+      <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\GUI\GUI.cpp">
+      <Filter>Src\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

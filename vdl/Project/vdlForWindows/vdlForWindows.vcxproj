@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.cpp" />
-    <ClCompile Include="..\..\Src\vdl\GUI\Windows\CGUI.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.cpp" />
@@ -42,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.hpp" />
-    <ClInclude Include="..\..\Src\vdl\GUI\Windows\CGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.hpp" />
@@ -136,7 +134,7 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;..\..\Src\ThirdParty\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty\Windows;..\..\Src\ThirdParty\Windows\FBXSDK\include;..\..\Src\ThirdParty\Windows\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
@@ -146,10 +144,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib;libfbxsdk-md_d.lib;GLTFSDK_d.lib;ImGui_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib;libfbxsdk-md_d.lib;GLTFSDK_d.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\Src\ThirdParty\FBXSDK;..\..\Src\ThirdParty\glTFSDK;..\..\Src\ThirdParty\ImGui</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\Src\ThirdParty\Windows\FBXSDK;..\..\Src\ThirdParty\Windows\glTFSDK</AdditionalLibraryDirectories>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -198,7 +196,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;..\..\Src\ThirdParty\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty\Windows;..\..\Src\ThirdParty\Windows\FBXSDK\include;..\..\Src\ThirdParty\Windows\glTFSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;26812;</DisableSpecificWarnings>
@@ -211,8 +209,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib;libfbxsdk-md.lib;GLTFSDK.lib;ImGui.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\Src\ThirdParty\FBXSDK;..\..\Src\ThirdParty\glTFSDK;..\..\Src\ThirdParty\ImGui</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib;libfbxsdk-md.lib;GLTFSDK.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Src\ThirdParty\Windows\FBXSDK;..\..\Src\ThirdParty\Windows\glTFSDK</AdditionalLibraryDirectories>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>

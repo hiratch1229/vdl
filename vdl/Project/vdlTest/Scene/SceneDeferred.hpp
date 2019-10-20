@@ -62,6 +62,8 @@ private:
   std::array<vdl::ShaderResource, kUseRenderTextureNum + 1> PixelStageShaderResources_;
   vdl::ConstantBuffer<LightData> LightConstantBuffer_;
   vdl::ConstantBuffer<RenderingData> RenderingConstantBuffer_;
+private:
+
 public:
   SceneDeferred() = default;
 

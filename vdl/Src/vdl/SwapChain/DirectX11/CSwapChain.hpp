@@ -14,6 +14,9 @@ class CSwapChain : public ISwapChain
   Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView_;
   Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView_;
 private:
+  ID3D11Device* pD3D11Device_;
+  ID3D11DeviceContext* pD3D11ImmediateContext_;
+private:
   IWindow* pWindow_;
   IDeviceContext* pDeviceContext_;
 private:

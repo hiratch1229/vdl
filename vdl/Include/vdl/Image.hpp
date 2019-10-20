@@ -30,6 +30,10 @@ namespace vdl
     [[nodiscard]] const Color* Buffer()const { return Buffer_.data(); }
 
     void Resize(const uint2& _Size) { Size_ = _Size; Buffer_.resize(static_cast<size_t>(Size_.x) * Size_.y); }
+  public:
+    [[nodiscard]] std::vector<uint8_t> EncodePNG()const;
+
+    bool SavePNG(const char* _Directory)const;
   };
 
   class CompressionImage

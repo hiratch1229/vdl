@@ -4,9 +4,9 @@
 #undef max
 #undef min
 
-#include <ThirdParty/glTFSDK/include/GLTFSDK/GLTF.h>
-#include <ThirdParty/glTFSDK/include/GLTFSDK/GLBResourceReader.h>
-#include <ThirdParty/glTFSDK/include/GLTFSDK/Deserialize.h>
+#include <glTFSDK/include/GLTFSDK/GLTF.h>
+#include <glTFSDK/include/GLTFSDK/GLBResourceReader.h>
+#include <glTFSDK/include/GLTFSDK/Deserialize.h>
 
 class TextureLoader;
 
