@@ -5,6 +5,8 @@ Texture2D DiffuseGBuffer : register(t0);
 Texture2D NormalGBuffer : register(t1);
 Texture2D SpecularGBuffer : register(t2);
 Texture2D DepthBuffer : register(t3);
+Texture2D ShadowMap : register(t4);
+SamplerState ShadowMapSampler : register(s0);
 
 static const uint kPointLightNum = 200;
 static const uint2 kWindowSize = uint2(1280, 720);
@@ -20,7 +22,13 @@ cbuffer Data : register(b1)
   float3 EyePosition;
   float SpecularPower;
   float4 Ambient;
-  float4x4 InverseViewProjection;
+  float4 Shadow;
+  row_major float4x4 InverseViewProjection;
+};
+
+cbuffer Light : register(b2)
+{
+  row_major float4x4 LightViewProjection;
 };
 
 float4 main(VS_OUT In) : SV_TARGET
@@ -30,7 +38,7 @@ float4 main(VS_OUT In) : SV_TARGET
   float2 P = In.Position.xy / kWindowSize;
   P = float2(P.x, 1.0f - P.y) * 2.0f - 1.0f;
 
-  float4 Position = mul(InverseViewProjection, float4(P, DepthBuffer.Load(TexCoord).r, 1.0f));
+  float4 Position = mul(float4(P, DepthBuffer.Load(TexCoord).r, 1.0f), InverseViewProjection);
   Position /= Position.w;
 
   float4 Diffuse = DiffuseGBuffer.Load(TexCoord);
@@ -51,5 +59,12 @@ float4 main(VS_OUT In) : SV_TARGET
 
   float3 AmbientColor = Diffuse.rgb * Ambient.rgb;
 
-  return float4(Diffuse.rgb + LightColor + AmbientColor + SpecularColor * Specular(H, Normal, SpecularPower), Diffuse.a);
+  float4 ShadowPosition = mul(Position, LightViewProjection);
+  ShadowPosition /= ShadowPosition.w;
+  ShadowPosition.xy = float2(ShadowPosition.x, -ShadowPosition.y) * 0.5f + 0.5f;
+
+  float d = ShadowMap.Sample(ShadowMapSampler, ShadowPosition.xy).r;
+  float3 ShadowColor = (ShadowPosition.z - d > 0.0001f) ? Shadow : 1.0f;
+
+  return float4((Diffuse.rgb + LightColor + AmbientColor + SpecularColor * Specular(H, Normal, SpecularPower)) * ShadowColor, Diffuse.a);
 }

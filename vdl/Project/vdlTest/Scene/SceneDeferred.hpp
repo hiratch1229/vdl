@@ -26,7 +26,7 @@ private:
   static constexpr float kSphereScale = 0.5f;
   static constexpr vdl::uint kDataNum = 200;
   static constexpr vdl::uint kUseRenderTextureNum = 3;
-  static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 4;
+  static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 5;
   static constexpr vdl::uint kGBufferLeftPos = kWindowSize.x - kGBufferDisplaySize.x;
   static constexpr const char* kLigthPassPSFilePath = "Shader/Deferred/LightPassPS.hlsl";
 private:
@@ -40,6 +40,7 @@ private:
     vdl::float3 EyePosition;
     float SpecularPower;
     vdl::ColorF Ambient;
+    vdl::ColorF Shadow;
     vdl::Matrix InverseViewProjection;
   };
 private:
@@ -50,6 +51,7 @@ private:
   vdl::Camera Camera_;
   float PointLightItensity_;
   float PointLightRange_;
+  bool isUpdate_ = true;
   std::array<Data, kDataNum> Datas_;
 private:
   vdl::VertexShader GBufferPassVertexShader_;
@@ -57,13 +59,18 @@ private:
   vdl::RenderTextures GBufferRenderTextures_;
   vdl::DepthStencilTexture GBufferDepthTexture_;
 private:
+  vdl::VertexShader ShadowMapVertexShader_;
+  vdl::PixelShader ShadowMapPixelShader_;
+  vdl::DepthStencilTexture ShadowMap_;
+  vdl::float3 DirectionLightPosition_;
+  vdl::ConstantBuffer<vdl::Matrix> LightViewProjectionConstantBuffer_;
+private:
   vdl::VertexShader LightPassVertexShader_;
   vdl::PixelShader LightPassPixelShader_;
-  std::array<vdl::ShaderResource, kUseRenderTextureNum + 1> PixelStageShaderResources_;
+  vdl::Sampler ShadowMapSampler_;
+  std::array<vdl::Texture, kUseRenderTextureNum + 2> PixelStageShaderResources_;
   vdl::ConstantBuffer<LightData> LightConstantBuffer_;
   vdl::ConstantBuffer<RenderingData> RenderingConstantBuffer_;
-private:
-
 public:
   SceneDeferred() = default;
 

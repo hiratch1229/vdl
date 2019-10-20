@@ -141,6 +141,9 @@
     <FxCompile Include="Shader\Deferred\LightPassVS.hlsl">
       <Filter>シェーダーファイル\Deferred</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Deferred\ShadowMapVS.hlsl">
+      <Filter>シェーダーファイル\Deferred</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">

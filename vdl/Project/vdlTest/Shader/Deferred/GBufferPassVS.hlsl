@@ -1,11 +1,5 @@
+#include "../Mesh/Mesh.hlsli"
 #include "GBufferPass.hlsli"
-
-#define MAX_BONES 32
-cbuffer CONSTANT_BUFFER : register(b0)
-{
-  row_major float4x4 ViewProjectionMatrix;
-  row_major float4x4 BoneTransforms[MAX_BONES];
-};
 
 VS_OUT main(VS_IN In)
 {

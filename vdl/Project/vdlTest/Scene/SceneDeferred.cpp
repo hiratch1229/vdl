@@ -18,8 +18,8 @@ void SceneDeferred::Initialize()
   SphereSpecularMap_ = Texture("Data/earthspec.jpg");
 
   Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));
-  PointLightItensity_ = 1.0f;
-  PointLightRange_ = 0.6f;
+  PointLightItensity_ = 0.5f;
+  PointLightRange_ = 0.75f;
 
   for (auto& Data : Datas_)
   {
@@ -32,34 +32,61 @@ void SceneDeferred::Initialize()
     Data.Time = Random::Range(5.0f, 15.0f);
   }
 
-  GBufferPassVertexShader_ = VertexShader("Shader/Deferred/GBufferPassVS.hlsl", InputLayoutType::eMesh);
-  GBufferPassPixelShader_ = PixelShader("Shader/Deferred/GBufferPassPS.hlsl");
-  Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
-
-  GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
-  GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
-  GBufferRenderTextures_[2] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
-  GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD16_Unorm);
-
-  LightPassVertexShader_ = VertexShader("Shader/Deferred/LightPassVS.hlsl", InputLayoutType::eNone);
-  LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
-
-  for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+  //  GBufferPass‚Ì‰Šú‰»
   {
-    PixelStageShaderResources_[i] = GBufferRenderTextures_[i];
-  }
-  PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_;
+    GBufferPassVertexShader_ = VertexShader("Shader/Deferred/GBufferPassVS.hlsl", InputLayoutType::eMesh);
+    GBufferPassPixelShader_ = PixelShader("Shader/Deferred/GBufferPassPS.hlsl");
 
-  Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
-  LightConstantBuffer_.GetData().DirectionalLight = { Camera_.ViewVector(), 1.0f, vdl::Palette::White };
-  Renderer::SetPixelStageConstantBuffers(0, 1, &LightConstantBuffer_);
-  RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
-  {
-    RenderingData.SpecularPower = 15.0f;
-    RenderingData.Ambient = Palette::White;
+    GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
+    GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
+    GBufferRenderTextures_[2] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
+    GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD16_Unorm);
   }
-  Renderer::SetPixelStageConstantBuffers(1, 1, &RenderingConstantBuffer_);
-  Renderer::SetTopology(TopologyType::eTriangleStrip);
+
+  //  ShadowMap‚Ì‰Šú‰»
+  {
+    ShadowMapVertexShader_ = VertexShader("Shader/Deferred/ShadowMapVS.hlsl", InputLayoutType::eMesh);
+    ShadowMapPixelShader_ = PixelShader();
+    ShadowMap_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
+
+    DirectionLightPosition_ = Camera_.Position;
+
+    Renderer3D::SetVertexStageConstantBuffers(1, 1, &LightViewProjectionConstantBuffer_);
+  }
+
+  //  LightPass‚Ì‰Šú‰»
+  {
+    LightPassVertexShader_ = VertexShader("Shader/Deferred/LightPassVS.hlsl", InputLayoutType::eNone);
+    LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
+    ShadowMapSampler_ = Sampler(AddressModeType::eBorder, AddressModeType::eBorder, AddressModeType::eBorder,
+      FilterType::eAnisotropic, 16, BorderColorType::eWhite);
+    Renderer::SetPixelStageSamplers(0, 1, &ShadowMapSampler_);
+
+    for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+    {
+      PixelStageShaderResources_[i] = GBufferRenderTextures_[i];
+    }
+    PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_;
+    PixelStageShaderResources_[kUseRenderTextureNum + 1] = ShadowMap_;
+
+    Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
+    LightData& LightData = LightConstantBuffer_.GetData();
+    {
+      LightData.DirectionalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
+      LightData.DirectionalLight.Itensity = 0.125f;
+      LightData.DirectionalLight.Color = Palette::White;
+    }
+    Renderer::SetPixelStageConstantBuffers(0, 1, &LightConstantBuffer_);
+    RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
+    {
+      RenderingData.SpecularPower = 15.0f;
+      RenderingData.Ambient = Palette::DimGray;
+      RenderingData.Shadow = Palette::DimGray;
+    }
+    Renderer::SetPixelStageConstantBuffers(1, 1, &RenderingConstantBuffer_);
+    Renderer::SetPixelStageConstantBuffers(2, 1, &LightViewProjectionConstantBuffer_);
+    Renderer::SetTopology(TopologyType::eTriangleStrip);
+  }
 }
 
 SceneDeferred::~SceneDeferred()
@@ -92,11 +119,18 @@ void SceneDeferred::Update()
         LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
         Renderer::SetPixelShader(LightPassPixelShader_);
       }
+      ImGui::Checkbox("SphereUpdate", &isUpdate_);
       ImGui::InputFloat("SpecularPower", &RenderingData.SpecularPower);
       ImGui::ColorEdit3("Ambient", &RenderingData.Ambient.Red);
+      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow.Red);
+      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow.Red);
       if (ImGui::TreeNode("DirectionalLight"))
       {
-        ImGui::InputFloat3("Direction", &LightData.DirectionalLight.Direction.x);
+        if (ImGui::InputFloat3("Position", &DirectionLightPosition_.x))
+        {
+          LightData.DirectionalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
+        }
+        ImGui::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
         ImGui::InputFloat("Itensity", &LightData.DirectionalLight.Itensity);
         ImGui::ColorEdit3("Color", &LightData.DirectionalLight.Color.Red);
         ImGui::TreePop();
@@ -110,45 +144,67 @@ void SceneDeferred::Update()
     }
     ImGui::End();
 
-    const float DeltaTime = System::GetDeltaTime();
-    for (uint i = 0; i < kDataNum; ++i)
+    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up()/*, 0.1f, 300.0f*/);
+    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
+
+    if (isUpdate_)
     {
-      Data& Data = Datas_[i];
-
-      Data.Timer += DeltaTime;
-      while (Data.Timer > Data.Time)
+      const float DeltaTime = System::GetDeltaTime();
+      for (uint i = 0; i < kDataNum; ++i)
       {
-        Data.Timer -= Data.Time;
-      }
-      Data.Position = float3(QuadraticFunction(Data.Timer, Data.Time, Data.MinRange.x, Data.MaxRange.x), 0.5f, QuadraticFunction(Data.Timer, Data.Time, Data.MinRange.z, Data.MaxRange.z));
+        Data& Data = Datas_[i];
 
-      PointLight& PointLight = LightData.PointLights[i];
-      PointLight.Position = Data.Position;
-      PointLight.Color = Data.Color;
-      PointLight.Itensity = PointLightItensity_;
-      PointLight.Range = PointLightRange_;
+        Data.Timer += DeltaTime;
+        while (Data.Timer > Data.Time)
+        {
+          Data.Timer -= Data.Time;
+        }
+        Data.Position = float3(QuadraticFunction(Data.Timer, Data.Time, Data.MinRange.x, Data.MaxRange.x), 0.5f, QuadraticFunction(Data.Timer, Data.Time, Data.MinRange.z, Data.MaxRange.z));
+
+        PointLight& PointLight = LightData.PointLights[i];
+        PointLight.Position = Data.Position;
+        PointLight.Color = Data.Color;
+        PointLight.Itensity = PointLightItensity_;
+        PointLight.Range = PointLightRange_;
+      }
     }
   }
 
-  for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+  //  ‰æ–Ê‚ÌƒNƒŠƒA
   {
-    Renderer::Clear(GBufferRenderTextures_[i]);
+    for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+    {
+      Renderer::Clear(GBufferRenderTextures_[i]);
+    }
+    Renderer::Clear(GBufferDepthTexture_);
+    Renderer::Clear(ShadowMap_);
   }
-  Renderer::Clear(GBufferDepthTexture_);
 
+  const Matrix RectangleWorld = Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f);
+  const Matrix SphereScale = Matrix::Scale(kSphereScale);
   //  GBufferPass
   {
     Renderer::SetRenderTextures(GBufferRenderTextures_, GBufferDepthTexture_);
-    {
-      Renderer3D::SetPixelStageShaderResources(2, 1, &RectangleSpecularMap_);
-      Renderer3D::Draw(Rectangle_, Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f));
+    Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
 
-      Renderer3D::SetPixelStageShaderResources(2, 1, &SphereSpecularMap_);
-      const Matrix Scale = Matrix::Scale(kSphereScale);
-      for (auto& Data : Datas_)
-      {
-        Renderer3D::Draw(Sphere_, Scale * Matrix::Translate(Data.Position), Data.Color);
-      }
+    Renderer3D::SetPixelStageShaderResources(2, 1, &RectangleSpecularMap_);
+    Renderer3D::Draw(Rectangle_, RectangleWorld);
+
+    Renderer3D::SetPixelStageShaderResources(2, 1, &SphereSpecularMap_);
+    for (auto& Data : Datas_)
+    {
+      Renderer3D::Draw(Sphere_, SphereScale * Matrix::Translate(Data.Position), Data.Color);
+    }
+  }
+
+  //  ShadowPass
+  {
+    Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
+    Renderer3D::SetShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
+
+    for (auto& Data : Datas_)
+    {
+      Renderer3D::Draw(Sphere_, SphereScale * Matrix::Translate(Data.Position), Data.Color);
     }
   }
 
@@ -165,10 +221,9 @@ void SceneDeferred::Update()
     decltype(PixelStageShaderResources_) ShaderResources;
     Renderer2D::SetPixelStageShaderResources(2, static_cast<vdl::uint>(ShaderResources.size()) - 2, ShaderResources.data());
 
-    for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+    for (vdl::uint i = 0; i < PixelStageShaderResources_.size(); ++i)
     {
-      Renderer2D::Draw(GBufferRenderTextures_[i], float2(kGBufferLeftPos, kGBufferDisplaySize.y * i), kGBufferDisplaySize);
+      Renderer2D::Draw(PixelStageShaderResources_[i], float2(kGBufferLeftPos, kGBufferDisplaySize.y * i), kGBufferDisplaySize);
     }
-    Renderer2D::Draw(GBufferDepthTexture_, float2(kGBufferLeftPos, kGBufferDisplaySize.y * kUseRenderTextureNum), kGBufferDisplaySize);
   }
 }

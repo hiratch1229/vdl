@@ -118,8 +118,6 @@ namespace vdl
 
     void SetPixelShader(const PixelShader& _PixelShader)
     {
-      assert(!_PixelShader.isEmpty());
-
       Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, InputLayoutType::eNone);
     }
 
@@ -365,8 +363,6 @@ namespace vdl
 
     void SetPixelShader(const PixelShader& _PixelShader)
     {
-      assert(!_PixelShader.isEmpty());
-
       Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, InputLayoutType::eTexture);
     }
 
@@ -579,8 +575,6 @@ namespace vdl
 
     void SetPixelShader(const PixelShader& _PixelShader)
     {
-      assert(!_PixelShader.isEmpty());
-
       Engine::Get<IRenderer>()->SetPixelShader(_PixelShader, InputLayoutType::eMesh);
     }
 
