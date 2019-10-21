@@ -122,7 +122,7 @@ void SceneDeferred::Update()
       ImGui::InputFloat("SpecularPower", &RenderingData.SpecularPower);
       ImGui::ColorEdit3("Ambient", &RenderingData.Ambient.Red);
       ImGui::ColorEdit3("Shadow", &RenderingData.Shadow.Red);
-      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow.Red);
+      ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha);
       if (ImGui::TreeNode("DirectionalLight"))
       {
         if (ImGui::InputFloat3("Position", &DirectionLightPosition_.x))

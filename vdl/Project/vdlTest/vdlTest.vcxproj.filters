@@ -153,6 +153,21 @@
     <FxCompile Include="Shader\Deferred\ShadowMapVS.hlsl">
       <Filter>シェーダーファイル\Deferred</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\PostEffect\GBufferPassVS.hlsl">
+      <Filter>シェーダーファイル\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PostEffect\GBufferPassPS.hlsl">
+      <Filter>シェーダーファイル\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PostEffect\LightPassVS.hlsl">
+      <Filter>シェーダーファイル\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PostEffect\LightPassPS.hlsl">
+      <Filter>シェーダーファイル\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PostEffect\ShadowMapVS.hlsl">
+      <Filter>シェーダーファイル\PostEffect</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">
@@ -178,6 +193,12 @@
     </None>
     <None Include="Shader\Option\Light.hlsli">
       <Filter>シェーダーファイル\Option</Filter>
+    </None>
+    <None Include="Shader\PostEffect\GBufferPass.hlsli">
+      <Filter>シェーダーファイル\PostEffect</Filter>
+    </None>
+    <None Include="Shader\PostEffect\LightPass.hlsli">
+      <Filter>シェーダーファイル\PostEffect</Filter>
     </None>
   </ItemGroup>
 </Project>
