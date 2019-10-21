@@ -3,7 +3,7 @@
 #include <vdl/Format/Vulkan/Format.hpp>
 #include <vdl/Texture/Vulkan/CTexture.hpp>
 #include <vdl/Shader/Vulkan/CShader.hpp>
-#include <vdl/Misc/Windows/Misc.hpp>
+#include <vdl/Misc/Misc.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 

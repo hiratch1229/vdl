@@ -135,6 +135,7 @@
     <ClInclude Include="..\..\Src\vdl\Input\XInput\IXInput.hpp" />
     <ClInclude Include="..\..\Src\vdl\Instance\Instance.hpp" />
     <ClInclude Include="..\..\Src\vdl\MemoryProfiler\IMemoryProfiler.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Misc\Misc.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\IModelManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Mesh.hpp" />
     <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp" />

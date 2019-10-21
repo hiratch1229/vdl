@@ -127,7 +127,6 @@ void CSwapChain::ScreenShot()
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-
   vdl::uint2 TextureSize;
   Microsoft::WRL::ComPtr<ID3D11Texture2D> CopyBuffer;
   {
@@ -159,5 +158,5 @@ void CSwapChain::ScreenShot()
     pD3D11ImmediateContext_->Unmap(CopyBuffer.Get(), 0);
   }
 
-  Image.SavePNG("ScreenShot");
+  Image.SavePNG(Constants::kScreenShotFileDirectory);
 }

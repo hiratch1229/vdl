@@ -36,6 +36,9 @@
     <Filter Include="シェーダーファイル\Option">
       <UniqueIdentifier>{ad1cf31d-9856-457d-9466-37806dfb5798}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\PostEffect">
+      <UniqueIdentifier>{e4362776-a401-4c73-a9e8-d06e5d99e61d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -59,6 +62,9 @@
     <ClCompile Include="Scene\SceneDeferred.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\ScenePostEffect.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Scene.hpp">
@@ -80,6 +86,9 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\SceneDeferred.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\ScenePostEffect.hpp">
       <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>

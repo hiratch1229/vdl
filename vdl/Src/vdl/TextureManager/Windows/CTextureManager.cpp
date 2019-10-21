@@ -35,6 +35,9 @@ vdl::ID CTextureManager::Load(const char* _FilePath, bool _isSerialize)
 
   if (Image.isEmpty())
   {
+    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
+      std::string(std::string(_FilePath) + "‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB").c_str());
+
     Image = TextureLoader().LoadFromFile(_FilePath);
 
     if (_isSerialize)

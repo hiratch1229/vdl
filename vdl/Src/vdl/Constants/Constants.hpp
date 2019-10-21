@@ -60,6 +60,8 @@ namespace Constants
 
   constexpr const char* kBinaryFileFormat = ".bin";
 
+  constexpr const char* kScreenShotFileDirectory = "ScreenShot/";
+
   constexpr const char* kClassName = "vdl";
 
   constexpr const char* kDefaultWindowName = "vdl";

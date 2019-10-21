@@ -6,6 +6,7 @@
 #include "Scene/SceneTessellation.hpp"
 #include "Scene/SceneGPUParticle.hpp"
 #include "Scene/SceneDeferred.hpp"
+#include "Scene/ScenePostEffect.hpp"
 
 #include <memory>
 
@@ -17,13 +18,12 @@ namespace
     {
     case 0:
       return new SceneTessellation;
-      break;
     case 1:
       return new SceneGPUParticle;
-      break;
     case 2:
       return new SceneDeferred;
-      break;
+    case 3:
+      return new ScenePostEffect;
     default: assert(false);
     }
 
@@ -39,12 +39,14 @@ void Main()
     //"MultiRenderTexture",
     "Tessellation",
     "GPUParticle",
-    "Deferred"
+    "Deferred",
+    "PostEffect"
   };
   static constexpr vdl::uint kSceneTypeNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kSceneTypes));
+  static constexpr vdl::uint kInitSceneType = 3;
+  static_assert(kInitSceneType < kSceneTypeNum);
 
-  vdl::uint SceneType = 2;
-  assert(SceneType < kSceneTypeNum);
+  vdl::uint SceneType = kInitSceneType;
   vdl::uint MaxFPS = vdl::Constants::kDefaultMaxFPS;
 
   std::unique_ptr<IScene> pCurrentScene(GetNextScene(SceneType));

@@ -142,6 +142,9 @@
     <Filter Include="Src\ThirdParty\ImGui">
       <UniqueIdentifier>{148242e5-da31-48c9-aa8d-c7eaa3a439d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Misc">
+      <UniqueIdentifier>{6cb123ff-61e9-49ab-900e-a628b1b9b0df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -446,6 +449,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_truetype.h">
       <Filter>Src\ThirdParty\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Misc\Misc.hpp">
+      <Filter>Src\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12,10 +12,10 @@ namespace
 
 void SceneDeferred::Initialize()
 {
-  Rectangle_ = MeshData::Rectangle("Data/asphalt.jpg", "Data/asphalt_normal.jpg");
-  RectangleSpecularMap_ = Texture("Data/asphalt_specular.jpg");
-  Sphere_ = MeshData::Sphere(12, 12, "Data/earthmap.jpg", "Data/earthnormal.jpg");
-  SphereSpecularMap_ = Texture("Data/earthspec.jpg");
+  Rectangle_ = MeshData::Rectangle("Data/asphalt/asphalt.jpg", "Data/asphalt/asphalt_normal.jpg");
+  RectangleSpecularMap_ = Texture("Data/asphalt/asphalt_specular.jpg");
+  Sphere_ = MeshData::Sphere(12, 12, "Data/earthmap/earthmap.jpg", "Data/earthmap/earthnormal.jpg");
+  SphereSpecularMap_ = Texture("Data/earthmap/earthspec.jpg");
 
   Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));
   PointLightItensity_ = 0.5f;
@@ -101,7 +101,6 @@ void SceneDeferred::Update()
   //  èÓïÒÇÃçXêV
   {
     FreeCamera(&Camera_);
-
     Renderer3D::SetCamera(Camera_);
 
     LightData& LightData = LightConstantBuffer_.GetData();

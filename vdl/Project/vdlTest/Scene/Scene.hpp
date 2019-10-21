@@ -10,6 +10,7 @@ enum class SceneType : vdl::uint
   eGPUParticle,
 
   eDeferred,
+  ePostEffect,
 
   eNum
 };

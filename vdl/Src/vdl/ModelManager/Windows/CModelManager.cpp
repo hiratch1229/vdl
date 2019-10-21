@@ -68,6 +68,9 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
 
     if (MeshDatas.empty())
     {
+      _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
+        std::string(std::string(_FilePath) + "Ç™å©Ç¬Ç©ÇËÇ‹ÇπÇÒÅB").c_str());
+
       if (FBXLoader::CheckSupportFormat(FileFormat))
       {
         MeshDatas = FBXLoader().Load(_FilePath);

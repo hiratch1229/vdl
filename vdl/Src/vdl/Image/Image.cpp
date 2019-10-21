@@ -8,6 +8,7 @@
 #include <string>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 
 namespace vdl
 {
@@ -63,8 +64,15 @@ namespace vdl
 
     std::filesystem::path FilePath;
     {
-      const std::string Str = std::to_string(Tm.tm_year + 1900) + std::to_string(Tm.tm_mon) + std::to_string(Tm.tm_mday)
-        + std::to_string(Tm.tm_hour) + std::to_string(Tm.tm_min) + std::to_string(Tm.tm_sec);
+      std::string Str;
+      {
+        std::stringstream SStream;
+        SStream << std::setw(4) << Tm.tm_year + 1900 << std::setw(2) << Tm.tm_mon << std::setw(2) << Tm.tm_mday
+          << std::setw(2) << Tm.tm_hour << std::setw(2) << Tm.tm_min << std::setw(2) << Tm.tm_sec;
+
+        Str = SStream.str();
+      }
+
       for (vdl::uint i = 0;; ++i)
       {
         FilePath = Directory / (Str + std::to_string(i) + ".png");

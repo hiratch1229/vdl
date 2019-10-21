@@ -8,7 +8,7 @@ Texture2D DepthBuffer : register(t3);
 Texture2D ShadowMap : register(t4);
 SamplerState ShadowMapSampler : register(s0);
 
-static const uint kPointLightNum = 200;
+static const uint kPointLightNum = 128;
 static const uint2 kWindowSize = uint2(1280, 720);
 
 cbuffer LightData : register(b0)
@@ -22,7 +22,8 @@ cbuffer Data : register(b1)
   float3 EyePosition;
   float SpecularPower;
   float4 Ambient;
-  float4 Shadow;
+  float3 Shadow;
+  float ShadowBias;
   row_major float4x4 InverseViewProjection;
 };
 
@@ -64,7 +65,7 @@ float4 main(VS_OUT In) : SV_TARGET
   ShadowPosition.xy = float2(ShadowPosition.x, -ShadowPosition.y) * 0.5f + 0.5f;
 
   float d = ShadowMap.Sample(ShadowMapSampler, ShadowPosition.xy).r;
-  float3 ShadowColor = (ShadowPosition.z - d > 0.0001f) ? Shadow : 1.0f;
+  float3 ShadowColor = (ShadowPosition.z - d > ShadowBias) ? Shadow : 1.0f;
 
   return float4((Diffuse.rgb + LightColor + AmbientColor + SpecularColor * Specular(H, Normal, SpecularPower)) * ShadowColor, Diffuse.a);
 }

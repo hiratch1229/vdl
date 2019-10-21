@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Scene\ScenePostEffect.cpp" />
     <ClCompile Include="Scene\SceneDeferred.cpp" />
     <ClCompile Include="Scene\SceneGPUParticle.cpp" />
     <ClCompile Include="Scene\SceneModel.cpp" />
@@ -65,6 +66,7 @@
     <ClInclude Include="Scene\Scene.hpp" />
     <ClInclude Include="Scene\SceneModel.hpp" />
     <ClInclude Include="Scene\SceneMultiRenderTexture.hpp" />
+    <ClInclude Include="Scene\ScenePostEffect.hpp" />
     <ClInclude Include="Scene\SceneSprite.hpp" />
     <ClInclude Include="Scene\SceneTessellation.hpp" />
   </ItemGroup>
@@ -171,6 +173,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shader\GPUParticle\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">Compute</ShaderType>
