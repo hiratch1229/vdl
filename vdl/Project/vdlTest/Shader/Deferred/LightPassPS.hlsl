@@ -43,11 +43,12 @@ float4 main(VS_OUT In) : SV_TARGET
   Position /= Position.w;
 
   float4 Diffuse = DiffuseGBuffer.Load(TexCoord);
+  float3 AmbientColor = Diffuse.rgb * Ambient.rgb;
   float3 Normal = NormalGBuffer.Load(TexCoord).rgb;
+  Diffuse.rgb *= Calc(DLight, Normal);
 
   float3 LightColor = 0.0f;
   {
-    LightColor += Calc(DLight, Normal);
     for (int i = 0; i < kPointLightNum; ++i)
     {
       LightColor += Calc(PLights[i], Position.xyz, Normal);
@@ -58,7 +59,6 @@ float4 main(VS_OUT In) : SV_TARGET
 
   float3 SpecularColor = SpecularGBuffer.Load(TexCoord).rgb;
 
-  float3 AmbientColor = Diffuse.rgb * Ambient.rgb;
 
   float4 ShadowPosition = mul(Position, LightViewProjection);
   ShadowPosition /= ShadowPosition.w;

@@ -17,7 +17,10 @@ cbuffer LightData : register(b0)
 
 cbuffer Data : register(b1)
 {
-  float4 EyePos;
+  float3 EyePos;
+  float LuminanceThreshold;
+  float3 Fog;
+  float Exposure;
   float3 Shadow;
   float ShadowBias;
   row_major float4x4 InverseViewProjection;
@@ -28,8 +31,21 @@ cbuffer Light : register(b2)
   row_major float4x4 LightViewProjection;
 };
 
-float4 main(float4 _Position : SV_POSITION) : SV_TARGET
+float GetLuminance(float3 _Color)
 {
+  return _Color.r * 0.29891f + _Color.g * 0.58661f + _Color.b * 0.11448f;
+}
+
+struct PS_OUT
+{
+  float4 Color : SV_TARGET0;
+  float4 Luminance : SV_TARGET1;
+};
+
+PS_OUT main(float4 _Position : SV_POSITION)
+{
+  PS_OUT Out;
+
   int3 TexCoord = int3(_Position.xy, 0);
 
   float2 P = _Position.xy / kWindowSize;
@@ -54,5 +70,8 @@ float4 main(float4 _Position : SV_POSITION) : SV_TARGET
 
   float3 Color = lerp(float3((Diffuse.rgb + LightColor) * ShadowColor), float3(0.6f, 0.6f, 0.6f), saturate((length(Position.xyz - EyePos.xyz) - kNear) / (kFar - kNear)));
 
-  return float4(Color, Diffuse.a);
+  Out.Color = float4(Color, Diffuse.a);
+  Out.Luminance = float4(Color * max(0.0f, GetLuminance(Color) - LuminanceThreshold) * Exposure, 1.0f);
+
+  return Out;
 }

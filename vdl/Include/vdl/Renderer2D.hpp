@@ -425,4 +425,10 @@ namespace vdl::Renderer2D
     const uint2 Size = _Texture.GetSize();
     Draw(_Texture, _DestLeftTop, Size, float2(0.0f), Size, 0.0f, _Color);
   }
+
+  inline void Draw(const Texture& _Texture, const ColorF& _Color = Palette::White)
+  {
+    const uint2 Size = _Texture.GetSize();
+    Draw(_Texture, float2(0.0f), Size, float2(0.0f), Size, 0.0f, _Color);
+  }
 }
