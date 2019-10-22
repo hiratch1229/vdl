@@ -11,7 +11,7 @@ class CModelManager : public IModelManager
 public:
   CModelManager() = default;
 
-  void Initialize()override;
+  void Initialize()override {}
 
   vdl::ID Load(const vdl::MeshData& _MeshData)override;
 

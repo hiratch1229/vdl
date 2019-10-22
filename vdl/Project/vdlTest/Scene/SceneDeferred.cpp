@@ -81,7 +81,7 @@ void SceneDeferred::Initialize()
     {
       RenderingData.SpecularPower = 15.0f;
       RenderingData.Ambient = Palette::DimGray;
-      RenderingData.Shadow = Palette::DimGray;
+      RenderingData.Shadow = ColorF(Palette::DimGray, 0.0001f);
     }
     Renderer::SetPixelStageConstantBuffers(1, 1, &RenderingConstantBuffer_);
     Renderer::SetPixelStageConstantBuffers(2, 1, &LightViewProjectionConstantBuffer_);

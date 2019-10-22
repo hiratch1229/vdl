@@ -31,6 +31,29 @@ Engine::Engine()
   pEngine = this;
 
   pSystem_->Initialize();
+  
+  pWindow_->Initialize();
+  pDevice_->Initialize();
+  pDeviceContext_->Initialize();
+  pSwapChain_->Initialize();
+
+  pCPUProfiler_->Initialize();
+  pMemoryProfiler_->Initialize();
+
+  pKeyboard_->Initialize();
+  pMouse_->Initialize();
+  pXInput_->Initialize();
+  pGamepad_->Initialize();
+
+  pSoundManager_->Initialize();
+  pTextureManager_->Initialize();
+  pModelManager_->Initialize();
+  pBufferManager_->Initialize();
+  pShaderManager_->Initialize();
+
+  pRenderer_->Initialize();
+  pComputer_->Initialize();
+  pGUI_->Initialize();
 }
 
 Engine::~Engine()

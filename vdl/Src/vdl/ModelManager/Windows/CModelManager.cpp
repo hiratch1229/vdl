@@ -15,11 +15,6 @@ namespace
   constexpr IndexType kIndexType = (sizeof(vdl::IndexType) == 2 ? IndexType::eUint16 : IndexType::eUint32);
 }
 
-void CModelManager::Initialize()
-{
-
-}
-
 vdl::ID CModelManager::Load(const vdl::MeshData& _MeshData)
 {
   Mesh* pMesh = new Mesh;

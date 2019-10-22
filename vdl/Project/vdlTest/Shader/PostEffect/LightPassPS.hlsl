@@ -52,8 +52,6 @@ float4 main(float4 _Position : SV_POSITION) : SV_TARGET
 
   float Alpha = saturate((length(Position.xyz - EyePos.xyz) - kNear) / (kFar - kNear));
 
-  //float3 Color = float3(0.8f, 0.8f, 0.6f) * Alpha + (1.0f - Alpha) * float3((Diffuse.rgb + LightColor) * ShadowColor);
-
   float3 Color = lerp(float3((Diffuse.rgb + LightColor) * ShadowColor), float3(0.6f, 0.6f, 0.6f), saturate((length(Position.xyz - EyePos.xyz) - kNear) / (kFar - kNear)));
 
   return float4(Color, Diffuse.a);

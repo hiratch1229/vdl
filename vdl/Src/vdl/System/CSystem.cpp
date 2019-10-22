@@ -2,8 +2,6 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Window/IWindow.hpp>
-#include <vdl/Device/IDevice.hpp>
-#include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/SwapChain/ISwapChain.hpp>
 #include <vdl/CPUProfiler/ICPUProfiler.hpp>
 #include <vdl/MemoryProfiler/IMemoryProfiler.hpp>
@@ -11,13 +9,7 @@
 #include <vdl/Input/Mouse/IMouse.hpp>
 #include <vdl/Input/XInput/IXInput.hpp>
 #include <vdl/Input/Gamepad/IGamepad.hpp>
-#include <vdl/SoundManager/ISoundManager.hpp>
-#include <vdl/TextureManager/ITextureManager.hpp>
-#include <vdl/ModelManager/IModelManager.hpp>
-#include <vdl/BufferManager/IBufferManager.hpp>
-#include <Vdl/ShaderManager/IShaderManager.hpp>
 #include <vdl/Renderer/IRenderer.hpp>
-#include <vdl/Computer/IComputer.hpp>
 #include <vdl/GUI/IGUI.hpp>
 #include <vdl/Constants/Constants.hpp>
 
@@ -40,29 +32,6 @@ void CSystem::Initialize()
   pGamepad_ = Engine::Get<IGamepad>();
   pRenderer_ = Engine::Get<IRenderer>();
   pGUI_ = Engine::Get<IGUI>();
-
-  Engine::Get<IWindow>()->Initialize();
-  Engine::Get<IDevice>()->Initialize();
-  Engine::Get<IDeviceContext>()->Initialize();
-  pSwapChain_->Initialize();
-
-  pCPUProfiler_->Initialize();
-  pMemoryProfiler_->Initialize();
-
-  pKeyboard_->Initialize();
-  pMouse_->Initialize();
-  pXInput_->Initialize();
-  pGamepad_->Initialize();
-
-  Engine::Get<ISoundManager>()->Initialize();
-  Engine::Get<ITextureManager>()->Initialize();
-  Engine::Get<IModelManager>()->Initialize();
-  Engine::Get<IBufferManager>()->Initialize();
-  Engine::Get<IShaderManager>()->Initialize();
-
-  pRenderer_->Initialize();
-  Engine::Get<IComputer>()->Initialize();
-  pGUI_->Initialize();
 
   //  フレームレートを設定
   SetMaxFPS(Constants::kDefaultMaxFPS);
