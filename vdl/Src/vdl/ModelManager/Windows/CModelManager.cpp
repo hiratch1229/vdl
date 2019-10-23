@@ -70,10 +70,10 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
       {
         MeshDatas = FBXLoader().Load(_FilePath);
       }
-      else if (glTFLoader::CheckSupportFormat(FileFormat))
-      {
-        MeshDatas = glTFLoader().Load(_FilePath);
-      }
+      //else if (glTFLoader::CheckSupportFormat(FileFormat))
+      //{
+      //  MeshDatas = glTFLoader().Load(_FilePath);
+      //}
       else
       {
         _ASSERT_EXPR_A(false, (FileFormat + "ÇÕëŒâûÇµÇƒÇ¢Ç‹ÇπÇÒÅB").c_str());
@@ -155,15 +155,13 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
         MeshData.Material.MaterialColor = LoadMaterial.MaterialColor;
         MeshData.Material.Diffuse = GetImage(LoadMaterial.Diffuse, vdl::ColorF(1.0f, 1.0f, 1.0f));
         MeshData.Material.NormalMap = GetImage(LoadMaterial.NormalMap, vdl::ColorF(0.5f, 0.5f, 1.0f));
-        //Material.Ambient = GetImage(LoadMaterial.Ambient, vdl::ColorF(1.0f, 1.0f, 1.0f));
         //Material.Specular = GetImage(LoadMaterial.Specular, vdl::ColorF(0.0f, 0.0f, 0.0f));
         //Material.MetallicRoughness = GetImage(LoadMaterial.MetallicRoughness, vdl::ColorF(1.0f, 1.0f, 1.0f));
-        //Material.Occlusion = GetImage(LoadMaterial.Occlusion, vdl::ColorF(1.0f, 1.0f, 1.0f));
         //Material.Emissive = GetImage(LoadMaterial.Emissive, vdl::ColorF(0.0f, 0.0f, 0.0f));
 
         MeshData.Material.IndexNum = LoadMaterial.IndexCount - LoadMaterial.IndexStart;
         MeshData.Indices.resize(MeshData.Material.IndexNum);
-        ::memcpy(MeshData.Indices.data(), &Indices[LoadMaterial.IndexStart], sizeof(vdl::IndexType)*MeshData.Material.IndexNum);
+        ::memcpy(MeshData.Indices.data(), &Indices[LoadMaterial.IndexStart], sizeof(vdl::IndexType) * MeshData.Material.IndexNum);
 
         SkinnedMeshes.push_back(MeshData);
       }

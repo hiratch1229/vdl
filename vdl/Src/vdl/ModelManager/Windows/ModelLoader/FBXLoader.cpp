@@ -141,7 +141,7 @@ std::vector<fbxsdk::FbxMesh*> FBXLoader::GetFbxMeshes(fbxsdk::FbxScene* _pScene)
   {
     if (pNode)
     {
-      if (fbxsdk::FbxNodeAttribute * pFbxNodeAttribute = pNode->GetNodeAttribute())
+      if (fbxsdk::FbxNodeAttribute* pFbxNodeAttribute = pNode->GetNodeAttribute())
       {
         switch (pFbxNodeAttribute->GetAttributeType())
         {
@@ -177,44 +177,44 @@ void FBXLoader::FetchMaterials(fbxsdk::FbxMesh* _pMesh, Materials* _pMaterials, 
     Material& Material = (*_pMaterials)[MaterialCount];
 
     const fbxsdk::FbxSurfaceMaterial* pSurfaceMaterial = pNode->GetMaterial(MaterialCount);
-    auto FetchMaterialProperty = [&](vdl::CompressionImage* _pCompressionImage, const char* _PropertyName, const char* _FactorName)->void
+    auto FetchMaterialProperty = [&](vdl::CompressionImage* _pCompressionImage, const char* _PropertyName, const char* _FactorName)->bool
     {
       const fbxsdk::FbxProperty Property = pSurfaceMaterial->FindProperty(_PropertyName);
       const fbxsdk::FbxProperty Factor = pSurfaceMaterial->FindProperty(_FactorName);
 
-      if (Property.IsValid())
+      if (!Property.IsValid())
       {
-        const vdl::uint TextureNum = Property.GetSrcObjectCount<fbxsdk::FbxFileTexture>();
+        return false;
+      }
 
-        if (TextureNum > 0)
+      const vdl::uint TextureNum = Property.GetSrcObjectCount<fbxsdk::FbxFileTexture>();
+
+      if (TextureNum > 0)
+      {
+        if (fbxsdk::FbxFileTexture * pFileTexture = Property.GetSrcObject<fbxsdk::FbxFileTexture>())
         {
-          if (fbxsdk::FbxFileTexture * pFileTexture = Property.GetSrcObject<fbxsdk::FbxFileTexture>())
-          {
-            const std::string FileName = (_FileFormat == "fbx" ? _FileDirectory + pFileTexture->GetRelativeFileName() : pFileTexture->GetFileName());
-            (*_pCompressionImage) = _TextureLoader.LoadFromFile(FileName.c_str());
-          }
+          const std::string FileName = (_FileFormat == "fbx" ? _FileDirectory + pFileTexture->GetRelativeFileName() : pFileTexture->GetFileName());
+          (*_pCompressionImage) = _TextureLoader.LoadFromFile(FileName.c_str());
         }
       }
+
+      return true;
     };
 
-    if (const fbxsdk::FbxProperty Property = pSurfaceMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuse),
-      Factor = pSurfaceMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuseFactor);
-      Property.IsValid() && Factor.IsValid())
+    if (FetchMaterialProperty(&Material.Diffuse, fbxsdk::FbxSurfaceMaterial::sDiffuse, fbxsdk::FbxSurfaceMaterial::sDiffuseFactor))
     {
-      const fbxsdk::FbxDouble3 Color = Property.Get<fbxsdk::FbxDouble3>();
-      const double f = Factor.Get<fbxsdk::FbxDouble>();
+      const fbxsdk::FbxDouble3 Color = pSurfaceMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuse).Get<fbxsdk::FbxDouble3>();
+      const double f = pSurfaceMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuseFactor).Get<fbxsdk::FbxDouble>();
 
       Material.MaterialColor.Red = static_cast<float>(Color[0] * f);
       Material.MaterialColor.Green = static_cast<float>(Color[1] * f);
       Material.MaterialColor.Blue = static_cast<float>(Color[2] * f);
       Material.MaterialColor.Alpha = 1.0f;
     }
-
-    FetchMaterialProperty(&Material.Diffuse, fbxsdk::FbxSurfaceMaterial::sDiffuse, fbxsdk::FbxSurfaceMaterial::sDiffuseFactor);
-    FetchMaterialProperty(&Material.Ambient, fbxsdk::FbxSurfaceMaterial::sAmbient, fbxsdk::FbxSurfaceMaterial::sAmbientFactor);
+    //FetchMaterialProperty(&Material.Ambient, fbxsdk::FbxSurfaceMaterial::sAmbient, fbxsdk::FbxSurfaceMaterial::sAmbientFactor);
     FetchMaterialProperty(&Material.Specular, fbxsdk::FbxSurfaceMaterial::sSpecular, fbxsdk::FbxSurfaceMaterial::sSpecularFactor);
     FetchMaterialProperty(&Material.NormalMap, fbxsdk::FbxSurfaceMaterial::sNormalMap, fbxsdk::FbxSurfaceMaterial::sBumpFactor);
-    FetchMaterialProperty(&Material.Bump, fbxsdk::FbxSurfaceMaterial::sBump, fbxsdk::FbxSurfaceMaterial::sBumpFactor);
+    //FetchMaterialProperty(&Material.Bump, fbxsdk::FbxSurfaceMaterial::sBump, fbxsdk::FbxSurfaceMaterial::sBumpFactor);
   }
 }
 
@@ -315,6 +315,10 @@ void FBXLoader::FetchVertices(fbxsdk::FbxMesh* _pMesh, Vertices* _pVertices, con
         Vertex.Normal.x = static_cast<float>(Normal[0]);
         Vertex.Normal.y = static_cast<float>(Normal[1]);
         Vertex.Normal.z = static_cast<float>(Normal[2]);
+      }
+      else
+      {
+        Vertex.Normal = vdl::float3::Forward();
       }
 
       if (hasTangent)
@@ -481,10 +485,10 @@ void FBXLoader::FetchBoneMatrices(fbxsdk::FbxMesh* _pMesh, Skeletal* _pSkeletal,
       fbxsdk::FbxAMatrix ClusterGlobalInitPosition;
       pCluster->GetTransformLinkMatrix(ClusterGlobalInitPosition);
 
-      FbxAMatrix ClusterGlobalCurrentPosition;
+      fbxsdk::FbxAMatrix ClusterGlobalCurrentPosition;
       ClusterGlobalCurrentPosition = pLink->EvaluateGlobalTransform(_Time);
 
-      FbxAMatrix ReferenceGlobalCurrentPosition;
+      fbxsdk::FbxAMatrix ReferenceGlobalCurrentPosition;
       ReferenceGlobalCurrentPosition = pNode->EvaluateGlobalTransform(_Time);
 
       Bone.Name = pLink->GetName();

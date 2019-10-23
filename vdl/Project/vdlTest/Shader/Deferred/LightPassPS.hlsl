@@ -32,11 +32,11 @@ cbuffer Light : register(b2)
   row_major float4x4 LightViewProjection;
 };
 
-float4 main(VS_OUT In) : SV_TARGET
+float4 main(float4 _Position : SV_POSITION) : SV_TARGET
 {
-  int3 TexCoord = int3(In.Position.xy, 0);
+  int3 TexCoord = int3(_Position.xy, 0);
 
-  float2 P = In.Position.xy / kWindowSize;
+  float2 P = _Position.xy / kWindowSize;
   P = float2(P.x, 1.0f - P.y) * 2.0f - 1.0f;
 
   float4 Position = mul(float4(P, DepthBuffer.Load(TexCoord).r, 1.0f), InverseViewProjection);

@@ -55,6 +55,12 @@
     <Filter Include="Src\MemoryProfiler">
       <UniqueIdentifier>{af937ae9-f1dd-4cfa-a350-e0abd3c1569f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\ThirdParty">
+      <UniqueIdentifier>{00641bbd-613c-4d97-b386-55bccb472c6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ThirdParty\tiny_gltf">
+      <UniqueIdentifier>{391c1866-1647-4e62-91d4-bd8590335d6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Input\Mouse\Windows\CMouse.cpp">
@@ -154,6 +160,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.hpp">
       <Filter>Src\MemoryProfiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\Windows\tiny_gltf\json.hpp">
+      <Filter>Src\ThirdParty\tiny_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\Windows\tiny_gltf\tiny_gltf.h">
+      <Filter>Src\ThirdParty\tiny_gltf</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

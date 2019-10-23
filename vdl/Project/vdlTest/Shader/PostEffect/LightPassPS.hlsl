@@ -66,9 +66,9 @@ PS_OUT main(float4 _Position : SV_POSITION)
   float d = ShadowMap.Sample(ShadowMapSampler, ShadowPosition.xy).r;
   float3 ShadowColor = (ShadowPosition.z - d > ShadowBias) ? Shadow : 1.0f;
 
-  float Alpha = saturate((length(Position.xyz - EyePos.xyz) - kNear) / (kFar - kNear));
+  float Alpha = saturate((length(Position.xyz - EyePos) - kNear) / (kFar - kNear));
 
-  float3 Color = lerp(float3((Diffuse.rgb + LightColor) * ShadowColor), float3(0.6f, 0.6f, 0.6f), saturate((length(Position.xyz - EyePos.xyz) - kNear) / (kFar - kNear)));
+  float3 Color = lerp(float3((Diffuse.rgb + LightColor) * ShadowColor), Fog, saturate((length(Position.xyz - EyePos.xyz) - kNear) / (kFar - kNear)));
 
   Out.Color = float4(Color, Diffuse.a);
   Out.Luminance = float4(Color * max(0.0f, GetLuminance(Color) - LuminanceThreshold) * Exposure, 1.0f);

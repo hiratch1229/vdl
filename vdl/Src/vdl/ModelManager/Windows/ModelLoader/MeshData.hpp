@@ -10,17 +10,14 @@ struct Material
 {
   vdl::ColorF MaterialColor = vdl::Palette::White;
   vdl::CompressionImage Diffuse;
-  vdl::CompressionImage Ambient;
   vdl::CompressionImage Specular;
   vdl::CompressionImage NormalMap;
-  vdl::CompressionImage Bump;
   vdl::CompressionImage MetallicRoughness;
-  vdl::CompressionImage Occlusion;
   vdl::CompressionImage Emissive;
   vdl::uint IndexStart = 0;
   vdl::uint IndexCount = 0;
 
-  CEREAL_SERIALIZE(MaterialColor, Diffuse, Ambient, Specular, NormalMap, MetallicRoughness, Occlusion, Emissive, Bump, IndexStart, IndexCount)
+  CEREAL_SERIALIZE(MaterialColor, Diffuse, Specular, NormalMap, MetallicRoughness, Emissive, IndexStart, IndexCount)
 };
 
 struct Bone
