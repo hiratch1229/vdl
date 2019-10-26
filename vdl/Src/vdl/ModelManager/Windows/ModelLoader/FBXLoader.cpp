@@ -1,7 +1,7 @@
 #include "FBXLoader.hpp"
 
 #include <vdl/Constants/Constants.hpp>
-#include <vdl/TextureManager/Windows/TextureLoader/TextureLoader.hpp>
+#include <vdl/TextureManager/TextureLoader/TextureLoader.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
 #include <filesystem>

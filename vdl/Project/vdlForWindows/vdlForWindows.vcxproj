@@ -35,8 +35,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.cpp" />
-    <ClCompile Include="..\..\Src\vdl\TextureManager\Windows\CTextureManager.cpp" />
-    <ClCompile Include="..\..\Src\vdl\TextureManager\Windows\TextureLoader\TextureLoader.cpp" />
     <ClCompile Include="..\..\Src\vdl\Window\Windows\CWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -56,8 +54,6 @@
     <ClInclude Include="..\..\Src\vdl\pch\Windows\pch.hpp" />
     <ClInclude Include="..\..\Src\vdl\Resource\Windows\Resource.hpp" />
     <ClInclude Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.hpp" />
-    <ClInclude Include="..\..\Src\vdl\TextureManager\Windows\CTextureManager.hpp" />
-    <ClInclude Include="..\..\Src\vdl\TextureManager\Windows\TextureLoader\TextureLoader.hpp" />
     <ClInclude Include="..\..\Src\vdl\Window\Windows\CWindow.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

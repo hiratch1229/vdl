@@ -28,12 +28,6 @@
     <Filter Include="Src\Misc">
       <UniqueIdentifier>{44bb1d7f-962f-4c97-b9fc-2dd234869741}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\TextureManager">
-      <UniqueIdentifier>{b2e6fccf-af17-46c1-88d0-9c037d0c6855}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\TextureManager\TextureLoader">
-      <UniqueIdentifier>{08cf594c-2742-408e-8eaa-6d5837974041}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\ModelManager">
       <UniqueIdentifier>{4108b5ac-dfc6-4274-b6f7-ba74e2471887}</UniqueIdentifier>
     </Filter>
@@ -81,12 +75,6 @@
     <ClCompile Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.cpp">
       <Filter>Src\SoundManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\TextureManager\Windows\CTextureManager.cpp">
-      <Filter>Src\TextureManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\TextureManager\Windows\TextureLoader\TextureLoader.cpp">
-      <Filter>Src\TextureManager\TextureLoader</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.cpp">
       <Filter>Src\ModelManager</Filter>
     </ClCompile>
@@ -130,12 +118,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Misc\Windows\Misc.hpp">
       <Filter>Src\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\TextureManager\Windows\CTextureManager.hpp">
-      <Filter>Src\TextureManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\TextureManager\Windows\TextureLoader\TextureLoader.hpp">
-      <Filter>Src\TextureManager\TextureLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.hpp">
       <Filter>Src\ModelManager</Filter>

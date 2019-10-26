@@ -358,7 +358,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
   constexpr DXGI_FORMAT kTextureFormat = Cast(Constants::kTextureFormat);
 
   CTexture* pTexture = new CTexture;
-  pTexture->TextureSize = _Image.GetSize();
+  pTexture->TextureSize = _Image.GetTextureSize();
 
   HRESULT hr = S_OK;
 

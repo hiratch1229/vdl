@@ -21,7 +21,7 @@ namespace vdl
 
     [[nodiscard]] uint BufferSize()const noexcept { return static_cast<vdl::uint>(Buffer_.size() * 4); }
 
-    [[nodiscard]] uint2 GetSize()const noexcept { return Size_; }
+    [[nodiscard]] uint2 GetTextureSize()const noexcept { return Size_; }
 
     [[nodiscard]] bool isEmpty()const noexcept { return Buffer_.empty(); }
 
@@ -47,7 +47,7 @@ namespace vdl
   public:
     [[nodiscard]] uint BufferSize()const noexcept { return static_cast<vdl::uint>(Buffer_.size()); }
 
-    [[nodiscard]] uint2 GetSize()const noexcept { return Size_; }
+    [[nodiscard]] uint2 GetTextureSize()const noexcept { return Size_; }
 
     [[nodiscard]] bool isEmpty()const noexcept { return Buffer_.empty(); }
 
