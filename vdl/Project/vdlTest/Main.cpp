@@ -7,6 +7,7 @@
 #include "Scene/SceneGPUParticle.hpp"
 #include "Scene/SceneDeferred.hpp"
 #include "Scene/ScenePostEffect.hpp"
+#include "Scene/SceneTBDR.hpp"
 
 #include <memory>
 
@@ -24,6 +25,8 @@ namespace
       return new SceneDeferred;
     case 3:
       return new ScenePostEffect;
+    case 4:
+      return new SceneTBDR;
     default: assert(false);
     }
 
@@ -40,10 +43,11 @@ void Main()
     "Tessellation",
     "GPUParticle",
     "Deferred",
-    "PostEffect"
+    "PostEffect",
+    "TBDR"
   };
   static constexpr vdl::uint kSceneTypeNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kSceneTypes));
-  static constexpr vdl::uint kInitSceneType = 3;
+  static constexpr vdl::uint kInitSceneType = 2;
   static_assert(kInitSceneType < kSceneTypeNum);
 
   vdl::uint SceneType = kInitSceneType;

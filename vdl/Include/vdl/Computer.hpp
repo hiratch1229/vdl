@@ -9,6 +9,46 @@ namespace vdl::Computer
 {
   void SetShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResource[]);
 
+  inline void SetShaderResources(uint _StartSlot, uint _TextureNum, const Texture _Textures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_TextureNum);
+    {
+      for (uint TextureCount = 0; TextureCount < _TextureNum; ++TextureCount)
+      {
+        ShaderResources[TextureCount] = _Textures[TextureCount];
+      }
+    }
+
+    SetShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
+    {
+      for (uint UnorderedAccessBufferDataCount = 0; UnorderedAccessBufferDataCount < _UnorderedAccessBufferDataNum; ++UnorderedAccessBufferDataCount)
+      {
+        ShaderResources[UnorderedAccessBufferDataCount] = _UnorderedAccessBufferDatas[UnorderedAccessBufferDataCount];
+      }
+    }
+
+    SetShaderResources(0, _UnorderedAccessBufferDataNum, ShaderResources.data());
+  }
+
+  template<class T>
+  inline void SetShaderResources(uint _StartSlot, uint _UnorderedAccessBufferNum, const UnorderedAccessBuffer<T> _UnorderedAccessBuffers[])
+  {
+    std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferNum);
+    {
+      for (uint UnorderedAccessBufferCount = 0; UnorderedAccessBufferCount < _UnorderedAccessBufferNum; ++UnorderedAccessBufferCount)
+      {
+        ShaderResources[UnorderedAccessBufferCount] = _UnorderedAccessBuffers[UnorderedAccessBufferCount].GetDetail();
+      }
+    }
+
+    SetShaderResources(_StartSlot, _UnorderedAccessBufferNum, ShaderResources.data());
+  }
+
   void SetSamplers(uint _StartSlot, uint _SamplerNum, const Sampler _Samplers[]);
 
   void SetConstantBuffers(uint _StartSlot, uint _ConstantBufferNum, const Detail::ConstantBufferData _ConstantBuffers[]);

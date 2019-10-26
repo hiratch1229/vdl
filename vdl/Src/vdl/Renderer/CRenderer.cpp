@@ -459,6 +459,8 @@ void CRenderer::Flush()
   const bool HasStaticMeshDrawCommand = MeshRendererCommandList_.HasDrawCommand();
   const bool HasTextureDrawCommand = TextureRendererCommandList_.HasDrawCommand();
 
+  pDeviceContext_->SetRenderTextures(OutputManager_.RenderTextures, OutputManager_.DepthStencilTexture);
+
   if (HasEmptyDrawCommand || HasStaticMeshDrawCommand || HasTextureDrawCommand)
   {
     //  それぞれのドローコールをソート(マルチスレッド)
@@ -476,8 +478,6 @@ void CRenderer::Flush()
         TextureRendererCommandList_.Adjust();
       }
     }
-
-    pDeviceContext_->SetRenderTextures(OutputManager_.RenderTextures, OutputManager_.DepthStencilTexture);
 
     if (HasStaticMeshDrawCommand)
     {

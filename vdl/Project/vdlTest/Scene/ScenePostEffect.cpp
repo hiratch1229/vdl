@@ -58,7 +58,7 @@ void ScenePostEffect::Initialize()
     PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_;
     PixelStageShaderResources_[kUseRenderTextureNum + 1] = ShadowMap_;
 
-    DirectionalLightConstantBuffer_.GetData() = { float3(float3(0.0f) - DirectionLightPosition_).Normalize(), 0.125f, Palette::White };
+    DirectionalLightConstantBuffer_.GetData() = { float3(float3(0.0f) - DirectionLightPosition_).Normalize(), 1.5f, Palette::White };
     Renderer::SetPixelStageConstantBuffers(0, 1, &DirectionalLightConstantBuffer_);
 
     RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
@@ -139,7 +139,7 @@ void ScenePostEffect::Update()
     }
     ImGui::End();
 
-    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up()/*, 0.1f, 300.0f*/);
+    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up());
     LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
   }
 

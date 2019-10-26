@@ -11,6 +11,7 @@ enum class SceneType : vdl::uint
 
   eDeferred,
   ePostEffect,
+  eTBDR,
 
   eNum
 };

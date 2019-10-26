@@ -17,7 +17,7 @@ void SceneDeferred::Initialize()
   Sphere_ = MeshData::Sphere(12, 12, "Data/earthmap/earthmap.jpg", "Data/earthmap/earthnormal.jpg");
   SphereSpecularMap_ = Texture("Data/earthmap/earthspec.jpg");
 
-  Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));
+  Camera_ = Camera(float3(0.0f, 5.0f, -25.0f));
   PointLightItensity_ = 0.5f;
   PointLightRange_ = 0.75f;
 
@@ -40,7 +40,7 @@ void SceneDeferred::Initialize()
     GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
     GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
     GBufferRenderTextures_[2] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
-    GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD16_Unorm);
+    GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
   }
 
   //  ShadowMapÇÃèâä˙âª

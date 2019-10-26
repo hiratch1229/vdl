@@ -1196,7 +1196,14 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(Texture.GetID()));
             if (pTexture->CurrentLayout != kImageLayout)
             {
-              pTexture->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+              if (pTexture->GetType() == TextureType::eDepthStencilTexture)
+              {
+                pTexture->SetImageLayout(CurrentCommandBuffer, kImageLayout, { static_cast<CDepthStencilTexture*>(pTexture)->ImageAspectFlag, 0, 1, 0, 1 });
+              }
+              else
+              {
+                pTexture->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+              }
             }
 
             DescriptorImageData& ImageData = TextureDatas.emplace_back();
@@ -1339,13 +1346,11 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
     {
       constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
 
-      const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType);
-
       vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
       {
         DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
         DescriptorSetAllocateInfo.descriptorSetCount = 1;
-        DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
       }
 
       vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
@@ -1457,7 +1462,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
           const vdl::UnorderedAccessTexture& UnorderedAccessTexture = std::get<vdl::UnorderedAccessTexture>(UnorderedAccessObject);
           if (!UnorderedAccessTexture.isEmpty())
           {
-            constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+            constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eGeneral;
 
             assert(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID())->GetType() == TextureType::eUnorderedAccessTexture);
             CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()));

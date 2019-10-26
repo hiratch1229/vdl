@@ -68,7 +68,7 @@ PS_OUT main(float4 _Position : SV_POSITION)
 
   float Alpha = saturate((length(Position.xyz - EyePos) - kNear) / (kFar - kNear));
 
-  float3 Color = lerp(float3((Diffuse.rgb + LightColor) * ShadowColor), Fog, saturate((length(Position.xyz - EyePos.xyz) - kNear) / (kFar - kNear)));
+  float3 Color = lerp(float3((Diffuse.rgb * LightColor) * ShadowColor), Fog, saturate((length(Position.xyz - EyePos.xyz) - kNear) / (kFar - kNear)));
 
   Out.Color = float4(Color, Diffuse.a);
   Out.Luminance = float4(Color * max(0.0f, GetLuminance(Color) - LuminanceThreshold) * Exposure, 1.0f);

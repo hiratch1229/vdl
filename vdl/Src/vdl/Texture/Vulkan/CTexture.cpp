@@ -19,6 +19,10 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
   case vk::ImageLayout::eUndefined:
     SrcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
     break;
+  case vk::ImageLayout::eGeneral:
+    SrcStageMask = vk::PipelineStageFlagBits::eComputeShader;
+    ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite;
+    break;
   case vk::ImageLayout::eColorAttachmentOptimal:
     SrcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
     ImageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
@@ -49,6 +53,10 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
   case vk::ImageLayout::eColorAttachmentOptimal:
     DstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
     ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+    break;
+  case vk::ImageLayout::eGeneral:
+    DstStageMask = vk::PipelineStageFlagBits::eComputeShader;
+    ImageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eShaderWrite;
     break;
   case vk::ImageLayout::eDepthStencilAttachmentOptimal:
     DstStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
