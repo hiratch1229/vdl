@@ -1,10 +1,6 @@
 #include "IModelManager.hpp"
 
-#include <vdl/Platform.hpp>
-
-#if defined VDL_TARGET_WINDOWS
-#include "Windows/CModelManager.hpp"
-#endif
+#include "CModelManager.hpp"
 
 IModelManager* IModelManager::Create()
 {

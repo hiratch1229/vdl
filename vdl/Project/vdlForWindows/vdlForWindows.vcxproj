@@ -26,9 +26,6 @@
     <ClCompile Include="..\..\Src\vdl\Input\XInput\Windows\CXInput.cpp" />
     <ClCompile Include="..\..\Src\vdl\Main\Windows\WinMain.cpp" />
     <ClCompile Include="..\..\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.cpp" />
-    <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.cpp" />
-    <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.cpp" />
-    <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.cpp" />
     <ClCompile Include="..\..\Src\vdl\pch\Windows\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -38,8 +35,6 @@
     <ClCompile Include="..\..\Src\vdl\Window\Windows\CWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Src\ThirdParty\Windows\tiny_gltf\json.hpp" />
-    <ClInclude Include="..\..\Src\ThirdParty\Windows\tiny_gltf\tiny_gltf.h" />
     <ClInclude Include="..\..\Src\vdl\CPUProfiler\Windows\CCPUProfiler.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Gamepad\Windows\CGamepad.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Keyboard\Windows\CKeyboard.hpp" />
@@ -47,10 +42,6 @@
     <ClInclude Include="..\..\Src\vdl\Input\XInput\Windows\CXInput.hpp" />
     <ClInclude Include="..\..\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.hpp" />
     <ClInclude Include="..\..\Src\vdl\Misc\Windows\Misc.hpp" />
-    <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.hpp" />
-    <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.hpp" />
-    <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.hpp" />
-    <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\MeshData.hpp" />
     <ClInclude Include="..\..\Src\vdl\pch\Windows\pch.hpp" />
     <ClInclude Include="..\..\Src\vdl\Resource\Windows\Resource.hpp" />
     <ClInclude Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.hpp" />
@@ -132,7 +123,7 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty\Windows;..\..\Src\ThirdParty\Windows\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
@@ -142,10 +133,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib;libfbxsdk-md_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\Src\ThirdParty\Windows\FBXSDK</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -194,7 +186,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty\Windows;..\..\Src\ThirdParty\Windows\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;26812;</DisableSpecificWarnings>
@@ -207,8 +199,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib;libfbxsdk-md.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\Src\ThirdParty\Windows\FBXSDK</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;XInput9_1_0.lib;dinput8.lib;dxguid.lib;pdh.lib;mfplay.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>

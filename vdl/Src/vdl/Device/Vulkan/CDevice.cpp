@@ -13,9 +13,9 @@
 #undef min
 #undef max
 #pragma warning(disable:26495)
-#include <SPIRV/GlslangToSpv.h>
-#include <StandAlone/DirStackFileIncluder.h>
-#include <StandAlone/ResourceLimits.hpp>
+#include <ThirdParty/Vulkan/glslang/SPIRV/GlslangToSpv.h>
+#include <ThirdParty/Vulkan/glslang/StandAlone/DirStackFileIncluder.h>
+#include <ThirdParty/Vulkan/glslang/StandAlone/ResourceLimits.hpp>
 #pragma warning(default:26495)
 
 #include <sstream>
@@ -548,7 +548,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
   constexpr vk::Format kTextureFormat = Cast(Constants::kTextureFormat);
 
   CTexture* pTexture = new CTexture;
-  pTexture->TextureSize = _Image.GetSize();
+  pTexture->TextureSize = _Image.GetTextureSize();
   pTexture->Format = kTextureFormat;
 
   BufferData StagingBuffer;

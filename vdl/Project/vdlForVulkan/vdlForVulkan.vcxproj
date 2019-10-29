@@ -123,7 +123,7 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\Vulkan;..\..\Src\ThirdParty\Vulkan\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\Vulkan\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
     </ClCompile>
@@ -184,7 +184,7 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;26812;</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;..\..\Src\ThirdParty\Vulkan\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\Include;..\..\Src;..\..\Include\ThirdParty;..\..\Src\ThirdParty\Vulkan\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
     </ClCompile>

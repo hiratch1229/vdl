@@ -19,7 +19,7 @@
 
 #include <vdl/Vertex.hpp>
 
-#include <ImGui/imgui.h>
+#include <ThirdParty/ImGui/imgui.h>
 
 namespace
 {

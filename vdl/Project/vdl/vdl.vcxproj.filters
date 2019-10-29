@@ -163,6 +163,12 @@
     <Filter Include="Src\ThirdParty\zstd\dictBuilder">
       <UniqueIdentifier>{bf3c2a1d-82b4-4696-964e-9da745c649a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\ModelManager\ModelLoader">
+      <UniqueIdentifier>{22048a9e-6deb-4c96-9fa8-afc0f1f565a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ThirdParty\tiny_gltf">
+      <UniqueIdentifier>{05fb1634-ec0b-488f-a90a-11eee2662c20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -570,6 +576,27 @@
     <ClInclude Include="..\..\Src\ThirdParty\zstd\dictBuilder\zdict.h">
       <Filter>Src\ThirdParty\zstd\dictBuilder</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\ModelManager\CModelManager.hpp">
+      <Filter>Src\ModelManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\glTFLoader.hpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\MeshData.hpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.hpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\tiny_gltf\json.hpp">
+      <Filter>Src\ThirdParty\tiny_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\ThirdParty\tiny_gltf\tiny_gltf.h">
+      <Filter>Src\ThirdParty\tiny_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\ModelData.hpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -805,6 +832,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\ThirdParty\zstd\dictBuilder\zdict.c">
       <Filter>Src\ThirdParty\zstd\dictBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ModelManager\CModelManager.cpp">
+      <Filter>Src\ModelManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ModelManager\ModelLoader\glTFLoader.cpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.cpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

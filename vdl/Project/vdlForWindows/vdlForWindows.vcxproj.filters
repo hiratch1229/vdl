@@ -28,12 +28,6 @@
     <Filter Include="Src\Misc">
       <UniqueIdentifier>{44bb1d7f-962f-4c97-b9fc-2dd234869741}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\ModelManager">
-      <UniqueIdentifier>{4108b5ac-dfc6-4274-b6f7-ba74e2471887}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\ModelManager\ModelLoader">
-      <UniqueIdentifier>{c4ea93d6-2b77-451c-8c63-848557512372}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Main">
       <UniqueIdentifier>{9bb82b6e-486a-4238-9db4-767e917f2c0b}</UniqueIdentifier>
     </Filter>
@@ -48,12 +42,6 @@
     </Filter>
     <Filter Include="Src\MemoryProfiler">
       <UniqueIdentifier>{af937ae9-f1dd-4cfa-a350-e0abd3c1569f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\ThirdParty">
-      <UniqueIdentifier>{00641bbd-613c-4d97-b386-55bccb472c6b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\ThirdParty\tiny_gltf">
-      <UniqueIdentifier>{391c1866-1647-4e62-91d4-bd8590335d6d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,15 +62,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\SoundManager\Windows\CSoundManager.cpp">
       <Filter>Src\SoundManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.cpp">
-      <Filter>Src\ModelManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.cpp">
-      <Filter>Src\ModelManager\ModelLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.cpp">
-      <Filter>Src\ModelManager\ModelLoader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Main\Windows\WinMain.cpp">
       <Filter>Src\Main</Filter>
@@ -119,18 +98,6 @@
     <ClInclude Include="..\..\Src\vdl\Misc\Windows\Misc.hpp">
       <Filter>Src\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\CModelManager.hpp">
-      <Filter>Src\ModelManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\FBXLoader.hpp">
-      <Filter>Src\ModelManager\ModelLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\glTFLoader.hpp">
-      <Filter>Src\ModelManager\ModelLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\ModelManager\Windows\ModelLoader\MeshData.hpp">
-      <Filter>Src\ModelManager\ModelLoader</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Resource\Windows\Resource.hpp">
       <Filter>Src\Resource</Filter>
     </ClInclude>
@@ -142,12 +109,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.hpp">
       <Filter>Src\MemoryProfiler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\ThirdParty\Windows\tiny_gltf\json.hpp">
-      <Filter>Src\ThirdParty\tiny_gltf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\ThirdParty\Windows\tiny_gltf\tiny_gltf.h">
-      <Filter>Src\ThirdParty\tiny_gltf</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

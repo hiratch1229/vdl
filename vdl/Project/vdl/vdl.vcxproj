@@ -116,6 +116,8 @@
     <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_rectpack.h" />
     <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_textedit.h" />
     <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_truetype.h" />
+    <ClInclude Include="..\..\Src\ThirdParty\tiny_gltf\json.hpp" />
+    <ClInclude Include="..\..\Src\ThirdParty\tiny_gltf\tiny_gltf.h" />
     <ClInclude Include="..\..\Src\ThirdParty\zstd\common\bitstream.h" />
     <ClInclude Include="..\..\Src\ThirdParty\zstd\common\compiler.h" />
     <ClInclude Include="..\..\Src\ThirdParty\zstd\common\cpu.h" />
@@ -167,8 +169,13 @@
     <ClInclude Include="..\..\Src\vdl\Instance\Instance.hpp" />
     <ClInclude Include="..\..\Src\vdl\MemoryProfiler\IMemoryProfiler.hpp" />
     <ClInclude Include="..\..\Src\vdl\Misc\Misc.hpp" />
+    <ClInclude Include="..\..\Src\vdl\ModelManager\CModelManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\IModelManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\Mesh.hpp" />
+    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.hpp" />
+    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\glTFLoader.hpp" />
+    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\MeshData.hpp" />
+    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\ModelData.hpp" />
     <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
     <ClInclude Include="..\..\Src\vdl\Renderer\CRenderer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Renderer\IRenderer.hpp" />
@@ -245,6 +252,9 @@
     <ClCompile Include="..\..\Src\vdl\Input\XInput\XInputFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\MemoryProfiler\MemoryProfilerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ModelManager\CModelManager.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ModelManager\ModelLoader\glTFLoader.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\ModelManagerFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Model\Model.cpp" />
     <ClCompile Include="..\..\Src\vdl\MotionData\MotionData.cpp" />
@@ -504,16 +514,16 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX11_d.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Lib;..\..\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX11_d.lib;libfbxsdk-md_d.lib</AdditionalDependencies>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -714,7 +724,7 @@
       <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -724,8 +734,8 @@
     </Link>
     <Lib>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX11.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX11.lib;libfbxsdk-md.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Lib;..\..\Src\ThirdParty\Windows\FBXSDK</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
