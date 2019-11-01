@@ -154,8 +154,8 @@ void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::
         const vdl::Detail::ConstantBufferData& PreviousConstantBuffer = PreviousConstantBuffers_[ConstantBufferCount];
         const vdl::Detail::ConstantBufferData& PreviousConstantBufferData = PreviousConstantBufferDatas_[ConstantBufferCount];
 
-        if (CurrentConstantBuffer != PreviousConstantBuffer
-          || ::memcmp(CurrentConstantBuffer.GetData(), PreviousConstantBufferData.GetData(), CurrentConstantBuffer.GetBufferSize()))
+        if (!CurrentConstantBuffer.isEmpty() && (CurrentConstantBuffer != PreviousConstantBuffer
+          || ::memcmp(CurrentConstantBuffer.GetData(), PreviousConstantBufferData.GetData(), CurrentConstantBuffer.GetBufferSize())))
         {
           TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
           StateChangeFlags_.Set(ComputerCommandType::eSetConstantBuffer);

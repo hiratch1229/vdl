@@ -1,5 +1,5 @@
 #pragma once
-#include "ResourceLimits.h"
+#include "../glslang/Include/ResourceLimits.h"
 
 namespace glslang
 {

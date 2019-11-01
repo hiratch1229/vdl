@@ -14,14 +14,10 @@ class SceneTBDR : public IScene
 private:
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
   static constexpr float kSphereScale = 0.5f;
-  static constexpr vdl::float3 kMinRange = vdl::float3(-10.0f, 0.0f, -7.5f);
-  static constexpr vdl::float3 kMaxRange = vdl::float3(10.0f, 10.0f, 7.5f);
+  static constexpr vdl::float3 kMinRange = vdl::float3(-12.5f, 0.0f, -7.5f);
+  static constexpr vdl::float3 kMaxRange = vdl::float3(12.5f, 0.0f, 7.5f);
   static constexpr vdl::uint kMaxDataNum = 4096;
-  static constexpr vdl::uint kGBufferNum = 2;
-  static constexpr vdl::uint2 kGBufferSize = kWindowSize;
-  static constexpr vdl::uint2 kShadowMapSize = kWindowSize * 1;
-  static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 5;
-  static constexpr vdl::uint kGBufferLeftPos = kWindowSize.x - kGBufferDisplaySize.x;
+  static constexpr vdl::uint kGBufferNum = 2; /* Diffuse + Normal */
   static constexpr vdl::uint kPointLightUpdateThreadNum = 1024;
   static constexpr vdl::uint3 kPointLightUpdateDispatchNum = vdl::uint3(kMaxDataNum / kPointLightUpdateThreadNum + (kMaxDataNum % kPointLightUpdateThreadNum == 0 ? 0 : 1), 1, 1);
   static constexpr float kMinUpdateTime = 5.0f;
@@ -39,11 +35,8 @@ private:
   };
   struct RenderingData
   {
-    vdl::float3 EyePosition;
-    float SpecularPower;
-    vdl::float3 AmbientColor;
+   vdl::float3 AmbientColor;
     vdl::uint PointLightNum;
-    vdl::ColorF Shadow;
     vdl::Matrix InverseViewProjection;
   };
   struct CameraData
@@ -54,7 +47,6 @@ private:
 private:
   vdl::Model Sponza_;
   vdl::Camera Camera_;
-  bool isUpdate_ = true;
   bool isTileBase = true;
 private:
   vdl::UnorderedAccessBuffer<Data> DatasUnorderedAccessBuffer_;
@@ -67,13 +59,6 @@ private:
   vdl::RenderTextures GBufferRenderTextures_;
   vdl::DepthStencilTexture GBufferDepthTexture_;
 private:
-  vdl::VertexShader ShadowMapVertexShader_;
-  vdl::PixelShader ShadowMapPixelShader_;
-  vdl::DepthStencilTexture ShadowMap_;
-  vdl::float3 DirectionLightPosition_;
-  vdl::ConstantBuffer<vdl::Matrix> LightViewProjectionConstantBuffer_;
-private:
-  vdl::Sampler ShadowMapSampler_;
   std::array<vdl::ShaderResource, kGBufferNum + 3> LightShaderResources_;
   vdl::ConstantBuffer<vdl::DirectinalLight> DirectinalLightConstantBuffer_;
   vdl::ConstantBuffer<RenderingData> RenderingConstantBuffer_;

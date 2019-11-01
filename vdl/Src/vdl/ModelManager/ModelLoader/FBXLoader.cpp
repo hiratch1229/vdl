@@ -441,7 +441,7 @@ ModelData FBXLoader::Load(const char* _FilePath)const
         vdl::IndexType* BaseIndices = &Indices[MeshData.IndexStart + MeshData.IndexCount];
 
         BaseIndices[(isIndexInverse ? 2 : 0)] = static_cast<vdl::uint>(IndexOffset) + VertexNum++;
-        BaseIndices[1] = IndexOffset + VertexNum++;
+        BaseIndices[1] = static_cast<vdl::uint>(IndexOffset) + VertexNum++;
         BaseIndices[(isIndexInverse ? 0 : 2)] = static_cast<vdl::uint>(IndexOffset) + VertexNum++;
 
         MeshData.IndexCount += 3;

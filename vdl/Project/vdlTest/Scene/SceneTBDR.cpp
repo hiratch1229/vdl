@@ -14,7 +14,7 @@ void SceneTBDR::Initialize()
 {
   Sponza_ = Model("Data/sponza/Sponza.gltf");
 
-  Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));
+  Camera_ = Camera(float3(6.0f, 3.0f, 0.0f));
 
   //  更新用データの初期化
   {
@@ -55,52 +55,34 @@ void SceneTBDR::Initialize()
     GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
   }
 
-  //  ShadowMapの初期化
-  {
-    ShadowMapVertexShader_ = VertexShader("Shader/TBDR/ShadowMapVS.hlsl", InputLayoutType::eMesh);
-    ShadowMapPixelShader_ = PixelShader();
-    ShadowMap_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
-
-    DirectionLightPosition_ = Camera_.Position;
-
-    Renderer3D::SetVertexStageConstantBuffers(1, 1, &LightViewProjectionConstantBuffer_);
-  }
-
   //  LightPassの初期化
   {
     //  DeferredRendering
     {
       LightPassVertexShader_ = VertexShader("Shader/TBDR/LightPassVS.hlsl", InputLayoutType::eNone);
       LightPassPixelShader_ = PixelShader("Shader/TBDR/LightPassPS.hlsl");
-      ShadowMapSampler_ = Sampler(AddressModeType::eBorder, AddressModeType::eBorder, AddressModeType::eBorder,
-        FilterType::eAnisotropic, 16, BorderColorType::eWhite);
-      Renderer::SetPixelStageSamplers(0, 1, &ShadowMapSampler_);
 
       for (vdl::uint i = 0; i < kGBufferNum; ++i)
       {
         LightShaderResources_[i] = GBufferRenderTextures_[i];
       }
       LightShaderResources_[kGBufferNum] = GBufferDepthTexture_;
-      LightShaderResources_[kGBufferNum + 1] = ShadowMap_;
       LightShaderResources_[kGBufferNum + 2] = PointLightsUnorderedAccessBuffer_.GetDetail();
 
       Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
       DirectinalLight& DirectinalLight = DirectinalLightConstantBuffer_.GetData();
       {
-        DirectinalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
+        DirectinalLight.Direction = float3(0.0f, 0.0f, 1.0f).Normalize();
         DirectinalLight.Itensity = 0.125f;
         DirectinalLight.Color = Palette::White;
       }
       Renderer::SetPixelStageConstantBuffers(0, 1, &DirectinalLightConstantBuffer_);
       RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
       {
-        RenderingData.SpecularPower = 15.0f;
         RenderingData.AmbientColor = { 0.5f,0.5f,0.5f };
         RenderingData.PointLightNum = kMaxDataNum;
-        RenderingData.Shadow = ColorF(Palette::DimGray, 0.0001f);
       }
       Renderer::SetPixelStageConstantBuffers(1, 1, &RenderingConstantBuffer_);
-      Renderer::SetPixelStageConstantBuffers(2, 1, &LightViewProjectionConstantBuffer_);
       Renderer::SetTopology(TopologyType::eTriangleStrip);
     }
 
@@ -109,11 +91,8 @@ void SceneTBDR::Initialize()
       TileBaseComputeShader_ = ComputeShader(kTileBaseComputeShaderFilePath);
       LightUnorderedAccessTexture_ = UnorderedAccessTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
 
-      Computer::SetSamplers(0, 1, &ShadowMapSampler_);
-
       Computer::SetShader(TileBaseComputeShader_);
       Computer::SetConstantBuffers(1, 1, &RenderingConstantBuffer_);
-      Computer::SetConstantBuffers(2, 1, &LightViewProjectionConstantBuffer_);
       Computer::SetConstantBuffers(3, 1, &CameraConstantBuffer_);
       Computer::SetConstantBuffers(4, 1, &DirectinalLightConstantBuffer_);
 
@@ -138,7 +117,6 @@ void SceneTBDR::Update()
 
     RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
     {
-      RenderingData.EyePosition = Camera_.Position;
       RenderingData.InverseViewProjection = (Renderer3D::GetView() * Renderer3D::GetProjection()).Inverse();
     }
     UpdateData& UpdateData = UpdateConstantBuffer_.GetData();
@@ -153,7 +131,6 @@ void SceneTBDR::Update()
         Computer::SetShader(TileBaseComputeShader_);
       }
       ImGui::Checkbox("TileBased", &isTileBase);
-      ImGui::Checkbox("SphereUpdate", &isUpdate_);
       int CurrentPointLightNum = static_cast<int>(RenderingData.PointLightNum);
       if (ImGui::SliderInt("PointLightNum", &CurrentPointLightNum, 0, kMaxDataNum))
       {
@@ -162,16 +139,10 @@ void SceneTBDR::Update()
           RenderingData.PointLightNum = CurrentPointLightNum;
         }
       }
-      ImGui::InputFloat("SpecularPower", &RenderingData.SpecularPower);
       ImGui::ColorEdit3("Ambient", &RenderingData.AmbientColor.x);
-      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow.Red);
-      ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha);
       if (ImGui::TreeNode("DirectionalLight"))
       {
-        if (ImGui::InputFloat3("Position", &DirectionLightPosition_.x))
-        {
-          DirectinalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
-        }
+        ImGui::InputFloat3("Direction", &DirectinalLight.Direction.x);
         ImGui::Text(std::string("Direction:" + std::to_string(DirectinalLight.Direction)).c_str());
         ImGui::InputFloat("Itensity", &DirectinalLight.Itensity);
         ImGui::ColorEdit3("Color", &DirectinalLight.Color.Red);
@@ -186,16 +157,7 @@ void SceneTBDR::Update()
     }
     ImGui::End();
 
-    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up());
-    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
-
-    if (isTileBase)
-    {
-      CameraData& CameraData = CameraConstantBuffer_.GetData();
-      CameraData.View = Camera_.View();
-      CameraData.Projection = Camera_.Projection(kWindowSize);
-    }
-    if (isUpdate_)
+    //  ポイントライトの更新
     {
       UpdateData.DeltaTime = System::GetDeltaTime();
 
@@ -204,6 +166,13 @@ void SceneTBDR::Update()
       Computer::Dispatch(kPointLightUpdateDispatchNum);
 
       Computer::SetShader(TileBaseComputeShader_);
+    }
+
+    if (isTileBase)
+    {
+      CameraData& CameraData = CameraConstantBuffer_.GetData();
+      CameraData.View = Camera_.View();
+      CameraData.Projection = Camera_.Projection(kWindowSize);
     }
   }
 
@@ -214,7 +183,6 @@ void SceneTBDR::Update()
       Renderer::Clear(GBufferRenderTextures_[i]);
     }
     Renderer::Clear(GBufferDepthTexture_);
-    Renderer::Clear(ShadowMap_);
     Renderer::Clear(LightUnorderedAccessTexture_);
   }
   const vdl::uint RenderingNum = RenderingConstantBuffer_.GetData().PointLightNum;
@@ -223,14 +191,6 @@ void SceneTBDR::Update()
   {
     Renderer::SetRenderTextures(GBufferRenderTextures_, GBufferDepthTexture_);
     Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
-
-    Renderer3D::Draw(Sponza_, Matrix::Identity());
-  }
-
-  //  ShadowPass
-  {
-    Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
-    Renderer3D::SetShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
 
     Renderer3D::Draw(Sponza_, Matrix::Identity());
   }
@@ -259,11 +219,5 @@ void SceneTBDR::Update()
       decltype(LightShaderResources_) ShaderResources;
       Renderer2D::SetPixelStageShaderResources(2, static_cast<vdl::uint>(ShaderResources.size()) - 2, ShaderResources.data());
     }
-  }
-
-  //  GBufferの描画
-  for (vdl::uint i = 0; i < kGBufferNum; ++i)
-  {
-    Renderer2D::Draw(std::get<vdl::Texture>(LightShaderResources_[i]), float2(kGBufferLeftPos, kGBufferDisplaySize.y * i), kGBufferDisplaySize);
   }
 }

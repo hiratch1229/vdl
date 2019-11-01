@@ -537,7 +537,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -545,8 +545,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vdlForWindows_d.lib;vdlForVulkan_d.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Lib;..\..\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vdlForWindows_d.lib;vdlForVulkan_d.lib;libfbxsdk-md_d.lib</AdditionalDependencies>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -692,7 +692,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_EXECUTE_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
@@ -704,8 +704,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vdlForWindows.lib;vdlForVulkan.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vdlForWindows.lib;vdlForVulkan.lib;libfbxsdk-md.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Lib;..\..\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -720,7 +720,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_DIRECTX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -734,7 +734,7 @@
     <Lib>
       <OutputFile>$(SolutionDir)Lib\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX11.lib;libfbxsdk-md.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\Lib;..\..\Src\ThirdParty\Windows\FBXSDK</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\Lib;..\..\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

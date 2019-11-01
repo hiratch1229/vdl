@@ -504,8 +504,8 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
           const vdl::Detail::ConstantBufferData& LastConstantBuffer = LastConstantBuffers[ConstantBufferCount];
           const vdl::Detail::ConstantBufferData& BeforeConstantBuffer = TempConstantBuffers[ConstantBufferCount];
 
-          if (CurrentConstantBuffer != LastConstantBuffer
-            || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetBufferSize()) != 0)
+          if (!CurrentConstantBuffer.isEmpty() && (CurrentConstantBuffer != LastConstantBuffer
+            || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetBufferSize()) != 0))
           {
             TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
             StateChangeFlags_.Set(_RendererCommandType);

@@ -308,19 +308,19 @@ ModelData glTFLoader::Load(const char* _FilePath)const
           case TINYGLTF_PARAMETER_TYPE_UNSIGNED_INT:
             for (size_t IndexCount = 0; IndexCount < IndexNum; ++IndexCount)
             {
-              Indices[IndexCount] = VertexOffset + static_cast<const vdl::uint32_t*>(IndexBuffer)[IndexCount];
+              Indices[IndexCount] = static_cast<vdl::IndexType>(VertexOffset + static_cast<const vdl::uint32_t*>(IndexBuffer)[IndexCount]);
             }
             break;
           case TINYGLTF_PARAMETER_TYPE_UNSIGNED_SHORT:
             for (size_t IndexCount = 0; IndexCount < IndexNum; ++IndexCount)
             {
-              Indices[IndexCount] = VertexOffset + static_cast<const vdl::uint16_t*>(IndexBuffer)[IndexCount];
+              Indices[IndexCount] = static_cast<vdl::IndexType>(VertexOffset + static_cast<const vdl::uint16_t*>(IndexBuffer)[IndexCount]);
             }
             break;
           case TINYGLTF_PARAMETER_TYPE_UNSIGNED_BYTE:
             for (size_t IndexCount = 0; IndexCount < IndexNum; ++IndexCount)
             {
-              Indices[IndexCount] = VertexOffset + static_cast<const vdl::uint8_t*>(IndexBuffer)[IndexCount];
+              Indices[IndexCount] = static_cast<vdl::IndexType>(VertexOffset + static_cast<const vdl::uint8_t*>(IndexBuffer)[IndexCount]);
             }
             break;
           default: assert(false);
