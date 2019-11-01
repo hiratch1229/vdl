@@ -9,8 +9,8 @@ VS_OUT main(VS_IN In)
 
   Out.Position = mul(World, ViewProjectionMatrix);
   Out.Texcoord = In.Texcoord;
-  Out.Normal = normalize(mul(In.Normal.xyz, (float3x3) In.World));
   Out.Color = In.Color;
+  Out.Normal = normalize(mul(In.Normal.xyz, (float3x3) In.World));
   Out.Tangent = normalize(mul(In.Tangent, (float3x3) In.World));
   Out.Binormal = cross(Out.Normal, Out.Tangent);
 

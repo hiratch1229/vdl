@@ -12,8 +12,7 @@ namespace
 
 void SceneTBDR::Initialize()
 {
-  Rectangle_ = ModelData::Rectangle("Data/asphalt/asphalt.jpg", "Data/asphalt/asphalt_normal.jpg");
-  //Sponza_ = Model("Data/sponza.fbx");
+  Sponza_ = Model("Data/sponza/Sponza.gltf");
 
   Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));
 
@@ -33,10 +32,8 @@ void SceneTBDR::Initialize()
       for (auto& Data : Datas)
       {
         Data.Color = ColorF(Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f));
-        Data.MinRange.x = Random::Range(-kRectangleHalfScale, kRectangleHalfScale);
-        Data.MinRange.z = Random::Range(-kRectangleHalfScale, kRectangleHalfScale);
-        Data.MaxRange.x = Random::Range(-kRectangleHalfScale, kRectangleHalfScale);
-        Data.MaxRange.z = Random::Range(-kRectangleHalfScale, kRectangleHalfScale);
+        Data.MinRange = float3(Random::Range(kMinRange.x, kMaxRange.x), Random::Range(kMinRange.y, kMaxRange.y), Random::Range(kMinRange.z, kMaxRange.z));
+        Data.MaxRange = float3(Random::Range(kMinRange.x, kMaxRange.x), Random::Range(kMinRange.y, kMaxRange.y), Random::Range(kMinRange.z, kMaxRange.z));
         Data.Timer = 0.0f;
         Data.Time = Random::Range(kMinUpdateTime, kMaxUpdateTime);
       }
@@ -54,7 +51,7 @@ void SceneTBDR::Initialize()
     GBufferPassPixelShader_ = PixelShader("Shader/TBDR/GBufferPassPS.hlsl");
 
     GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
-    GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
+    GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Snorm);
     GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
   }
 
@@ -222,14 +219,12 @@ void SceneTBDR::Update()
   }
   const vdl::uint RenderingNum = RenderingConstantBuffer_.GetData().PointLightNum;
 
-  const Matrix RectangleWorld = Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f);
   //  GBufferPass
   {
     Renderer::SetRenderTextures(GBufferRenderTextures_, GBufferDepthTexture_);
     Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
-    Renderer3D::Draw(Rectangle_, RectangleWorld);
 
-    //Renderer3D::Draw(Sponza_, Matrix::Identity());
+    Renderer3D::Draw(Sponza_, Matrix::Identity());
   }
 
   //  ShadowPass
@@ -237,7 +232,7 @@ void SceneTBDR::Update()
     Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
     Renderer3D::SetShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
 
-    //Renderer3D::Draw(Sponza_, Matrix::Identity());
+    Renderer3D::Draw(Sponza_, Matrix::Identity());
   }
 
   //  LightPass
@@ -266,9 +261,9 @@ void SceneTBDR::Update()
     }
   }
 
-  ////  GBuffer‚Ì•`‰æ
-  //for (vdl::uint i = 0; i < LightShaderResources_.size(); ++i)
-  //{
-  //  Renderer2D::Draw(LightShaderResources_[i], float2(kGBufferLeftPos, kGBufferDisplaySize.y * i), kGBufferDisplaySize);
-  //}
+  //  GBuffer‚Ì•`‰æ
+  for (vdl::uint i = 0; i < kGBufferNum; ++i)
+  {
+    Renderer2D::Draw(std::get<vdl::Texture>(LightShaderResources_[i]), float2(kGBufferLeftPos, kGBufferDisplaySize.y * i), kGBufferDisplaySize);
+  }
 }

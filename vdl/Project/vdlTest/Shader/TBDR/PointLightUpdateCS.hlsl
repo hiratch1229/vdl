@@ -34,8 +34,8 @@ void main(uint3 DID : SV_DispatchThreadID)
   
   //  ポイントライトの更新
   {
-    PointLights[Index].Position = float3(QuadraticFunction(Datas[Index].Timer, Datas[Index].Time, Datas[Index].MinRangeX, Datas[Index].MaxRangeX),
-        0.5f, QuadraticFunction(Datas[Index].Timer, Datas[Index].Time, Datas[Index].MinRangeZ, Datas[Index].MaxRangeZ));
+    PointLights[Index].Position = float3(QuadraticFunction(Datas[Index].Timer, Datas[Index].Time, Datas[Index].MinRange.x, Datas[Index].MaxRange.x),
+        QuadraticFunction(Datas[Index].Timer, Datas[Index].Time, Datas[Index].MinRange.y, Datas[Index].MaxRange.y), QuadraticFunction(Datas[Index].Timer, Datas[Index].Time, Datas[Index].MinRange.z, Datas[Index].MaxRange.z));
     PointLights[Index].Color = Datas[Index].Color;
     PointLights[Index].Itensity = PointLightItensity;
     PointLights[Index].Range = PointLightRange;

@@ -3,26 +3,20 @@
 
 class SceneTBDR : public IScene
 {
-  struct Range
-  {
-    float x;
-    float z;
-  };
   struct Data
   {
     vdl::ColorF Color;
-    Range MinRange;
-    Range MaxRange;
+    vdl::float3 MinRange;
     float Timer;
+    vdl::float3 MaxRange;
     float Time;
-    vdl::float2 Padding;
   };
 private:
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
-  static constexpr float kRectangleScale = 15.0f;
-  static constexpr float kRectangleHalfScale = kRectangleScale * 0.5f;
   static constexpr float kSphereScale = 0.5f;
-  static constexpr vdl::uint kMaxDataNum = 1024;
+  static constexpr vdl::float3 kMinRange = vdl::float3(-10.0f, 0.0f, -7.5f);
+  static constexpr vdl::float3 kMaxRange = vdl::float3(10.0f, 10.0f, 7.5f);
+  static constexpr vdl::uint kMaxDataNum = 4096;
   static constexpr vdl::uint kGBufferNum = 2;
   static constexpr vdl::uint2 kGBufferSize = kWindowSize;
   static constexpr vdl::uint2 kShadowMapSize = kWindowSize * 1;
@@ -58,8 +52,7 @@ private:
     vdl::Matrix Projection;
   };
 private:
-  vdl::Mesh Rectangle_;
-  //vdl::Model Sponza_;
+  vdl::Model Sponza_;
   vdl::Camera Camera_;
   bool isUpdate_ = true;
   bool isTileBase = true;

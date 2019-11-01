@@ -158,7 +158,7 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
       vdl::Material& Material = Materials.emplace_back();
       Material.MaterialColor = ModelMaterial.MaterialColor;
       Material.Diffuse = CreateTexture(ModelMaterial.Diffuse, vdl::Color(255, 255, 255));
-      Material.NormalMap = CreateTexture(ModelMaterial.NormalMap, vdl::Color(128, 128, 128));
+      Material.NormalMap = CreateTexture(ModelMaterial.NormalMap, vdl::Color(128, 128, 255));
       //Material.Specular = CreateTexture(ModelMaterial.Specular, vdl::Color(0, 0, 0));
       //Material.MetalicRoughness = CreateTexture(ModelMaterial.MetalicRoughness, vdl::Color(0, 0, 0));
       //Material.Emissive = CreateTexture(ModelMaterial.Emissive, vdl::Color(0, 0, 0));

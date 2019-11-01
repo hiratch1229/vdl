@@ -122,11 +122,10 @@ ModelData glTFLoader::Load(const char* _FilePath)const
     _ASSERT_EXPR_A(Result, Error.c_str());
   }
 
-  Materials Materials;
   //  マテリアルのロード
   for (auto& glTFMaterial : Model.materials)
   {
-    Material& Material = Materials.emplace_back();
+    Material& Material = ModelData.Materials.emplace_back();
 
     auto LoadTexture = [&](vdl::CompressionImage* _pCompressionImage, const std::string& _Key)->bool
     {
@@ -224,7 +223,8 @@ ModelData glTFLoader::Load(const char* _FilePath)const
       {
         assert(Primitive.material >= 0);
 
-        const size_t IndexOffset = ModelData.Vertices.size();
+        const size_t VertexOffset = ModelData.Vertices.size();
+        const size_t IndexOffset = ModelData.Indices.size();
 
         //  頂点データの取得
         {
@@ -252,6 +252,9 @@ ModelData glTFLoader::Load(const char* _FilePath)const
           const float* NormalBuffer = nullptr;
           GetPrimitiveData(&NormalBuffer, "NORMAL");
 
+          const float* TangentBuffer = nullptr;
+          GetPrimitiveData(&TangentBuffer, "TANGENT");
+
           const float* TexcoordBuffer = nullptr;
           GetPrimitiveData(&TexcoordBuffer, "TEXCOORD_0");
 
@@ -266,10 +269,10 @@ ModelData glTFLoader::Load(const char* _FilePath)const
           {
             vdl::Vertex3D& Vertex = Vertices[VertexCount];
             {
-              Vertex.Position = LoadVec3(&PositionBuffer[VertexCount * 3 + 0]);
-              Vertex.Normal = NormalBuffer ? LoadVec3(&NormalBuffer[VertexCount * 3 + 0]) : vdl::float3::Forward();
-              Vertex.Tangent = Vertex.Normal.Cross(vdl::float3::Up());
-              Vertex.Texcoord = TexcoordBuffer ? LoadVec2(&TexcoordBuffer[VertexCount * 2 + 0]) : vdl::float2(0.0);
+              Vertex.Position = LoadVec3(&PositionBuffer[VertexCount * 3]);
+              Vertex.Normal = NormalBuffer ? LoadVec3(&NormalBuffer[VertexCount * 3]) : vdl::float3::Forward();
+              Vertex.Tangent = TangentBuffer ? LoadVec3(&TangentBuffer[VertexCount * 3]) : Vertex.Normal.Cross(vdl::float3::Up());
+              Vertex.Texcoord = TexcoordBuffer ? LoadVec2(&TexcoordBuffer[VertexCount * 2]) : vdl::float2(0.0);
 
               //  ボーンが入ってるとき
               if (JointBuffer && WeightBuffer)
@@ -305,19 +308,19 @@ ModelData glTFLoader::Load(const char* _FilePath)const
           case TINYGLTF_PARAMETER_TYPE_UNSIGNED_INT:
             for (size_t IndexCount = 0; IndexCount < IndexNum; ++IndexCount)
             {
-              Indices[IndexCount] = static_cast<const vdl::uint32_t*>(IndexBuffer)[IndexOffset + IndexCount];
+              Indices[IndexCount] = VertexOffset + static_cast<const vdl::uint32_t*>(IndexBuffer)[IndexCount];
             }
             break;
           case TINYGLTF_PARAMETER_TYPE_UNSIGNED_SHORT:
             for (size_t IndexCount = 0; IndexCount < IndexNum; ++IndexCount)
             {
-              Indices[IndexCount] = static_cast<const vdl::uint16_t*>(IndexBuffer)[IndexOffset + IndexCount];
+              Indices[IndexCount] = VertexOffset + static_cast<const vdl::uint16_t*>(IndexBuffer)[IndexCount];
             }
             break;
           case TINYGLTF_PARAMETER_TYPE_UNSIGNED_BYTE:
             for (size_t IndexCount = 0; IndexCount < IndexNum; ++IndexCount)
             {
-              Indices[IndexCount] = static_cast<const vdl::uint8_t*>(IndexBuffer)[IndexOffset + IndexCount];
+              Indices[IndexCount] = VertexOffset + static_cast<const vdl::uint8_t*>(IndexBuffer)[IndexCount];
             }
             break;
           default: assert(false);

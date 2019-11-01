@@ -47,7 +47,7 @@ void Main()
     "TBDR"
   };
   static constexpr vdl::uint kSceneTypeNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kSceneTypes));
-  static constexpr vdl::uint kInitSceneType = 2;
+  static constexpr vdl::uint kInitSceneType = 4;
   static_assert(kInitSceneType < kSceneTypeNum);
 
   vdl::uint SceneType = kInitSceneType;

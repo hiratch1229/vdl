@@ -36,9 +36,10 @@ namespace vdl
 
     if (pMouse->Press(Input::Mouse::Buttons::eMiddle))
     {
-      const float3 AxisY = _pCamera->Up.Normalize();
       const float3 AxisZ = _pCamera->ViewVector().Normalize();
-      const float3 AxisX = AxisY.Cross(AxisZ);
+      const float3 AxisX = _pCamera->Up.Normalize().Cross(AxisZ);
+      const float3 AxisY = AxisZ.Cross(AxisX);
+
 
       const float3 Move = AxisX * -pMouse->GetDelta().x * 0.01f + AxisY * pMouse->GetDelta().y * 0.01f;
 
