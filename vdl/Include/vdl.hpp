@@ -54,7 +54,7 @@
 #include <vdl/Sampler.hpp>
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/UnorderedAccessBuffer.hpp>
-#include <vdl/MeshData.hpp>
+#include <vdl/ModelData.hpp>
 #include <vdl/MotionData.hpp>
 #include <vdl/Model.hpp>
 #include <vdl/Renderer.hpp>

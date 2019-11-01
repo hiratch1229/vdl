@@ -91,9 +91,6 @@
     <Filter Include="Src\Collision3D">
       <UniqueIdentifier>{38b543fb-4aba-413d-b004-74391346657b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\MeshData">
-      <UniqueIdentifier>{11ac7080-e54d-4588-89a9-7b9a25f1ec32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Image">
       <UniqueIdentifier>{4cc3cea2-7076-4855-98ae-5532569b185b}</UniqueIdentifier>
     </Filter>
@@ -168,6 +165,9 @@
     </Filter>
     <Filter Include="Src\ThirdParty\tiny_gltf">
       <UniqueIdentifier>{05fb1634-ec0b-488f-a90a-11eee2662c20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ModelData">
+      <UniqueIdentifier>{11ac7080-e54d-4588-89a9-7b9a25f1ec32}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -265,9 +265,6 @@
       <Filter>Include\vdl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\vdl\Serialize.hpp">
-      <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\vdl\MeshData.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\ModelManager\Mesh.hpp">
@@ -582,9 +579,6 @@
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\glTFLoader.hpp">
       <Filter>Src\ModelManager\ModelLoader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\MeshData.hpp">
-      <Filter>Src\ModelManager\ModelLoader</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.hpp">
       <Filter>Src\ModelManager\ModelLoader</Filter>
     </ClInclude>
@@ -596,6 +590,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\ModelData.hpp">
       <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\vdl\ModelData.hpp">
+      <Filter>Include\vdl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -694,9 +691,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Collision2D\Collision2D.cpp">
       <Filter>Src\Collision2D</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp">
-      <Filter>Src\MeshData</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Image\Image.cpp">
       <Filter>Src\Image</Filter>
@@ -841,6 +835,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.cpp">
       <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ModelData\ModelData.cpp">
+      <Filter>Src\ModelData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -271,7 +271,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
               _pDeviceContext->PSSetShaderResources(0, 1, &vdl::ShaderResource(pMesh->Material.Diffuse));
               _pDeviceContext->PSSetShaderResources(1, 1, &vdl::ShaderResource(pMesh->Material.NormalMap));
 
-              _pDeviceContext->DrawIndexed(pMesh->Material.IndexNum, ContinuousDrawCallNum, 0, 0, 0);
+              _pDeviceContext->DrawIndexed(pMesh->IndexCount, ContinuousDrawCallNum, pMesh->IndexStart, 0, 0);
             }
 
             if (DrawState == DrawStateType::eEnd)

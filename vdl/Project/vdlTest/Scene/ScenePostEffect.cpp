@@ -4,8 +4,8 @@ using namespace vdl;
 
 void ScenePostEffect::Initialize()
 {
-  House_ = Model("Data/Charctor_motion.fbx");
-  Ground_ = MeshData::Rectangle("Data/GRASSX1/GRASSX1.jpg", "Data/GRASSX1/GRASSX1_normal.jpg");
+  House_ = Model("Data/sponza/Sponza.gltf");
+  Ground_ = ModelData::Rectangle("Data/GRASSX1/GRASSX1.jpg", "Data/GRASSX1/GRASSX1_normal.jpg");
 
   Camera_ = Camera(float3(0.0f, 10.0f, -25.0f));
 

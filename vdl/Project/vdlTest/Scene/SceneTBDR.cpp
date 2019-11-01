@@ -12,7 +12,7 @@ namespace
 
 void SceneTBDR::Initialize()
 {
-  Rectangle_ = MeshData::Rectangle("Data/asphalt/asphalt.jpg", "Data/asphalt/asphalt_normal.jpg");
+  Rectangle_ = ModelData::Rectangle("Data/asphalt/asphalt.jpg", "Data/asphalt/asphalt_normal.jpg");
   //Sponza_ = Model("Data/sponza.fbx");
 
   Camera_ = Camera(float3(0.0f, 5.0f, -15.0f));

@@ -98,7 +98,7 @@ class ReferenceCounts
 private:
   std::vector<Type> ReferenceCounts_;
 public:
-  Type& Get(vdl::ID _ID) { return ReferenceCounts_[*_ID]; }
+  Type& Get(const vdl::ID& _ID) { return ReferenceCounts_[*_ID]; }
 public:
   ReferenceCounts() = default;
 

@@ -228,7 +228,7 @@ ModelData glTFLoader::Load(const char* _FilePath)const
 
         //  頂点データの取得
         {
-          Vertices Vertices;
+          vdl::Vertices Vertices;
 
           auto GetPrimitiveData = [&](const float** _pBuffer, const std::string& _Key)->size_t
           {
@@ -289,7 +289,7 @@ ModelData glTFLoader::Load(const char* _FilePath)const
 
         //  インデックスデータの取得
         {
-          Indices Indices;
+          vdl::Indices Indices;
           assert(Primitive.indices > -1);
 
           const tinygltf::Accessor& Accessor = Model.accessors[Primitive.indices];
@@ -333,7 +333,7 @@ ModelData glTFLoader::Load(const char* _FilePath)const
           {
             MeshData& MeshData = ModelData.MeshDatas.emplace_back();
             {
-              MeshData.IndexStart = IndexOffset;
+              MeshData.IndexStart = static_cast<vdl::uint>(IndexOffset);
               MeshData.IndexCount = 0;
               MeshData.MaterialIndex = Primitive.material;
               MeshData.GlobalTransform = GlobalTransform * kRotate;

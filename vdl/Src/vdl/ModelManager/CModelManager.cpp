@@ -15,29 +15,72 @@ namespace
   constexpr IndexType kIndexType = (sizeof(vdl::IndexType) == 2 ? IndexType::eUint16 : IndexType::eUint32);
 }
 
-vdl::ID CModelManager::Load(const vdl::MeshData& _MeshData)
+vdl::ID CModelManager::Load(const vdl::Vertices& _Vertices, const vdl::Indices& _Indices, const vdl::MeshData& _MeshData)
 {
+  auto GetVertexBuffer = [&]()->VertexBuffer
+  {
+    for (auto& VertexBufferData : VertexBufferDatas_)
+    {
+      if (VertexBufferData && VertexBufferData->Vertices == _Vertices)
+      {
+        return VertexBufferData->VertexBuffer;
+      }
+    }
+
+    VertexBuffer Buffer = VertexBuffer(_Vertices.data(), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_Vertices.size() * sizeof(vdl::Vertex3D)));
+    {
+      if (VertexBufferDatas_.size() <= Buffer.GetID())
+      {
+        VertexBufferDatas_.resize(*Buffer.GetID() + 1);
+      }
+      VertexBufferData* pData = new VertexBufferData;
+      {
+        pData->VertexBuffer = Buffer;
+        pData->Vertices = _Vertices;
+      }
+
+      VertexBufferDatas_[*Buffer.GetID()] = pData;
+    }
+
+    return Buffer;
+  };
+  auto GetIndexBuffer = [&]()->IndexBuffer
+  {
+    for (auto& IndexBufferData : IndexBufferDatas_)
+    {
+      if (IndexBufferData && IndexBufferData->Indices == _Indices)
+      {
+        return IndexBufferData->IndexBuffer;
+      }
+    }
+
+    IndexBuffer Buffer = IndexBuffer(_Indices.data(), static_cast<vdl::uint>(_Indices.size() * sizeof(vdl::IndexType)), kIndexType);
+    {
+      if (IndexBufferDatas_.size() <= Buffer.GetID())
+      {
+        IndexBufferDatas_.resize(*Buffer.GetID() + 1);
+      }
+      IndexBufferData* pData = new IndexBufferData;
+      {
+        pData->IndexBuffer = Buffer;
+        pData->Indices = _Indices;
+      }
+
+      IndexBufferDatas_[*Buffer.GetID()] = pData;
+    }
+
+    return Buffer;
+  };
+
   Mesh* pMesh = new Mesh;
   {
-    pMesh->VertexBuffer = VertexBuffer(_MeshData.Vertices.data(), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)));
-    pMesh->IndexBuffer = IndexBuffer(_MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
-    pMesh->Name = _MeshData.Name;
+    pMesh->VertexBuffer = GetVertexBuffer();
+    pMesh->IndexBuffer = GetIndexBuffer();
+    pMesh->IndexStart = _MeshData.IndexStart;
+    pMesh->IndexCount = _MeshData.IndexCount;
     pMesh->Material = _MeshData.Material;
+    //pMesh->Animations = _MeshData.Animations;
     pMesh->GlobalTransform = _MeshData.GlobalTransform;
-  }
-
-  return Meshes_.Add(pMesh);
-}
-
-vdl::ID CModelManager::Load(vdl::MeshData&& _MeshData)
-{
-  Mesh* pMesh = new Mesh;
-  {
-    pMesh->VertexBuffer = VertexBuffer(_MeshData.Vertices.data(), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_MeshData.Vertices.size() * sizeof(vdl::Vertex3D)));
-    pMesh->IndexBuffer = IndexBuffer(_MeshData.Indices.data(), static_cast<vdl::uint>(_MeshData.Indices.size() * sizeof(vdl::IndexType)), kIndexType);
-    pMesh->Name = std::move(_MeshData.Name);
-    pMesh->Material = std::move(_MeshData.Material);
-    pMesh->GlobalTransform = std::move(_MeshData.GlobalTransform);
   }
 
   return Meshes_.Add(pMesh);
@@ -48,32 +91,27 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
   const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
   const std::filesystem::path BinaryFilePath = (BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).concat(Constants::kBinaryFileFormat);
 
-  MeshDatas MeshDatas;
+  ModelData ModelData;
   {
     const std::string FileFormat = GetFileFormat(_FilePath);
 
-    if (_isSerialize)
+    //  バイナリファイルが存在する場合ファイルから読み込む
+    if (_isSerialize && std::filesystem::exists(BinaryFilePath))
     {
-      //  バイナリファイルが存在する場合ファイルから読み込む
-      if (std::filesystem::exists(BinaryFilePath))
-      {
-        ImportFromBinary(BinaryFilePath.string().c_str(), MeshDatas);
-      }
+      ImportFromBinary(BinaryFilePath.string().c_str(), ModelData);
     }
-
-    if (MeshDatas.empty())
+    else
     {
       _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
         std::string(std::string(_FilePath) + "が見つかりません。").c_str());
 
       if (FBXLoader::CheckSupportFormat(FileFormat))
       {
-        FBXLoader().Load(_FilePath);
-        //MeshDatas = FBXLoader().Load(_FilePath);
+        ModelData = FBXLoader().Load(_FilePath);
       }
       else if (glTFLoader::CheckSupportFormat(FileFormat))
       {
-        //MeshDatas = glTFLoader().Load(_FilePath);
+        ModelData = glTFLoader().Load(_FilePath);
       }
       else
       {
@@ -89,85 +127,65 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
         }
 
         //  バイナリファイルに書き出し
-        ExportToBinary(BinaryFilePath.string().c_str(), MeshDatas);
+        ExportToBinary(BinaryFilePath.string().c_str(), ModelData);
       }
     }
   }
 
-  auto GetImage = [](const vdl::CompressionImage& _CompressionImage, const vdl::ColorF& _DummyData)->vdl::Image
+  //  マテリアルデータの変換
+  vdl::Materials Materials;
   {
-    vdl::Image Image;
+    auto CreateTexture = [](const vdl::CompressionImage& _CompressionImage, const vdl::Color& _DummyData)->vdl::Image
     {
-      if (_CompressionImage.isEmpty())
+      vdl::Image Image;
       {
-        Image.Resize(1);
-        Image.Buffer()[0] = _DummyData;
+        if (_CompressionImage.isEmpty())
+        {
+          Image.Resize(1);
+          Image.Buffer()[0] = _DummyData;
+        }
+        else
+        {
+          Image = _CompressionImage;
+        }
       }
-      else
-      {
-        Image = _CompressionImage;
-      }
+
+      return Image;
+    };
+
+    for (auto& ModelMaterial : ModelData.Materials)
+    {
+      vdl::Material& Material = Materials.emplace_back();
+      Material.MaterialColor = ModelMaterial.MaterialColor;
+      Material.Diffuse = CreateTexture(ModelMaterial.Diffuse, vdl::Color(255, 255, 255));
+      Material.NormalMap = CreateTexture(ModelMaterial.NormalMap, vdl::Color(128, 128, 128));
+      //Material.Specular = CreateTexture(ModelMaterial.Specular, vdl::Color(0, 0, 0));
+      //Material.MetalicRoughness = CreateTexture(ModelMaterial.MetalicRoughness, vdl::Color(0, 0, 0));
+      //Material.Emissive = CreateTexture(ModelMaterial.Emissive, vdl::Color(0, 0, 0));
     }
-
-    return Image;
-  };
-
-  std::vector<vdl::Mesh> SkinnedMeshes;
-
-  const vdl::uint MeshNum = static_cast<vdl::uint>(MeshDatas.size());
-  for (vdl::uint MeshCount = 0; MeshCount < MeshNum; ++MeshCount)
-  {
-    MeshData& LoadMeshData = MeshDatas[MeshCount];
-
-    //vdl::MeshData MeshData;
-    //{
-    //  MeshData.Name = std::move(LoadMeshData.Name);
-    //  MeshData.Vertices = std::move(LoadMeshData.Vertices);
-    //  MeshData.GlobalTransform = std::move(LoadMeshData.GlobalTransform);
-    //  Indices Indices = std::move(LoadMeshData.Indices);
-    //
-    //  const size_t AnimationNum = LoadMeshData.Animations.size();
-    //  MeshData.Animations.resize(AnimationNum);
-    //  for (size_t AnimationCount = 0; AnimationCount < AnimationNum; ++AnimationCount)
-    //  {
-    //    Animation& LoadAnimation = LoadMeshData.Animations[AnimationCount];
-    //    vdl::Animation& Animation = MeshData.Animations[AnimationCount];
-    //
-    //    const size_t SkeletalNum = LoadAnimation.Skeletals.size();
-    //    Animation.Skeletals.resize(SkeletalNum);
-    //    for (size_t SkeletalCount = 0; SkeletalCount < SkeletalNum; ++SkeletalCount)
-    //    {
-    //      Skeletal& LoadSkeletal = LoadAnimation.Skeletals[SkeletalCount];
-    //      vdl::Skeletal& Skeletal = Animation.Skeletals[SkeletalCount];
-    //
-    //      for (auto& Bone : LoadSkeletal)
-    //      {
-    //        Skeletal.Bones[Bone.Name].Pose = std::move(Bone.Pose);
-    //        Skeletal.Bones[Bone.Name].Offset = std::move(Bone.Offset);
-    //      }
-    //    }
-    //  }
-    //
-    //  const size_t MaterialNum = LoadMeshData.Materials.size();
-    //  for (size_t MaterialCount = 0; MaterialCount < MaterialNum; ++MaterialCount)
-    //  {
-    //    Material& LoadMaterial = LoadMeshData.Materials[MaterialCount];
-    //
-    //    MeshData.Material.MaterialColor = LoadMaterial.MaterialColor;
-    //    MeshData.Material.Diffuse = GetImage(LoadMaterial.Diffuse, vdl::ColorF(1.0f, 1.0f, 1.0f));
-    //    MeshData.Material.NormalMap = GetImage(LoadMaterial.NormalMap, vdl::ColorF(0.5f, 0.5f, 1.0f));
-    //    //Material.Specular = GetImage(LoadMaterial.Specular, vdl::ColorF(0.0f, 0.0f, 0.0f));
-    //    //Material.MetallicRoughness = GetImage(LoadMaterial.MetallicRoughness, vdl::ColorF(1.0f, 1.0f, 1.0f));
-    //    //Material.Emissive = GetImage(LoadMaterial.Emissive, vdl::ColorF(0.0f, 0.0f, 0.0f));
-    //
-    //    MeshData.Material.IndexNum = LoadMaterial.IndexCount;
-    //    MeshData.Indices.resize(MeshData.Material.IndexNum);
-    //    ::memcpy(MeshData.Indices.data(), &Indices[LoadMaterial.IndexStart], sizeof(vdl::IndexType) * MeshData.Material.IndexNum);
-    //
-    //    SkinnedMeshes.push_back(MeshData);
-    //  }
-    //}
   }
 
-  return SkinnedMeshes;
+  std::vector<vdl::Mesh> Meshes;
+  {
+    const size_t MeshNum = ModelData.MeshDatas.size();
+    Meshes.resize(MeshNum);
+
+    for (size_t MeshCount = 0; MeshCount < MeshNum; ++MeshCount)
+    {
+      const MeshData& ModelMesh = ModelData.MeshDatas[MeshCount];
+
+      vdl::MeshData MeshData;
+      {
+        MeshData.IndexStart = ModelMesh.IndexStart;
+        MeshData.IndexCount = ModelMesh.IndexCount;
+        MeshData.Material = Materials[ModelMesh.MaterialIndex];
+        //MeshData.Animations = ModelMesh.Animations;
+        MeshData.GlobalTransform = ModelMesh.GlobalTransform;
+      }
+
+      Meshes[MeshCount] = vdl::Mesh(ModelData.Vertices, ModelData.Indices, MeshData);
+    }
+  }
+
+  return Meshes;
 }

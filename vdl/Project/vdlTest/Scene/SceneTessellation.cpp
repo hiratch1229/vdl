@@ -4,7 +4,7 @@ using namespace vdl;
 
 void SceneTessellation::Initialize()
 {
-  Rectangle_ = MeshData::Rectangle();
+  Rectangle_ = ModelData::Rectangle();
   Camera_ = Camera(vdl::float3(0.0f, 0.0f, -15.0f));
 
   Renderer3D::SetShaders(VertexShader("Shader/Tessellation/TessellationVS.hlsl", InputLayoutType::eMesh),

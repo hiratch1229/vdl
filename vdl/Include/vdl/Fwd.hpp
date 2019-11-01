@@ -65,6 +65,9 @@ namespace vdl
   //-------------------------
   struct Vertex2D;
   struct Vertex3D;
+  using IndexType = uint32_t;
+  using Vertices = std::vector<Vertex3D>;
+  using Indices = std::vector<IndexType>;
 
   //-------------------------
   //  InputLayout.hpp
@@ -178,13 +181,17 @@ namespace vdl
   using MotionBlendDatas = std::vector<MotionBlendData>;
 
   //-------------------------
-  //  MeshData.hpp
+  //  ModelData.hpp
   //-------------------------
   struct Material;
+  using Materials = std::vector<Material>;
   struct Bone;
   struct Skeletal;
   struct Animation;
+  using Animations = std::vector<Animation>;
   struct MeshData;
+  using MeshDatas = std::vector<MeshData>;
+  struct ModelData;
 
   //-------------------------
   //  Model.hpp

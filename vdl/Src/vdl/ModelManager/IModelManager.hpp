@@ -14,9 +14,7 @@ public:
 
   virtual void Initialize() = 0;
 
-  [[nodiscard]] virtual vdl::ID Load(const vdl::MeshData& _MeshData) = 0;
-
-  [[nodiscard]] virtual vdl::ID Load(vdl::MeshData&& _MeshData) = 0;
+  [[nodiscard]] virtual vdl::ID Load(const vdl::Vertices& _Vertices, const vdl::Indices& _Indices, const vdl::MeshData& _MeshData) = 0;
 
   [[nodiscard]] virtual std::vector<vdl::Mesh> Load(const char* _FilePath, bool _isSerialize) = 0;
 

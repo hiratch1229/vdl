@@ -1,5 +1,5 @@
 #pragma once
-#include <vdl/MeshData.hpp>
+#include <vdl/ModelData.hpp>
 
 #include <vdl/Buffer/Buffer.hpp>
 
@@ -10,11 +10,12 @@
 
 struct Mesh
 {
-  std::string Name;
   VertexBuffer VertexBuffer;
   IndexBuffer IndexBuffer;
-  std::vector<vdl::Animation> Animations;
+  vdl::uint IndexStart;
+  vdl::uint IndexCount;
   vdl::Material Material;
+  vdl::Animations Animations;
   vdl::Matrix GlobalTransform;
 };
 using Meshes = std::vector<Mesh>;

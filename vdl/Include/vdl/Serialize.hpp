@@ -11,6 +11,7 @@
 #include "../ThirdParty/cereal/cereal.hpp"
 #include "../ThirdParty/cereal/archives/binary.hpp"
 #include "../ThirdParty/cereal/types/vector.hpp"
+#include "../ThirdParty/cereal/types/array.hpp"
 #include "../ThirdParty/cereal/types/string.hpp"
 
 #define CEREAL_SERIALIZE(...)\

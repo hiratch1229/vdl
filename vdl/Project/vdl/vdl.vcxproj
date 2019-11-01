@@ -82,7 +82,7 @@
     <ClInclude Include="..\..\Include\vdl\Math.hpp" />
     <ClInclude Include="..\..\Include\vdl\MathConstants.hpp" />
     <ClInclude Include="..\..\Include\vdl\Matrix.hpp" />
-    <ClInclude Include="..\..\Include\vdl\MeshData.hpp" />
+    <ClInclude Include="..\..\Include\vdl\ModelData.hpp" />
     <ClInclude Include="..\..\Include\vdl\Model.hpp" />
     <ClInclude Include="..\..\Include\vdl\Mouse.hpp" />
     <ClInclude Include="..\..\Include\vdl\Platform.hpp" />
@@ -174,7 +174,6 @@
     <ClInclude Include="..\..\Src\vdl\ModelManager\Mesh.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\glTFLoader.hpp" />
-    <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\MeshData.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\ModelData.hpp" />
     <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
     <ClInclude Include="..\..\Src\vdl\Renderer\CRenderer.hpp" />
@@ -251,7 +250,7 @@
     <ClCompile Include="..\..\Src\vdl\Input\XInput\XInput.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\XInput\XInputFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\MemoryProfiler\MemoryProfilerFactory.cpp" />
-    <ClCompile Include="..\..\Src\vdl\MeshData\MeshData.cpp" />
+    <ClCompile Include="..\..\Src\vdl\ModelData\ModelData.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\CModelManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.cpp" />
     <ClCompile Include="..\..\Src\vdl\ModelManager\ModelLoader\glTFLoader.cpp" />

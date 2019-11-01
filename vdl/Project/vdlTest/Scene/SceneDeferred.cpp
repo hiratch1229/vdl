@@ -12,9 +12,9 @@ namespace
 
 void SceneDeferred::Initialize()
 {
-  Rectangle_ = MeshData::Rectangle("Data/asphalt/asphalt.jpg", "Data/asphalt/asphalt_normal.jpg");
+  Rectangle_ = ModelData::Rectangle("Data/asphalt/asphalt.jpg", "Data/asphalt/asphalt_normal.jpg");
   RectangleSpecularMap_ = Texture("Data/asphalt/asphalt_specular.jpg");
-  Sphere_ = MeshData::Sphere(12, 12, "Data/earthmap/earthmap.jpg", "Data/earthmap/earthnormal.jpg");
+  Sphere_ = ModelData::Sphere(12, 12, "Data/earthmap/earthmap.jpg", "Data/earthmap/earthnormal.jpg");
   SphereSpecularMap_ = Texture("Data/earthmap/earthspec.jpg");
 
   Camera_ = Camera(float3(0.0f, 5.0f, -25.0f));

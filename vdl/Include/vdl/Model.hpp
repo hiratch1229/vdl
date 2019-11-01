@@ -12,15 +12,14 @@ namespace vdl
   public:
     Mesh() = default;
 
-    //  静的メッシュデータから作成
-    Mesh(const MeshData& _MeshData);
+    Mesh(const Vertices& _Vertices, const Indices& _Indices, const MeshData& _MeshData);
 
-    Mesh(MeshData&& _MeshData);
+    Mesh(const ModelData& _ModelData, vdl::uint _MeshIndex = 0);
 
     Mesh(const Mesh& _Mesh);
 
     Mesh(Mesh&& _Mesh)noexcept;
-    
+
     ~Mesh();
   public:
     Mesh& operator=(const Mesh& _Mesh);
@@ -47,7 +46,9 @@ namespace vdl
     //  ファイルから作成
     Model(const char* _FilePath, bool _isSerialize = true);
 
-    Model(const std::vector<Mesh>& _Meshes); 
+    Model(const ModelData& _ModelData);
+
+    Model(const std::vector<Mesh>& _Meshes);
   public:
     [[nodiscard]] bool isEmpty()const noexcept { return Meshes_.empty(); }
 

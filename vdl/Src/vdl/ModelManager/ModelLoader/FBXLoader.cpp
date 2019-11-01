@@ -176,6 +176,9 @@ ModelData FBXLoader::Load(const char* _FilePath)const
     }
   }
 
+  TextureLoader TextureLoader;
+  const std::string Directory = std::filesystem::path(_FilePath).remove_filename().string();
+
   const int MeshNum = pScene->GetSrcObjectCount<fbxsdk::FbxMesh>();
   for (int MeshCount = 0; MeshCount < MeshNum; ++MeshCount)
   {
@@ -296,7 +299,7 @@ ModelData FBXLoader::Load(const char* _FilePath)const
     const size_t IndexOffset = ModelData.Vertices.size();
     //  頂点データのロード
     {
-      Vertices Vertices;
+      vdl::Vertices Vertices;
 
       const vdl::uint PolygonNum = pMesh->GetPolygonCount();
       Vertices.resize(static_cast<size_t>(PolygonNum) * 3);
@@ -399,7 +402,7 @@ ModelData FBXLoader::Load(const char* _FilePath)const
 
     //  インデックスデータのロード
     {
-      Indices Indices;
+      vdl::Indices Indices;
 
       const vdl::uint PolygonNum = pMesh->GetPolygonCount();
       Indices.resize(static_cast<size_t>(PolygonNum) * 3);
@@ -437,9 +440,9 @@ ModelData FBXLoader::Load(const char* _FilePath)const
 
         vdl::IndexType* BaseIndices = &Indices[MeshData.IndexStart + MeshData.IndexCount];
 
-        BaseIndices[(isIndexInverse ? 2 : 0)] = IndexOffset + VertexNum++;
+        BaseIndices[(isIndexInverse ? 2 : 0)] = static_cast<vdl::uint>(IndexOffset) + VertexNum++;
         BaseIndices[1] = IndexOffset + VertexNum++;
-        BaseIndices[(isIndexInverse ? 0 : 2)] = IndexOffset + VertexNum++;
+        BaseIndices[(isIndexInverse ? 0 : 2)] = static_cast<vdl::uint>(IndexOffset) + VertexNum++;
 
         MeshData.IndexCount += 3;
       }

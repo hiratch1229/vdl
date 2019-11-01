@@ -17,6 +17,7 @@ struct Material
 
   CEREAL_SERIALIZE(MaterialColor, Diffuse, Specular, NormalMap, MetallicRoughness, Emissive)
 };
+using Materials = std::vector<Material>;
 
 struct Bone
 {
@@ -35,10 +36,6 @@ struct Animation
 
   CEREAL_SERIALIZE(Name, Skeletals)
 };
-
-using Vertices = std::vector<vdl::Vertex3D>;
-using Indices = std::vector<vdl::IndexType>;
-using Materials = std::vector<Material>;
 using Animations = std::vector<Animation>;
 
 struct MeshData
@@ -47,18 +44,18 @@ struct MeshData
   vdl::uint IndexCount = 0;
   vdl::uint MaterialIndex = 0;
   vdl::Matrix GlobalTransform;
+  //Animations Animations;
 
-  CEREAL_SERIALIZE(IndexStart, IndexCount, MaterialIndex, GlobalTransform)
+  CEREAL_SERIALIZE(IndexStart, IndexCount, MaterialIndex, GlobalTransform /*,Animations*/)
 };
 using MeshDatas = std::vector<MeshData>;
 
 struct ModelData
 {
-  Vertices Vertices;
-  Indices Indices;
+  vdl::Vertices Vertices;
+  vdl::Indices Indices;
   Materials Materials;
-  //Animations Animations;
   MeshDatas MeshDatas;
 
-  CEREAL_SERIALIZE(Vertices, Indices, Materials, /*Animations,*/ MeshDatas)
+  CEREAL_SERIALIZE(Vertices, Indices, Materials, MeshDatas)
 };

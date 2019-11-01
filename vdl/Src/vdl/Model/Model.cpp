@@ -5,14 +5,14 @@
 
 namespace vdl
 {
-  Mesh::Mesh(const MeshData& _MeshData)
+  Mesh::Mesh(const Vertices& _Vertices, const Indices& _Indices, const MeshData& _MeshData)
   {
-    ID_ = Engine::Get<IModelManager>()->Load(_MeshData);
+    ID_ = Engine::Get<IModelManager>()->Load(_Vertices, _Indices, _MeshData);
   }
 
-  Mesh::Mesh(MeshData&& _MeshData)
+  Mesh::Mesh(const ModelData& _ModelData, vdl::uint _MeshIndex)
   {
-    ID_ = Engine::Get<IModelManager>()->Load(std::move(_MeshData));
+    ID_ = Engine::Get<IModelManager>()->Load(_ModelData.Vertices, _ModelData.Indices, _ModelData.MeshDatas[_MeshIndex]);
   }
 
   Mesh::Mesh(const Mesh& _Mesh)
