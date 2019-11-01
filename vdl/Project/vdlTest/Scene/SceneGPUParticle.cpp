@@ -32,11 +32,6 @@ void SceneGPUParticle::Initialize()
   Renderer::SetTopology(TopologyType::ePointList);
 }
 
-SceneGPUParticle::~SceneGPUParticle()
-{
-
-}
-
 void SceneGPUParticle::Update()
 {
   CSConstantBufferData& CSData = CSConstantBuffer_.GetData();

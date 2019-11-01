@@ -21,9 +21,7 @@ private:
 public:
   SceneSprite() = default;
 
-  ~SceneSprite();
-
-  void Initialize();
+  void Initialize()override;
 
   void Update()override;
 

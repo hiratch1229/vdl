@@ -35,7 +35,7 @@ private:
   };
   struct RenderingData
   {
-   vdl::float3 AmbientColor;
+    vdl::float3 AmbientColor;
     vdl::uint PointLightNum;
     vdl::Matrix InverseViewProjection;
   };
@@ -71,8 +71,6 @@ private:
   vdl::ConstantBuffer<CameraData> CameraConstantBuffer_;
 public:
   SceneTBDR() = default;
-
-  ~SceneTBDR();
 
   void Initialize()override;
 

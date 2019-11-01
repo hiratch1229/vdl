@@ -11,9 +11,7 @@ class SceneModel : public IScene
 public:
   SceneModel() = default;
 
-  ~SceneModel();
-
-  void Initialize();
+  void Initialize()override;
 
   void Update()override;
 

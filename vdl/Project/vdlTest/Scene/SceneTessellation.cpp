@@ -25,16 +25,6 @@ void SceneTessellation::Initialize()
   }
 }
 
-SceneTessellation::~SceneTessellation()
-{
-  Renderer3D::SetShaders(VertexShader("Shader/Mesh/MeshVS.hlsl", InputLayoutType::eMesh),
-    PixelShader("Shader/Mesh/MeshPS.hlsl"));
-
-  Renderer3D::SetTopology(TopologyType::eDefaultMesh);
-
-  Renderer3D::SetRasterizerState(RasterizerState::kDefault3D);
-}
-
 void SceneTessellation::Update()
 {
   ImGui::Begin("SceneTessellation");

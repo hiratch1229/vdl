@@ -47,7 +47,7 @@ void SceneTBDR::Initialize()
 
   //  GBufferPassÇÃèâä˙âª
   {
-    GBufferPassVertexShader_ = VertexShader("Shader/TBDR/GBufferPassVS.hlsl", InputLayoutType::eMesh);
+    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eMesh);
     GBufferPassPixelShader_ = PixelShader("Shader/TBDR/GBufferPassPS.hlsl");
 
     GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
@@ -59,7 +59,7 @@ void SceneTBDR::Initialize()
   {
     //  DeferredRendering
     {
-      LightPassVertexShader_ = VertexShader("Shader/TBDR/LightPassVS.hlsl", InputLayoutType::eNone);
+      LightPassVertexShader_ = VertexShader("Shader/Option/FullScreenTriangleVS.hlsl", InputLayoutType::eNone);
       LightPassPixelShader_ = PixelShader("Shader/TBDR/LightPassPS.hlsl");
 
       for (vdl::uint i = 0; i < kGBufferNum; ++i)
@@ -99,13 +99,6 @@ void SceneTBDR::Initialize()
       Computer::SetUnorderedAccessObjects(2, 1, &LightUnorderedAccessTexture_);
     }
   }
-}
-
-SceneTBDR::~SceneTBDR()
-{
-  Renderer3D::SetShaders(VertexShader("Shader/Mesh/MeshVS.hlsl", InputLayoutType::eMesh),
-    PixelShader("Shader/Mesh/MeshPS.hlsl"));
-  Renderer::SetTopology(TopologyType::eDefaultNone);
 }
 
 void SceneTBDR::Update()
@@ -214,7 +207,7 @@ void SceneTBDR::Update()
     {
       Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(LightShaderResources_.size()), LightShaderResources_.data());
 
-      Renderer::Draw(4);
+      Renderer::Draw(3);
 
       decltype(LightShaderResources_) ShaderResources;
       Renderer2D::SetPixelStageShaderResources(2, static_cast<vdl::uint>(ShaderResources.size()) - 2, ShaderResources.data());

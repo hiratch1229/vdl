@@ -1,4 +1,11 @@
-#include "GBufferPass.hlsli"
+#include "../GBufferPass/GBufferPass.hlsli"
+
+struct PS_OUT
+{
+  float4 Diffuse : SV_TARGET0;
+  float4 Normal : SV_TARGET1;
+  float4 Specular : SV_TARGET2;
+};
 
 SamplerState Sampler : register(s0);
 Texture2D Texture : register(t0);

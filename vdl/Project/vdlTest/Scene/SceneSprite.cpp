@@ -7,11 +7,6 @@ void SceneSprite::Initialize()
   Texture_ = Texture("Data/SAOîwåi.png");
 }
 
-SceneSprite::~SceneSprite()
-{
-
-}
-
 void SceneSprite::Update()
 {
   int Size = static_cast<int>(Datas_.size());

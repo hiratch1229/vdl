@@ -16,12 +16,6 @@ void SceneMultiRenderTexture::Initialize()
   Renderer3D::SetPixelShader(PixelShader("Shader/MultiRenderTexture/MultiRenderTexturePS.hlsl"));
 }
 
-SceneMultiRenderTexture::~SceneMultiRenderTexture()
-{
-  Renderer3D::SetShaders(VertexShader("Shader/Mesh/MeshVS.hlsl", InputLayoutType::eMesh),
-    PixelShader("Shader/Mesh/MeshPS.hlsl"));
-}
-
 void SceneMultiRenderTexture::Update()
 {
   for (uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)

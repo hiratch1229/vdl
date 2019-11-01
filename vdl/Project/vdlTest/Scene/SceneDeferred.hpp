@@ -74,8 +74,6 @@ private:
 public:
   SceneDeferred() = default;
 
-  ~SceneDeferred();
-
   void Initialize()override;
 
   void Update()override;

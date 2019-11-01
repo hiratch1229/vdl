@@ -57,8 +57,6 @@ private:
 public:
   ScenePostEffect() = default;
 
-  ~ScenePostEffect();
-
   void Initialize()override;
 
   void Update()override;

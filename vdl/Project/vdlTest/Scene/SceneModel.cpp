@@ -8,11 +8,6 @@ void SceneModel::Initialize()
   Camera_ = Camera(vdl::float3(0.0f, 0.0f, -15.0f));
 }
 
-SceneModel::~SceneModel()
-{
-
-}
-
 void SceneModel::Update()
 {
   FreeCamera(&Camera_);

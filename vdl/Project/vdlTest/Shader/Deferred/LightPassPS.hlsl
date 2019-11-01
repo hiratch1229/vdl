@@ -1,4 +1,3 @@
-#include "LightPass.hlsli"
 #include "../Option/Light.hlsli"
 
 Texture2D DiffuseGBuffer : register(t0);

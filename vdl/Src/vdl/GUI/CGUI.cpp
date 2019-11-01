@@ -689,7 +689,7 @@ void CGUI::Initialize()
   {
     GraphicsStates_.BlendState = vdl::BlendState(false, false, { true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd });
     vdl::DepthStencilOpState DepthStencilOpState(vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::ComparisonFuncType::eAlways);
-    GraphicsStates_.DepthSteniclState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState);
+    GraphicsStates_.DepthStencilState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState);
     GraphicsStates_.RasterizerState = vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, false, 0, true);
     Viewport_ = { 0.0f, 0.0f };
   }
@@ -824,7 +824,7 @@ void CGUI::Draw()
   pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
 
   pDeviceContext_->SetBlendState(GraphicsStates_.BlendState);
-  pDeviceContext_->SetDepthStencilState(GraphicsStates_.DepthSteniclState);
+  pDeviceContext_->SetDepthStencilState(GraphicsStates_.DepthStencilState);
   pDeviceContext_->SetRasterizerState(GraphicsStates_.RasterizerState);
 
   pDeviceContext_->VSSetShader(VertexShader_);

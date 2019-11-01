@@ -18,8 +18,6 @@ private:
 public:
   SceneTessellation() = default;
 
-  ~SceneTessellation();
-
   void Initialize()override;
 
   void Update()override;

@@ -34,8 +34,6 @@ private:
 public:
   SceneGPUParticle() = default;
 
-  ~SceneGPUParticle();
-
   void Initialize()override;
 
   void Update()override;

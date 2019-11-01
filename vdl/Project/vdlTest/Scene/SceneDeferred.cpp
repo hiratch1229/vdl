@@ -34,7 +34,7 @@ void SceneDeferred::Initialize()
 
   //  GBufferPassÇÃèâä˙âª
   {
-    GBufferPassVertexShader_ = VertexShader("Shader/Deferred/GBufferPassVS.hlsl", InputLayoutType::eMesh);
+    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eMesh);
     GBufferPassPixelShader_ = PixelShader("Shader/Deferred/GBufferPassPS.hlsl");
 
     GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
@@ -56,7 +56,7 @@ void SceneDeferred::Initialize()
 
   //  LightPassÇÃèâä˙âª
   {
-    LightPassVertexShader_ = VertexShader("Shader/Deferred/LightPassVS.hlsl", InputLayoutType::eNone);
+    LightPassVertexShader_ = VertexShader("Shader/Option/FullScreenTriangleVS.hlsl", InputLayoutType::eNone);
     LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
     ShadowMapSampler_ = Sampler(AddressModeType::eBorder, AddressModeType::eBorder, AddressModeType::eBorder,
       FilterType::eAnisotropic, 16, BorderColorType::eWhite);
@@ -87,13 +87,6 @@ void SceneDeferred::Initialize()
     Renderer::SetPixelStageConstantBuffers(2, 1, &LightViewProjectionConstantBuffer_);
     Renderer::SetTopology(TopologyType::eTriangleStrip);
   }
-}
-
-SceneDeferred::~SceneDeferred()
-{
-  Renderer3D::SetShaders(VertexShader("Shader/Mesh/MeshVS.hlsl", InputLayoutType::eMesh),
-    PixelShader("Shader/Mesh/MeshPS.hlsl"));
-  Renderer::SetTopology(TopologyType::eDefaultNone);
 }
 
 void SceneDeferred::Update()
@@ -212,7 +205,7 @@ void SceneDeferred::Update()
     Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
     Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(PixelStageShaderResources_.size()), PixelStageShaderResources_.data());
 
-    Renderer::Draw(4);
+    Renderer::Draw(3);
   }
 
   //  GBufferÇÃï`âÊ

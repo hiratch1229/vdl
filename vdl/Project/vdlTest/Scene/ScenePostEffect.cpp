@@ -14,7 +14,7 @@ void ScenePostEffect::Initialize()
 
   //  GBufferPassÇÃèâä˙âª
   {
-    GBufferPassVertexShader_ = VertexShader("Shader/PostEffect/GBufferPassVS.hlsl", InputLayoutType::eMesh);
+    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eMesh);
     GBufferPassPixelShader_ = PixelShader("Shader/PostEffect/GBufferPassPS.hlsl");
 
     //  DiffuseMap
@@ -38,7 +38,7 @@ void ScenePostEffect::Initialize()
 
   //  LightPassÇÃèâä˙âª
   {
-    LightPassVertexShader_ = VertexShader("Shader/Deferred/LightPassVS.hlsl", InputLayoutType::eNone);
+    LightPassVertexShader_ = VertexShader("Shader/Option/FullScreenTriangleVS.hlsl", InputLayoutType::eNone);
     LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
     Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
 
@@ -89,13 +89,6 @@ void ScenePostEffect::Initialize()
       TextureSize /= 2;
     }
   }
-}
-
-ScenePostEffect::~ScenePostEffect()
-{
-  Renderer3D::SetShaders(VertexShader("Shader/Mesh/MeshVS.hlsl", InputLayoutType::eMesh),
-    PixelShader("Shader/Mesh/MeshPS.hlsl"));
-  Renderer::SetTopology(TopologyType::eDefaultNone);
 }
 
 void ScenePostEffect::Update()
@@ -180,7 +173,7 @@ void ScenePostEffect::Update()
     Renderer::SetRenderTextures(RenderTextures_, DepthStencilTexture());
     Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(PixelStageShaderResources_.size()), PixelStageShaderResources_.data());
 
-    Renderer::Draw(4);
+    Renderer::Draw(3);
   }
 
   //  PostProcess

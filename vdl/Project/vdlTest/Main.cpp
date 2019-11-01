@@ -11,9 +11,11 @@
 
 #include <memory>
 
+using namespace vdl;
+
 namespace
 {
-  inline IScene* GetNextScene(vdl::uint i)
+  inline IScene* GetNextScene(uint i)
   {
     switch (i)
     {
@@ -46,12 +48,23 @@ void Main()
     "PostEffect",
     "TBDR"
   };
-  static constexpr vdl::uint kSceneTypeNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kSceneTypes));
-  static constexpr vdl::uint kInitSceneType = 4;
+  static constexpr uint kSceneTypeNum = static_cast<uint>(Macro::ArraySize(kSceneTypes));
+  static constexpr uint kInitSceneType = 4;
   static_assert(kInitSceneType < kSceneTypeNum);
 
-  vdl::uint SceneType = kInitSceneType;
-  vdl::uint MaxFPS = vdl::Constants::kDefaultMaxFPS;
+  const VertexShader DefaultVertexShader2D = VertexShader("Shader/Texture/TextureVS.hlsl", InputLayoutType::eTexture);
+  const PixelShader DefaultPixelShader2D = PixelShader("Shader/Texture/TexturePS.hlsl");
+  const BlendState DefaultBlendState2D = BlendState::kDefault;
+  const DepthStencilState DefaultDepthStencilState2D = DepthStencilState::kDefault2D;
+  const RasterizerState DefaultRasterizerState2D = RasterizerState::kDefault2D;
+  const VertexShader DefaultVertexShader3D = VertexShader("Shader/Mesh/MeshVS.hlsl", InputLayoutType::eMesh);
+  const PixelShader DefaultPixelShader3D = PixelShader("Shader/Mesh/MeshPS.hlsl");
+  const BlendState DefaultBlendState3D = BlendState::kDefault;
+  const DepthStencilState DefaultDepthStencilState3D = DepthStencilState::kDefault3D;
+  const RasterizerState DefaultRasterizerState3D = RasterizerState::kDefault3D;
+
+  uint SceneType = kInitSceneType;
+  uint MaxFPS = vdl::Constants::kDefaultMaxFPS;
 
   std::unique_ptr<IScene> pCurrentScene(GetNextScene(SceneType));
   pCurrentScene->Initialize();
@@ -59,9 +72,9 @@ void Main()
   while (vdl::System::Update())
   {
     ImGui::Begin("Information");
-    ImGui::Text("FPS:%d(1 / %f)", vdl::System::GetFPS(), vdl::System::GetDeltaTime());
-    ImGui::Text("CPU:%f%%", vdl::System::GetCPUUseRate());
-    ImGui::Text("Memory:%f%%", vdl::System::GetMemoryUseRate());
+    ImGui::Text("FPS:%d(1 / %f)", System::GetFPS(), System::GetDeltaTime());
+    ImGui::Text("CPU:%f%%", System::GetCPUUseRate());
+    ImGui::Text("Memory:%f%%", System::GetMemoryUseRate());
     if (ImGui::InputInt("MaxFPS", reinterpret_cast<int*>(&MaxFPS)))
     {
       vdl::System::SetMaxFPS(MaxFPS);
@@ -82,6 +95,15 @@ void Main()
       if (pNextScene)
       {
         pCurrentScene.reset(pNextScene);
+
+        Renderer::SetTopology(TopologyType::eDefaultNone);
+        Renderer2D::SetTopology(TopologyType::eDefaultTexture);
+        Renderer2D::SetGraphicsStates(DefaultBlendState2D, DefaultDepthStencilState2D, DefaultRasterizerState2D);
+        Renderer2D::SetShaders(DefaultVertexShader2D, DefaultPixelShader2D);
+        Renderer3D::SetTopology(TopologyType::eDefaultMesh);
+        Renderer3D::SetGraphicsStates(DefaultBlendState3D, DefaultDepthStencilState3D, DefaultRasterizerState3D);
+        Renderer3D::SetShaders(DefaultVertexShader3D, DefaultPixelShader3D);
+
         pCurrentScene->Initialize();
       }
     }

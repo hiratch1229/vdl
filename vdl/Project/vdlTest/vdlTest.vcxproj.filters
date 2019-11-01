@@ -42,6 +42,9 @@
     <Filter Include="シェーダーファイル\TBDR">
       <UniqueIdentifier>{fcbab651-bd0a-4407-9b07-87030c578cb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\GBufferPass">
+      <UniqueIdentifier>{71a30c62-719d-424b-825d-6241bbb6d1a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -144,9 +147,6 @@
     <FxCompile Include="Shader\Deferred\GBufferPassPS.hlsl">
       <Filter>シェーダーファイル\Deferred</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Deferred\GBufferPassVS.hlsl">
-      <Filter>シェーダーファイル\Deferred</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\Deferred\LightPassPS.hlsl">
       <Filter>シェーダーファイル\Deferred</Filter>
     </FxCompile>
@@ -156,19 +156,10 @@
     <FxCompile Include="Shader\Texture\TextureVS.hlsl">
       <Filter>シェーダーファイル\Texture</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Deferred\LightPassVS.hlsl">
-      <Filter>シェーダーファイル\Deferred</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\Deferred\ShadowMapVS.hlsl">
       <Filter>シェーダーファイル\Deferred</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\PostEffect\GBufferPassVS.hlsl">
-      <Filter>シェーダーファイル\PostEffect</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\PostEffect\GBufferPassPS.hlsl">
-      <Filter>シェーダーファイル\PostEffect</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\PostEffect\LightPassVS.hlsl">
       <Filter>シェーダーファイル\PostEffect</Filter>
     </FxCompile>
     <FxCompile Include="Shader\PostEffect\LightPassPS.hlsl">
@@ -186,13 +177,7 @@
     <FxCompile Include="Shader\TBDR\GBufferPassPS.hlsl">
       <Filter>シェーダーファイル\TBDR</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\TBDR\GBufferPassVS.hlsl">
-      <Filter>シェーダーファイル\TBDR</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\TBDR\LightPassPS.hlsl">
-      <Filter>シェーダーファイル\TBDR</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\TBDR\LightPassVS.hlsl">
       <Filter>シェーダーファイル\TBDR</Filter>
     </FxCompile>
     <FxCompile Include="Shader\TBDR\ShadowMapVS.hlsl">
@@ -203,6 +188,12 @@
     </FxCompile>
     <FxCompile Include="Shader\TBDR\PointLightUpdateCS.hlsl">
       <Filter>シェーダーファイル\TBDR</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Option\FullScreenTriangleVS.hlsl">
+      <Filter>シェーダーファイル\Option</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\GBufferPass\GBufferPassVS.hlsl">
+      <Filter>シェーダーファイル\GBufferPass</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -218,32 +209,20 @@
     <None Include="Shader\Mesh\Mesh.hlsli">
       <Filter>シェーダーファイル\Mesh</Filter>
     </None>
-    <None Include="Shader\Deferred\GBufferPass.hlsli">
-      <Filter>シェーダーファイル\Deferred</Filter>
-    </None>
     <None Include="Shader\Texture\Texture.hlsli">
       <Filter>シェーダーファイル\Texture</Filter>
-    </None>
-    <None Include="Shader\Deferred\LightPass.hlsli">
-      <Filter>シェーダーファイル\Deferred</Filter>
     </None>
     <None Include="Shader\Option\Light.hlsli">
       <Filter>シェーダーファイル\Option</Filter>
     </None>
-    <None Include="Shader\PostEffect\GBufferPass.hlsli">
-      <Filter>シェーダーファイル\PostEffect</Filter>
-    </None>
-    <None Include="Shader\PostEffect\LightPass.hlsli">
-      <Filter>シェーダーファイル\PostEffect</Filter>
-    </None>
     <None Include="Shader\Option\GaussianBlur.hlsli">
       <Filter>シェーダーファイル\Option</Filter>
     </None>
-    <None Include="Shader\TBDR\GBufferPass.hlsli">
-      <Filter>シェーダーファイル\TBDR</Filter>
-    </None>
     <None Include="Shader\TBDR\PointLight.hlsli">
       <Filter>シェーダーファイル\TBDR</Filter>
+    </None>
+    <None Include="Shader\GBufferPass\GBufferPass.hlsli">
+      <Filter>シェーダーファイル\GBufferPass</Filter>
     </None>
   </ItemGroup>
 </Project>

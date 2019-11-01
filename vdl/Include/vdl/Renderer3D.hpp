@@ -30,11 +30,18 @@ namespace vdl::Renderer3D
   void SetDepthStencilState(const DepthStencilState& _DepthStencilState);
 
   void SetRasterizerState(const RasterizerState& _RasterizerState);
+  
+  inline void SetGraphicsStates(const BlendState& _BlendState, const DepthStencilState& _DepthStencilState, const RasterizerState& _RasterizerState)
+  {
+    SetBlendState(_BlendState);
+    SetDepthStencilState(_DepthStencilState);
+    SetRasterizerState(_RasterizerState);
+  }
 
   inline void SetGraphicsState(const GraphicsStates& _GraphicsStates)
   {
     SetBlendState(_GraphicsStates.BlendState);
-    SetDepthStencilState(_GraphicsStates.DepthSteniclState);
+    SetDepthStencilState(_GraphicsStates.DepthStencilState);
     SetRasterizerState(_GraphicsStates.RasterizerState);
   }
 

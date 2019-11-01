@@ -12,9 +12,7 @@ private:
 public:
   SceneMultiRenderTexture() = default;
 
-  ~SceneMultiRenderTexture();
-
-  void Initialize();
+  void Initialize()override;
 
   void Update()override;
 
