@@ -22,9 +22,9 @@ void SceneModel::Update()
     ImGui::SetNextTreeNodeOpen(false, ImGuiCond_Once);
     if (ImGui::TreeNode("Camera"))
     {
-      ImGui::InputFloat3("Position", &Camera_.Position.x);
-      ImGui::InputFloat3("Target", &Camera_.Target.x);
-      ImGui::InputFloat3("Up", &Camera_.Up.x);
+      ImGui::InputFloat3("Position", &Camera_.Position);
+      ImGui::InputFloat3("Target", &Camera_.Target);
+      ImGui::InputFloat3("Up", &Camera_.Up);
       ImGui::InputFloat("Near", &Camera_.Near);
       ImGui::InputFloat("Far", &Camera_.Far);
       ImGui::InputFloat("Fov", reinterpret_cast<float*>(&Camera_.Fov));

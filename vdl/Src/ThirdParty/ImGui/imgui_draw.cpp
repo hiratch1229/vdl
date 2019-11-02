@@ -26,7 +26,7 @@ Index of this file:
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "imgui.h"
+#include <ThirdParty/ImGui/imgui.h>
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
@@ -370,7 +370,7 @@ void ImDrawList::Clear()
     _VtxWritePtr = NULL;
     _IdxWritePtr = NULL;
     _ClipRectStack.resize(0);
-    _TextureIdStack.resize(0);
+    _TextureStack.resize(0);
     _Path.resize(0);
     _Splitter.Clear();
 }
@@ -384,7 +384,7 @@ void ImDrawList::ClearFreeMemory()
     _VtxWritePtr = NULL;
     _IdxWritePtr = NULL;
     _ClipRectStack.clear();
-    _TextureIdStack.clear();
+    _TextureStack.clear();
     _Path.clear();
     _Splitter.ClearFreeMemory();
 }
@@ -401,13 +401,13 @@ ImDrawList* ImDrawList::CloneOutput() const
 
 // Using macros because C++ is a terrible language, we want guaranteed inline, no code in header, and no overhead in Debug builds
 #define GetCurrentClipRect()    (_ClipRectStack.Size ? _ClipRectStack.Data[_ClipRectStack.Size-1]  : _Data->ClipRectFullscreen)
-#define GetCurrentTextureId()   (_TextureIdStack.Size ? _TextureIdStack.Data[_TextureIdStack.Size-1] : (ImTextureID)NULL)
+#define GetCurrentTexture()   (!_TextureStack.empty() ? _TextureStack.back() : vdl::Texture())
 
 void ImDrawList::AddDrawCmd()
 {
     ImDrawCmd draw_cmd;
     draw_cmd.ClipRect = GetCurrentClipRect();
-    draw_cmd.TextureId = GetCurrentTextureId();
+    draw_cmd.Texture = GetCurrentTexture();
     draw_cmd.VtxOffset = _VtxCurrentOffset;
     draw_cmd.IdxOffset = IdxBuffer.Size;
 
@@ -417,7 +417,7 @@ void ImDrawList::AddDrawCmd()
 
 void ImDrawList::AddCallback(ImDrawCallback callback, void* callback_data)
 {
-    ImDrawCmd* current_cmd = CmdBuffer.Size ? &CmdBuffer.back() : NULL;
+    ImDrawCmd* current_cmd = !CmdBuffer.empty() ? &CmdBuffer.back() : NULL;
     if (!current_cmd || current_cmd->ElemCount != 0 || current_cmd->UserCallback != NULL)
     {
         AddDrawCmd();
@@ -435,7 +435,7 @@ void ImDrawList::UpdateClipRect()
 {
     // If current command is used with different settings we need to add a new command
     const ImVec4 curr_clip_rect = GetCurrentClipRect();
-    ImDrawCmd* curr_cmd = CmdBuffer.Size > 0 ? &CmdBuffer.Data[CmdBuffer.Size-1] : NULL;
+    ImDrawCmd* curr_cmd = !CmdBuffer.empty() ? &CmdBuffer.back() : NULL;
     if (!curr_cmd || (curr_cmd->ElemCount != 0 && memcmp(&curr_cmd->ClipRect, &curr_clip_rect, sizeof(ImVec4)) != 0) || curr_cmd->UserCallback != NULL)
     {
         AddDrawCmd();
@@ -443,30 +443,30 @@ void ImDrawList::UpdateClipRect()
     }
 
     // Try to merge with previous command if it matches, else use current command
-    ImDrawCmd* prev_cmd = CmdBuffer.Size > 1 ? curr_cmd - 1 : NULL;
-    if (curr_cmd->ElemCount == 0 && prev_cmd && memcmp(&prev_cmd->ClipRect, &curr_clip_rect, sizeof(ImVec4)) == 0 && prev_cmd->TextureId == GetCurrentTextureId() && prev_cmd->UserCallback == NULL)
+    ImDrawCmd* prev_cmd = CmdBuffer.size() > 1 ? curr_cmd - 1 : NULL;
+    if (curr_cmd->ElemCount == 0 && prev_cmd && memcmp(&prev_cmd->ClipRect, &curr_clip_rect, sizeof(ImVec4)) == 0 && prev_cmd->Texture == GetCurrentTexture() && prev_cmd->UserCallback == NULL)
         CmdBuffer.pop_back();
     else
         curr_cmd->ClipRect = curr_clip_rect;
 }
 
-void ImDrawList::UpdateTextureID()
+void ImDrawList::UpdateTexture()
 {
     // If current command is used with different settings we need to add a new command
-    const ImTextureID curr_texture_id = GetCurrentTextureId();
-    ImDrawCmd* curr_cmd = CmdBuffer.Size ? &CmdBuffer.back() : NULL;
-    if (!curr_cmd || (curr_cmd->ElemCount != 0 && curr_cmd->TextureId != curr_texture_id) || curr_cmd->UserCallback != NULL)
+    const vdl::Texture curr_texture = GetCurrentTexture();
+    ImDrawCmd* curr_cmd = !CmdBuffer.empty() ? &CmdBuffer.back() : NULL;
+    if (!curr_cmd || (curr_cmd->ElemCount != 0 && curr_cmd->Texture != curr_texture) || curr_cmd->UserCallback != NULL)
     {
         AddDrawCmd();
         return;
     }
 
     // Try to merge with previous command if it matches, else use current command
-    ImDrawCmd* prev_cmd = CmdBuffer.Size > 1 ? curr_cmd - 1 : NULL;
-    if (curr_cmd->ElemCount == 0 && prev_cmd && prev_cmd->TextureId == curr_texture_id && memcmp(&prev_cmd->ClipRect, &GetCurrentClipRect(), sizeof(ImVec4)) == 0 && prev_cmd->UserCallback == NULL)
+    ImDrawCmd* prev_cmd = CmdBuffer.size() > 1 ? curr_cmd - 1 : NULL;
+    if (curr_cmd->ElemCount == 0 && prev_cmd && prev_cmd->Texture == curr_texture && memcmp(&prev_cmd->ClipRect, &GetCurrentClipRect(), sizeof(ImVec4)) == 0 && prev_cmd->UserCallback == NULL)
         CmdBuffer.pop_back();
     else
-        curr_cmd->TextureId = curr_texture_id;
+        curr_cmd->Texture = curr_texture;
 }
 
 #undef GetCurrentClipRect
@@ -503,17 +503,17 @@ void ImDrawList::PopClipRect()
     UpdateClipRect();
 }
 
-void ImDrawList::PushTextureID(ImTextureID texture_id)
+void ImDrawList::PushTexture(const vdl::Texture& texture)
 {
-    _TextureIdStack.push_back(texture_id);
-    UpdateTextureID();
+    _TextureStack.push_back(texture);
+    UpdateTexture();
 }
 
-void ImDrawList::PopTextureID()
+void ImDrawList::PopTexture()
 {
-    IM_ASSERT(_TextureIdStack.Size > 0);
-    _TextureIdStack.pop_back();
-    UpdateTextureID();
+    IM_ASSERT(_TextureStack.size() > 0);
+    _TextureStack.pop_back();
+    UpdateTexture();
 }
 
 // NB: this can be called with negative count for removing primitives (as long as the result does not underflow)
@@ -527,7 +527,7 @@ void ImDrawList::PrimReserve(int idx_count, int vtx_count)
         AddDrawCmd();
     }
 
-    ImDrawCmd& draw_cmd = CmdBuffer.Data[CmdBuffer.Size-1];
+    ImDrawCmd& draw_cmd = CmdBuffer.back();
     draw_cmd.ElemCount += idx_count;
 
     int vtx_buffer_old_size = VtxBuffer.Size;
@@ -1116,7 +1116,7 @@ void ImDrawList::AddText(const ImFont* font, float font_size, const ImVec2& pos,
     if (font_size == 0.0f)
         font_size = _Data->FontSize;
 
-    IM_ASSERT(font->ContainerAtlas->TexID == _TextureIdStack.back());  // Use high-level ImGui::PushFont() or low-level ImDrawList::PushTextureId() to change font.
+    IM_ASSERT(font->ContainerAtlas->Texture == _TextureStack.back());  // Use high-level ImGui::PushFont() or low-level ImDrawList::PushTextureId() to change font.
 
     ImVec4 clip_rect = _ClipRectStack.back();
     if (cpu_fine_clip_rect)
@@ -1134,52 +1134,52 @@ void ImDrawList::AddText(const ImVec2& pos, ImU32 col, const char* text_begin, c
     AddText(NULL, 0.0f, pos, col, text_begin, text_end);
 }
 
-void ImDrawList::AddImage(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col)
+void ImDrawList::AddImage(const vdl::Texture& texture, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col)
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
-    const bool push_texture_id = _TextureIdStack.empty() || user_texture_id != _TextureIdStack.back();
-    if (push_texture_id)
-        PushTextureID(user_texture_id);
+    const bool push_texture = _TextureStack.empty() || texture != _TextureStack.back();
+    if (push_texture)
+        PushTexture(texture);
 
     PrimReserve(6, 4);
     PrimRectUV(p_min, p_max, uv_min, uv_max, col);
 
-    if (push_texture_id)
-        PopTextureID();
+    if (push_texture)
+        PopTexture();
 }
 
-void ImDrawList::AddImageQuad(ImTextureID user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1, const ImVec2& uv2, const ImVec2& uv3, const ImVec2& uv4, ImU32 col)
+void ImDrawList::AddImageQuad(const vdl::Texture& texture, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1, const ImVec2& uv2, const ImVec2& uv3, const ImVec2& uv4, ImU32 col)
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
-    const bool push_texture_id = _TextureIdStack.empty() || user_texture_id != _TextureIdStack.back();
-    if (push_texture_id)
-        PushTextureID(user_texture_id);
+    const bool push_texture = _TextureStack.empty() || texture != _TextureStack.back();
+    if (push_texture)
+        PushTexture(texture);
 
     PrimReserve(6, 4);
     PrimQuadUV(p1, p2, p3, p4, uv1, uv2, uv3, uv4, col);
 
-    if (push_texture_id)
-        PopTextureID();
+    if (push_texture)
+        PopTexture();
 }
 
-void ImDrawList::AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners)
+void ImDrawList::AddImageRounded(const vdl::Texture& texture, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners)
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
     if (rounding <= 0.0f || (rounding_corners & ImDrawCornerFlags_All) == 0)
     {
-        AddImage(user_texture_id, p_min, p_max, uv_min, uv_max, col);
+        AddImage(texture, p_min, p_max, uv_min, uv_max, col);
         return;
     }
 
-    const bool push_texture_id = _TextureIdStack.empty() || user_texture_id != _TextureIdStack.back();
-    if (push_texture_id)
-        PushTextureID(user_texture_id);
+    const bool push_texture = _TextureStack.empty() || texture != _TextureStack.back();
+    if (push_texture)
+        PushTexture(texture);
 
     int vert_start_idx = VtxBuffer.Size;
     PathRect(p_min, p_max, rounding, rounding_corners);
@@ -1187,8 +1187,8 @@ void ImDrawList::AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_mi
     int vert_end_idx = VtxBuffer.Size;
     ImGui::ShadeVertsLinearUV(this, vert_start_idx, vert_end_idx, p_min, p_max, uv_min, uv_max, true);
 
-    if (push_texture_id)
-        PopTextureID();
+    if (push_texture)
+        PopTexture();
 }
 
 
@@ -1239,7 +1239,7 @@ void ImDrawListSplitter::Split(ImDrawList* draw_list, int channels_count)
         {
             ImDrawCmd draw_cmd;
             draw_cmd.ClipRect = draw_list->_ClipRectStack.back();
-            draw_cmd.TextureId = draw_list->_TextureIdStack.back();
+            draw_cmd.Texture = draw_list->_TextureStack.back();
             _Channels[i]._CmdBuffer.push_back(draw_cmd);
         }
     }
@@ -1247,7 +1247,7 @@ void ImDrawListSplitter::Split(ImDrawList* draw_list, int channels_count)
 
 static inline bool CanMergeDrawCommands(ImDrawCmd* a, ImDrawCmd* b)
 {
-    return memcmp(&a->ClipRect, &b->ClipRect, sizeof(a->ClipRect)) == 0 && a->TextureId == b->TextureId && a->VtxOffset == b->VtxOffset && !a->UserCallback && !b->UserCallback;
+    return memcmp(&a->ClipRect, &b->ClipRect, sizeof(a->ClipRect)) == 0 && a->Texture == b->Texture && a->VtxOffset == b->VtxOffset && !a->UserCallback && !b->UserCallback;
 }
 
 void ImDrawListSplitter::Merge(ImDrawList* draw_list)
@@ -1257,13 +1257,13 @@ void ImDrawListSplitter::Merge(ImDrawList* draw_list)
         return;
 
     SetCurrentChannel(draw_list, 0);
-    if (draw_list->CmdBuffer.Size != 0 && draw_list->CmdBuffer.back().ElemCount == 0)
+    if (draw_list->CmdBuffer.size() != 0 && draw_list->CmdBuffer.back().ElemCount == 0)
         draw_list->CmdBuffer.pop_back();
 
     // Calculate our final buffer sizes. Also fix the incorrect IdxOffset values in each command.
     int new_cmd_buffer_count = 0;
     int new_idx_buffer_count = 0;
-    ImDrawCmd* last_cmd = (_Count > 0 && draw_list->CmdBuffer.Size > 0) ? &draw_list->CmdBuffer.back() : NULL;
+    ImDrawCmd* last_cmd = (_Count > 0 && !draw_list->CmdBuffer.empty()) ? &draw_list->CmdBuffer.back() : NULL;
     int idx_offset = last_cmd ? last_cmd->IdxOffset + last_cmd->ElemCount : 0;
     for (int i = 1; i < _Count; i++)
     {
@@ -1287,11 +1287,11 @@ void ImDrawListSplitter::Merge(ImDrawList* draw_list)
             idx_offset += ch._CmdBuffer.Data[cmd_n].ElemCount;
         }
     }
-    draw_list->CmdBuffer.resize(draw_list->CmdBuffer.Size + new_cmd_buffer_count);
+    draw_list->CmdBuffer.resize(draw_list->CmdBuffer.size() + new_cmd_buffer_count);
     draw_list->IdxBuffer.resize(draw_list->IdxBuffer.Size + new_idx_buffer_count);
 
     // Write commands and indices in order (they are fairly small structures, we don't copy vertices only indices)
-    ImDrawCmd* cmd_write = draw_list->CmdBuffer.Data + draw_list->CmdBuffer.Size - new_cmd_buffer_count;
+    ImDrawCmd* cmd_write = &draw_list->CmdBuffer[draw_list->CmdBuffer.size() - new_cmd_buffer_count];
     ImDrawIdx* idx_write = draw_list->IdxBuffer.Data + draw_list->IdxBuffer.Size - new_idx_buffer_count;
     for (int i = 1; i < _Count; i++)
     {
@@ -1301,7 +1301,7 @@ void ImDrawListSplitter::Merge(ImDrawList* draw_list)
     }
     draw_list->_IdxWritePtr = idx_write;
     draw_list->UpdateClipRect(); // We call this instead of AddDrawCmd(), so that empty channels won't produce an extra draw call.
-    draw_list->UpdateTextureID();
+    draw_list->UpdateTexture();
     _Count = 1;
 }
 
@@ -1350,7 +1350,7 @@ void ImDrawData::ScaleClipRects(const ImVec2& fb_scale)
     for (int i = 0; i < CmdListsCount; i++)
     {
         ImDrawList* cmd_list = CmdLists[i];
-        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.size(); cmd_i++)
         {
             ImDrawCmd* cmd = &cmd_list->CmdBuffer[cmd_i];
             cmd->ClipRect = ImVec4(cmd->ClipRect.x * fb_scale.x, cmd->ClipRect.y * fb_scale.y, cmd->ClipRect.z * fb_scale.x, cmd->ClipRect.w * fb_scale.y);
@@ -1489,7 +1489,7 @@ ImFontAtlas::ImFontAtlas()
 {
     Locked = false;
     Flags = ImFontAtlasFlags_None;
-    TexID = (ImTextureID)NULL;
+    Texture = vdl::Texture();
     TexDesiredWidth = 0;
     TexGlyphPadding = 1;
 
@@ -1752,7 +1752,7 @@ int ImFontAtlas::AddCustomRectFontGlyph(ImFont* font, ImWchar id, int width, int
     return CustomRects.Size - 1; // Return index
 }
 
-void ImFontAtlas::CalcCustomRectUV(const ImFontAtlasCustomRect* rect, ImVec2* out_uv_min, ImVec2* out_uv_max)
+void ImFontAtlas::CalcCustomRectUV(const ImFontAtlasCustomRect* rect, ImVec2* out_uv_min, ImVec2* out_uv_max) const
 {
     IM_ASSERT(TexWidth > 0 && TexHeight > 0);   // Font atlas needs to be built before we can calculate UV coordinates
     IM_ASSERT(rect->IsPacked());                // Make sure the rectangle has been packed
@@ -1849,7 +1849,7 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     ImFontAtlasBuildRegisterDefaultCustomRects(atlas);
 
     // Clear atlas
-    atlas->TexID = (ImTextureID)NULL;
+    atlas->Texture = vdl::Texture();
     atlas->TexWidth = atlas->TexHeight = 0;
     atlas->TexUvScale = ImVec2(0.0f, 0.0f);
     atlas->TexUvWhitePixel = ImVec2(0.0f, 0.0f);
@@ -2069,7 +2069,7 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
         const float descent = ImFloor(unscaled_descent * font_scale + ((unscaled_descent > 0.0f) ? +1 : -1));
         ImFontAtlasBuildSetupFont(atlas, dst_font, &cfg, ascent, descent);
         const float font_off_x = cfg.GlyphOffset.x;
-        const float font_off_y = cfg.GlyphOffset.y + (float)(int)(dst_font->Ascent + 0.5f);
+        const float font_off_y = cfg.GlyphOffset.y + IM_ROUND(dst_font->Ascent);
 
         for (int glyph_i = 0; glyph_i < src_tmp.GlyphsCount; glyph_i++)
         {
@@ -2080,7 +2080,7 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
             const float char_advance_x_mod = ImClamp(char_advance_x_org, cfg.GlyphMinAdvanceX, cfg.GlyphMaxAdvanceX);
             float char_off_x = font_off_x;
             if (char_advance_x_org != char_advance_x_mod)
-                char_off_x += cfg.PixelSnapH ? (float)(int)((char_advance_x_mod - char_advance_x_org) * 0.5f) : (char_advance_x_mod - char_advance_x_org) * 0.5f;
+                char_off_x += cfg.PixelSnapH ? ImFloor((char_advance_x_mod - char_advance_x_org) * 0.5f) : (char_advance_x_mod - char_advance_x_org) * 0.5f;
 
             // Register glyph
             stbtt_aligned_quad q;
@@ -2591,7 +2591,7 @@ void ImFont::AddGlyph(ImWchar codepoint, float x0, float y0, float x1, float y1,
     glyph.AdvanceX = advance_x + ConfigData->GlyphExtraSpacing.x;  // Bake spacing into AdvanceX
 
     if (ConfigData->PixelSnapH)
-        glyph.AdvanceX = (float)(int)(glyph.AdvanceX + 0.5f);
+        glyph.AdvanceX = IM_ROUND(glyph.AdvanceX);
 
     // Compute rough surface usage metrics (+1 to account for average padding, +0.99 to round)
     DirtyLookupTables = true;
@@ -2833,8 +2833,8 @@ void ImFont::RenderChar(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
     if (const ImFontGlyph* glyph = FindGlyph(c))
     {
         float scale = (size >= 0.0f) ? (size / FontSize) : 1.0f;
-        pos.x = (float)(int)pos.x + DisplayOffset.x;
-        pos.y = (float)(int)pos.y + DisplayOffset.y;
+        pos.x = IM_FLOOR(pos.x + DisplayOffset.x);
+        pos.y = IM_FLOOR(pos.y + DisplayOffset.y);
         draw_list->PrimReserve(6, 4);
         draw_list->PrimRectUV(ImVec2(pos.x + glyph->X0 * scale, pos.y + glyph->Y0 * scale), ImVec2(pos.x + glyph->X1 * scale, pos.y + glyph->Y1 * scale), ImVec2(glyph->U0, glyph->V0), ImVec2(glyph->U1, glyph->V1), col);
     }
@@ -2846,8 +2846,8 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
         text_end = text_begin + strlen(text_begin); // ImGui:: functions generally already provides a valid text_end, so this is merely to handle direct calls.
 
     // Align to be pixel perfect
-    pos.x = (float)(int)pos.x + DisplayOffset.x;
-    pos.y = (float)(int)pos.y + DisplayOffset.y;
+    pos.x = IM_FLOOR(pos.x + DisplayOffset.x);
+    pos.y = IM_FLOOR(pos.y + DisplayOffset.y);
     float x = pos.x;
     float y = pos.y;
     if (y > clip_rect.w)
@@ -3023,7 +3023,7 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
     // Give back unused vertices
     draw_list->VtxBuffer.resize((int)(vtx_write - draw_list->VtxBuffer.Data));
     draw_list->IdxBuffer.resize((int)(idx_write - draw_list->IdxBuffer.Data));
-    draw_list->CmdBuffer[draw_list->CmdBuffer.Size-1].ElemCount -= (idx_expected_size - draw_list->IdxBuffer.Size);
+    draw_list->CmdBuffer.back().ElemCount -= (idx_expected_size - draw_list->IdxBuffer.Size);
     draw_list->_VtxWritePtr = vtx_write;
     draw_list->_IdxWritePtr = idx_write;
     draw_list->_VtxCurrentIdx = vtx_current_idx;
@@ -3049,13 +3049,13 @@ void ImGui::RenderMouseCursor(ImDrawList* draw_list, ImVec2 pos, float scale, Im
     if (font_atlas->GetMouseCursorTexData(mouse_cursor, &offset, &size, &uv[0], &uv[2]))
     {
         pos -= offset;
-        const ImTextureID tex_id = font_atlas->TexID;
-        draw_list->PushTextureID(tex_id);
-        draw_list->AddImage(tex_id, pos + ImVec2(1,0)*scale, pos + ImVec2(1,0)*scale + size*scale, uv[2], uv[3], col_shadow);
-        draw_list->AddImage(tex_id, pos + ImVec2(2,0)*scale, pos + ImVec2(2,0)*scale + size*scale, uv[2], uv[3], col_shadow);
-        draw_list->AddImage(tex_id, pos,                     pos + size*scale,                     uv[2], uv[3], col_border);
-        draw_list->AddImage(tex_id, pos,                     pos + size*scale,                     uv[0], uv[1], col_fill);
-        draw_list->PopTextureID();
+        const vdl::Texture& texture = font_atlas->Texture;
+        draw_list->PushTexture(texture);
+        draw_list->AddImage(texture, pos + ImVec2(1,0)*scale, pos + ImVec2(1,0)*scale + size*scale, uv[2], uv[3], col_shadow);
+        draw_list->AddImage(texture, pos + ImVec2(2,0)*scale, pos + ImVec2(2,0)*scale + size*scale, uv[2], uv[3], col_shadow);
+        draw_list->AddImage(texture, pos,                     pos + size*scale,                     uv[2], uv[3], col_border);
+        draw_list->AddImage(texture, pos,                     pos + size*scale,                     uv[0], uv[1], col_fill);
+        draw_list->PopTexture();
     }
 }
 
@@ -3201,9 +3201,9 @@ static unsigned int stb_adler32(unsigned int adler32, unsigned char *buffer, uns
 {
     const unsigned long ADLER_MOD = 65521;
     unsigned long s1 = adler32 & 0xffff, s2 = adler32 >> 16;
-    unsigned long blocklen, i;
+    unsigned long blocklen = buflen % 5552;
 
-    blocklen = buflen % 5552;
+    unsigned long i;
     while (buflen) {
         for (i=0; i + 7 < blocklen; i += 8) {
             s1 += buffer[0], s2 += s1;
@@ -3230,10 +3230,9 @@ static unsigned int stb_adler32(unsigned int adler32, unsigned char *buffer, uns
 
 static unsigned int stb_decompress(unsigned char *output, const unsigned char *i, unsigned int /*length*/)
 {
-    unsigned int olen;
     if (stb__in4(0) != 0x57bC0000) return 0;
     if (stb__in4(4) != 0)          return 0; // error! stream is > 4GB
-    olen = stb_decompress_length(i);
+    const unsigned int olen = stb_decompress_length(i);
     stb__barrier_in_b = i;
     stb__barrier_out_e = output + olen;
     stb__barrier_out_b = output;

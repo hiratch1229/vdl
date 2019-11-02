@@ -110,8 +110,6 @@
     <ClInclude Include="..\..\Include\vdl\Viewport.hpp" />
     <ClInclude Include="..\..\Include\vdl\Window.hpp" />
     <ClInclude Include="..\..\Include\vdl\XInput.hpp" />
-    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imconfig.h" />
-    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imgui.h" />
     <ClInclude Include="..\..\Src\ThirdParty\ImGui\imgui_internal.h" />
     <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_rectpack.h" />
     <ClInclude Include="..\..\Src\ThirdParty\ImGui\imstb_textedit.h" />
@@ -278,6 +276,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Shader\Mesh\Mesh.hlsli" />
+    <None Include="..\..\Shader\Option\GaussianBlur.hlsli" />
     <None Include="..\..\Shader\Option\Light.hlsli" />
     <None Include="..\..\Shader\Texture\Texture.hlsli" />
     <None Include="..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl" />
@@ -294,6 +293,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\Option\FullScreenTriangleVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>

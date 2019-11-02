@@ -113,9 +113,9 @@ void ScenePostEffect::Update()
         LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
         Renderer::SetPixelShader(LightPassPixelShader_);
       }
-      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow.Red);
+      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow);
       ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha);
-      ImGui::ColorEdit3("Fog", &RenderingData.Fog.Red);
+      ImGui::ColorEdit3("Fog", &RenderingData.Fog);
       ImGui::SliderFloat("LuminanceThreshold", &RenderingData.LuminanceThreshold, 0.0f, 1.0f);
       ImGui::InputFloat("Exposure", &RenderingData.Fog.Alpha);
       if (ImGui::TreeNode("DirectionalLight"))
@@ -126,7 +126,7 @@ void ScenePostEffect::Update()
         }
         ImGui::Text(std::string("Direction:" + std::to_string(DirectionalLight.Direction)).c_str());
         ImGui::InputFloat("Itensity", &DirectionalLight.Itensity);
-        ImGui::ColorEdit3("Color", &DirectionalLight.Color.Red);
+        ImGui::ColorEdit3("Color", &DirectionalLight.Color);
         ImGui::TreePop();
       }
     }

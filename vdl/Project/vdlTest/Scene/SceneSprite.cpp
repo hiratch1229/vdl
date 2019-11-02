@@ -34,12 +34,12 @@ void SceneSprite::Update()
 
       if (ImGui::TreeNode((std::string("Data[") + std::to_string(i) + "]").c_str()))
       {
-        ImGui::InputFloat2("Pos", &Data.Pos.x);
-        ImGui::InputFloat2("Size", &Data.Size.x);
-        ImGui::InputFloat2("SrcPos", &Data.SrcPos.x);
-        ImGui::InputFloat2("SrcSize", &Data.SrcSize.x);
+        ImGui::InputFloat2("Pos", &Data.Pos);
+        ImGui::InputFloat2("Size", &Data.Size);
+        ImGui::InputFloat2("SrcPos", &Data.SrcPos);
+        ImGui::InputFloat2("SrcSize", &Data.SrcSize);
         ImGui::InputFloat("Angle", reinterpret_cast<float*>(&Data.Angle));
-        ImGui::ColorEdit4("Color", &Data.Color.Red);
+        ImGui::ColorEdit4("Color", &Data.Color);
         ImGui::TreePop();
       }
     }

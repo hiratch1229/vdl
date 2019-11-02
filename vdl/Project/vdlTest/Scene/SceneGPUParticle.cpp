@@ -44,7 +44,7 @@ void SceneGPUParticle::Update()
   {
     ImGui::Text("ParticleNum:%d", kBufferNum);
     ImGui::Text((std::string("Target:") + std::to_string(CSData.MousePosition)).c_str());
-    ImGui::InputFloat2("PointHalfSize", &GSConstantBuffer_.GetData().PointHalfSize.x);
+    ImGui::InputFloat2("PointHalfSize", &GSConstantBuffer_.GetData().PointHalfSize);
   }
   ImGui::End();
 

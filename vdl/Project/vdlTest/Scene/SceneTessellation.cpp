@@ -30,7 +30,7 @@ void SceneTessellation::Update()
   ImGui::Begin("SceneTessellation");
   {
     ConstantBufferData& Data = ConstantBuffer_.GetData();
-    ImGui::SliderFloat3("TessFactor", &Data.TessFactor.x, kTessellationMinValue, kTessellationMaxValue);
+    ImGui::SliderFloat3("TessFactor", &Data.TessFactor, kTessellationMinValue, kTessellationMaxValue);
     ImGui::SliderFloat("InsideFactor", &Data.InsideFactor, kTessellationMinValue, kTessellationMaxValue);
   }
   ImGui::End();

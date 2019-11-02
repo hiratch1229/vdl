@@ -636,9 +636,7 @@ void CGUI::Initialize()
       Image.Resize(Size);
       ::memcpy(Image.Buffer(), Buffer, Image.BufferSize());
     }
-    Font_ = Image;
-    
-    //io.Fonts->TexID = static_cast<ImTextureID>(Font_);
+   /* Font_ =*/ io.Fonts->Texture = Image;
   }
 
   //  ImGui‚Ìƒtƒ‰ƒO‚ÌÝ’è
@@ -838,7 +836,7 @@ void CGUI::Draw()
 
   pDeviceContext_->PSSetShader(PixelShader_);
   pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
-  pDeviceContext_->PSSetShaderResources(0, 1, &Font_);
+  //pDeviceContext_->PSSetShaderResources(0, 1, &Font_);
 
   // Render command lists
   // (Because we merged all buffers into a single one, we maintain our own offset into them)
@@ -848,16 +846,14 @@ void CGUI::Draw()
   for (int i = 0; i < pDrawData->CmdListsCount; ++i)
   {
     const ImDrawList* pCmdList = pDrawData->CmdLists[i];
-    for (int j = 0; j < pCmdList->CmdBuffer.Size; ++j)
+    for (auto& Cmd : pCmdList->CmdBuffer)
     {
-      const ImDrawCmd* pCmd = &pCmdList->CmdBuffer[j];
-
       // Project scissor/clipping rectangles into framebuffer space
       {
-        ClipRect.x = (pCmd->ClipRect.x - ClipOffset.x) * ClipScale.x;
-        ClipRect.y = (pCmd->ClipRect.y - ClipOffset.y) * ClipScale.y;
-        ClipRect.z = (pCmd->ClipRect.z - ClipOffset.x) * ClipScale.x;
-        ClipRect.w = (pCmd->ClipRect.w - ClipOffset.y) * ClipScale.y;
+        ClipRect.x = (Cmd.ClipRect.x - ClipOffset.x) * ClipScale.x;
+        ClipRect.y = (Cmd.ClipRect.y - ClipOffset.y) * ClipScale.y;
+        ClipRect.z = (Cmd.ClipRect.z - ClipOffset.x) * ClipScale.x;
+        ClipRect.w = (Cmd.ClipRect.w - ClipOffset.y) * ClipScale.y;
       }
 
       if (ClipRect.x < FrameBufferSize.x && ClipRect.y < FrameBufferSize.y && ClipRect.z >= 0.0f && ClipRect.w >= 0.0f)
@@ -874,8 +870,10 @@ void CGUI::Draw()
         }
         pDeviceContext_->SetScissor(Scissor_);
 
+        pDeviceContext_->PSSetShaderResources(0, 1, &vdl::ShaderResource(Cmd.Texture));
+
         // Draw
-        pDeviceContext_->DrawIndexed(pCmd->ElemCount, 1, pCmd->IdxOffset + IndexOffset, pCmd->VtxOffset + VertexOffset, 0);
+        pDeviceContext_->DrawIndexed(Cmd.ElemCount, 1, Cmd.IdxOffset + IndexOffset, Cmd.VtxOffset + VertexOffset, 0);
       }
     }
 

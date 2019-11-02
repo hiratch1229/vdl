@@ -453,12 +453,6 @@
     <ClInclude Include="..\..\Src\vdl\GUI\CGUI.hpp">
       <Filter>Src\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imconfig.h">
-      <Filter>Src\ThirdParty\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\ThirdParty\ImGui\imgui.h">
-      <Filter>Src\ThirdParty\ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Src\ThirdParty\ImGui\imgui_internal.h">
       <Filter>Src\ThirdParty\ImGui</Filter>
     </ClInclude>
@@ -853,6 +847,9 @@
     <None Include="..\..\Shader\Mesh\Mesh.hlsli">
       <Filter>Shader\Mesh</Filter>
     </None>
+    <None Include="..\..\Shader\Option\GaussianBlur.hlsli">
+      <Filter>Shader\Option</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
@@ -866,6 +863,9 @@
     </FxCompile>
     <FxCompile Include="..\..\Shader\Mesh\MeshVS.hlsl">
       <Filter>Shader\Mesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\Option\FullScreenTriangleVS.hlsl">
+      <Filter>Shader\Option</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

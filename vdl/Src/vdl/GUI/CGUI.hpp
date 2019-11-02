@@ -49,7 +49,7 @@ private:
   vdl::GraphicsStates GraphicsStates_;
   vdl::RenderTextures RenderTextures_;
   vdl::DepthStencilTexture DepthStencilTexture_;
-  vdl::ShaderResource Font_;
+  //vdl::ShaderResource Font_;
   vdl::Sampler Sampler_;
   std::unique_ptr<vdl::ConstantBuffer<ConstantBufferData>> pConstantBuffer_;
   vdl::Scissor Scissor_;

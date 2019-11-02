@@ -113,8 +113,8 @@ void SceneDeferred::Update()
       }
       ImGui::Checkbox("SphereUpdate", &isUpdate_);
       ImGui::InputFloat("SpecularPower", &RenderingData.SpecularPower);
-      ImGui::ColorEdit3("Ambient", &RenderingData.Ambient.Red);
-      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow.Red);
+      ImGui::ColorEdit3("Ambient", &RenderingData.Ambient);
+      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow);
       ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha);
       if (ImGui::TreeNode("DirectionalLight"))
       {
@@ -124,7 +124,7 @@ void SceneDeferred::Update()
         }
         ImGui::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
         ImGui::InputFloat("Itensity", &LightData.DirectionalLight.Itensity);
-        ImGui::ColorEdit3("Color", &LightData.DirectionalLight.Color.Red);
+        ImGui::ColorEdit3("Color", &LightData.DirectionalLight.Color);
         ImGui::TreePop();
       }
       if (ImGui::TreeNode("PointLight"))
@@ -207,6 +207,14 @@ void SceneDeferred::Update()
 
     Renderer::Draw(3);
   }
+
+  ImGui::Begin("Test");
+  for (vdl::uint i = 0; i < PixelStageShaderResources_.size(); ++i)
+  {
+    ImGui::Image(PixelStageShaderResources_[i], kGBufferDisplaySize);
+  }
+
+  ImGui::End();
 
   //  GBuffer‚Ì•`‰æ
   {

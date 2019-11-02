@@ -135,10 +135,10 @@ void SceneTBDR::Update()
       ImGui::ColorEdit3("Ambient", &RenderingData.AmbientColor.x);
       if (ImGui::TreeNode("DirectionalLight"))
       {
-        ImGui::InputFloat3("Direction", &DirectinalLight.Direction.x);
+        ImGui::InputFloat3("Direction", &DirectinalLight.Direction);
         ImGui::Text(std::string("Direction:" + std::to_string(DirectinalLight.Direction)).c_str());
         ImGui::InputFloat("Itensity", &DirectinalLight.Itensity);
-        ImGui::ColorEdit3("Color", &DirectinalLight.Color.Red);
+        ImGui::ColorEdit3("Color", &DirectinalLight.Color);
         ImGui::TreePop();
       }
       if (ImGui::TreeNode("PointLight"))
