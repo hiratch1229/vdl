@@ -834,13 +834,6 @@ void CDeviceContext::Initialize()
   }
 }
 
-vdl::Matrix CDeviceContext::GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const
-{
-  return vdl::Matrix(DirectX::XMMatrixAffineTransformation2D(DirectX::XMVectorSet(_DestSize.x, _DestSize.y, 0.0f, 0.0f), DirectX::XMVectorZero(),
-    _Angle, DirectX::XMVectorSet(_DestLeftTop.x + _DestSize.x * 0.5f, _DestLeftTop.y + _DestSize.y * 0.5f, 0.0f, 0.0f))
-    * vdl::Matrix::Scale({ 2.0f / _WindowSize.x, -2.0f / _WindowSize.y, 1.0f }) * vdl::Matrix::Translate({ -1.0f, 1.0f, 0.0f }));
-}
-
 #pragma region GraphicsPipeline
 #define SetGraphicsState(GraphicsCommandType, StateName)\
 GraphicsStateChangeFlags_.Set(GraphicsCommandType);\
@@ -887,17 +880,17 @@ void CDeviceContext::SetTopology(vdl::TopologyType _Topology)
   SetGraphicsState(GraphicsCommandType::eSetTopology, Topology)
 }
 
-void CDeviceContext::SetScissor(const vdl::Scissor & _Scissor)
+void CDeviceContext::SetScissor(const vdl::Scissor& _Scissor)
 {
   SetGraphicsState(GraphicsCommandType::eSetScissor, Scissor)
 }
 
-void CDeviceContext::SetViewport(const vdl::Viewport & _Viewport)
+void CDeviceContext::SetViewport(const vdl::Viewport& _Viewport)
 {
   SetGraphicsState(GraphicsCommandType::eSetViewport, Viewport)
 }
 
-void CDeviceContext::SetRenderTextures(const vdl::RenderTextures & _RenderTextures, const vdl::DepthStencilTexture & _DepthStenilTexture)
+void CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)
 {
   vdl::OutputManager OutputManager = { _RenderTextures, _DepthStenilTexture };
 

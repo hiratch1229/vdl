@@ -16,8 +16,6 @@ public:
 
   virtual void Initialize() = 0;
 
-  [[nodiscard]] virtual vdl::Matrix GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const = 0;
-
   virtual void SetVertexBuffer(const VertexBuffer& _VertexBuffer) = 0;
 
   virtual void SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer) = 0;

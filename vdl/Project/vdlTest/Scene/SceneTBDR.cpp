@@ -23,7 +23,7 @@ void SceneTBDR::Initialize()
     UpdateData& UpdateData = UpdateConstantBuffer_.GetData();
     {
       UpdateData.PointLightItensity = 0.5f;
-      UpdateData.PointLightRange = 0.75f;
+      UpdateData.PointLightRange = 1.0f;
     }
     Computer::SetConstantBuffers(0, 1, &UpdateConstantBuffer_);
 
@@ -32,10 +32,58 @@ void SceneTBDR::Initialize()
       for (auto& Data : Datas)
       {
         Data.Color = ColorF(Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f));
-        Data.MinRange = float3(Random::Range(kMinRange.x, kMaxRange.x), Random::Range(kMinRange.y, kMaxRange.y), Random::Range(kMinRange.z, kMaxRange.z));
-        Data.MaxRange = float3(Random::Range(kMinRange.x, kMaxRange.x), Random::Range(kMinRange.y, kMaxRange.y), Random::Range(kMinRange.z, kMaxRange.z));
         Data.Timer = 0.0f;
         Data.Time = Random::Range(kMinUpdateTime, kMaxUpdateTime);
+
+        switch (static_cast<PointLightMoveAxis>(rand() % kPointLightMoveAxisNum))
+        {
+        case PointLightMoveAxis::eMinusX:
+        {
+          Data.MinRange.x = Data.MaxRange.x = kPointLightMinMoveRange.x + Random::Range(0.0f, kPointLightAxisMargin.x);
+          Data.MinRange.y = Random::Range(kPointLightMinMoveRange.y, kPointLightMaxMoveRange.y);
+          Data.MaxRange.y = Random::Range(kPointLightMinMoveRange.y, kPointLightMaxMoveRange.y);
+          Data.MinRange.z = Random::Range(kPointLightMinMoveRange.z, kPointLightMaxMoveRange.z);
+          Data.MaxRange.z = Random::Range(kPointLightMinMoveRange.z, kPointLightMaxMoveRange.z);
+        }
+        break;
+        case PointLightMoveAxis::eX:
+        {
+          Data.MinRange.x = Data.MaxRange.x = kPointLightMaxMoveRange.x - Random::Range(0.0f, kPointLightAxisMargin.x);
+          Data.MinRange.y = Random::Range(kPointLightMinMoveRange.y, kPointLightMaxMoveRange.y);
+          Data.MaxRange.y = Random::Range(kPointLightMinMoveRange.y, kPointLightMaxMoveRange.y);
+          Data.MinRange.z = Random::Range(kPointLightMinMoveRange.z, kPointLightMaxMoveRange.z);
+          Data.MaxRange.z = Random::Range(kPointLightMinMoveRange.z, kPointLightMaxMoveRange.z);
+        }
+        break;
+        case PointLightMoveAxis::eY:
+        {
+          Data.MinRange.x = Random::Range(kPointLightMinMoveRange.x, kPointLightMaxMoveRange.x);
+          Data.MaxRange.x = Random::Range(kPointLightMinMoveRange.x, kPointLightMaxMoveRange.x);
+          Data.MinRange.y = Data.MaxRange.y = kPointLightMinMoveRange.y + Random::Range(0.0f, kPointLightAxisMargin.y);
+          Data.MinRange.z = Random::Range(kPointLightMinMoveRange.z, kPointLightMaxMoveRange.z);
+          Data.MaxRange.z = Random::Range(kPointLightMinMoveRange.z, kPointLightMaxMoveRange.z);
+        }
+        break;
+        case PointLightMoveAxis::eMinusZ:
+        {
+          Data.MinRange.x = Random::Range(kPointLightMinMoveRange.x, kPointLightMaxMoveRange.x);
+          Data.MaxRange.x = Random::Range(kPointLightMinMoveRange.x, kPointLightMaxMoveRange.x);
+          Data.MinRange.y = Random::Range(kPointLightMinMoveRange.y, kPointLightMaxMoveRange.y);
+          Data.MaxRange.y = Random::Range(kPointLightMinMoveRange.y, kPointLightMaxMoveRange.y);
+          Data.MinRange.z = Data.MaxRange.z = kPointLightMinMoveRange.z + Random::Range(0.0f, kPointLightAxisMargin.z);
+        }
+        break;
+        case PointLightMoveAxis::eZ:
+        {
+          Data.MinRange.x = Random::Range(kPointLightMinMoveRange.x, kPointLightMaxMoveRange.x);
+          Data.MaxRange.x = Random::Range(kPointLightMinMoveRange.x, kPointLightMaxMoveRange.x);
+          Data.MinRange.y = Random::Range(kPointLightMinMoveRange.y, kPointLightMaxMoveRange.y);
+          Data.MaxRange.y = Random::Range(kPointLightMinMoveRange.y, kPointLightMaxMoveRange.y);
+          Data.MinRange.z = Data.MaxRange.z = kPointLightMaxMoveRange.z - Random::Range(0.0f, kPointLightAxisMargin.z);
+        }
+        break;
+        default: assert(false);
+        }
       }
     }
 
@@ -178,7 +226,6 @@ void SceneTBDR::Update()
     Renderer::Clear(GBufferDepthTexture_);
     Renderer::Clear(LightUnorderedAccessTexture_);
   }
-  const vdl::uint RenderingNum = RenderingConstantBuffer_.GetData().PointLightNum;
 
   //  GBufferPass
   {

@@ -3,6 +3,16 @@
 
 class SceneTBDR : public IScene
 {
+  enum class PointLightMoveAxis
+  {
+    eMinusX,
+    eX,
+    eY,
+    eMinusZ,
+    eZ,
+
+    eNum
+  };
   struct Data
   {
     vdl::ColorF Color;
@@ -12,10 +22,12 @@ class SceneTBDR : public IScene
     float Time;
   };
 private:
+  static constexpr vdl::uint kPointLightMoveAxisNum = static_cast<vdl::uint>(PointLightMoveAxis::eNum);
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
   static constexpr float kSphereScale = 0.5f;
-  static constexpr vdl::float3 kMinRange = vdl::float3(-12.5f, 0.0f, -7.5f);
-  static constexpr vdl::float3 kMaxRange = vdl::float3(12.5f, 0.0f, 7.5f);
+  static constexpr vdl::float3 kPointLightMinMoveRange = vdl::float3(-11.25f, 0.5f, -4.25f);
+  static constexpr vdl::float3 kPointLightMaxMoveRange = vdl::float3(10.1f, 10.5f, 5.0f);
+  static constexpr vdl::float3 kPointLightAxisMargin = vdl::float3(3.5f, 0.5f, 3.25f);
   static constexpr vdl::uint kMaxDataNum = 4096;
   static constexpr vdl::uint kGBufferNum = 2; /* Diffuse + Normal */
   static constexpr vdl::uint kPointLightUpdateThreadNum = 1024;

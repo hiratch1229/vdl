@@ -9,6 +9,7 @@
 
 #include <vdl/Constants/Constants.hpp>
 
+#include <vdl/Platform.hpp>
 #include <vdl/Topology.hpp>
 #include <vdl/Macro.hpp>
 
@@ -397,7 +398,15 @@ void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftT
 
   Instance2D Instance;
   {
-    Instance.NDCTransform = pDeviceContext_->GetNDCTransform(_DestLeftTop, _DestSize, _Angle, TextureRendererCommandList_.GetCurrentViewport().Size);
+    const vdl::Viewport& CurrentViewport = TextureRendererCommandList_.GetCurrentViewport();
+
+    Instance.NDCTransform = vdl::Matrix(DirectX::XMMatrixAffineTransformation2D(DirectX::XMVectorSet(_DestSize.x, _DestSize.y, 0.0f, 0.0f), DirectX::XMVectorZero(),
+      _Angle, DirectX::XMVectorSet(_DestLeftTop.x + _DestSize.x * 0.5f, _DestLeftTop.y + _DestSize.y * 0.5f, 0.0f, 0.0f))
+      * vdl::Matrix::Scale({ 2.0f / CurrentViewport.Size.x, -2.0f / CurrentViewport.Size.y, 1.0f }) * vdl::Matrix::Translate({ -1.0f, 1.0f, 0.0f }))
+#if !defined VDL_EXECUTE_VULKAN
+      .Transpose()
+#endif
+      ;
 
     const vdl::uint2 TextureSize = _Texture.GetSize();
 

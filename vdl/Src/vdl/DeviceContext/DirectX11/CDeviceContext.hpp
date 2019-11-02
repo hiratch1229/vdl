@@ -44,8 +44,6 @@ public:
 
   void Initialize()override;
 
-  vdl::Matrix GetNDCTransform(const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::Radian& _Angle, const vdl::float2& _WindowSize)const override;
-
   void SetVertexBuffer(const VertexBuffer& _VertexBuffer)override;
 
   void SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer)override;

@@ -636,7 +636,7 @@ void CGUI::Initialize()
       Image.Resize(Size);
       ::memcpy(Image.Buffer(), Buffer, Image.BufferSize());
     }
-   /* Font_ =*/ io.Fonts->Texture = Image;
+   io.Fonts->Texture = Image;
   }
 
   //  ImGui‚Ìƒtƒ‰ƒO‚ÌÝ’è
@@ -836,7 +836,6 @@ void CGUI::Draw()
 
   pDeviceContext_->PSSetShader(PixelShader_);
   pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
-  //pDeviceContext_->PSSetShaderResources(0, 1, &Font_);
 
   // Render command lists
   // (Because we merged all buffers into a single one, we maintain our own offset into them)
