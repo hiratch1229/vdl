@@ -133,10 +133,18 @@ void SceneDeferred::Update()
         ImGui::InputFloat("Range", &PointLightRange_);
         ImGui::TreePop();
       }
+      if (ImGui::TreeNode("GBuffer"))
+      {
+        for (auto& PixelStageShaderResource : PixelStageShaderResources_)
+        {
+          ImGui::Image(PixelStageShaderResource, kGBufferDisplaySize);
+        }
+        ImGui::TreePop();
+      }
     }
     ImGui::End();
 
-    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up()/*, 0.1f, 300.0f*/);
+    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up());
     LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
 
     if (isUpdate_)
@@ -172,7 +180,6 @@ void SceneDeferred::Update()
     Renderer::Clear(ShadowMap_);
   }
 
-  const Matrix RectangleWorld = Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f);
   const Matrix SphereScale = Matrix::Scale(kSphereScale);
   //  GBufferPass
   {
@@ -180,7 +187,7 @@ void SceneDeferred::Update()
     Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
 
     Renderer3D::SetPixelStageShaderResources(2, 1, &RectangleSpecularMap_);
-    Renderer3D::Draw(Rectangle_, RectangleWorld);
+    Renderer3D::Draw(Rectangle_, Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f));
 
     Renderer3D::SetPixelStageShaderResources(2, 1, &SphereSpecularMap_);
     for (auto& Data : Datas_)
@@ -206,24 +213,5 @@ void SceneDeferred::Update()
     Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(PixelStageShaderResources_.size()), PixelStageShaderResources_.data());
 
     Renderer::Draw(3);
-  }
-
-  ImGui::Begin("Test");
-  for (vdl::uint i = 0; i < PixelStageShaderResources_.size(); ++i)
-  {
-    ImGui::Image(PixelStageShaderResources_[i], kGBufferDisplaySize);
-  }
-
-  ImGui::End();
-
-  //  GBuffer‚Ì•`‰æ
-  {
-    decltype(PixelStageShaderResources_) ShaderResources;
-    Renderer2D::SetPixelStageShaderResources(2, static_cast<vdl::uint>(ShaderResources.size()) - 2, ShaderResources.data());
-
-    for (vdl::uint i = 0; i < PixelStageShaderResources_.size(); ++i)
-    {
-      Renderer2D::Draw(PixelStageShaderResources_[i], float2(kGBufferLeftPos, kGBufferDisplaySize.y * i), kGBufferDisplaySize);
-    }
   }
 }

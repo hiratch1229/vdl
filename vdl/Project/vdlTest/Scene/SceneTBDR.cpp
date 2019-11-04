@@ -245,9 +245,6 @@ void SceneTBDR::Update()
 
       Computer::Dispatch(kTileBaseDispatchNum);
 
-      decltype(LightShaderResources_) ShaderResources;
-      Computer::SetShaderResources(0, static_cast<vdl::uint>(ShaderResources.size() - 1), ShaderResources.data());
-
       Renderer2D::Draw(LightUnorderedAccessTexture_);
     }
     else
@@ -255,9 +252,6 @@ void SceneTBDR::Update()
       Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(LightShaderResources_.size()), LightShaderResources_.data());
 
       Renderer::Draw(3);
-
-      decltype(LightShaderResources_) ShaderResources;
-      Renderer2D::SetPixelStageShaderResources(2, static_cast<vdl::uint>(ShaderResources.size()) - 2, ShaderResources.data());
     }
   }
 }

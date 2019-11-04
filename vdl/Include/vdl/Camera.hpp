@@ -25,7 +25,7 @@ namespace vdl
 
     [[nodiscard]] Matrix View()const;
 
-    [[nodiscard]] Matrix Projection(const vdl::float2& _Size)const;
+    [[nodiscard]] Matrix Projection(const float2& _Size)const;
   };
 
   void FreeCamera(Camera* _pCamera);

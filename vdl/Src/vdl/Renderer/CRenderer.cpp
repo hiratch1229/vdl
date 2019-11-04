@@ -507,9 +507,6 @@ void CRenderer::Flush()
       pDeviceContext_->SetVertexBuffer(TextureVertexBuffer_);
       TextureRendererCommandList_.Flush(pDeviceContext_, TextureInstanceBuffer_);
       TextureRendererCommandList_.Reset();
-
-      vdl::ShaderResource EmptyTexture = vdl::Texture();
-      pDeviceContext_->PSSetShaderResources(0, 1, &EmptyTexture);
     }
 
     pDeviceContext_->Flush();

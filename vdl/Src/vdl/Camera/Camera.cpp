@@ -18,7 +18,7 @@ namespace vdl
       { Target.x, Target.y, Target.z, 1.0f }, { Up.x, Up.y, Up.z, 0.0f });
   }
 
-  Matrix Camera::Projection(const vdl::float2& _Size)const
+  Matrix Camera::Projection(const float2& _Size)const
   {
     if (isPerspective)
     {
@@ -36,43 +36,45 @@ namespace vdl
 
     if (pMouse->Press(Input::Mouse::Buttons::eMiddle))
     {
-      const float3 AxisZ = _pCamera->ViewVector().Normalize();
-      const float3 AxisX = _pCamera->Up.Normalize().Cross(AxisZ);
-      const float3 AxisY = AxisZ.Cross(AxisX);
+      if (const int2 MouseDelta = pMouse->GetDelta(); MouseDelta != 0)
+      {
+        constexpr float3 kMultiple = { 0.01f, 0.01f, 0.1f };
 
+        const float3 ViewVector = _pCamera->ViewVector();
 
-      const float3 Move = AxisX * -pMouse->GetDelta().x * 0.01f + AxisY * pMouse->GetDelta().y * 0.01f;
+        const float3 AxisZ = ViewVector.Normalize();
+        const float3 AxisX = _pCamera->Up.Normalize().Cross(AxisZ);
+        const float3 AxisY = AxisZ.Cross(AxisX);
 
-      _pCamera->Position += Move;
-      _pCamera->Target += Move;
+        const float3 Move = (AxisX * -MouseDelta.x * kMultiple.x + AxisY * MouseDelta.y * kMultiple.y) * (ViewVector.Length() * kMultiple.z);
+
+        _pCamera->Position += Move;
+        _pCamera->Target += Move;
+      }
     }
     if (pMouse->Press(Input::Mouse::Buttons::eRight))
     {
-      const float3 AxisZ = _pCamera->ViewVector();
-      const float3 AxisY = _pCamera->Up.Normalize();
-      const float3 AxisX = AxisY.Cross(AxisZ.Normalize());
-
-      if (const int2 MouseDelta = pMouse->GetDelta();
-        MouseDelta != 0)
+      if (const int2 MouseDelta = pMouse->GetDelta(); MouseDelta != 0)
       {
-        const Matrix Rotation = Matrix::Rotate(Quaternion::RotationAxis(AxisX, MouseDelta.y * 0.01f) * Quaternion::RotationAxis(AxisY, -MouseDelta.x * 0.01f));
+        const float3 ViewVector = _pCamera->ViewVector();
 
-        _pCamera->Position = _pCamera->Target - AxisZ * Rotation;
+        const float3 AxisZ = ViewVector.Normalize();
+        const float3 AxisX = _pCamera->Up.Normalize().Cross(AxisZ);
+        const float3 AxisY = AxisZ.Cross(AxisX);
+
+        const Matrix Rotation = Matrix::Rotate(Quaternion::RotationAxis(AxisX, MouseDelta.y * 0.01f) * Quaternion::RotationAxis(AxisY, MouseDelta.x * 0.01f));
+
+        _pCamera->Target = _pCamera->Position + AxisZ * Rotation * ViewVector.Length();
       }
     }
     if (int Wheel = pMouse->GetWheel().y; Wheel != 0)
     {
-      const float3 AxisZ = _pCamera->ViewVector();
-      const float Length = AxisZ.Length();
+      constexpr float kMultiple = 1.5f;
 
-      if (Wheel < 0)
-      {
-        _pCamera->Position -= AxisZ.Normalize() * 5.0f;
-      }
-      else
-      {
-        _pCamera->Position += AxisZ.Normalize() * Length * 0.25f;
-      }
+      const float3 Move = _pCamera->ViewVector().Normalize() * Wheel * kMultiple;
+
+      _pCamera->Position += Move;
+      _pCamera->Target += Move;
     }
   }
 }

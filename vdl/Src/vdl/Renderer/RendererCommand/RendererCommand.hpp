@@ -6,6 +6,7 @@
 #include <vdl/Texture.hpp>
 #include <vdl/Sampler.hpp>
 #include <vdl/ConstantBuffer.hpp>
+#include <vdl/UnorderedAccessBuffer.hpp>
 
 #include <vdl/Model.hpp>
 
@@ -72,10 +73,9 @@ private:
 private:
   using RendererCommandPair = std::pair<RendererCommandType, vdl::uint>;
   using RendererCommands = std::vector<RendererCommandPair>;
-  using Textures = std::vector<vdl::Texture>;
-  using ShaderResources = std::vector<vdl::ShaderResource>;
-  using Samplers = std::vector<vdl::Sampler>;
-  using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
+  using ShaderResources = std::array<vdl::ShaderResource, Constants::kMaxShaderResourceNum>;
+  using Samplers = std::array<vdl::Sampler, Constants::kMaxSamplerNum>;
+  using ConstantBuffers = std::array<vdl::Detail::ConstantBufferData, Constants::kMaxConstantBufferNum>;
 private:
   IDevice* pDevice_;
   IModelManager* pModelManager_;

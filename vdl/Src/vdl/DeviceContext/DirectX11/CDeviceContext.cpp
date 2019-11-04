@@ -905,6 +905,11 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
   pD3D11ImmediateContext_->Dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
 }
 
+void CDeviceContext::Flush()
+{
+  pD3D11ImmediateContext_->ClearState();
+}
+
 //--------------------------------------------------
 
 void CDeviceContext::RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _pCode)

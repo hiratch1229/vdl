@@ -37,8 +37,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(vdl::To
   for (auto& Samplers : Samplers_) { Samplers.resize(1); }
   for (auto& ConstantBuffers : ConstantBuffers_) { ConstantBuffers.resize(1); }
 
-  CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)].resize(1);
-  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0].push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0] = _Sampler);
+  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0][0] = CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0] = _Sampler;
 
   Reset();
 }
@@ -488,17 +487,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
 
       TempConstantBuffers = ConstantBuffers.back();
       {
-        const size_t CurrentConstantBufferNum = CurrentConstantBuffers.size();
-        const size_t LastConstantBufferNum = LastConstantBuffers.size();
-
-        if (TempConstantBuffers.size() < CurrentConstantBufferNum)
-        {
-          TempConstantBuffers.resize(CurrentConstantBufferNum);
-          StateChangeFlags_.Set(_RendererCommandType);
-        }
-
-        size_t ConstantBufferCount = 0;
-        while (ConstantBufferCount < LastConstantBufferNum)
+        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < Constants::kMaxConstantBufferNum; ++ConstantBufferCount)
         {
           const vdl::Detail::ConstantBufferData& CurrentConstantBuffer = CurrentConstantBuffers[ConstantBufferCount];
           const vdl::Detail::ConstantBufferData& LastConstantBuffer = LastConstantBuffers[ConstantBufferCount];
@@ -510,15 +499,6 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
             TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
             StateChangeFlags_.Set(_RendererCommandType);
           }
-
-          ++ConstantBufferCount;
-        }
-        while (ConstantBufferCount < CurrentConstantBufferNum)
-        {
-          TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffers[ConstantBufferCount]);
-          StateChangeFlags_.Set(_RendererCommandType);
-
-          ++ConstantBufferCount;
         }
       }
 
@@ -794,13 +774,6 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushPixelShader(co
 
 #define SetShaderStates(RendererCommandType, ShaderType, ShaderState)\
 ShaderState##s& Current##ShaderState##s = Current##ShaderState##s_[static_cast<vdl::uint>(ShaderType)];\
-\
-if (const vdl::uint RequiredSize = _StartSlot + _##ShaderState##Num;\
-  Current##ShaderState##s.size() < RequiredSize)\
-{\
-  Current##ShaderState##s.resize(RequiredSize);\
-  StateChangeFlags_.Set(RendererCommandType);\
-}\
 \
 if (!StateChangeFlags_.Has(RendererCommandType))\
 {\

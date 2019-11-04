@@ -238,7 +238,6 @@
     <ClCompile Include="..\..\Src\vdl\Device\DeviceFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Engine.cpp" />
     <ClCompile Include="..\..\Src\vdl\GUI\CGUI.cpp" />
-    <ClCompile Include="..\..\Src\vdl\GUI\GUI.cpp" />
     <ClCompile Include="..\..\Src\vdl\GUI\GUIFactory.cpp" />
     <ClCompile Include="..\..\Src\vdl\Image\Image.cpp" />
     <ClCompile Include="..\..\Src\vdl\Input\Button.cpp" />

@@ -880,4 +880,6 @@ void CGUI::Draw()
     VertexOffset += pCmdList->VtxBuffer.Size;
     IndexOffset += pCmdList->IdxBuffer.Size;
   }
+
+  pDeviceContext_->PSSetShaderResources(0, 1, &vdl::ShaderResource());
 }

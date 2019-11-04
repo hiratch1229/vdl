@@ -737,9 +737,6 @@
     <ClCompile Include="..\..\Src\ThirdParty\ImGui\imgui_widgets.cpp">
       <Filter>Src\ThirdParty\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\GUI\GUI.cpp">
-      <Filter>Src\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Src\vdl\TextureManager\TextureLoader\TextureLoader.cpp">
       <Filter>Src\TextureManager\TextureLoader</Filter>
     </ClCompile>
