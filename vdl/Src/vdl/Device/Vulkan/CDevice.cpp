@@ -10,7 +10,6 @@
 
 #include <vdl/Image.hpp>
 #include <vdl/Macro.hpp>
-#include <vdl/DetectMemoryLeak.hpp>
 
 #undef min
 #undef max
@@ -19,6 +18,8 @@
 #include <ThirdParty/glslang/StandAlone/DirStackFileIncluder.h>
 #include <ThirdParty/glslang/StandAlone/ResourceLimits.hpp>
 #pragma warning(default:26495)
+
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <sstream>
 

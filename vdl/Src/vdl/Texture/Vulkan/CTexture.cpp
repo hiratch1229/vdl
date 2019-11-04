@@ -125,7 +125,18 @@ vdl::Texture CDepthStencilTexture::GetDepthTexture()
     pDepthTexture->View = static_cast<CDevice*>(Engine::Get<IDevice>())->GetDevice().createImageViewUnique(ImageViewInfo);
     assert(pDepthTexture->View);
 
-    Engine::Get<ITextureManager>()->SetTexture(DepthTexture.GetID(), pDepthTexture);
+    ITextureManager* pTextureManager = Engine::Get<ITextureManager>();
+    pTextureManager->SetTexture(DepthTexture.GetID(), pDepthTexture);
+
+    //  TODO:親のオブジェクトを渡して参照カウントを増やす
+    for (vdl::uint i = 0;; ++i)
+    {
+      if (pDepthTexture->pParent == pTextureManager->GetTexture(i))
+      {
+        pTextureManager->AddRef(i);
+        break;
+      }
+    }
   }
 
   return DepthTexture;
@@ -155,7 +166,18 @@ vdl::Texture CDepthStencilTexture::GetStencilTexture()
     pStencilTexture->View = static_cast<CDevice*>(Engine::Get<IDevice>())->GetDevice().createImageViewUnique(ImageViewInfo);
     assert(pStencilTexture->View);
 
-    Engine::Get<ITextureManager>()->SetTexture(StencilTexture.GetID(), pStencilTexture);
+    ITextureManager* pTextureManager = Engine::Get<ITextureManager>();
+    pTextureManager->SetTexture(StencilTexture.GetID(), pStencilTexture);
+
+    //  TODO:親のオブジェクトを渡して参照カウントを増やす
+    for (vdl::uint i = 0;; ++i)
+    {
+      if (pStencilTexture->pParent == pTextureManager->GetTexture(i))
+      {
+        pTextureManager->AddRef(i);
+        break;
+      }
+    }
   }
 
   return StencilTexture;
@@ -167,4 +189,38 @@ void CDepthStencilTexture::SetImageLayout(const vk::CommandBuffer & _CommandBuff
 
   CTexture::SetImageLayout(_CommandBuffer, Image.get(), CurrentLayout, _NewImageLayout, _SubresourceRange);
   CurrentLayout = _NewImageLayout;
+}
+
+//--------------------------------------------------
+
+CDepthTexture::~CDepthTexture()
+{
+  assert(pParent);
+
+  ITextureManager* pTextureManager = Engine::Get<ITextureManager>();
+  for (vdl::uint i = 0;; ++i)
+  {
+    if (pParent == pTextureManager->GetTexture(i))
+    {
+      pTextureManager->Release(i);
+      break;
+    }
+  }
+}
+
+//--------------------------------------------------
+
+CStencilTexture::~CStencilTexture()
+{
+  assert(pParent);
+
+  ITextureManager* pTextureManager = Engine::Get<ITextureManager>();
+  for (vdl::uint i = 0;; ++i)
+  {
+    if (pParent == pTextureManager->GetTexture(i))
+    {
+      pTextureManager->Release(i);
+      break;
+    }
+  }
 }

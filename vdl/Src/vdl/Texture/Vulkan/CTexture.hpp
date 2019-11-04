@@ -74,6 +74,8 @@ struct CDepthTexture : public ITexture
 public:
   CDepthTexture() = default;
 
+  ~CDepthTexture();
+
   TextureType GetType()const final { return TextureType::eDepthTexture; }
 
   vdl::uint2 GetSize()const final { return pParent->TextureSize; }
@@ -87,6 +89,8 @@ struct CStencilTexture : public ITexture
   vk::UniqueImageView View;
 public:
   CStencilTexture() = default;
+
+  ~CStencilTexture();
 
   TextureType GetType()const final { return TextureType::eStencilTexture; }
 

@@ -17,10 +17,10 @@
 #include <vdl/Instance/Instance.hpp>
 #include <vdl/Constants/Constants.hpp>
 
+#include <ThirdParty/ImGui/imgui.h>
+
 #include <vdl/Vertex.hpp>
 #include <vdl/DetectMemoryLeak.hpp>
-
-#include <ThirdParty/ImGui/imgui.h>
 
 namespace
 {
@@ -2004,7 +2004,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
               if (pDepthTexture->pParent->CurrentLayout != kImageLayout)
               {
                 BeginGraphicsCommandBuffer();
-                pDepthTexture->pParent->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
+                pDepthTexture->pParent->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pDepthTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
               }
             }
             break;
@@ -2015,7 +2015,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
               if (pStencilTexture->pParent->CurrentLayout != kImageLayout)
               {
                 BeginGraphicsCommandBuffer();
-                pStencilTexture->pParent->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
+                pStencilTexture->pParent->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pStencilTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
               }
             }
             break;
