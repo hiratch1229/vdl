@@ -14,9 +14,9 @@
 #include <vdl/Constants/Constants.hpp>
 
 #include <vdl/System.hpp>
-
 #include <vdl/Viewport.hpp>
 #include <vdl/Scissor.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <thread>
 #include <Windows.h>

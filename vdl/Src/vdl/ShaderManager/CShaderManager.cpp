@@ -4,6 +4,8 @@
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 #include <string>
 #include <fstream>
 

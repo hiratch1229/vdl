@@ -2,6 +2,8 @@
 
 #include <vdl/Misc/Windows/Misc.hpp>
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 void CWindow::Initialize()
 {
   HRESULT hr = S_OK;

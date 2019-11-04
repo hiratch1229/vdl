@@ -1,6 +1,7 @@
 #include "CCPUProfiler.hpp"
 
 #include <vdl/Macro.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <PdhMsg.h>
 #include <string>

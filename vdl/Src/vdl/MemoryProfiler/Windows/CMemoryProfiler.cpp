@@ -1,5 +1,7 @@
 #include "CMemoryProfiler.hpp"
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 #include <sysinfoapi.h>
 #include <psapi.h>
 

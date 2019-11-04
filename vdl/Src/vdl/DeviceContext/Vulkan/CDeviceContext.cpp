@@ -18,6 +18,7 @@
 #include <vdl/Constants/Constants.hpp>
 
 #include <vdl/Vertex.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <ThirdParty/ImGui/imgui.h>
 
@@ -88,7 +89,7 @@ namespace
     return 0;
   }
 
-  inline vk::ClearColorValue Cast(const vdl::ColorF & _Color)
+  inline vk::ClearColorValue Cast(const vdl::ColorF& _Color)
   {
     return std::array<float, 4>({ _Color.Red, _Color.Blue, _Color.Green, _Color.Alpha });
   }
@@ -175,7 +176,7 @@ namespace
     return vk::StencilOp::eKeep;
   }
 
-  inline vk::StencilOpState Cast(const vdl::DepthStencilOpState & _StencilOpState)
+  inline vk::StencilOpState Cast(const vdl::DepthStencilOpState& _StencilOpState)
   {
     return { Cast(_StencilOpState.StencilFailOp), Cast(_StencilOpState.StencilPassOp),
       Cast(_StencilOpState.StencilDepthFailOp), Cast(_StencilOpState.StencilFunc), 0, 0, 1 };
@@ -903,22 +904,22 @@ void CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTexture
   }
 }
 
-void CDeviceContext::SetBlendState(const vdl::BlendState & _BlendState)
+void CDeviceContext::SetBlendState(const vdl::BlendState& _BlendState)
 {
   SetGraphicsState(GraphicsCommandType::eSetBlendState, BlendState)
 }
 
-void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState & _DepthStencilState)
+void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState)
 {
   SetGraphicsState(GraphicsCommandType::eSetDepthStencilState, DepthStencilState)
 }
 
-void CDeviceContext::SetRasterizerState(const vdl::RasterizerState & _RasterizerState)
+void CDeviceContext::SetRasterizerState(const vdl::RasterizerState& _RasterizerState)
 {
   SetGraphicsState(GraphicsCommandType::eSetRasterizerState, RasterizerState)
 }
 
-void CDeviceContext::VSSetShader(const vdl::VertexShader & _VertexShader)
+void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetVertexShader, VertexShader)
 }
@@ -938,7 +939,7 @@ void CDeviceContext::VSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   SetGraphicsShaderStates(GraphicsCommandType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader, ConstantBuffer)
 }
 
-void CDeviceContext::HSSetShader(const vdl::HullShader & _HullShader)
+void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetHullShader, HullShader)
 }
@@ -958,7 +959,7 @@ void CDeviceContext::HSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   SetGraphicsShaderStates(GraphicsCommandType::eSetHullStageConstantBuffer, ShaderType::eHullShader, ConstantBuffer)
 }
 
-void CDeviceContext::DSSetShader(const vdl::DomainShader & _DomainShader)
+void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetDomainShader, DomainShader)
 }
@@ -978,7 +979,7 @@ void CDeviceContext::DSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   SetGraphicsShaderStates(GraphicsCommandType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader, ConstantBuffer)
 }
 
-void CDeviceContext::GSSetShader(const vdl::GeometryShader & _GeometryShader)
+void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetGeometryShader, GeometryShader)
 }
@@ -998,7 +999,7 @@ void CDeviceContext::GSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
   SetGraphicsShaderStates(GraphicsCommandType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader, ConstantBuffer)
 }
 
-void CDeviceContext::PSSetShader(const vdl::PixelShader & _PixelShader)
+void CDeviceContext::PSSetShader(const vdl::PixelShader& _PixelShader)
 {
   SetGraphicsState(GraphicsCommandType::eSetPixelShader, PixelShader)
 }
@@ -1081,7 +1082,7 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
   const vdl::ID TextureID = _RenderTexture.GetID();
   CRenderTexture* pRenderTexture = (TextureID ? static_cast<CRenderTexture*>(pTextureManager_->GetTexture(TextureID)) : pSwapChain_->GetRenderTexture());
   {
-    std::unordered_map<vdl::ID, vdl::Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
+    std::unordered_map<vdl::ID, Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
 
     if (ClearTextures.find(TextureID) == ClearTextures.end())
     {
@@ -1103,7 +1104,7 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   const vdl::ID TextureID = _DepthStencilTexture.GetID();
   CDepthStencilTexture* pDepthStencilTexture = (TextureID ? static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(TextureID)) : pSwapChain_->GetDepthStencilTexture());
   {
-    std::unordered_map<vdl::ID, vdl::Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
+    std::unordered_map<vdl::ID, Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
 
     if (ClearTextures.find(TextureID) == ClearTextures.end())
     {
@@ -1130,7 +1131,7 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
   const vdl::ID TextureID = _UnorderedAccessTexture.GetID();
   CUnorderedAccessTexture* pUnorderedAccessTexture = static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(TextureID));
   {
-    std::unordered_map<vdl::ID, vdl::Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
+    std::unordered_map<vdl::ID, Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
 
     if (ClearTextures.find(TextureID) == ClearTextures.end())
     {
@@ -1186,24 +1187,51 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
           {
             constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
-            CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(Texture.GetID()));
-            if (pTexture->CurrentLayout != kImageLayout)
-            {
-              if (pTexture->GetType() == TextureType::eDepthStencilTexture)
-              {
-                pTexture->SetImageLayout(CurrentCommandBuffer, kImageLayout, { static_cast<CDepthStencilTexture*>(pTexture)->ImageAspectFlag, 0, 1, 0, 1 });
-              }
-              else
-              {
-                pTexture->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-              }
-            }
-
             DescriptorImageData& ImageData = TextureDatas.emplace_back();
             {
-              ImageData.Info.imageView = pTexture->View.get();
               ImageData.Info.imageLayout = kImageLayout;
               ImageData.Bind = ShaderResourceCount;
+            }
+
+            ITexture* pTexture = pTextureManager_->GetTexture(Texture.GetID());
+
+            switch (pTexture->GetType())
+            {
+            case TextureType::eDepthStencilTexture:
+              assert(false);
+            case TextureType::eDepthTexture:
+            {
+              CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+              ImageData.Info.imageView = pDepthTexture->View.get();
+
+              if (pDepthTexture->pParent->CurrentLayout != kImageLayout)
+              {
+                pDepthTexture->pParent->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
+              }
+            }
+            break;
+            case TextureType::eStencilTexture:
+            {
+              CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+              ImageData.Info.imageView = pStencilTexture->View.get();
+
+              if (pStencilTexture->pParent->CurrentLayout != kImageLayout)
+              {
+                pStencilTexture->pParent->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
+              }
+            }
+            break;
+            default:
+            {
+              CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+              ImageData.Info.imageView = pColorTexture->View.get();
+
+              if (pColorTexture->CurrentLayout != kImageLayout)
+              {
+                pColorTexture->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+              }
+            }
+            break;
             }
           }
         }
@@ -1825,7 +1853,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
 
             vk::AttachmentDescription& AttachmentDescription = AttachmentDescriptions[AttachmentCount];
             {
-              AttachmentDescription.format = _pRenderTexture->Format;
+              AttachmentDescription.format = _pRenderTexture->VkFormat;
               AttachmentDescription.samples = vk::SampleCountFlagBits::e1;
               AttachmentDescription.loadOp = vk::AttachmentLoadOp::eLoad;
               AttachmentDescription.storeOp = vk::AttachmentStoreOp::eStore;
@@ -1876,7 +1904,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
 
           vk::AttachmentDescription& AttachmentDescription = AttachmentDescriptions[AttachmentCount];
           {
-            AttachmentDescription.format = pDepthStencilTexture->Format;
+            AttachmentDescription.format = pDepthStencilTexture->VkFormat;
             AttachmentDescription.samples = vk::SampleCountFlagBits::e1;
             AttachmentDescription.stencilLoadOp = vk::AttachmentLoadOp::eLoad;
             AttachmentDescription.stencilStoreOp = vk::AttachmentStoreOp::eStore;
@@ -1958,22 +1986,50 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
         if (std::get_if<vdl::Texture>(&ShaderResource))
         {
           const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
+
           if (!Texture.isEmpty())
           {
             constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
-            CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(Texture.GetID()));
-            if (pTexture->CurrentLayout != kImageLayout)
+            ITexture* pTexture = pTextureManager_->GetTexture(Texture.GetID());
+
+            switch (pTexture->GetType())
             {
-              BeginGraphicsCommandBuffer();
-              if (pTexture->GetType() == TextureType::eDepthStencilTexture)
+            case TextureType::eDepthStencilTexture:
+              assert(false);
+            case TextureType::eDepthTexture:
+            {
+              CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+
+              if (pDepthTexture->pParent->CurrentLayout != kImageLayout)
               {
-                pTexture->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { static_cast<CDepthStencilTexture*>(pTexture)->ImageAspectFlag, 0, 1, 0, 1 });
+                BeginGraphicsCommandBuffer();
+                pDepthTexture->pParent->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
               }
-              else
+            }
+            break;
+            case TextureType::eStencilTexture:
+            {
+              CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+
+              if (pStencilTexture->pParent->CurrentLayout != kImageLayout)
               {
-                pTexture->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+                BeginGraphicsCommandBuffer();
+                pStencilTexture->pParent->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
               }
+            }
+            break;
+            default:
+            {
+              CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+
+              if (pColorTexture->CurrentLayout != kImageLayout)
+              {
+                BeginGraphicsCommandBuffer();
+                pColorTexture->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+              }
+            }
+            break;
             }
           }
         }
@@ -2246,13 +2302,36 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
               {
                 constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
-                CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(Texture.GetID()));
+                ITexture* pTexture = pTextureManager_->GetTexture(Texture.GetID());
 
                 DescriptorImageData& ImageData = TextureDatas.emplace_back();
                 {
-                  ImageData.Info.imageView = pTexture->View.get();
                   ImageData.Info.imageLayout = kImageLayout;
                   ImageData.Bind = ShaderResourceCount;
+                }
+
+                switch (pTexture->GetType())
+                {
+                case TextureType::eDepthStencilTexture:
+                  assert(false);
+                case TextureType::eDepthTexture:
+                {
+                  CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+                  ImageData.Info.imageView = pDepthTexture->View.get();
+                }
+                break;
+                case TextureType::eStencilTexture:
+                {
+                  CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+                  ImageData.Info.imageView = pStencilTexture->View.get();
+                }
+                break;
+                default:
+                {
+                  CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+                  ImageData.Info.imageView = pColorTexture->View.get();
+                }
+                break;
                 }
               }
             }
@@ -2644,7 +2723,7 @@ void CDeviceContext::WaitFence(const vk::Fence& _Fence)
 
 //--------------------------------------------------
 
-const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState & _RasterizerState)
+const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState& _RasterizerState)
 {
   if (RasterizerStates_.find(_RasterizerState) == RasterizerStates_.end())
   {
@@ -2668,7 +2747,7 @@ const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRaste
   return RasterizerStates_.at(_RasterizerState);
 }
 
-const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState & _DepthStencilState)
+const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState& _DepthStencilState)
 {
   if (DepthStencilStates_.find(_DepthStencilState) == DepthStencilStates_.end())
   {
@@ -2681,7 +2760,7 @@ const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthS
       PipelineDepthStencilStateInfo.stencilTestEnable = _DepthStencilState.StencilEnable;
       PipelineDepthStencilStateInfo.front = Cast(_DepthStencilState.FrontFace);
       PipelineDepthStencilStateInfo.back = Cast(_DepthStencilState.BackFace);
-      PipelineDepthStencilStateInfo.front.reference = PipelineDepthStencilStateInfo.back.reference = _DepthStencilState.StencilReadMask;
+      PipelineDepthStencilStateInfo.front.reference = PipelineDepthStencilStateInfo.back.reference = _DepthStencilState.StencilReference;
       PipelineDepthStencilStateInfo.front.writeMask = PipelineDepthStencilStateInfo.back.writeMask = _DepthStencilState.StencilWriteMask;
       PipelineDepthStencilStateInfo.minDepthBounds = 0.0f;
       PipelineDepthStencilStateInfo.maxDepthBounds = 1.0f;
@@ -2693,7 +2772,7 @@ const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthS
   return DepthStencilStates_.at(_DepthStencilState);
 }
 
-const vk::PipelineColorBlendAttachmentState& CDeviceContext::GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState & _RenderTextureBlendState)
+const vk::PipelineColorBlendAttachmentState& CDeviceContext::GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState& _RenderTextureBlendState)
 {
   if (RenderTextureBlendStates_.find(_RenderTextureBlendState) == RenderTextureBlendStates_.end())
   {

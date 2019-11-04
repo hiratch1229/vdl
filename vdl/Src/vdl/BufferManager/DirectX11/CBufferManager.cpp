@@ -6,6 +6,8 @@
 
 #include <vdl/Misc/Windows/Misc.hpp>
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 #include <assert.h>
 
 void CBufferManager::Initialize()

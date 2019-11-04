@@ -95,12 +95,4 @@
 #include <vdl/Hash.hpp>
 #include <vdl/Serialize.hpp>
 #include <vdl/Random.hpp>
-
-
-//--------------------------------------------------
-//--------------------------------------------------
-
-//  ƒƒ‚ƒŠƒŠ[ƒNÚ×•\¦
-#if defined(DEBUG) | defined(_DEBUG)
-#define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
+#include <vdl/DetectMemoryLeak.hpp>

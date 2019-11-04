@@ -66,8 +66,8 @@ void SceneDeferred::Initialize()
     {
       PixelStageShaderResources_[i] = GBufferRenderTextures_[i];
     }
-    PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_;
-    PixelStageShaderResources_[kUseRenderTextureNum + 1] = ShadowMap_;
+    PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_.GetDepthTexture();
+    PixelStageShaderResources_[kUseRenderTextureNum + 1] = ShadowMap_.GetDepthTexture();
 
     Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
     LightData& LightData = LightConstantBuffer_.GetData();

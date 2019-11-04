@@ -29,4 +29,6 @@ public:
   void Release(const vdl::ID& _ID)override { Textures_.Get(_ID).Release(); }
 
   ITexture* GetTexture(const vdl::ID& _ID) { return Textures_.Get(_ID).Get(); }
+
+  void SetTexture(const vdl::ID& _ID, ITexture* _pTexture)override { Textures_.Get(_ID) = _pTexture; }
 };

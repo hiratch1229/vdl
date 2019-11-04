@@ -110,7 +110,7 @@ namespace vdl
         DepthWriteMaskType DepthWriteMask : 1;
         ComparisonFuncType DepthFunc : 3;
         bool StencilEnable : 1;
-        uint8_t StencilReadMask;
+        uint8_t StencilReference;
         uint8_t StencilWriteMask;
         DepthStencilOpState FrontFace;
         DepthStencilOpState BackFace;
@@ -120,10 +120,10 @@ namespace vdl
 #pragma warning(default:4201)
   public:
     constexpr DepthStencilState(bool _DepthEnable = true, DepthWriteMaskType _DepthWriteMask = DepthWriteMaskType::eAll, ComparisonFuncType _DepthFunc = ComparisonFuncType::eLess,
-      bool _StencilEnable = false, uint8_t _StencilReadMask = 0xFF, uint8_t _StencilWriteMask = 0xFF,
-      const DepthStencilOpState & _FrontFace = DepthStencilOpState::kDefaultFront, const DepthStencilOpState & _BackFace = DepthStencilOpState::kDefaultBack)noexcept
+      bool _StencilEnable = false, uint8_t _StencilReference = 0, uint8_t _StencilWriteMask = 0xFF,
+      const DepthStencilOpState& _FrontFace = DepthStencilOpState::kDefaultFront, const DepthStencilOpState& _BackFace = DepthStencilOpState::kDefaultBack)noexcept
       : DepthEnable(_DepthEnable), DepthWriteMask(_DepthWriteMask), DepthFunc(_DepthFunc),
-      StencilEnable(_StencilEnable), StencilReadMask(_StencilReadMask), StencilWriteMask(_StencilWriteMask),
+      StencilEnable(_StencilEnable), StencilReference(_StencilReference), StencilWriteMask(_StencilWriteMask),
       FrontFace(_FrontFace), BackFace(_BackFace) {}
 
     DepthStencilState(PreDefined _PreDefined)noexcept

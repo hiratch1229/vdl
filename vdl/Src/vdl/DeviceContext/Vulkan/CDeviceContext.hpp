@@ -34,6 +34,7 @@ class CDeviceContext : public IDeviceContext
   static constexpr vdl::uint kComputeCommandBufferNum = 3;
   static constexpr vdl::uint kComputeDescriptorPoolMaxSet = kComputeDescriptorTypeNum * kComputeCommandBufferNum;
 private:
+  using Texture = std::variant<vdl::Texture, vdl::DepthStencilTexture>;
   using ShaderResources = std::vector<vdl::ShaderResource>;
   using Samplers = std::vector<vdl::Sampler>;
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
@@ -136,7 +137,7 @@ private:
     std::vector<ShaderResources> ShaderResources;
     std::vector<ConstantBuffers> ConstantBuffers;
 
-    std::unordered_map<vdl::ID, vdl::Texture> ClearTextures;
+    std::unordered_map<vdl::ID, Texture> ClearTextures;
 
     std::vector<RenderPassData> RenderPassDatas;
     std::vector<vk::UniquePipeline> Pipelines;

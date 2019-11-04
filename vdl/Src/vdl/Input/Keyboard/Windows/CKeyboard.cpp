@@ -3,6 +3,8 @@
 #include <vdl/Engine.hpp>
 #include <vdl/Window/IWindow.hpp>
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 #include <Windows.h>
 
 void CKeyboard::Update()

@@ -2,6 +2,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/DeviceContext/DirectX11/CDeviceContext.hpp>
+#include <vdl/TextureManager/ITextureManager.hpp>
 
 #include <vdl/Format/DirectX/Format.hpp>
 #include <vdl/Buffer/DirectX11/CBuffer.hpp>
@@ -9,10 +10,12 @@
 #include <vdl/Shader/DirectX11/CShader.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
+#include <vdl/Format/Format.hpp>
 #include <vdl/Constants/Constants.hpp>
 
 #include <vdl/Image.hpp>
 #include <vdl/Macro.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <dxgi1_6.h>
 #include <d3dcompiler.h>
@@ -73,6 +76,7 @@ namespace
 void CDevice::Initialize()
 {
   pDeviceContext_ = static_cast<CDeviceContext*>(Engine::Get<IDeviceContext>());
+  pTextureManager_ = Engine::Get<ITextureManager>();
 
   //  エラーチェック用
   HRESULT hr = S_OK;
@@ -410,6 +414,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
 
   CRenderTexture* pRenderTexture = new CRenderTexture;
   pRenderTexture->TextureSize = _TextureSize;
+  pRenderTexture->Format = _Format;
 
   HRESULT hr = S_OK;
 
@@ -448,14 +453,14 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
   assert(_ppDepthStecilTexture);
 
   CDepthStencilTexture* pDepthStencilTexture = new CDepthStencilTexture;
-  pDepthStencilTexture->TextureSize = _TextureSize;
+  pDepthStencilTexture->Format = _Format;
 
   HRESULT hr = S_OK;
 
   D3D11_TEXTURE2D_DESC DepthStencilBufferDesc;
   {
-    DepthStencilBufferDesc.Width = pDepthStencilTexture->TextureSize.x;
-    DepthStencilBufferDesc.Height = pDepthStencilTexture->TextureSize.y;
+    DepthStencilBufferDesc.Width = _TextureSize.x;
+    DepthStencilBufferDesc.Height = _TextureSize.y;
     DepthStencilBufferDesc.MipLevels = 1;
     DepthStencilBufferDesc.ArraySize = 1;
     DepthStencilBufferDesc.Format = TextureFormatFromDepthStencilFormat(_Format);
@@ -473,17 +478,6 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-  D3D11_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
-  {
-    ShaderResourceViewDesc.Format = ShaderResourceFormatFromDepthStencilFormat(_Format);
-    ShaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-    ShaderResourceViewDesc.Texture2D.MipLevels = 1;
-  }
-
-  hr = pD3D11Device_->CreateShaderResourceView(pDepthStencilBuffer.Get(), &ShaderResourceViewDesc, pDepthStencilTexture->pShaderResourceView.GetAddressOf());
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-
   D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
   {
     DepthStencilViewDesc.Format = Cast(_Format);
@@ -494,6 +488,44 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
 
   hr = pD3D11Device_->CreateDepthStencilView(pDepthStencilBuffer.Get(), &DepthStencilViewDesc, pDepthStencilTexture->pDepthStencilView.GetAddressOf());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+  D3D11_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+  {
+    ShaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+    ShaderResourceViewDesc.Texture2D.MipLevels = 1;
+  }
+
+  //  Depthのシェーダーリソースの作成
+  {
+    pDepthStencilTexture->DepthTexture = vdl::Palette::White;
+
+    CDepthTexture* pDepthTexture = new CDepthTexture;
+    pDepthTexture->TextureSize = _TextureSize;
+
+    ShaderResourceViewDesc.Format = DepthFormatFromDepthStencilFormat(_Format);
+
+    hr = pD3D11Device_->CreateShaderResourceView(pDepthStencilBuffer.Get(), &ShaderResourceViewDesc, pDepthTexture->pShaderResourceView.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+    pTextureManager_->SetTexture(pDepthStencilTexture->DepthTexture.GetID(), pDepthTexture);
+  }
+
+  //  Stencilのシェーダーリソースの作成
+  if (hasStencil(_Format))
+  {
+    pDepthStencilTexture->StencilTexture = vdl::Palette::White;
+
+    CStencilTexture* pStencilTexture = new CStencilTexture;
+    pStencilTexture->TextureSize = _TextureSize;
+
+    ShaderResourceViewDesc.Format = StencilFormatFromDepthStencilFormat(_Format);
+
+    hr = pD3D11Device_->CreateShaderResourceView(pDepthStencilBuffer.Get(), &ShaderResourceViewDesc, pStencilTexture->pShaderResourceView.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+    pTextureManager_->SetTexture(pDepthStencilTexture->StencilTexture.GetID(), pStencilTexture);
+  }
 
   (*_ppDepthStecilTexture) = std::move(pDepthStencilTexture);
 }

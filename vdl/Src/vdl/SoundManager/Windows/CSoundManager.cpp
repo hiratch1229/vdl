@@ -6,6 +6,8 @@
 #include <vdl/Constants/Constants.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 void CSoundManager::Initialize()
 {
   hWnd_ = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());

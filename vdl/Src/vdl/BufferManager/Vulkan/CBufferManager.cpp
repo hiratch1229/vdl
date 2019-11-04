@@ -3,6 +3,8 @@
 #include <vdl/Engine.hpp>
 #include <vdl/Device/Vulkan/CDevice.hpp>
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 void CBufferManager::Initialize()
 {
   CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());

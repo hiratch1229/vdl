@@ -4,6 +4,8 @@
 #include <vdl/Window/IWindow.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 void CMouse::Initialize()
 {
   pKeyboard_ = Engine::Get<IKeyboard>();

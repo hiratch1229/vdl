@@ -167,7 +167,7 @@ inline constexpr DXGI_FORMAT TextureFormatFromDepthStencilFormat(vdl::FormatType
   case vdl::FormatType::eD32_Float:
     return DXGI_FORMAT_R32_TYPELESS;
   case vdl::FormatType::eD24_Unorm_S8_Uint:
-  return DXGI_FORMAT_R24G8_TYPELESS;
+    return DXGI_FORMAT_R24G8_TYPELESS;
   case vdl::FormatType::eD16_Unorm:
     return DXGI_FORMAT_R16_TYPELESS;
   default: assert(false);
@@ -176,7 +176,7 @@ inline constexpr DXGI_FORMAT TextureFormatFromDepthStencilFormat(vdl::FormatType
   return DXGI_FORMAT_UNKNOWN;
 }
 
-inline constexpr DXGI_FORMAT ShaderResourceFormatFromDepthStencilFormat(vdl::FormatType _Format)
+inline constexpr DXGI_FORMAT DepthFormatFromDepthStencilFormat(vdl::FormatType _Format)
 {
   switch (_Format)
   {
@@ -188,6 +188,20 @@ inline constexpr DXGI_FORMAT ShaderResourceFormatFromDepthStencilFormat(vdl::For
     return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
   case vdl::FormatType::eD16_Unorm:
     return DXGI_FORMAT_R16_UNORM;
+  default: assert(false);
+  }
+
+  return DXGI_FORMAT_UNKNOWN;
+}
+
+inline constexpr DXGI_FORMAT StencilFormatFromDepthStencilFormat(vdl::FormatType _Format)
+{
+  switch (_Format)
+  {
+  case vdl::FormatType::eD32_Float_S8X24_Uint:
+    return DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
+  case vdl::FormatType::eD24_Unorm_S8_Uint:
+    return DXGI_FORMAT_X24_TYPELESS_G8_UINT;
   default: assert(false);
   }
 

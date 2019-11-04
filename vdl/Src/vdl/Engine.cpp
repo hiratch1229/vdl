@@ -20,6 +20,8 @@
 #include "Computer/IComputer.hpp"
 #include "GUI/IGUI.hpp"
 
+#include <vdl/DetectMemoryLeak.hpp>
+
 #include <assert.h>
 
 Engine::Engine()

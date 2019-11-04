@@ -12,6 +12,7 @@
 
 #include <vdl/Window.hpp>
 #include <vdl/Image.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 void CSwapChain::Initialize()
 {

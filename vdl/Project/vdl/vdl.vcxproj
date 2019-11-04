@@ -66,6 +66,7 @@
     <ClInclude Include="..\..\Include\vdl\ConstantBuffer.hpp" />
     <ClInclude Include="..\..\Include\vdl\Constants.hpp" />
     <ClInclude Include="..\..\Include\vdl\DepthStencilState.hpp" />
+    <ClInclude Include="..\..\Include\vdl\DetectMemoryLeak.hpp" />
     <ClInclude Include="..\..\Include\vdl\Format.hpp" />
     <ClInclude Include="..\..\Include\vdl\Fwd.hpp" />
     <ClInclude Include="..\..\Include\vdl\Gamepad.hpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="..\..\Src\vdl\DeviceContext\IDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\IDevice.hpp" />
     <ClInclude Include="..\..\Src\vdl\Engine.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Format\Format.hpp" />
     <ClInclude Include="..\..\Src\vdl\GUI\CGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\GUI\IGUI.hpp" />
     <ClInclude Include="..\..\Src\vdl\Input\Gamepad\IGamepad.hpp" />

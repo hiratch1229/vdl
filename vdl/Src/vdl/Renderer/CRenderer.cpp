@@ -12,6 +12,7 @@
 #include <vdl/Platform.hpp>
 #include <vdl/Topology.hpp>
 #include <vdl/Macro.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <assert.h>
 

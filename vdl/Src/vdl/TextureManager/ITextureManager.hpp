@@ -29,4 +29,6 @@ public:
   virtual void Release(const vdl::ID& _ID) = 0;
 
   [[nodiscard]] virtual ITexture* GetTexture(const vdl::ID& _ID) = 0;
+
+  virtual void SetTexture(const vdl::ID& _ID, ITexture* _pTexture) = 0;
 };

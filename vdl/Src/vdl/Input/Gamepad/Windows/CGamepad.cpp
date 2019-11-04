@@ -1,12 +1,13 @@
 #include "CGamepad.hpp"
 
-#include "vdl/Type2.hpp"
-#include "vdl/Math.hpp"
-
 #include <vdl/Engine.hpp>
 #include <vdl/Window/IWindow.hpp>
 #include <vdl/Input/XInput/IXInput.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
+
+#include <vdl/Type2.hpp>
+#include <vdl/Math.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 namespace
 {

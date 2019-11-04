@@ -157,21 +157,34 @@ inline constexpr vk::Format Cast(vdl::FormatType _Format)
   return vk::Format::eUndefined;
 }
 
-inline bool ContainsStencil(vk::Format _Format)
-{
-  constexpr vk::Format kStencilFormats[] = {
-    vk::Format::eD16UnormS8Uint,
-    vk::Format::eD24UnormS8Uint,
-    vk::Format::eD32SfloatS8Uint
-  };
-
-  for (auto& StencilFormat : kStencilFormats)
-  {
-    if (_Format == StencilFormat)
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
+//inline constexpr vk::Format DepthFormatFromDepthStencilFormat(vdl::FormatType _Format)
+//{
+//  switch (_Format)
+//  {
+//  case vdl::FormatType::eD32_Float_S8X24_Uint:
+//    return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+//  case vdl::FormatType::eD32_Float:
+//    return DXGI_FORMAT_R32_FLOAT;
+//  case vdl::FormatType::eD24_Unorm_S8_Uint:
+//    return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+//  case vdl::FormatType::eD16_Unorm:
+//    return DXGI_FORMAT_R16_UNORM;
+//    return vk::Format::eD16Unorm;
+//  default: assert(false);
+//  }
+//
+//  return vk::Format::eUndefined;
+//}
+//
+//inline constexpr vk::Format StencilFormatFromDepthStencilFormat(vdl::FormatType _Format)
+//{
+//  switch (_Format)
+//  {
+//  case vdl::FormatType::eD32_Float_S8X24_Uint:
+//  case vdl::FormatType::eD24_Unorm_S8_Uint:
+//    return vk::Format::eS8Uint;
+//  default: assert(false);
+//  }
+//
+//  return vk::Format::eUndefined;
+//}

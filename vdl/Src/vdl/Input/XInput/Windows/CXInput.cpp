@@ -1,6 +1,7 @@
 #include "CXInput.hpp"
 
-#include "vdl/Math.hpp"
+#include <vdl/Math.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <Windows.h>
 #include <Xinput.h>

@@ -20,6 +20,7 @@
 
 #include <vdl/Texture.hpp>
 #include <vdl/Shader.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <assert.h>
 
@@ -448,7 +449,7 @@ void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState& _DepthSt
         DepthStencilDesc.DepthWriteMask = Cast(_DepthStencilState.DepthWriteMask);
         DepthStencilDesc.DepthFunc = Cast(_DepthStencilState.DepthFunc);
         DepthStencilDesc.StencilEnable = _DepthStencilState.StencilEnable;
-        DepthStencilDesc.StencilReadMask = _DepthStencilState.StencilReadMask;
+        DepthStencilDesc.StencilReadMask = 0xFF;
         DepthStencilDesc.StencilWriteMask = _DepthStencilState.StencilWriteMask;
         DepthStencilDesc.FrontFace.StencilFailOp = Cast(_DepthStencilState.FrontFace.StencilFailOp);
         DepthStencilDesc.FrontFace.StencilDepthFailOp = Cast(_DepthStencilState.FrontFace.StencilDepthFailOp);
@@ -467,7 +468,7 @@ void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState& _DepthSt
     DepthStencilStates_.insert(std::make_pair(_DepthStencilState, pDepthStencilState));
   }
 
-  pD3D11ImmediateContext_->OMSetDepthStencilState(DepthStencilStates_.at(_DepthStencilState).Get(), 1);
+  pD3D11ImmediateContext_->OMSetDepthStencilState(DepthStencilStates_.at(_DepthStencilState).Get(), _DepthStencilState.StencilReference);
 }
 
 void CDeviceContext::SetRasterizerState(const vdl::RasterizerState& _RasterizerState)

@@ -55,8 +55,8 @@ void ScenePostEffect::Initialize()
     {
       PixelStageShaderResources_[i] = GBufferRenderTextures_[i];
     }
-    PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_;
-    PixelStageShaderResources_[kUseRenderTextureNum + 1] = ShadowMap_;
+    PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_.GetDepthTexture();
+    PixelStageShaderResources_[kUseRenderTextureNum + 1] = ShadowMap_.GetDepthTexture();
 
     DirectionalLightConstantBuffer_.GetData() = { float3(float3(0.0f) - DirectionLightPosition_).Normalize(), 1.5f, Palette::White };
     Renderer::SetPixelStageConstantBuffers(0, 1, &DirectionalLightConstantBuffer_);

@@ -79,6 +79,6 @@ namespace vdl
     eB4G4R4A4_Unorm,
 
     eSwapChain = eR8G8B8A8_Unorm,
-    eDepthStencil = eD24_Unorm_S8_Uint,
+    eDepthStencil = eD16_Unorm,
   };
 }

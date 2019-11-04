@@ -48,14 +48,8 @@ namespace vdl
     RenderTexture() = default;
 
     RenderTexture(const uint2& _TextureSize, FormatType _Format);
-  };
-
-  class DepthStencilTexture : public Texture
-  {
   public:
-    DepthStencilTexture() = default;
-
-    DepthStencilTexture(const uint2& _TextureSize, FormatType _Format);
+    [[nodiscard]] FormatType GetFormat()const;
   };
 
   class UnorderedAccessTexture : public Texture
@@ -64,6 +58,42 @@ namespace vdl
     UnorderedAccessTexture() = default;
 
     UnorderedAccessTexture(const uint2& _TextureSize, FormatType _Format);
+  public:
+    [[nodiscard]] FormatType GetFormat()const;
+  };
+
+  class DepthStencilTexture
+  {
+  protected:
+    ID ID_;
+  public:
+    DepthStencilTexture() = default;
+
+    DepthStencilTexture(const uint2& _TextureSize, FormatType _Format);
+
+    DepthStencilTexture(const DepthStencilTexture& _DepthStencilBuffer);
+
+    DepthStencilTexture(DepthStencilTexture&& _DepthStencilBuffer)noexcept;
+
+    ~DepthStencilTexture();
+  public:
+    DepthStencilTexture& operator=(const DepthStencilTexture& _DepthStencilTexture);
+
+    DepthStencilTexture& operator=(DepthStencilTexture&& _DepthStencilTexture)noexcept;
+
+    [[nodiscard]] constexpr bool operator==(const DepthStencilTexture& _DepthStencilTexture)const noexcept { return ID_ == _DepthStencilTexture.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const DepthStencilTexture& _DepthStencilTexture)const noexcept { return ID_ != _DepthStencilTexture.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
+
+    [[nodiscard]] FormatType GetFormat()const;
+
+    [[nodiscard]] vdl::Texture GetDepthTexture()const;
+
+    [[nodiscard]] vdl::Texture GetStencilTexture()const;
   };
 
   struct OutputManager

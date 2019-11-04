@@ -5,9 +5,12 @@
 #include <vdl/DeviceContext/Vulkan/CDeviceContext.hpp>
 #include <vdl/Window/IWindow.hpp>
 
+#include <vdl/Format/Vulkan/Format.hpp>
+
+#include <vdl/Format/Format.hpp>
 #include <vdl/Constants/Constants.hpp>
 
-#include <vdl/Format/Vulkan/Format.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 void CSwapChain::Initialize()
 {
@@ -141,7 +144,8 @@ void CSwapChain::Initialize()
       VkRenderTexture.Image = vk::UniqueImage(Images[i]);
       ImageViewInfo.image = VkRenderTexture.Image.get();
       VkRenderTexture.View = VkDevice_.createImageViewUnique(ImageViewInfo);
-      VkRenderTexture.Format = Format;
+      VkRenderTexture.Format = vdl::FormatType::eSwapChain;
+      VkRenderTexture.VkFormat = Format;
 
       VkRenderTexture.SetImageLayout(CommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
     }
@@ -149,9 +153,10 @@ void CSwapChain::Initialize()
 
   //  深度ステンシルバッファの作成
   {
-    VkDepthStencilTexture_.Format = kDepthStencilFormat;
+    VkDepthStencilTexture_.VkFormat = kDepthStencilFormat;
+    VkDepthStencilTexture_.Format = vdl::FormatType::eDepthStencil;
     VkDepthStencilTexture_.ImageAspectFlag = vk::ImageAspectFlagBits::eDepth;
-    if (ContainsStencil(VkDepthStencilTexture_.Format))
+    if (hasStencil(VkDepthStencilTexture_.Format))
     {
       VkDepthStencilTexture_.ImageAspectFlag |= vk::ImageAspectFlagBits::eStencil;;
     }
@@ -175,7 +180,7 @@ void CSwapChain::Initialize()
       vk::ImageCreateInfo ImageInfo;
       {
         ImageInfo.imageType = vk::ImageType::e2D;
-        ImageInfo.format = VkDepthStencilTexture_.Format;
+        ImageInfo.format = VkDepthStencilTexture_.VkFormat;
         ImageInfo.extent = vk::Extent3D(Constants::kDefaultWindowSize.x, Constants::kDefaultWindowSize.y, 1);
         ImageInfo.mipLevels = 1;
         ImageInfo.arrayLayers = 1;
@@ -223,7 +228,7 @@ void CSwapChain::Initialize()
       {
         ImageViewCreateInfo.image = VkDepthStencilTexture_.Image.get();
         ImageViewCreateInfo.viewType = vk::ImageViewType::e2D;
-        ImageViewCreateInfo.format = VkDepthStencilTexture_.Format;
+        ImageViewCreateInfo.format = VkDepthStencilTexture_.VkFormat;
         ImageViewCreateInfo.components.r = vk::ComponentSwizzle::eR;
         ImageViewCreateInfo.components.g = vk::ComponentSwizzle::eG;
         ImageViewCreateInfo.components.b = vk::ComponentSwizzle::eB;

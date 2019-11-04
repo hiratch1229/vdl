@@ -4,8 +4,6 @@
 
 #include <vdl/Shader/IShader.hpp>
 
-#include <vector>
-
 class IRenderer
 {
 public:

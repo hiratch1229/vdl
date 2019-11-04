@@ -5,10 +5,12 @@
 #include <vdl/Shader/Vulkan/CShader.hpp>
 #include <vdl/Misc/Misc.hpp>
 
+#include <vdl/Format/Format.hpp>
 #include <vdl/Constants/Constants.hpp>
 
 #include <vdl/Image.hpp>
 #include <vdl/Macro.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #undef min
 #undef max
@@ -236,11 +238,11 @@ namespace
        " [ UNASSIGNED-CoreValidation-Shader-InterfaceTypeMismatch ] ",  //  glslangによるエラー
        " [ UNASSIGNED-CoreValidation-Shader-OutputNotConsumed ] ",      //  glslangによるエラー
       };
-    
+
       for (auto& IgnoreMessage : kIgnoreMessages)
       {
         std::string Str = IgnoreMessage;
-    
+
         if (std::equal(Str.cbegin(), Str.cend(), std::begin(Message)))
         {
           return false;
@@ -549,7 +551,6 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
 
   CTexture* pTexture = new CTexture;
   pTexture->TextureSize = _Image.GetTextureSize();
-  pTexture->Format = kTextureFormat;
 
   BufferData StagingBuffer;
   CreateStagingBuffer(&StagingBuffer, _Image.Buffer(), _Image.BufferSize());
@@ -559,7 +560,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
     vk::ImageCreateInfo ImageInfo;
     {
       ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = pTexture->Format;
+      ImageInfo.format = kTextureFormat;
       ImageInfo.extent = { pTexture->TextureSize.x, pTexture->TextureSize.y, 1 };
       ImageInfo.mipLevels = 1;
       ImageInfo.arrayLayers = 1;
@@ -635,7 +636,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
     {
       ImageViewInfo.image = pTexture->Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = pTexture->Format;
+      ImageViewInfo.format = kTextureFormat;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
@@ -660,14 +661,15 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
 
   CRenderTexture* pRenderTexture = new CRenderTexture;
   pRenderTexture->TextureSize = _TextureSize;
-  pRenderTexture->Format = Cast(_Format);
+  pRenderTexture->Format = _Format;
+  pRenderTexture->VkFormat = Cast(_Format);
 
   //  イメージ作成
   {
     vk::ImageCreateInfo ImageInfo;
     {
       ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = pRenderTexture->Format;
+      ImageInfo.format = pRenderTexture->VkFormat;
       ImageInfo.extent = { pRenderTexture->TextureSize.x, pRenderTexture->TextureSize.y, 1 };
       ImageInfo.mipLevels = 1;
       ImageInfo.arrayLayers = 1;
@@ -712,7 +714,7 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
     {
       ImageViewInfo.image = pRenderTexture->Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = pRenderTexture->Format;
+      ImageViewInfo.format = pRenderTexture->VkFormat;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
@@ -748,9 +750,10 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
 
   CDepthStencilTexture* pDepthStencilTexture = new CDepthStencilTexture;
   pDepthStencilTexture->TextureSize = _TextureSize;
-  pDepthStencilTexture->Format = Cast(_Format);
+  pDepthStencilTexture->Format = _Format;
+  pDepthStencilTexture->VkFormat = Cast(_Format);
   pDepthStencilTexture->ImageAspectFlag = vk::ImageAspectFlagBits::eDepth;
-  if (ContainsStencil(pDepthStencilTexture->Format))
+  if (hasStencil(pDepthStencilTexture->Format))
   {
     pDepthStencilTexture->ImageAspectFlag |= vk::ImageAspectFlagBits::eStencil;
   }
@@ -760,8 +763,8 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     vk::ImageCreateInfo ImageInfo;
     {
       ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = pDepthStencilTexture->Format;
-      ImageInfo.extent = { pDepthStencilTexture->TextureSize.x, pDepthStencilTexture->TextureSize.y, 1 };
+      ImageInfo.format = pDepthStencilTexture->VkFormat;
+      ImageInfo.extent = { _TextureSize.x, _TextureSize.y, 1 };
       ImageInfo.mipLevels = 1;
       ImageInfo.arrayLayers = 1;
       ImageInfo.samples = vk::SampleCountFlagBits::e1;
@@ -805,7 +808,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     {
       ImageViewInfo.image = pDepthStencilTexture->Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = pDepthStencilTexture->Format;
+      ImageViewInfo.format = pDepthStencilTexture->VkFormat;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
@@ -841,14 +844,14 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
 
   CUnorderedAccessTexture* pUnorderedAccessTexture = new CUnorderedAccessTexture;
   pUnorderedAccessTexture->TextureSize = _TextureSize;
-  pUnorderedAccessTexture->Format = Cast(_Format);
+  pUnorderedAccessTexture->Format = _Format;
 
   //  イメージ作成
   {
     vk::ImageCreateInfo ImageInfo;
     {
       ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = pUnorderedAccessTexture->Format;
+      ImageInfo.format = Cast(pUnorderedAccessTexture->Format);
       ImageInfo.extent = { pUnorderedAccessTexture->TextureSize.x, pUnorderedAccessTexture->TextureSize.y, 1 };
       ImageInfo.mipLevels = 1;
       ImageInfo.arrayLayers = 1;
@@ -884,7 +887,7 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
     {
       ImageViewInfo.image = pUnorderedAccessTexture->Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = pUnorderedAccessTexture->Format;
+      ImageViewInfo.format = Cast(pUnorderedAccessTexture->Format);
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
       ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
       ImageViewInfo.components.b = vk::ComponentSwizzle::eB;

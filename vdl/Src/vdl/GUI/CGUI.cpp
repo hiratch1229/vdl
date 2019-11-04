@@ -17,6 +17,7 @@
 #include <vdl/GUI.hpp>
 #include <vdl/Mouse.hpp>
 #include <vdl/Macro.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <ImGui/imgui.h>
 

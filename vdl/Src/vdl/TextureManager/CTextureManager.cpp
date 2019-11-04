@@ -2,12 +2,13 @@
 
 #include "TextureLoader/TextureLoader.hpp"
 
-#include <vdl/Image.hpp>
-
 #include <vdl/Engine.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/Constants/Constants.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
+
+#include <vdl/Image.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <filesystem>
 

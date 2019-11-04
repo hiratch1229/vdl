@@ -4,6 +4,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Renderer/IRenderer.hpp>
+#include <vdl/TextureManager/ITextureManager.hpp>
 
 #include <vdl/Window.hpp>
 
@@ -34,6 +35,20 @@ namespace
 
     return true;
   }
+
+  //inline bool CheckStencilFormat(vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
+  //{
+  //  for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
+  //  {
+  //    if (const vdl::Texture* pTexture = std::get_if<vdl::Texture>(&_ShaderResources[ShaderResourceCount]);
+  //      pTexture && !pTexture->isEmpty())
+  //    {
+  //      Engine::Get<ITextureManager>()->GetTexture(pTexture->GetID())->GetFormat();
+  //    }
+  //  }
+  //
+  //  return true;
+  //}
 }
 
 namespace vdl

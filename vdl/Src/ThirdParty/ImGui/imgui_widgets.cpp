@@ -7349,7 +7349,7 @@ void ImGui::PushColumnsBackground()
     if (columns->Count == 1)
         return;
     window->DrawList->ChannelsSetCurrent(0);
-    int cmd_size = window->DrawList->CmdBuffer.size();
+    int cmd_size = static_cast<int>(window->DrawList->CmdBuffer.size());
     PushClipRect(columns->HostClipRect.Min, columns->HostClipRect.Max, false);
     IM_UNUSED(cmd_size);
     IM_ASSERT(cmd_size == window->DrawList->CmdBuffer.size()); // Being in channel 0 this should not have created an ImDrawCmd

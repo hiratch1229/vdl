@@ -1,12 +1,13 @@
 #include "CModelManager.hpp"
 
-#include <vdl/Model.hpp>
+#include "ModelLoader/FBXLoader.hpp"
+#include "ModelLoader/glTFLoader.hpp"
 
 #include <vdl/Constants/Constants.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
-#include "ModelLoader/FBXLoader.hpp"
-#include "ModelLoader/glTFLoader.hpp"
+#include <vdl/Model.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 #include <filesystem>
 

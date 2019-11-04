@@ -114,7 +114,7 @@ void SceneTBDR::Initialize()
       {
         LightShaderResources_[i] = GBufferRenderTextures_[i];
       }
-      LightShaderResources_[kGBufferNum] = GBufferDepthTexture_;
+      LightShaderResources_[kGBufferNum] = GBufferDepthTexture_.GetDepthTexture();
       LightShaderResources_[kGBufferNum + 2] = PointLightsUnorderedAccessBuffer_.GetDetail();
 
       Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
@@ -140,9 +140,9 @@ void SceneTBDR::Initialize()
       LightUnorderedAccessTexture_ = UnorderedAccessTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
 
       Computer::SetShader(TileBaseComputeShader_);
-      Computer::SetConstantBuffers(1, 1, &RenderingConstantBuffer_);
+      Computer::SetConstantBuffers(1, 1, &DirectinalLightConstantBuffer_);
+      Computer::SetConstantBuffers(2, 1, &RenderingConstantBuffer_);
       Computer::SetConstantBuffers(3, 1, &CameraConstantBuffer_);
-      Computer::SetConstantBuffers(4, 1, &DirectinalLightConstantBuffer_);
 
       Computer::SetUnorderedAccessObjects(2, 1, &LightUnorderedAccessTexture_);
     }

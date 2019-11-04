@@ -7,7 +7,12 @@ Texture2D DepthBuffer : register(t2);
 RWStructuredBuffer<PointLight> PointLights : register(u1);
 RWTexture2D<float4> OutputTexture : register(u2);
 
-cbuffer Data : register(b1)
+cbuffer LightData : register(b1)
+{
+  DirectionalLight DLight;
+};
+
+cbuffer Data : register(b2)
 {
   float3 Ambient;
   uint PointLightNum;
@@ -18,11 +23,6 @@ cbuffer Camera : register(b3)
 {
   row_major float4x4 View;
   row_major float4x4 Projection;
-};
-
-cbuffer LightData : register(b4)
-{
-  DirectionalLight DLight;
 };
 
 static const uint2 kTileSize = uint2(16, 16);

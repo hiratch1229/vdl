@@ -4,6 +4,7 @@
 #include <vdl/pch/DirectX11/pch.hpp>
 
 class CDeviceContext;
+class ITextureManager;
 
 class CDevice : public IDevice
 {
@@ -11,6 +12,7 @@ class CDevice : public IDevice
   Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3D11ImmediateContext_;
 private:
   CDeviceContext* pDeviceContext_;
+  ITextureManager* pTextureManager_;
 public:
   [[nodiscard]] ID3D11Device* GetDevice()const { return pD3D11Device_.Get(); }
   [[nodiscard]] ID3D11DeviceContext* GetImmediateContext()const { return pD3D11ImmediateContext_.Get(); }
