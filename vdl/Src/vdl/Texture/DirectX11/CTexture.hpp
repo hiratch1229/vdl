@@ -3,6 +3,8 @@
 
 #include <vdl/pch/DirectX11/pch.hpp>
 
+#include <vdl/Window.hpp>
+
 #include <vdl/Constants/Constants.hpp>
 
 struct CTexture : public ITexture
@@ -31,6 +33,18 @@ public:
   vdl::FormatType GetFormat()const final { return Format; }
 };
 
+struct CSwapChainRenderTexture : public ITexture
+{
+public:
+  CSwapChainRenderTexture() = default;
+
+  TextureType GetType()const final { return TextureType::eSwapChainRenderTexture; }
+
+  vdl::uint2 GetSize()const final { return vdl::Window::GetWindowSize(); }
+
+  vdl::FormatType GetFormat()const final { return vdl::FormatType::eSwapChain; }
+};
+
 struct CDepthStencilTexture : public IDepthStencilTexture
 {
   Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
@@ -46,9 +60,9 @@ public:
 
   vdl::FormatType GetFormat()const final { return Format; }
 
-  vdl::Texture GetDepthTexture()final { return DepthTexture; }
+  const vdl::Texture& GetDepthTexture()final { return DepthTexture; }
 
-  vdl::Texture GetStencilTexture()final { return StencilTexture; }
+  const vdl::Texture& GetStencilTexture()final { return StencilTexture; }
 };
 
 struct CDepthTexture : public CTexture

@@ -4,6 +4,8 @@
 #include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/DirectX11/CDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
+#include <vdl/TextureManager/ITextureManager.hpp>
+#include <vdl/Texture/DirectX11/CTexture.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 
@@ -25,9 +27,6 @@ void CSwapChain::Initialize()
 
   const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
 
-  constexpr DXGI_FORMAT kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
-  constexpr DXGI_FORMAT kDepthStencilFormat = Cast(vdl::FormatType::eDepthStencil);
-
   //  エラーチェック用
   HRESULT hr = S_OK;
 
@@ -37,7 +36,7 @@ void CSwapChain::Initialize()
     SwapChainDesc.BufferDesc.Height = Constants::kDefaultWindowSize.y;
     SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
     SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-    SwapChainDesc.BufferDesc.Format = kSwapChainFormat;
+    SwapChainDesc.BufferDesc.Format = Cast(vdl::FormatType::eSwapChain);
     SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
     SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
     SwapChainDesc.SampleDesc.Count = 1;
@@ -82,23 +81,17 @@ void CSwapChain::Initialize()
     pBackBuffer->GetDesc(&BackBufferDesc);
   }
 
-  //  深度ステンシルビューの作成
+  //  レンダーテクスチャの作成
   {
-    D3D11_TEXTURE2D_DESC DepthStencilBufferDesc = std::move(BackBufferDesc);
-    {
-      DepthStencilBufferDesc.Format = kDepthStencilFormat;
-      DepthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    }
+    RenderTextures_[0] = vdl::RenderTexture(Constants::kDefaultWindowSize, vdl::FormatType::eSwapChain);
 
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencilBuffer;
-    {
-      hr = pD3D11Device_->CreateTexture2D(&DepthStencilBufferDesc, nullptr, pDepthStencilBuffer.GetAddressOf());
-      _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
-    }
+    CSwapChainRenderTexture* pRenderTexture = new CSwapChainRenderTexture;
 
-    hr = pD3D11Device_->CreateDepthStencilView(pDepthStencilBuffer.Get(), nullptr, pDepthStencilView_.GetAddressOf());
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    Engine::Get<ITextureManager>()->SetTexture(RenderTextures_[0].GetID(), pRenderTexture);
   }
+
+  //  深度ステンシルテクスチャの作成
+  DepthStencilTexture_ = vdl::DepthStencilTexture(Constants::kDefaultWindowSize, vdl::FormatType::eDefaultDepthStencil);
 }
 
 void CSwapChain::ScreenClear()

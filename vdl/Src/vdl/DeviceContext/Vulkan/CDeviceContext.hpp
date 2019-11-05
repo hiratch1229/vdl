@@ -13,9 +13,10 @@
 #include <vdl/Hash.hpp>
 
 #include <vdl/Buffer/Buffer.hpp>
-
-#include <vdl/Shader/Vulkan/CShader.hpp>
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
+
+#include <vdl/Texture/Vulkan/CTexture.hpp>
+#include <vdl/Shader/Vulkan/CShader.hpp>
 
 #include <vdl/pch/Vulkan/pch.hpp>
 
@@ -263,6 +264,7 @@ private:
   void BeginRenderPassGraphicsCommandBuffer();
   void PreprocessingGraphicsCommandBufferDraw();
   void WaitFence(const vk::Fence& _Fence);
+  CRenderTexture* GetVkRenderTexture(const vdl::RenderTexture& _RenderTexture);
   const vk::PipelineRasterizationStateCreateInfo& GetPipelineRasterizationStateInfo(const vdl::RasterizerState& _RasterizerState);
   const vk::PipelineDepthStencilStateCreateInfo& GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState& _DepthStencilState);
   const vk::PipelineColorBlendAttachmentState& GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState& _RenderTextureBlendState);

@@ -26,11 +26,11 @@ void SceneMultiRenderTexture::Update()
   FreeCamera(&Camera_);
   Renderer3D::SetCamera(Camera_);
 
-  Renderer::SetRenderTextures(RenderTextures_, DepthStencilTexture());
+  Renderer::SetRenderTextures(RenderTextures_, Window::GetDepthStencilTexture());
 
   Renderer3D::Draw(Model_, Matrix::Identity());
 
-  Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
+  Renderer::SetRenderTexture(Window::GetRenderTexture(), Window::GetDepthStencilTexture());
 
   for (uint RenderTextureCount = 0; RenderTextureCount < kUsingRenderTextureNum; ++RenderTextureCount)
   {

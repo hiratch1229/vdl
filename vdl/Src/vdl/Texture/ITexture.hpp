@@ -7,6 +7,7 @@ enum class TextureType
 {
   eTexture,
   eRenderTexture,
+  eSwapChainRenderTexture,
   eDepthStencilTexture,
   eDepthTexture,
   eStencilTexture,
@@ -31,7 +32,7 @@ struct IDepthStencilTexture : public ITexture
 public:
   IDepthStencilTexture() = default;
 
-  [[nodiscard]] virtual vdl::Texture GetDepthTexture() = 0;
+  [[nodiscard]] virtual const vdl::Texture& GetDepthTexture() = 0;
 
-  [[nodiscard]] virtual vdl::Texture GetStencilTexture() = 0;
+  [[nodiscard]] virtual const vdl::Texture& GetStencilTexture() = 0;
 };

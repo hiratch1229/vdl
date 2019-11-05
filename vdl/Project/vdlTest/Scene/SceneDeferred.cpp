@@ -212,7 +212,7 @@ void SceneDeferred::Update()
 
   //  LightPass
   {
-    Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
+    Renderer::SetRenderTexture(Window::GetRenderTexture(), Window::GetDepthStencilTexture());
     Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(ShaderResources_.size()), ShaderResources_.data());
 
     Renderer::Draw(3);

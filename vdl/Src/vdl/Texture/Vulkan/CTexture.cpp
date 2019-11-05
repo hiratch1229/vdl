@@ -101,7 +101,7 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, vk::Image
 
 //--------------------------------------------------
 
-vdl::Texture CDepthStencilTexture::GetDepthTexture()
+const vdl::Texture& CDepthStencilTexture::GetDepthTexture()
 {
   if (DepthTexture.isEmpty())
   {
@@ -142,7 +142,7 @@ vdl::Texture CDepthStencilTexture::GetDepthTexture()
   return DepthTexture;
 }
 
-vdl::Texture CDepthStencilTexture::GetStencilTexture()
+const vdl::Texture& CDepthStencilTexture::GetStencilTexture()
 {
   if (hasStencil(Format) && StencilTexture.isEmpty())
   {

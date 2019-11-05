@@ -22,7 +22,7 @@ void ScenePostEffect::Initialize()
     //  NormalMap
     GBufferRenderTextures_[1] = RenderTexture(kGBufferSize, FormatType::eR16G16B16A16_Float);
 
-    GBufferDepthTexture_ = DepthStencilTexture(kGBufferSize, FormatType::eD16_Unorm);
+    GBufferDepthTexture_ = DepthStencilTexture(kGBufferSize, FormatType::eD32_Float);
   }
 
   //  ShadowMapÇÃèâä˙âª
@@ -229,7 +229,7 @@ void ScenePostEffect::Update()
 
     //  Bloom
     {
-      Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
+      Renderer::SetRenderTexture(Window::GetRenderTexture(), Window::GetDepthStencilTexture());
       Renderer2D::SetPixelShader(BloomPixelShader_);
       Renderer2D::SetPixelStageShaderResources(1, kShrinkBuffeNum, BloomShaderResources_.data());
 

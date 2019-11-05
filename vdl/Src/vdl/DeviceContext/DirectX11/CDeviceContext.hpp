@@ -35,6 +35,7 @@ public:
   [[nodiscard]] bool isFoundInputLayout(vdl::InputLayoutType _InputLayout) { return InputLayouts_.find(_InputLayout) != InputLayouts_.end(); }
   void RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _pCode);
 private:
+  ID3D11RenderTargetView* GetRenderTargetView(const vdl::RenderTexture& _RenderTexture);
   ID3D11ShaderResourceView* GetShaderResourceView(const vdl::ShaderResource& _ShaderResource);
   ID3D11SamplerState* GetSamplerState(const vdl::Sampler& _Sampler);
   ID3D11Buffer* GetConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer);
@@ -58,7 +59,7 @@ public:
 
   void SetViewport(const vdl::Viewport& _Viewport)override;
 
-  void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)override;
+  void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)override;
 
   void SetBlendState(const vdl::BlendState& _BlendState)override;
 

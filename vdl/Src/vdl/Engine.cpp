@@ -36,6 +36,13 @@ Engine::Engine()
   
   pWindow_->Initialize();
   pDevice_->Initialize();
+
+  pSoundManager_->Initialize();
+  pTextureManager_->Initialize();
+  pModelManager_->Initialize();
+  pBufferManager_->Initialize();
+  pShaderManager_->Initialize();
+
   pDeviceContext_->Initialize();
   pSwapChain_->Initialize();
 
@@ -46,12 +53,6 @@ Engine::Engine()
   pMouse_->Initialize();
   pXInput_->Initialize();
   pGamepad_->Initialize();
-
-  pSoundManager_->Initialize();
-  pTextureManager_->Initialize();
-  pModelManager_->Initialize();
-  pBufferManager_->Initialize();
-  pShaderManager_->Initialize();
 
   pRenderer_->Initialize();
   pComputer_->Initialize();

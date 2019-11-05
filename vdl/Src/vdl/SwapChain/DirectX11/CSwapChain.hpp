@@ -12,7 +12,6 @@ class CSwapChain : public ISwapChain
 {
   Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain_;
   Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView_;
-  Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView_;
 private:
   ID3D11Device* pD3D11Device_;
   ID3D11DeviceContext* pD3D11ImmediateContext_;
@@ -24,7 +23,6 @@ private:
   vdl::DepthStencilTexture DepthStencilTexture_;
 public:
   ID3D11RenderTargetView* GetRenderTargetView()const { return pRenderTargetView_.Get(); }
-  ID3D11DepthStencilView* GetDepthStencilView()const { return pDepthStencilView_.Get(); }
 public:
   CSwapChain() = default;
 
@@ -37,4 +35,8 @@ public:
   void ChangeWindowMode()override;
 
   void ScreenShot()override;
+
+  const vdl::RenderTexture& GetRenderTexture()const override { return RenderTextures_[0]; }
+
+  const vdl::DepthStencilTexture& GetDepthStencilTexture()const override { return DepthStencilTexture_; }
 };

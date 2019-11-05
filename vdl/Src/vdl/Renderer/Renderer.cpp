@@ -14,7 +14,12 @@ namespace
 {
   inline bool CheckSupportMultiRenderTextures(const vdl::RenderTextures& _RenderTextures)
   {
-    const vdl::uint2 TexureSize = (_RenderTextures[0].isEmpty() ? vdl::Window::GetWindowSize() : _RenderTextures[0].GetSize());
+    if (_RenderTextures[0].isEmpty())
+    {
+      return true;
+    }
+
+    const vdl::uint2 TexureSize = _RenderTextures[0].GetSize();
 
     for (size_t RenderTextureCount = 1; RenderTextureCount < vdl::Constants::kMaxRenderTextureNum; ++RenderTextureCount)
     {
@@ -36,19 +41,24 @@ namespace
     return true;
   }
 
-  //inline bool CheckStencilFormat(vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
-  //{
-  //  for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
-  //  {
-  //    if (const vdl::Texture* pTexture = std::get_if<vdl::Texture>(&_ShaderResources[ShaderResourceCount]);
-  //      pTexture && !pTexture->isEmpty())
-  //    {
-  //      Engine::Get<ITextureManager>()->GetTexture(pTexture->GetID())->GetFormat();
-  //    }
-  //  }
-  //
-  //  return true;
-  //}
+  inline bool CheckSupportShaderResoruces(vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
+  {
+    ITextureManager* pTextureManager = Engine::Get<ITextureManager>();
+
+    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
+    {
+      if (const vdl::Texture* pTexture = std::get_if<vdl::Texture>(&_ShaderResources[ShaderResourceCount]);
+        pTexture && !pTexture->isEmpty())
+      {
+        if (pTextureManager->GetTexture(pTexture->GetID())->GetType() == TextureType::eSwapChainRenderTexture)
+        {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace vdl
@@ -57,6 +67,7 @@ namespace vdl
   {
     void SetRenderTextures(const RenderTextures& _RenderTextures, const DepthStencilTexture& _DepthStencilTexture)
     {
+      assert(!(_RenderTextures[0].isEmpty() && _DepthStencilTexture.isEmpty()));
       assert(CheckSupportMultiRenderTextures(_RenderTextures));
 
       Engine::Get<IRenderer>()->SetRenderTextures(_RenderTextures, _DepthStencilTexture);
@@ -138,6 +149,7 @@ namespace vdl
 
     void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -150,6 +162,7 @@ namespace vdl
 
     void SetHullStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -162,6 +175,7 @@ namespace vdl
 
     void SetDomainStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -174,6 +188,7 @@ namespace vdl
 
     void SetGeometryStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -186,6 +201,7 @@ namespace vdl
 
     void SetPixelStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -383,6 +399,7 @@ namespace vdl
 
     void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -395,6 +412,7 @@ namespace vdl
 
     void SetHullStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -407,6 +425,7 @@ namespace vdl
 
     void SetDomainStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -419,6 +438,7 @@ namespace vdl
 
     void SetGeometryStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -431,6 +451,7 @@ namespace vdl
 
     void SetPixelStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -595,6 +616,7 @@ namespace vdl
 
     void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -607,6 +629,7 @@ namespace vdl
 
     void SetHullStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -619,6 +642,7 @@ namespace vdl
 
     void SetDomainStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -631,6 +655,7 @@ namespace vdl
 
     void SetGeometryStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(_StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)
@@ -643,6 +668,7 @@ namespace vdl
 
     void SetPixelStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[])
     {
+      assert(CheckSupportShaderResoruces(_ShaderResourceNum, _ShaderResources));
       assert(1 < _StartSlot && _StartSlot + _ShaderResourceNum - 1 < Constants::kMaxShaderResourceNum);
 
       if (_ShaderResourceNum == 0)

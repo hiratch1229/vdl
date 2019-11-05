@@ -364,32 +364,33 @@ void CDeviceContext::SetViewport(const vdl::Viewport& _Viewport)
   pD3D11ImmediateContext_->RSSetViewports(1, &Cast(_Viewport));
 }
 
-void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)
+void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)
 {
-  auto GetRenderTargetView = [&](const vdl::RenderTexture& _RenderTexture)->ID3D11RenderTargetView *
+  std::vector<ID3D11RenderTargetView*> pRenderTeargetViews;
   {
-    assert(!_RenderTexture.isEmpty());
-
-    return static_cast<CRenderTexture*>(pTextureManager_->GetTexture(_RenderTexture.GetID()))->pRenderTargetView.Get();
-  };
-
-  std::vector<ID3D11RenderTargetView*> pRenderTeargetViews(1);
-  ID3D11DepthStencilView* pDepthStencilView;
-
-  pRenderTeargetViews[0] = (_RenderTextures[0].isEmpty() ? pSwapChain_->GetRenderTargetView() : GetRenderTargetView(_RenderTextures[0]));
-
-  for (vdl::uint RenderTextureCount = 1; RenderTextureCount < Constants::kMaxRenderTextureNum; ++RenderTextureCount)
-  {
-    if (_RenderTextures[RenderTextureCount].isEmpty())
+    for (vdl::uint RenderTextureCount = 0; RenderTextureCount < Constants::kMaxRenderTextureNum; ++RenderTextureCount)
     {
-      break;
+      if (_RenderTextures[RenderTextureCount].isEmpty())
+      {
+        break;
+      }
+
+      pRenderTeargetViews.push_back(GetRenderTargetView(_RenderTextures[RenderTextureCount]));
     }
 
-    pRenderTeargetViews.push_back(GetRenderTargetView(_RenderTextures[RenderTextureCount]));
+    if (pRenderTeargetViews.empty())
+    {
+      pRenderTeargetViews = { nullptr };
+    }
   }
-  pDepthStencilView = (_DepthStenilTexture.isEmpty() ? pSwapChain_->GetDepthStencilView()
-    : static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(_DepthStenilTexture.GetID()))->pDepthStencilView.Get());
-  assert(!pRenderTeargetViews.empty() && pDepthStencilView);
+
+  ID3D11DepthStencilView* pDepthStencilView = nullptr;
+  {
+    if (!_DepthStencilTexture.isEmpty())
+    {
+      pDepthStencilView = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(_DepthStencilTexture.GetID()))->pDepthStencilView.Get();
+    }
+  }
 
   pD3D11ImmediateContext_->OMSetRenderTargets(static_cast<vdl::uint>(pRenderTeargetViews.size()), pRenderTeargetViews.data(), pDepthStencilView);
 }
@@ -848,38 +849,16 @@ void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint
 
 void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)
 {
-  ID3D11RenderTargetView* pRenderTargetView;
+  assert(!_RenderTexture.isEmpty());
 
-  if (const vdl::ID ID = _RenderTexture.GetID();
-    ID == std::nullopt)
-  {
-    pRenderTargetView = pSwapChain_->GetRenderTargetView();
-  }
-  else
-  {
-    assert(pTextureManager_->GetTexture(ID)->GetType() == TextureType::eRenderTexture);
-    pRenderTargetView = static_cast<CRenderTexture*>(pTextureManager_->GetTexture(ID))->pRenderTargetView.Get();
-  }
-
-  pD3D11ImmediateContext_->ClearRenderTargetView(pRenderTargetView, &_ClearColor.Red);
+  pD3D11ImmediateContext_->ClearRenderTargetView(GetRenderTargetView(_RenderTexture), &_ClearColor.Red);
 }
 
 void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil)
 {
-  ID3D11DepthStencilView* pDepthStencilView;
+  assert(!_DepthStencilTexture.isEmpty());
 
-  if (const vdl::ID ID = _DepthStencilTexture.GetID();
-    ID == std::nullopt)
-  {
-    pDepthStencilView = pSwapChain_->GetDepthStencilView();
-  }
-  else
-  {
-    assert(pTextureManager_->GetTexture(ID)->GetType() == TextureType::eDepthStencilTexture);
-    pDepthStencilView = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(ID))->pDepthStencilView.Get();
-  }
-
-  pD3D11ImmediateContext_->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, _ClearDepth, _ClearStencil);
+  pD3D11ImmediateContext_->ClearDepthStencilView(static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(_DepthStencilTexture.GetID()))->pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, _ClearDepth, _ClearStencil);
 }
 
 void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)
@@ -978,6 +957,21 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _p
   }
 
   InputLayouts_.insert(std::make_pair(_Key, pInputLayout));
+}
+
+ID3D11RenderTargetView* CDeviceContext::GetRenderTargetView(const vdl::RenderTexture& _RenderTexture)
+{
+  assert(!_RenderTexture.isEmpty());
+
+  ITexture* pTexture = pTextureManager_->GetTexture(_RenderTexture.GetID());
+  if (pTexture->GetType() == TextureType::eSwapChainRenderTexture)
+  {
+    return pSwapChain_->GetRenderTargetView();
+  }
+  else
+  {
+    return static_cast<CRenderTexture*>(pTexture)->pRenderTargetView.Get();
+  }
 }
 
 ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::ShaderResource& _ShaderResource)

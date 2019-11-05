@@ -12,7 +12,6 @@
 #include <vdl/Scissor/Vulkan/Scissor.hpp>
 #include <vdl/Viewport/Vulkan/Viewport.hpp>
 #include <vdl/Buffer/Vulkan/CBuffer.hpp>
-#include <vdl/Texture/Vulkan/CTexture.hpp>
 
 #include <vdl/Instance/Instance.hpp>
 #include <vdl/Constants/Constants.hpp>
@@ -1075,12 +1074,20 @@ void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint
 
 void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)
 {
+  assert(!_RenderTexture.isEmpty());
+
   BeginGraphicsCommandBuffer();
 
   const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
 
   const vdl::ID TextureID = _RenderTexture.GetID();
-  CRenderTexture* pRenderTexture = (TextureID ? static_cast<CRenderTexture*>(pTextureManager_->GetTexture(TextureID)) : pSwapChain_->GetRenderTexture());
+  CRenderTexture* pRenderTexture = GetVkRenderTexture(_RenderTexture);
+
+  const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
+  pRenderTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  CurrentGraphicsCommandBuffer.clearColorImage(pRenderTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, Cast(_ClearColor), SubresourceRange);
+
+  //  Clearするまで生存を保証
   {
     std::unordered_map<vdl::ID, Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
 
@@ -1089,20 +1096,24 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
       ClearTextures.insert(std::make_pair(TextureID, _RenderTexture));
     }
   }
-
-  const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
-  pRenderTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
-  CurrentGraphicsCommandBuffer.clearColorImage(pRenderTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, Cast(_ClearColor), SubresourceRange);
 }
 
 void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil)
 {
+  assert(!_DepthStencilTexture.isEmpty());
+
   BeginGraphicsCommandBuffer();
 
   const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
 
   const vdl::ID TextureID = _DepthStencilTexture.GetID();
-  CDepthStencilTexture* pDepthStencilTexture = (TextureID ? static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(TextureID)) : pSwapChain_->GetDepthStencilTexture());
+  CDepthStencilTexture* pDepthStencilTexture = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(TextureID));
+
+  const vk::ImageSubresourceRange SubresourceRange = { pDepthStencilTexture->ImageAspectFlag, 0, 1, 0, 1 };
+  pDepthStencilTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  CurrentGraphicsCommandBuffer.clearDepthStencilImage(pDepthStencilTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, { _ClearDepth, _ClearStencil }, SubresourceRange);
+
+  //  Clearするまで生存を保証
   {
     std::unordered_map<vdl::ID, Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
 
@@ -1111,10 +1122,6 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
       ClearTextures.insert(std::make_pair(TextureID, _DepthStencilTexture));
     }
   }
-
-  const vk::ImageSubresourceRange SubresourceRange = { pDepthStencilTexture->ImageAspectFlag, 0, 1, 0, 1 };
-  pDepthStencilTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
-  CurrentGraphicsCommandBuffer.clearDepthStencilImage(pDepthStencilTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, { _ClearDepth, _ClearStencil }, SubresourceRange);
 }
 
 void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)
@@ -1126,10 +1133,15 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
   BeginGraphicsCommandBuffer();
 
   const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
-  const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
 
   const vdl::ID TextureID = _UnorderedAccessTexture.GetID();
   CUnorderedAccessTexture* pUnorderedAccessTexture = static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(TextureID));
+
+  const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
+  pUnorderedAccessTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  CurrentGraphicsCommandBuffer.clearColorImage(pUnorderedAccessTexture->Image.get(), kImageLayout, Cast(_ClearColor), SubresourceRange);
+
+  //  Clearするまで生存を保証
   {
     std::unordered_map<vdl::ID, Texture>& ClearTextures = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].ClearTextures;
 
@@ -1138,9 +1150,6 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
       ClearTextures.insert(std::make_pair(TextureID, _UnorderedAccessTexture));
     }
   }
-
-  pUnorderedAccessTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
-  CurrentGraphicsCommandBuffer.clearColorImage(pUnorderedAccessTexture->Image.get(), kImageLayout, Cast(_ClearColor), SubresourceRange);
 }
 
 void CDeviceContext::Draw(vdl::uint _VertexCount, vdl::uint _InstanceCount, vdl::uint _FirstVertex, vdl::uint _FirstInstance)
@@ -1767,7 +1776,7 @@ void CDeviceContext::Present()
   }
 
   //  バックバッファをPresent可能状態に変更
-  pSwapChain_->GetRenderTexture()->SetImageLayout(CurrentCommandBuffer, vk::ImageLayout::ePresentSrcKHR, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+  pSwapChain_->GetVkRenderTexture()->SetImageLayout(CurrentCommandBuffer, vk::ImageLayout::ePresentSrcKHR, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
 
   Flush();
 
@@ -1829,8 +1838,6 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
     vdl::OutputManager& CurrentOutputManager = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].OutputManagers.back();
     RenderPassData& RenderPassData = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].RenderPassDatas.emplace_back();
 
-    vdl::uint2 RenderTextureSize;
-
     vdl::uint AttachmentCount = 0;
     std::array<vk::ImageView, Constants::kMaxRenderTextureNum + 1> Attachments;
     //  レンダーパスの作成
@@ -1840,13 +1847,6 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
       {
         //  レンダーターゲットの設定
         {
-          auto GetRenderTexture = [&](const vdl::RenderTexture& _RenderTexture)->CRenderTexture *
-          {
-            assert(!_RenderTexture.isEmpty());
-            assert(RenderTextureSize == _RenderTexture.GetSize());
-
-            return static_cast<CRenderTexture*>(pTextureManager_->GetTexture(_RenderTexture.GetID()));
-          };
           auto SetAttachment = [&](CRenderTexture* _pRenderTexture)->void
           {
             constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eColorAttachmentOptimal;
@@ -1870,19 +1870,6 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
             Attachments[AttachmentCount] = _pRenderTexture->View.get();
           };
 
-          if (CurrentOutputManager.RenderTextures[0].isEmpty())
-          {
-            RenderTextureSize = pWindow_->GetWindowSize();
-            SetAttachment(pSwapChain_->GetRenderTexture());
-          }
-          else
-          {
-            RenderTextureSize = CurrentOutputManager.RenderTextures[0].GetSize();
-            SetAttachment(GetRenderTexture(CurrentOutputManager.RenderTextures[0]));
-          }
-
-          ++AttachmentCount;
-
           for (; AttachmentCount < Constants::kMaxRenderTextureNum; ++AttachmentCount)
           {
             const vdl::RenderTexture RenderTexture = CurrentOutputManager.RenderTextures[AttachmentCount];
@@ -1891,14 +1878,17 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
               break;
             }
 
-            SetAttachment(GetRenderTexture(RenderTexture));
+            CRenderTexture* pRenderTexture = GetVkRenderTexture(RenderTexture);
+            SetAttachment(pRenderTexture);
           }
         }
 
+        GraphicsColorAttachmentCount_ = AttachmentCount;
+
         //  デプスステンシルバッファの設定
+        if (!CurrentOutputManager.DepthStencilTexture.isEmpty())
         {
-          CDepthStencilTexture* pDepthStencilTexture = (CurrentOutputManager.DepthStencilTexture.isEmpty() ? pSwapChain_->GetDepthStencilTexture()
-            : static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(CurrentOutputManager.DepthStencilTexture.GetID())));
+          CDepthStencilTexture* pDepthStencilTexture = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(CurrentOutputManager.DepthStencilTexture.GetID()));
 
           constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
 
@@ -1923,13 +1913,12 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
         }
       }
 
-      GraphicsColorAttachmentCount_ = AttachmentCount - 1;
       vk::SubpassDescription SubpassDescription;
       {
         SubpassDescription.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
         SubpassDescription.colorAttachmentCount = GraphicsColorAttachmentCount_;
         SubpassDescription.pColorAttachments = AttachmentReferences.data();
-        SubpassDescription.pDepthStencilAttachment = &AttachmentReferences[GraphicsColorAttachmentCount_];
+        SubpassDescription.pDepthStencilAttachment = (GraphicsColorAttachmentCount_ == AttachmentCount ? nullptr : &AttachmentReferences[GraphicsColorAttachmentCount_]);
       }
 
       vk::RenderPassCreateInfo RenderPassInfo;
@@ -1944,6 +1933,8 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
       assert(RenderPassData.RenderPass);
     }
 
+    const vdl::uint2 FrameBufferSize = (CurrentOutputManager.RenderTextures[0].isEmpty() ? CurrentOutputManager.DepthStencilTexture.GetDepthTexture().GetSize() : CurrentOutputManager.RenderTextures[0].GetSize());
+
     //  フレームバッファの作成
     {
       vk::FramebufferCreateInfo FramebufferInfo;
@@ -1951,8 +1942,8 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
         FramebufferInfo.renderPass = RenderPassData.RenderPass.get();
         FramebufferInfo.attachmentCount = AttachmentCount;
         FramebufferInfo.pAttachments = Attachments.data();
-        FramebufferInfo.width = RenderTextureSize.x;
-        FramebufferInfo.height = RenderTextureSize.y;
+        FramebufferInfo.width = FrameBufferSize.x;
+        FramebufferInfo.height = FrameBufferSize.y;
         FramebufferInfo.layers = 1;
       }
 
@@ -1961,7 +1952,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
     }
 
     CurrentGraphicsCommandBuffer.beginRenderPass({ RenderPassData.RenderPass.get(), RenderPassData.Framebuffer.get(),
-      { { 0, 0 }, { RenderTextureSize.x, RenderTextureSize.y } } }, vk::SubpassContents::eInline);
+      { { 0, 0 }, { FrameBufferSize.x, FrameBufferSize.y } } }, vk::SubpassContents::eInline);
 
     GraphicsStateChangeFlags_.Cancel(GraphicsCommandType::eSetRenderTextures);
   }
@@ -2191,10 +2182,12 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
       const vk::PipelineDepthStencilStateCreateInfo& PipelineDepthStencilStateInfo = GetPipelineDepthStencilStateInfo(CurrentGraphicsState_.DepthStencilState);
 
-      std::vector<vk::PipelineColorBlendAttachmentState> PipelineColorBlendAttachmentStates(GraphicsColorAttachmentCount_);
+      std::vector<vk::PipelineColorBlendAttachmentState> PipelineColorBlendAttachmentStates;
+      if(GraphicsColorAttachmentCount_)
       {
         assert(GraphicsColorAttachmentCount_ <= Constants::kMaxRenderTextureNum);
 
+        PipelineColorBlendAttachmentStates.resize(GraphicsColorAttachmentCount_);
         if (CurrentGraphicsState_.BlendState.IndependentBlendEnable)
         {
           for (vdl::uint i = 0; i < GraphicsColorAttachmentCount_; ++i)
@@ -2727,6 +2720,15 @@ void CDeviceContext::WaitFence(const vk::Fence& _Fence)
 }
 
 //--------------------------------------------------
+
+CRenderTexture* CDeviceContext::GetVkRenderTexture(const vdl::RenderTexture& _RenderTexture)
+{
+  assert(!_RenderTexture.isEmpty());
+
+  ITexture* pTexture = pTextureManager_->GetTexture(_RenderTexture.GetID());
+
+  return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? pSwapChain_->GetVkRenderTexture() : static_cast<CRenderTexture*>(pTexture));
+}
 
 const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState& _RasterizerState)
 {

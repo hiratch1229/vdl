@@ -1,9 +1,10 @@
 #include "CSwapChain.hpp"
 
 #include <vdl/Engine.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/Vulkan/CDevice.hpp>
 #include <vdl/DeviceContext/Vulkan/CDeviceContext.hpp>
-#include <vdl/Window/IWindow.hpp>
+#include <vdl/TextureManager/ITextureManager.hpp>
 
 #include <vdl/Format/Vulkan/Format.hpp>
 
@@ -24,7 +25,6 @@ void CSwapChain::Initialize()
   const vk::PhysicalDevice& PhysicalDevice = pDevice->GetPhysicalDevice();
 
   constexpr vk::Format kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
-  constexpr vk::Format kDepthStencilFormat = Cast(vdl::FormatType::eDepthStencil);
 
   vk::Format Format;
   vdl::uint SwapChainImageNum = Constants::kBackBufferNum;
@@ -146,102 +146,10 @@ void CSwapChain::Initialize()
       VkRenderTexture.View = VkDevice_.createImageViewUnique(ImageViewInfo);
       VkRenderTexture.Format = vdl::FormatType::eSwapChain;
       VkRenderTexture.VkFormat = Format;
+      VkRenderTexture.TextureSize = Constants::kDefaultWindowSize;
 
       VkRenderTexture.SetImageLayout(CommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
     }
-  }
-
-  //  深度ステンシルバッファの作成
-  {
-    VkDepthStencilTexture_.VkFormat = kDepthStencilFormat;
-    VkDepthStencilTexture_.Format = vdl::FormatType::eDepthStencil;
-    VkDepthStencilTexture_.ImageAspectFlag = vk::ImageAspectFlagBits::eDepth;
-    if (hasStencil(VkDepthStencilTexture_.Format))
-    {
-      VkDepthStencilTexture_.ImageAspectFlag |= vk::ImageAspectFlagBits::eStencil;;
-    }
-
-    vk::ImageTiling ImageTiling;
-    {
-      vk::FormatProperties FormatProperties = PhysicalDevice.getFormatProperties(kDepthStencilFormat);
-
-      if (FormatProperties.linearTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment)
-      {
-        ImageTiling = vk::ImageTiling::eLinear;
-      }
-      else if (FormatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment)
-      {
-        ImageTiling = vk::ImageTiling::eOptimal;
-      }
-    }
-
-    //  イメージの作成
-    {
-      vk::ImageCreateInfo ImageInfo;
-      {
-        ImageInfo.imageType = vk::ImageType::e2D;
-        ImageInfo.format = VkDepthStencilTexture_.VkFormat;
-        ImageInfo.extent = vk::Extent3D(Constants::kDefaultWindowSize.x, Constants::kDefaultWindowSize.y, 1);
-        ImageInfo.mipLevels = 1;
-        ImageInfo.arrayLayers = 1;
-        ImageInfo.samples = vk::SampleCountFlagBits::e1;
-        ImageInfo.tiling = ImageTiling;
-        ImageInfo.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferDst;
-        ImageInfo.sharingMode = vk::SharingMode::eExclusive;
-        ImageInfo.queueFamilyIndexCount = 0;
-        ImageInfo.pQueueFamilyIndices = nullptr;
-        ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
-      }
-
-      VkDepthStencilTexture_.Image = VkDevice_.createImageUnique(ImageInfo);
-      assert(VkDepthStencilTexture_.Image);
-    }
-
-    //  メモリの確保
-    {
-      vk::MemoryRequirements MemoryRequirement = VkDevice_.getImageMemoryRequirements(VkDepthStencilTexture_.Image.get());
-
-      vk::MemoryAllocateInfo MemoryAllocateInfo;
-      {
-        MemoryAllocateInfo.allocationSize = MemoryRequirement.size;
-        MemoryAllocateInfo.memoryTypeIndex = pDevice->GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-      }
-
-      VkDepthStencilTexture_.Memory = VkDevice_.allocateMemoryUnique(MemoryAllocateInfo);
-      assert(VkDepthStencilTexture_.Memory);
-
-      VkDevice_.bindImageMemory(VkDepthStencilTexture_.Image.get(), VkDepthStencilTexture_.Memory.get(), 0);
-    }
-
-    vk::ImageSubresourceRange SubresourceRange;
-    {
-      SubresourceRange.aspectMask = VkDepthStencilTexture_.ImageAspectFlag;
-      SubresourceRange.baseMipLevel = 0;
-      SubresourceRange.levelCount = 1;
-      SubresourceRange.baseArrayLayer = 0;
-      SubresourceRange.layerCount = 1;
-    }
-
-    //  ビューの作成
-    {
-      vk::ImageViewCreateInfo ImageViewCreateInfo;
-      {
-        ImageViewCreateInfo.image = VkDepthStencilTexture_.Image.get();
-        ImageViewCreateInfo.viewType = vk::ImageViewType::e2D;
-        ImageViewCreateInfo.format = VkDepthStencilTexture_.VkFormat;
-        ImageViewCreateInfo.components.r = vk::ComponentSwizzle::eR;
-        ImageViewCreateInfo.components.g = vk::ComponentSwizzle::eG;
-        ImageViewCreateInfo.components.b = vk::ComponentSwizzle::eB;
-        ImageViewCreateInfo.components.a = vk::ComponentSwizzle::eA;
-        ImageViewCreateInfo.subresourceRange = SubresourceRange;
-      }
-
-      VkDepthStencilTexture_.View = VkDevice_.createImageViewUnique(ImageViewCreateInfo);
-      assert(VkDepthStencilTexture_.View);
-    }
-
-    //  レイアウトの変更
-    VkDepthStencilTexture_.SetImageLayout(CommandBuffer, vk::ImageLayout::eDepthStencilAttachmentOptimal, SubresourceRange);
   }
 
   CommandBuffer.end();
@@ -255,6 +163,18 @@ void CSwapChain::Initialize()
     }
     pDevice->SubmitAndWait(SubmitInfo);
   }
+
+  //  レンダーテクスチャの作成
+  {
+    RenderTextures_[0] = vdl::RenderTexture(Constants::kDefaultWindowSize, vdl::FormatType::eSwapChain);
+
+    CSwapChainRenderTexture* pRenderTexture = new CSwapChainRenderTexture;
+
+    Engine::Get<ITextureManager>()->SetTexture(RenderTextures_[0].GetID(), pRenderTexture);
+  }
+
+  //  深度ステンシルテクスチャの作成
+  DepthStencilTexture_ = vdl::DepthStencilTexture(Constants::kDefaultWindowSize, vdl::FormatType::eDefaultDepthStencil);
 
   //  コマンドプールの作成
   {

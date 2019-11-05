@@ -21,7 +21,6 @@ private:
   vk::UniqueSurfaceKHR Surface_;
   vk::UniqueSwapchainKHR VkSwapChain_;
   std::vector<CRenderTexture> VkRenderTextures_;
-  CDepthStencilTexture VkDepthStencilTexture_;
   vk::UniqueCommandPool CommandPool_;
   std::vector<vk::UniqueCommandBuffer> CommandBuffers_;
   vk::UniqueSemaphore Semaphore_;
@@ -44,8 +43,7 @@ public:
     return vk::Semaphore();
   }
 public:
-  [[nodiscard]] CRenderTexture* GetRenderTexture() { return &VkRenderTextures_[CurrentBufferIndex_]; }
-  [[nodiscard]] CDepthStencilTexture* GetDepthStencilTexture() { return &VkDepthStencilTexture_; }
+  [[nodiscard]] CRenderTexture* GetVkRenderTexture() { return &VkRenderTextures_[CurrentBufferIndex_]; }
 public:
   CSwapChain() = default;
 
@@ -60,4 +58,8 @@ public:
   void ChangeWindowMode()override;
 
   void ScreenShot()override;
+
+  const vdl::RenderTexture& GetRenderTexture()const override { return RenderTextures_[0]; }
+
+  const vdl::DepthStencilTexture& GetDepthStencilTexture()const override { return DepthStencilTexture_; }
 };

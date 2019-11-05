@@ -3,6 +3,8 @@
 
 #include <vdl/pch/Vulkan/pch.hpp>
 
+#include <vdl/Window.hpp>
+
 #include <vdl/Constants/Constants.hpp>
 
 struct CTexture : public ITexture
@@ -39,6 +41,18 @@ public:
   vdl::FormatType GetFormat()const final { return Format; }
 };
 
+struct CSwapChainRenderTexture : public ITexture
+{
+public:
+  CSwapChainRenderTexture() = default;
+
+  TextureType GetType()const final { return TextureType::eSwapChainRenderTexture; }
+
+  vdl::uint2 GetSize()const final { return vdl::Window::GetWindowSize(); }
+
+  vdl::FormatType GetFormat()const final { return vdl::FormatType::eSwapChain; }
+};
+
 struct CDepthStencilTexture : public IDepthStencilTexture
 {
   vk::UniqueImage Image;
@@ -60,9 +74,9 @@ public:
 
   vdl::FormatType GetFormat()const final { return Format; }
 
-  vdl::Texture GetDepthTexture()final;
+  const vdl::Texture& GetDepthTexture()final;
 
-  vdl::Texture GetStencilTexture()final;
+  const vdl::Texture& GetStencilTexture()final;
 public:
   void SetImageLayout(const vk::CommandBuffer& _CommandBuffer, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange& _SubresourceRange);
 };

@@ -248,7 +248,7 @@ void SceneTBDR::Update()
 
   //  LightPass
   {
-    Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
+    Renderer::SetRenderTexture(Window::GetRenderTexture(), Window::GetDepthStencilTexture());
 
     if (isTileBase)
     {
