@@ -476,158 +476,137 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
 template<class DisplayObject, class InstanceData>
 inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData)
 {
-  //  SetConstantBuffer
+  if (StateChangeFlags_.Has(RendererCommandType::eSetTopology))
   {
-    auto IssueRendererCommandSetConstantBuffer = [this](RendererCommandType _RendererCommandType, ShaderType _ShaderType)->void
-    {
-      ConstantBuffers TempConstantBuffers;
-      auto& CurrentConstantBuffers = CurrentConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
-      auto& ConstantBuffers = ConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
-      auto& LastConstantBuffers = LastConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
+    RendererCommands_.emplace_back(RendererCommandType::eSetTopology, static_cast<vdl::uint>(Topologys_.size()));
+    Topologys_.push_back(CurrentTopology_);
 
-      TempConstantBuffers = ConstantBuffers.back();
-      {
-        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < Constants::kMaxConstantBufferNum; ++ConstantBufferCount)
-        {
-          const vdl::Detail::ConstantBufferData& CurrentConstantBuffer = CurrentConstantBuffers[ConstantBufferCount];
-          const vdl::Detail::ConstantBufferData& LastConstantBuffer = LastConstantBuffers[ConstantBufferCount];
-          const vdl::Detail::ConstantBufferData& BeforeConstantBuffer = TempConstantBuffers[ConstantBufferCount];
-
-          if (!CurrentConstantBuffer.isEmpty() && (CurrentConstantBuffer != LastConstantBuffer
-            || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetBufferSize()) != 0))
-          {
-            TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
-            StateChangeFlags_.Set(_RendererCommandType);
-          }
-        }
-      }
-
-      if (StateChangeFlags_.Has(_RendererCommandType))
-      {
-        RendererCommands_.emplace_back(_RendererCommandType, static_cast<vdl::uint>(ConstantBuffers.size()));
-        LastConstantBuffers = CurrentConstantBuffers;
-        ConstantBuffers.emplace_back(std::move(TempConstantBuffers));
-        StateChangeFlags_.Cancel(_RendererCommandType);
-      }
-    };
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader);
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetHullStageConstantBuffer, ShaderType::eHullShader);
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader);
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader);
-
-    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetPixelStageConstantBuffer, ShaderType::ePixelShader);
+    StateChangeFlags_.Cancel(RendererCommandType::eSetTopology);
   }
 
-  if (!StateChangeFlags_.isEmpty())
+  if (StateChangeFlags_.Has(RendererCommandType::eSetScissor))
   {
-    if (StateChangeFlags_.Has(RendererCommandType::eSetTopology))
+    RendererCommands_.emplace_back(RendererCommandType::eSetScissor, static_cast<vdl::uint>(Scissors_.size()));
+    Scissors_.push_back(CurrentScissor_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetScissor);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetViewport))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetViewport, static_cast<vdl::uint>(Viewports_.size()));
+    Viewports_.push_back(CurrentViewport_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetViewport);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetBlendState))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetBlendState, static_cast<vdl::uint>(BlendStates_.size()));
+    BlendStates_.push_back(CurrentBlendState_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetBlendState);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetDepthStencilState))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetDepthStencilState, static_cast<vdl::uint>(DepthStencilStates_.size()));
+    DepthStencilStates_.push_back(CurrentDepthStencilState_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetDepthStencilState);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetRasterizerState))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetRasterizerState, static_cast<vdl::uint>(RasterizerStates_.size()));
+    RasterizerStates_.push_back(CurrentRasterizerState_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetRasterizerState);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetVertexShader))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetVertexShader, static_cast<vdl::uint>(VertexShaders_.size()));
+    VertexShaders_.push_back(CurrentVertexShader_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetVertexShader);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetHullShader))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetHullShader, static_cast<vdl::uint>(HullShaders_.size()));
+    HullShaders_.push_back(CurrentHullShader_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetHullShader);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetDomainShader))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetDomainShader, static_cast<vdl::uint>(DomainShaders_.size()));
+    DomainShaders_.push_back(CurrentDomainShader_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetDomainShader);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetGeometryShader))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetGeometryShader, static_cast<vdl::uint>(GeometryShaders_.size()));
+    GeometryShaders_.push_back(CurrentGeometryShader_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetGeometryShader);
+  }
+
+  if (StateChangeFlags_.Has(RendererCommandType::eSetPixelShader))
+  {
+    RendererCommands_.emplace_back(RendererCommandType::eSetPixelShader, static_cast<vdl::uint>(PixelShaders_.size()));
+    PixelShaders_.push_back(CurrentPixelShader_);
+
+    StateChangeFlags_.Cancel(RendererCommandType::eSetPixelShader);
+  }
+
+  auto IssueRendererCommandSetConstantBuffer = [this](RendererCommandType _RendererCommandType, ShaderType _ShaderType)->void
+  {
+    ConstantBuffers TempConstantBuffers;
+    auto& CurrentConstantBuffers = CurrentConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
+    auto& ConstantBuffers = ConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
+    auto& LastConstantBuffers = LastConstantBuffers_[static_cast<vdl::uint>(_ShaderType)];
+
+    TempConstantBuffers = ConstantBuffers.back();
     {
-      RendererCommands_.emplace_back(RendererCommandType::eSetTopology, static_cast<vdl::uint>(Topologys_.size()));
-      Topologys_.push_back(CurrentTopology_);
+      for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < Constants::kMaxConstantBufferNum; ++ConstantBufferCount)
+      {
+        const vdl::Detail::ConstantBufferData& CurrentConstantBuffer = CurrentConstantBuffers[ConstantBufferCount];
+        const vdl::Detail::ConstantBufferData& LastConstantBuffer = LastConstantBuffers[ConstantBufferCount];
+        const vdl::Detail::ConstantBufferData& BeforeConstantBuffer = TempConstantBuffers[ConstantBufferCount];
+
+        if (!CurrentConstantBuffer.isEmpty() && (CurrentConstantBuffer != LastConstantBuffer
+          || ::memcmp(CurrentConstantBuffer.GetData(), BeforeConstantBuffer.GetData(), CurrentConstantBuffer.GetBufferSize()) != 0))
+        {
+          TempConstantBuffers[ConstantBufferCount] = pBufferManager_->CloneConstantBuffer(CurrentConstantBuffer);
+          StateChangeFlags_.Set(_RendererCommandType);
+        }
+      }
     }
 
-    if (StateChangeFlags_.Has(RendererCommandType::eSetScissor))
+    if (StateChangeFlags_.Has(_RendererCommandType))
     {
-      RendererCommands_.emplace_back(RendererCommandType::eSetScissor, static_cast<vdl::uint>(Scissors_.size()));
-      Scissors_.push_back(CurrentScissor_);
+      RendererCommands_.emplace_back(_RendererCommandType, static_cast<vdl::uint>(ConstantBuffers.size()));
+      LastConstantBuffers = CurrentConstantBuffers;
+      ConstantBuffers.emplace_back(std::move(TempConstantBuffers));
+      StateChangeFlags_.Cancel(_RendererCommandType);
     }
+  };
 
-    if (StateChangeFlags_.Has(RendererCommandType::eSetViewport))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetViewport, static_cast<vdl::uint>(Viewports_.size()));
-      Viewports_.push_back(CurrentViewport_);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetBlendState))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetBlendState, static_cast<vdl::uint>(BlendStates_.size()));
-      BlendStates_.push_back(CurrentBlendState_);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetDepthStencilState))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetDepthStencilState, static_cast<vdl::uint>(DepthStencilStates_.size()));
-      DepthStencilStates_.push_back(CurrentDepthStencilState_);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetRasterizerState))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetRasterizerState, static_cast<vdl::uint>(RasterizerStates_.size()));
-      RasterizerStates_.push_back(CurrentRasterizerState_);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetVertexShader))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetVertexShader, static_cast<vdl::uint>(VertexShaders_.size()));
-      VertexShaders_.push_back(CurrentVertexShader_);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetHullShader))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetHullShader, static_cast<vdl::uint>(HullShaders_.size()));
-      HullShaders_.push_back(CurrentHullShader_);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetDomainShader))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetDomainShader, static_cast<vdl::uint>(DomainShaders_.size()));
-      DomainShaders_.push_back(CurrentDomainShader_);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetGeometryShader))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetGeometryShader, static_cast<vdl::uint>(GeometryShaders_.size()));
-      GeometryShaders_.push_back(CurrentGeometryShader_);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetPixelShader))
-    {
-      RendererCommands_.emplace_back(RendererCommandType::eSetPixelShader, static_cast<vdl::uint>(PixelShaders_.size()));
-      PixelShaders_.push_back(CurrentPixelShader_);
-    }
-
+  if (!CurrentVertexShader_.isEmpty())
+  {
     if (StateChangeFlags_.Has(RendererCommandType::eSetVertexStageShaderResource))
     {
       auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::eVertexShader)];
 
       RendererCommands_.emplace_back(RendererCommandType::eSetVertexStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
       ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::eVertexShader)]);
-    }
 
-    if (StateChangeFlags_.Has(RendererCommandType::eSetHullStageShaderResource))
-    {
-      auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::eHullShader)];
-
-      RendererCommands_.emplace_back(RendererCommandType::eSetHullStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
-      ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::eHullShader)]);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetDomainStageShaderResource))
-    {
-      auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::eDomainShader)];
-
-      RendererCommands_.emplace_back(RendererCommandType::eSetDomainStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
-      ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::eDomainShader)]);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetGeometryStageShaderResource))
-    {
-      auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::eGeometryShader)];
-
-      RendererCommands_.emplace_back(RendererCommandType::eSetGeometryStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
-      ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::eGeometryShader)]);
-    }
-
-    if (StateChangeFlags_.Has(RendererCommandType::eSetPixelStageShaderResource))
-    {
-      auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::ePixelShader)];
-
-      RendererCommands_.emplace_back(RendererCommandType::eSetPixelStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
-      ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::ePixelShader)]);
+      StateChangeFlags_.Cancel(RendererCommandType::eSetVertexStageShaderResource);
     }
 
     if (StateChangeFlags_.Has(RendererCommandType::eSetVertexStageSampler))
@@ -636,6 +615,23 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
 
       RendererCommands_.emplace_back(RendererCommandType::eSetVertexStageSampler, static_cast<vdl::uint>(Sampler.size()));
       Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eVertexShader)]);
+
+      StateChangeFlags_.Cancel(RendererCommandType::eSetVertexStageSampler);
+    }
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetVertexStageConstantBuffer, ShaderType::eVertexShader);
+  }
+
+  if (!CurrentHullShader_.isEmpty())
+  {
+    if (StateChangeFlags_.Has(RendererCommandType::eSetHullStageShaderResource))
+    {
+      auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::eHullShader)];
+
+      RendererCommands_.emplace_back(RendererCommandType::eSetHullStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
+      ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::eHullShader)]);
+
+      StateChangeFlags_.Cancel(RendererCommandType::eSetHullStageShaderResource);
     }
 
     if (StateChangeFlags_.Has(RendererCommandType::eSetHullStageSampler))
@@ -644,6 +640,23 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
 
       RendererCommands_.emplace_back(RendererCommandType::eSetHullStageSampler, static_cast<vdl::uint>(Sampler.size()));
       Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eHullShader)]);
+
+      StateChangeFlags_.Cancel(RendererCommandType::eSetHullStageSampler);
+    }
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetHullStageConstantBuffer, ShaderType::eHullShader);
+  }
+
+  if (!CurrentDomainShader_.isEmpty())
+  {
+    if (StateChangeFlags_.Has(RendererCommandType::eSetDomainStageShaderResource))
+    {
+      auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::eDomainShader)];
+
+      RendererCommands_.emplace_back(RendererCommandType::eSetDomainStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
+      ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::eDomainShader)]);
+
+      StateChangeFlags_.Cancel(RendererCommandType::eSetDomainStageShaderResource);
     }
 
     if (StateChangeFlags_.Has(RendererCommandType::eSetDomainStageSampler))
@@ -652,6 +665,23 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
 
       RendererCommands_.emplace_back(RendererCommandType::eSetDomainStageSampler, static_cast<vdl::uint>(Sampler.size()));
       Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eDomainShader)]);
+
+      StateChangeFlags_.Cancel(RendererCommandType::eSetDomainStageSampler);
+    }
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetDomainStageConstantBuffer, ShaderType::eDomainShader);
+  }
+
+  if (!CurrentGeometryShader_.isEmpty())
+  {
+    if (StateChangeFlags_.Has(RendererCommandType::eSetGeometryStageShaderResource))
+    {
+      auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::eGeometryShader)];
+
+      RendererCommands_.emplace_back(RendererCommandType::eSetGeometryStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
+      ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::eGeometryShader)]);
+
+      StateChangeFlags_.Cancel(RendererCommandType::eSetGeometryStageShaderResource);
     }
 
     if (StateChangeFlags_.Has(RendererCommandType::eSetGeometryStageSampler))
@@ -660,6 +690,23 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
 
       RendererCommands_.emplace_back(RendererCommandType::eSetGeometryStageSampler, static_cast<vdl::uint>(Sampler.size()));
       Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::eGeometryShader)]);
+
+      StateChangeFlags_.Cancel(RendererCommandType::eSetGeometryStageSampler);
+    }
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetGeometryStageConstantBuffer, ShaderType::eGeometryShader);
+  }
+
+  if (!CurrentPixelShader_.isEmpty())
+  {
+    if (StateChangeFlags_.Has(RendererCommandType::eSetPixelStageShaderResource))
+    {
+      auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(ShaderType::ePixelShader)];
+
+      RendererCommands_.emplace_back(RendererCommandType::eSetPixelStageShaderResource, static_cast<vdl::uint>(ShaderResources.size()));
+      ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(ShaderType::ePixelShader)]);
+
+      StateChangeFlags_.Cancel(RendererCommandType::eSetPixelStageShaderResource);
     }
 
     if (StateChangeFlags_.Has(RendererCommandType::eSetPixelStageSampler))
@@ -668,10 +715,12 @@ inline void RendererCommandList<DisplayObject, InstanceData>::PushDrawData(const
 
       RendererCommands_.emplace_back(RendererCommandType::eSetPixelStageSampler, static_cast<vdl::uint>(Sampler.size()));
       Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)]);
-    }
-  }
 
-  StateChangeFlags_.Clear();
+      StateChangeFlags_.Cancel(RendererCommandType::eSetPixelStageSampler);
+    }
+
+    IssueRendererCommandSetConstantBuffer(RendererCommandType::eSetPixelStageConstantBuffer, ShaderType::ePixelShader);
+  }
 
   //  Draw
   {

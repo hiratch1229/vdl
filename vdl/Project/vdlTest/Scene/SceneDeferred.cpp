@@ -62,12 +62,12 @@ void SceneDeferred::Initialize()
       FilterType::eAnisotropic, 16, BorderColorType::eWhite);
     Renderer::SetPixelStageSamplers(0, 1, &ShadowMapSampler_);
 
-    for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+    for (vdl::uint i = 0; i < kGBufferNum; ++i)
     {
-      PixelStageShaderResources_[i] = GBufferRenderTextures_[i];
+      ShaderResources_[i] = GBufferRenderTextures_[i];
     }
-    PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_.GetDepthTexture();
-    PixelStageShaderResources_[kUseRenderTextureNum + 1] = ShadowMap_.GetDepthTexture();
+    ShaderResources_[kGBufferNum + 0] = GBufferDepthTexture_.GetDepthTexture();
+    ShaderResources_[kGBufferNum + 1] = ShadowMap_.GetDepthTexture();
 
     Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
     LightData& LightData = LightConstantBuffer_.GetData();
@@ -133,11 +133,14 @@ void SceneDeferred::Update()
         ImGui::InputFloat("Range", &PointLightRange_);
         ImGui::TreePop();
       }
-      if (ImGui::TreeNode("GBuffer"))
+      if (ImGui::TreeNode("ShaderResources"))
       {
-        for (auto& PixelStageShaderResource : PixelStageShaderResources_)
+        for (vdl::uint i = 0; i < kShaderResourceNum; ++i)
         {
-          ImGui::Image(PixelStageShaderResource, kGBufferDisplaySize);
+          if (ImGui::CollapsingHeader(kShaderResourceNames[i]))
+          {
+            ImGui::Image(ShaderResources_[i], kGBufferDisplaySize);
+          }
         }
         ImGui::TreePop();
       }
@@ -172,7 +175,7 @@ void SceneDeferred::Update()
 
   //  ‰æ–Ê‚ÌƒNƒŠƒA
   {
-    for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+    for (vdl::uint i = 0; i < kGBufferNum; ++i)
     {
       Renderer::Clear(GBufferRenderTextures_[i]);
     }
@@ -210,7 +213,7 @@ void SceneDeferred::Update()
   //  LightPass
   {
     Renderer::SetRenderTexture(RenderTexture(), DepthStencilTexture());
-    Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(PixelStageShaderResources_.size()), PixelStageShaderResources_.data());
+    Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(ShaderResources_.size()), ShaderResources_.data());
 
     Renderer::Draw(3);
   }

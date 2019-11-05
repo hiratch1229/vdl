@@ -138,6 +138,6 @@ void main(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThread
   {
     LightColor += Calc(PointLights[gTileLightIndices[LightCount]], Position.xyz, Normal);
   }
-  
+
   OutputTexture[Texcoord.xy] = float4(Diffuse.rgb + AmbientColor + LightColor, Diffuse.a);
 }

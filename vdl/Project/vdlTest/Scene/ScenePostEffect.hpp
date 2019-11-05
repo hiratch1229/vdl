@@ -4,13 +4,14 @@
 class ScenePostEffect : public IScene
 {
   static constexpr float kGroundScale = 18.0f;
-  static constexpr vdl::uint kUseRenderTextureNum = 2;
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
   static constexpr vdl::uint2 kGBufferSize = kWindowSize;
   static constexpr vdl::uint2 kShadowMapSize = kWindowSize * 1;
+  static constexpr vdl::uint kGBufferNum = 2; /* Diffuse + NormalMap */
+  static constexpr vdl::uint kShaderResourceNum = kGBufferNum + 2;  /* GBuffer + Depth + ShadowMap */
+  static constexpr const char* kShaderResourceNames[] = { "Diffuse", "NormalMap", "Depth", "ShadowMap", "Blur" };
   static constexpr vdl::uint kShrinkBuffeNum = 4;
-  static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 4;
-  static constexpr vdl::uint kGBufferLeftPos = kWindowSize.x - kGBufferDisplaySize.x;
+  static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 5;
   static constexpr const char* kLigthPassPSFilePath = "Shader/PostEffect/LightPassPS.hlsl";
 private:
   struct RenderingData
@@ -43,7 +44,7 @@ private:
   vdl::PixelShader LightPassPixelShader_;
   vdl::RenderTextures RenderTextures_;
   vdl::Sampler ShadowMapSampler_;
-  std::array<vdl::Texture, kUseRenderTextureNum + 2> PixelStageShaderResources_;
+  std::array<vdl::Texture, kShaderResourceNum> ShaderResources_;
   vdl::ConstantBuffer<vdl::DirectinalLight> DirectionalLightConstantBuffer_;
   vdl::ConstantBuffer<RenderingData> RenderingConstantBuffer_;
 private:

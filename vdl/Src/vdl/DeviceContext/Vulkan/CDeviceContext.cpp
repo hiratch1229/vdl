@@ -2575,6 +2575,11 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
           const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
           for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
           {
+            if (ConstantBuffers[ConstantBufferCount].isEmpty())
+            {
+              continue;
+            }
+
             assert(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eCopyConstantBuffer);
             CCopyConstantBuffer* pConstantBuffer = static_cast<CCopyConstantBuffer*>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
 

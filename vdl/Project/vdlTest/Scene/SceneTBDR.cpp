@@ -195,6 +195,17 @@ void SceneTBDR::Update()
         ImGui::InputFloat("Range", &UpdateData.PointLightRange);
         ImGui::TreePop();
       }
+      if (ImGui::TreeNode("GBuffer"))
+      {
+        for (vdl::uint i = 0; i < kGBufferNum; ++i)
+        {
+          if (ImGui::CollapsingHeader(kGBufferNames[i]))
+          {
+            ImGui::Image(GBufferRenderTextures_[i], kGBufferDisplaySize);
+          }
+        }
+        ImGui::TreePop();
+      }
     }
     ImGui::End();
 

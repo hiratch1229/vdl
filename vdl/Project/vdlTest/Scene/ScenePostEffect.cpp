@@ -51,12 +51,12 @@ void ScenePostEffect::Initialize()
       FilterType::eAnisotropic, 16, BorderColorType::eWhite);
     Renderer::SetPixelStageSamplers(0, 1, &ShadowMapSampler_);
 
-    for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+    for (vdl::uint i = 0; i < kGBufferNum; ++i)
     {
-      PixelStageShaderResources_[i] = GBufferRenderTextures_[i];
+      ShaderResources_[i] = GBufferRenderTextures_[i];
     }
-    PixelStageShaderResources_[kUseRenderTextureNum] = GBufferDepthTexture_.GetDepthTexture();
-    PixelStageShaderResources_[kUseRenderTextureNum + 1] = ShadowMap_.GetDepthTexture();
+    ShaderResources_[kGBufferNum + 0] = GBufferDepthTexture_.GetDepthTexture();
+    ShaderResources_[kGBufferNum + 1] = ShadowMap_.GetDepthTexture();
 
     DirectionalLightConstantBuffer_.GetData() = { float3(float3(0.0f) - DirectionLightPosition_).Normalize(), 1.5f, Palette::White };
     Renderer::SetPixelStageConstantBuffers(0, 1, &DirectionalLightConstantBuffer_);
@@ -106,7 +106,7 @@ void ScenePostEffect::Update()
       RenderingData.InverseViewProjection = (Renderer3D::GetView() * Renderer3D::GetProjection()).Inverse();
     }
 
-    ImGui::Begin("SceneDeferred");
+    ImGui::Begin("ScenePostEffect");
     {
       if (ImGui::Button("Reload LightPassPS"))
       {
@@ -129,6 +129,27 @@ void ScenePostEffect::Update()
         ImGui::ColorEdit3("Color", &DirectionalLight.Color);
         ImGui::TreePop();
       }
+      if (ImGui::TreeNode("ShaderResources"))
+      {
+        for (vdl::uint i = 0; i < kShaderResourceNum; ++i)
+        {
+          if (ImGui::CollapsingHeader(kShaderResourceNames[i]))
+          {
+            ImGui::Image(ShaderResources_[i], kGBufferDisplaySize);
+          }
+        }
+        if (ImGui::CollapsingHeader(kShaderResourceNames[kShaderResourceNum + 0]))
+        {
+          for (vdl::uint ShrinkBufferCount = 0; ShrinkBufferCount < kShrinkBuffeNum; ++ShrinkBufferCount)
+          {
+            ImGui::Text(std::string("TextureSize:" + std::to_string(ShrinkBuffers_[ShrinkBufferCount].GetSize())).c_str());
+            ImGui::Image(ShrinkBuffers_[ShrinkBufferCount], kGBufferDisplaySize);
+          }
+        }
+
+        ImGui::TreePop();
+      }
+
     }
     ImGui::End();
 
@@ -138,7 +159,7 @@ void ScenePostEffect::Update()
 
   //  ‰æ–Ê‚ÌƒNƒŠƒA
   {
-    for (vdl::uint i = 0; i < kUseRenderTextureNum; ++i)
+    for (vdl::uint i = 0; i < kGBufferNum; ++i)
     {
       Renderer::Clear(GBufferRenderTextures_[i]);
     }
@@ -171,7 +192,7 @@ void ScenePostEffect::Update()
   //  LightPass
   {
     Renderer::SetRenderTextures(RenderTextures_, DepthStencilTexture());
-    Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(PixelStageShaderResources_.size()), PixelStageShaderResources_.data());
+    Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(ShaderResources_.size()), ShaderResources_.data());
 
     Renderer::Draw(3);
   }
@@ -183,7 +204,6 @@ void ScenePostEffect::Update()
 
     //  Blur
     {
-
       vdl::Texture SrcTexture = RenderTextures_[1];
       vdl::Viewport Viewport = { 0, 0 };
 
@@ -215,17 +235,5 @@ void ScenePostEffect::Update()
 
       Renderer2D::Draw(RenderTextures_[0]);
     }
-  }
-
-  //  GBuffer‚Ì•`‰æ
-  {
-    Renderer2D::SetPixelShader(TexturePixelShader_);
-
-    for (vdl::uint i = 0; i < PixelStageShaderResources_.size(); ++i)
-    {
-      Renderer2D::Draw(PixelStageShaderResources_[i], float2(kGBufferLeftPos, kGBufferDisplaySize.y * i), kGBufferDisplaySize);
-    }
-
-    Renderer2D::Draw(RenderTextures_[1], float2(kGBufferLeftPos - kGBufferDisplaySize.x, kWindowSize.y - kGBufferDisplaySize.y), kGBufferDisplaySize);
   }
 }

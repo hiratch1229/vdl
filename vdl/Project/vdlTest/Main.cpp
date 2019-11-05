@@ -49,7 +49,7 @@ void Main()
     "TBDR"
   };
   static constexpr uint kSceneTypeNum = static_cast<uint>(Macro::ArraySize(kSceneTypes));
-  static constexpr uint kInitSceneType = 2;
+  static constexpr uint kInitSceneType = 4;
   static_assert(kInitSceneType < kSceneTypeNum);
 
   const VertexShader DefaultVertexShader2D = VertexShader("Shader/Texture/TextureVS.hlsl", InputLayoutType::eTexture);

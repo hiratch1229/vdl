@@ -25,9 +25,10 @@ private:
   static constexpr float kRectangleHalfScale = kRectangleScale * 0.5f;
   static constexpr float kSphereScale = 0.5f;
   static constexpr vdl::uint kDataNum = 128;
-  static constexpr vdl::uint kUseRenderTextureNum = 3;
+  static constexpr vdl::uint kGBufferNum = 3; /* Diffuse + NormalMap + Specular */
+  static constexpr vdl::uint kShaderResourceNum = kGBufferNum + 2;  /* GBuffer + Depth + ShadowMap */
+  static constexpr const char* kShaderResourceNames[] = { "Diffuse", "NormalMap", "Specular", "Depth", "ShadowMap" };
   static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 5;
-  static constexpr vdl::uint kGBufferLeftPos = kWindowSize.x - kGBufferDisplaySize.x;
   static constexpr const char* kLigthPassPSFilePath = "Shader/Deferred/LightPassPS.hlsl";
 private:
   struct LightData
@@ -68,7 +69,7 @@ private:
   vdl::VertexShader LightPassVertexShader_;
   vdl::PixelShader LightPassPixelShader_;
   vdl::Sampler ShadowMapSampler_;
-  std::array<vdl::Texture, kUseRenderTextureNum + 2> PixelStageShaderResources_;
+  std::array<vdl::Texture, kShaderResourceNum> ShaderResources_;
   vdl::ConstantBuffer<LightData> LightConstantBuffer_;
   vdl::ConstantBuffer<RenderingData> RenderingConstantBuffer_;
 public:

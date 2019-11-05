@@ -29,7 +29,9 @@ private:
   static constexpr vdl::float3 kPointLightMaxMoveRange = vdl::float3(10.1f, 10.5f, 5.0f);
   static constexpr vdl::float3 kPointLightAxisMargin = vdl::float3(3.5f, 0.5f, 3.25f);
   static constexpr vdl::uint kMaxDataNum = 4096;
-  static constexpr vdl::uint kGBufferNum = 2; /* Diffuse + Normal */
+  static constexpr vdl::uint kGBufferNum = 2; /* Diffuse + NormalMap */
+  static constexpr const char* kGBufferNames[] = { "Diffuse", "NormalMap" };
+  static constexpr vdl::float2 kGBufferDisplaySize = kWindowSize / 5.0f;
   static constexpr vdl::uint kPointLightUpdateThreadNum = 1024;
   static constexpr vdl::uint3 kPointLightUpdateDispatchNum = vdl::uint3(kMaxDataNum / kPointLightUpdateThreadNum + (kMaxDataNum % kPointLightUpdateThreadNum == 0 ? 0 : 1), 1, 1);
   static constexpr float kMinUpdateTime = 5.0f;

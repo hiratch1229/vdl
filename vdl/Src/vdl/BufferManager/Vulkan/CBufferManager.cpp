@@ -88,23 +88,18 @@ vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::D
 
 void* CBufferManager::GetBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
-  IBuffer* pConstantBuffer = GetBuffer(_ConstantBuffer.GetID());
-  assert(pConstantBuffer->GetType() == BufferType::eConstantBuffer || pConstantBuffer->GetType() == BufferType::eCopyConstantBuffer);
+  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer || GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
 
-  if (pConstantBuffer->GetType() == BufferType::eConstantBuffer)
-  {
-    return static_cast<CConstantBuffer*>(pConstantBuffer)->GetBuffer();
-  }
-  else
-  {
-    return static_cast<CCopyConstantBuffer*>(pConstantBuffer)->GetBuffer();
-  }
+  IConstantBuffer* pConstantBuffer =static_cast<IConstantBuffer*>( GetBuffer(_ConstantBuffer.GetID()));
+  return pConstantBuffer->GetBuffer();
 }
 
 vdl::uint CBufferManager::GetBufferSize(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
   assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer || GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
-  return static_cast<CConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()))->GetBufferSize();
+
+  IConstantBuffer* pConstantBuffer = static_cast<IConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()));
+  return pConstantBuffer->GetBufferSize();
 }
 
 vdl::ID CBufferManager::CreateUnorderedAccessBuffer(vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer)

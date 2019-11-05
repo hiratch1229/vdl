@@ -37,7 +37,6 @@ public:
 
 struct CConstantBuffer : public IConstantBuffer
 {
-  Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
   void* Buffer;
   vdl::uint BufferSize;
 public:
@@ -53,6 +52,26 @@ public:
   void* GetBuffer()const override final { return Buffer; }
 
   vdl::uint GetBufferSize()const override final { return BufferSize; }
+};
+
+struct CCopyConstantBuffer : public IConstantBuffer
+{
+  Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
+  void* Buffer;
+  vdl::uint BufferSize;
+public:
+  CCopyConstantBuffer() = default;
+
+  CCopyConstantBuffer(vdl::uint _BufferSize)
+    : Buffer(new char[_BufferSize]), BufferSize(_BufferSize) {}
+
+  ~CCopyConstantBuffer() { vdl::Macro::SafeDelete(Buffer); }
+
+  void* GetBuffer()const final { return Buffer; }
+
+  vdl::uint GetBufferSize()const final { return BufferSize; }
+
+  BufferType GetType()const final { return BufferType::eCopyConstantBuffer; }
 };
 
 struct CUnordererdAccessBuffer : public IBuffer

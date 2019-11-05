@@ -74,30 +74,34 @@ vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::D
 
   vdl::Detail::ConstantBufferData ConstantBuffer(pSrcConstantBuffer->BufferSize);
   {
-    CConstantBuffer* pDestConstantBuffer = static_cast<CConstantBuffer*>(GetBuffer(ConstantBuffer.GetID()));
-    ::memcpy(pDestConstantBuffer->Buffer, pSrcConstantBuffer->Buffer, pDestConstantBuffer->BufferSize);
-
-    HRESULT hr = S_OK;
-
-    D3D11_BUFFER_DESC BufferDesc;
+    CCopyConstantBuffer* pCopyConstantBuffer = new CCopyConstantBuffer(pSrcConstantBuffer->BufferSize);
     {
-      BufferDesc.ByteWidth = pDestConstantBuffer->BufferSize;
-      BufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-      BufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-      BufferDesc.CPUAccessFlags = 0;
-      BufferDesc.MiscFlags = 0;
-      BufferDesc.StructureByteStride = 0;
+      ::memcpy(pCopyConstantBuffer->Buffer, pSrcConstantBuffer->Buffer, pCopyConstantBuffer->BufferSize);
+
+      HRESULT hr = S_OK;
+
+      D3D11_BUFFER_DESC BufferDesc;
+      {
+        BufferDesc.ByteWidth = pCopyConstantBuffer->BufferSize;
+        BufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+        BufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        BufferDesc.CPUAccessFlags = 0;
+        BufferDesc.MiscFlags = 0;
+        BufferDesc.StructureByteStride = 0;
+      }
+
+      D3D11_SUBRESOURCE_DATA InitialData;
+      {
+        InitialData.pSysMem = pCopyConstantBuffer->Buffer;
+        InitialData.SysMemPitch = 0;
+        InitialData.SysMemSlicePitch = 0;
+      }
+
+      hr = pD3D11Device_->CreateBuffer(&BufferDesc, &InitialData, pCopyConstantBuffer->pBuffer.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
     }
 
-    D3D11_SUBRESOURCE_DATA InitialData;
-    {
-      InitialData.pSysMem = pDestConstantBuffer->Buffer;
-      InitialData.SysMemPitch = 0;
-      InitialData.SysMemSlicePitch = 0;
-    }
-
-    hr = pD3D11Device_->CreateBuffer(&BufferDesc, &InitialData, pDestConstantBuffer->pBuffer.GetAddressOf());
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    Buffers_.Get(ConstantBuffer.GetID()) = pCopyConstantBuffer;
   }
 
   return ConstantBuffer;
@@ -105,14 +109,18 @@ vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::D
 
 void* CBufferManager::GetBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
-  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
-  return static_cast<CConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()))->GetBuffer();
+  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer || GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
+
+  IConstantBuffer* pConstantBuffer = static_cast<IConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()));
+  return pConstantBuffer->GetBuffer();
 }
 
 vdl::uint CBufferManager::GetBufferSize(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
-  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
-  return static_cast<CConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()))->GetBufferSize();
+  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer || GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
+
+  IConstantBuffer* pConstantBuffer = static_cast<IConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()));
+  return pConstantBuffer->GetBufferSize();
 }
 
 vdl::ID CBufferManager::CreateUnorderedAccessBuffer(vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer)

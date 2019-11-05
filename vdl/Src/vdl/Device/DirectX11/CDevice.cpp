@@ -109,10 +109,14 @@ void CDevice::Initialize()
   };
   constexpr vdl::uint kFeatureLevelNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kFeatureLevels));
 
-  Microsoft::WRL::ComPtr<IDXGIFactory7> pFactory;
+  Microsoft::WRL::ComPtr<IDXGIFactory6> pFactory;
   {
-    hr = ::CreateDXGIFactory2(kDxgiCreateFactoryFlag, IID_PPV_ARGS(pFactory.GetAddressOf()));
+    Microsoft::WRL::ComPtr<IDXGIFactory2> pFactory2;
+
+    hr = ::CreateDXGIFactory2(kDxgiCreateFactoryFlag, IID_PPV_ARGS(pFactory2.GetAddressOf()));
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+
+    pFactory2.As(&pFactory);
   }
 
   bool useWrapAdapter = false;

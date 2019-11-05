@@ -88,7 +88,6 @@ namespace vdl
 
 namespace std
 {
-  template <class Type>
   [[nodiscard]] inline string to_string(vdl::FormatType _Format)
   {
     switch (_Format)
@@ -169,7 +168,6 @@ namespace std
     }
   }
 
-  template <class Type>
   [[nodiscard]] inline wstring to_wstring(vdl::FormatType _Format)
   {
     switch (_Format)

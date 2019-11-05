@@ -907,7 +907,13 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
 void CDeviceContext::Flush()
 {
-  pD3D11ImmediateContext_->ClearState();
+  std::array<ID3D11ShaderResourceView*, Constants::kMaxShaderResourceNum> ShaderResources = {};
+
+  pD3D11ImmediateContext_->VSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
+  pD3D11ImmediateContext_->HSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
+  pD3D11ImmediateContext_->DSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
+  pD3D11ImmediateContext_->GSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
+  pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
 }
 
 //--------------------------------------------------
@@ -1041,8 +1047,8 @@ ID3D11Buffer* CDeviceContext::GetConstantBuffer(const vdl::Detail::ConstantBuffe
   {
     if (!_ConstantBuffer.isEmpty())
     {
-      assert(pBufferManager_->GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
-      pConstantBuffer = static_cast<CConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()))->pBuffer.Get();
+      assert(pBufferManager_->GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
+      pConstantBuffer = static_cast<CCopyConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()))->pBuffer.Get();
     }
   }
 
