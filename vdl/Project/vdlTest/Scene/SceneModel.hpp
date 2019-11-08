@@ -14,6 +14,4 @@ public:
   void Initialize()override;
 
   void Update()override;
-
-  SceneType GetType()const override { return SceneType::eModel; }
 };

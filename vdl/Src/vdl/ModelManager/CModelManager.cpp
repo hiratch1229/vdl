@@ -7,6 +7,9 @@
 #include <vdl/Misc/Windows/Misc.hpp>
 
 #include <vdl/Model.hpp>
+
+#include <ThirdParty/meshoptimizer/meshoptimizer.h>
+
 #include <vdl/DetectMemoryLeak.hpp>
 
 #include <filesystem>
@@ -117,6 +120,24 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
       else
       {
         _ASSERT_EXPR_A(false, (FileFormat + "は対応していません。").c_str());
+      }
+
+      //  メッシュの最適化
+      {
+        const size_t VertexNum = ModelData.Vertices.size();
+        const size_t IndexNum = ModelData.Indices.size();
+
+        std::vector<vdl::IndexType> Remap(VertexNum);
+        const size_t NewVertexNum = ::meshopt_generateVertexRemap(Remap.data(), ModelData.Indices.data(), IndexNum, ModelData.Vertices.data(), VertexNum, sizeof(vdl::Vertex3D));
+
+        vdl::Indices Indices(IndexNum);
+        ::meshopt_remapIndexBuffer(Indices.data(), ModelData.Indices.data(), IndexNum, Remap.data());
+
+        vdl::Vertices Vertices(NewVertexNum);
+        ::meshopt_remapVertexBuffer(Vertices.data(), ModelData.Vertices.data(), VertexNum, sizeof(vdl::Vertex3D), Remap.data());
+
+        ModelData.Vertices = std::move(Vertices);
+        ModelData.Indices = std::move(Indices);
       }
 
       if (_isSerialize)

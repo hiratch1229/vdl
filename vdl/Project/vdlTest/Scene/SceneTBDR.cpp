@@ -99,7 +99,7 @@ void SceneTBDR::Initialize()
     GBufferPassPixelShader_ = PixelShader("Shader/TBDR/GBufferPassPS.hlsl");
 
     GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
-    GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Snorm);
+    GBufferRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
     GBufferDepthTexture_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
   }
 
@@ -230,7 +230,7 @@ void SceneTBDR::Update()
 
   //  ‰æ–Ê‚ÌƒNƒŠƒA
   {
-    for (vdl::uint i = 0; i < kGBufferNum; ++i)
+    for (uint i = 0; i < kGBufferNum; ++i)
     {
       Renderer::Clear(GBufferRenderTextures_[i]);
     }
@@ -252,7 +252,7 @@ void SceneTBDR::Update()
 
     if (isTileBase)
     {
-      Computer::SetShaderResources(0, static_cast<vdl::uint>(LightShaderResources_.size() - 1), LightShaderResources_.data());
+      Computer::SetShaderResources(0, static_cast<uint>(LightShaderResources_.size() - 1), LightShaderResources_.data());
 
       Computer::Dispatch(kTileBaseDispatchNum);
 
@@ -260,7 +260,7 @@ void SceneTBDR::Update()
     }
     else
     {
-      Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(LightShaderResources_.size()), LightShaderResources_.data());
+      Renderer::SetPixelStageShaderResources(0, static_cast<uint>(LightShaderResources_.size()), LightShaderResources_.data());
 
       Renderer::Draw(3);
     }

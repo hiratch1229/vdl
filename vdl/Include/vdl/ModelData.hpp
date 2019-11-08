@@ -12,7 +12,7 @@ namespace vdl
 {
   struct Material
   {
-    ColorF MaterialColor;
+    ColorF MaterialColor = Palette::White;
     Texture Diffuse;
     Texture NormalMap;
   };

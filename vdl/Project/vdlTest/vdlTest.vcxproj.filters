@@ -45,6 +45,9 @@
     <Filter Include="シェーダーファイル\GBufferPass">
       <UniqueIdentifier>{71a30c62-719d-424b-825d-6241bbb6d1a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Ocean">
+      <UniqueIdentifier>{a3cd13b5-6af7-4ee7-9411-662809f90946}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -74,6 +77,9 @@
     <ClCompile Include="Scene\SceneTBDR.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\SceneOcean.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Scene.hpp">
@@ -101,6 +107,9 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\SceneTBDR.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneOcean.hpp">
       <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
@@ -195,6 +204,18 @@
     <FxCompile Include="Shader\GBufferPass\GBufferPassVS.hlsl">
       <Filter>シェーダーファイル\GBufferPass</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurfaceVS.hlsl">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurfacePS.hlsl">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurfaceDS.hlsl">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurfaceHS.hlsl">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">
@@ -223,6 +244,9 @@
     </None>
     <None Include="Shader\GBufferPass\GBufferPass.hlsli">
       <Filter>シェーダーファイル\GBufferPass</Filter>
+    </None>
+    <None Include="Shader\Ocean\WaterSurface.hlsli">
+      <Filter>シェーダーファイル\Ocean</Filter>
     </None>
   </ItemGroup>
 </Project>

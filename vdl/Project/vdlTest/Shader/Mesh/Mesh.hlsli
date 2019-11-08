@@ -1,7 +1,7 @@
 struct VS_IN
 {
   float4 Position : POSITION;
-  float4 Normal : NORMAL;
+  float3 Normal : NORMAL;
   float3 Tangent : TANGENT;
   float2 Texcoord : TEXCOORD;
   float4 BoneWeights : WEIGHTS;

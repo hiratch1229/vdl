@@ -159,13 +159,13 @@ void ScenePostEffect::Update()
 
   //  ‰æ–Ê‚ÌƒNƒŠƒA
   {
-    for (vdl::uint i = 0; i < kGBufferNum; ++i)
+    for (uint i = 0; i < kGBufferNum; ++i)
     {
       Renderer::Clear(GBufferRenderTextures_[i]);
     }
     Renderer::Clear(GBufferDepthTexture_);
     Renderer::Clear(ShadowMap_);
-    for (vdl::uint i = 0; i < kShrinkBuffeNum; ++i)
+    for (uint i = 0; i < kShrinkBuffeNum; ++i)
     {
       Renderer::Clear(ShrinkBuffers_[i]);
       Renderer::Clear(ShrinkDepthBuffer_[i]);
@@ -192,7 +192,7 @@ void ScenePostEffect::Update()
   //  LightPass
   {
     Renderer::SetRenderTextures(RenderTextures_, DepthStencilTexture());
-    Renderer::SetPixelStageShaderResources(0, static_cast<vdl::uint>(ShaderResources_.size()), ShaderResources_.data());
+    Renderer::SetPixelStageShaderResources(0, static_cast<uint>(ShaderResources_.size()), ShaderResources_.data());
 
     Renderer::Draw(3);
   }
@@ -200,14 +200,14 @@ void ScenePostEffect::Update()
   //  PostProcess
   {
     decltype(BloomShaderResources_) ShaderResources;
-    Renderer2D::SetPixelStageShaderResources(1, static_cast<vdl::uint>(ShaderResources.size()), ShaderResources.data());
+    Renderer2D::SetPixelStageShaderResources(1, static_cast<uint>(ShaderResources.size()), ShaderResources.data());
 
     //  Blur
     {
-      vdl::Texture SrcTexture = RenderTextures_[1];
-      vdl::Viewport Viewport = { 0, 0 };
+      Texture SrcTexture = RenderTextures_[1];
+      Viewport Viewport = { 0, 0 };
 
-      for (vdl::uint i = 0; i < kShrinkBuffeNum; ++i)
+      for (uint i = 0; i < kShrinkBuffeNum; ++i)
       {
         Renderer::SetRenderTexture(ShrinkBuffers_[i], ShrinkDepthBuffer_[i]);
 

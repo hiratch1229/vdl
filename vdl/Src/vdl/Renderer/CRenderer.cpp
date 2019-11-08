@@ -3,6 +3,7 @@
 #include <vdl/Engine.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
+#include <vdl/SwapChain/ISwapChain.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
 #include <vdl/ModelManager/IModelManager.hpp>
@@ -20,6 +21,11 @@ void CRenderer::Initialize()
 {
   pDevice_ = Engine::Get<IDevice>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
+
+  ISwapChain* pSwapchain = Engine::Get<ISwapChain>();
+
+  OutputManager_.RenderTextures[0] = pSwapchain->GetRenderTexture();
+  OutputManager_.DepthStencilTexture = pSwapchain->GetDepthStencilTexture();
 
   pCameraData_ = std::make_unique<CameraData>();
 

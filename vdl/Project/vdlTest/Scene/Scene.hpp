@@ -1,21 +1,6 @@
 #pragma once
 #include <vdl.hpp>
 
-enum class SceneType : vdl::uint
-{
-  eSprite,
-  eModel,
-  eMultiRenderTexture,
-  eTessellation,
-  eGPUParticle,
-
-  eDeferred,
-  ePostEffect,
-  eTBDR,
-
-  eNum
-};
-
 class IScene
 {
 public:
@@ -26,6 +11,4 @@ public:
   virtual void Initialize() = 0;
 
   virtual void Update() = 0;
-
-  [[nodiscard]] virtual SceneType GetType()const = 0;
 };

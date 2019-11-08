@@ -1,12 +1,12 @@
 #include "Tessellation.hlsli"
 
-[domain("tri")]
-DS_OUT main(TriangleConstantData Input, float3 Domain : SV_DomainLocation, const OutputPatch<HS_OUT, CONTROL_POINT_TRIANGLE> OPatch)
+[domain("quad")]
+DS_OUT main(QuadConstantData Input, float2 UV : SV_DomainLocation, const OutputPatch<HS_OUT, CONTROL_POINT_QUAD> OPatch)
 {
   DS_OUT Out;
 
-  Out.Position = OPatch[0].Position * Domain.x + OPatch[1].Position * Domain.y + OPatch[2].Position * Domain.z;
-  Out.Color = OPatch[0].Color * Domain.x + OPatch[1].Color * Domain.y + OPatch[2].Color * Domain.z;
+  Out.Position = lerp(lerp(OPatch[1].Position, OPatch[0].Position, UV.x), lerp(OPatch[3].Position, OPatch[2].Position, UV.x), UV.y);
+  Out.Color = lerp(lerp(OPatch[1].Color, OPatch[0].Color, UV.x), lerp(OPatch[3].Color, OPatch[2].Color, UV.x), UV.y);
 
   return Out;
 }
