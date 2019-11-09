@@ -299,7 +299,7 @@ ModelData FBXLoader::Load(const char* _FilePath)const
     const size_t IndexOffset = ModelData.Vertices.size();
     //  頂点データのロード
     {
-      vdl::Vertices Vertices;
+      vdl::VertexSkinnedMeshs Vertices;
 
       const vdl::uint PolygonNum = pMesh->GetPolygonCount();
       Vertices.resize(static_cast<size_t>(PolygonNum) * 3);
@@ -318,7 +318,7 @@ ModelData FBXLoader::Load(const char* _FilePath)const
         {
           const vdl::uint VertexIndex = VertexCount + PolygonCount * 3;
 
-          vdl::Vertex3D& Vertex = Vertices[VertexIndex];
+          vdl::VertexSkinnedMesh& Vertex = Vertices[VertexIndex];
 
           const int ControlPointIndex = pMesh->GetPolygonVertex(PolygonCount, VertexCount);
 

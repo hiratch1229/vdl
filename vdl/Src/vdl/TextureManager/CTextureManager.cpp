@@ -17,51 +17,28 @@ void CTextureManager::Initialize()
   pDevice_ = Engine::Get<IDevice>();
 }
 
-vdl::ID CTextureManager::Load(const char* _FilePath, bool _isSerialize)
+vdl::ID CTextureManager::LoadTexture(const char* _FilePath, bool _isSerialize)
 {
-  const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
-  const std::filesystem::path BinaryFilePath = (BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).concat(Constants::kBinaryFileFormat);
-
-  vdl::Image Image;
-  if (_isSerialize)
-  {
-    //  バイナリファイルが存在する場合ファイルから読み込む
-    if (std::filesystem::exists(BinaryFilePath))
-    {
-      vdl::CompressionImage CompressionImage;
-      ImportFromBinary(BinaryFilePath.string().c_str(), CompressionImage);
-      Image = CompressionImage;
-    }
-  }
-
-  if (Image.isEmpty())
-  {
-    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
-
-    Image = TextureLoader().LoadFromFile(_FilePath);
-
-    if (_isSerialize)
-    {
-      //  フォルダが存在しない場合作成
-      if (!std::filesystem::exists(BinaryFileDirectory))
-      {
-        std::filesystem::create_directories(BinaryFileDirectory);
-      }
-
-      //  バイナリファイルに書き出し
-      vdl::CompressionImage CompressionImage = Image;
-      ExportToBinary(BinaryFilePath.string().c_str(), CompressionImage);
-    }
-  }
-
-  return Load(Image);
+  return LoadTexture(GetImageFromFilePath(_FilePath, _isSerialize));
 }
 
-vdl::ID CTextureManager::Load(const vdl::Image& _Image)
+vdl::ID CTextureManager::LoadTexture(const vdl::Image& _Image)
 {
   ITexture* pTexture;
   pDevice_->CreateTexture(&pTexture, _Image);
+
+  return Textures_.Add(pTexture);
+}
+
+vdl::ID CTextureManager::LoadCubeTexture(const char* _FilePath, bool _isSerialize)
+{
+  return LoadCubeTexture(GetImageFromFilePath(_FilePath, _isSerialize));
+}
+
+vdl::ID CTextureManager::LoadCubeTexture(const vdl::Image& _Image)
+{
+  ITexture* pTexture;
+  pDevice_->CreateCubeTexture(&pTexture, _Image);
 
   return Textures_.Add(pTexture);
 }
@@ -88,4 +65,47 @@ vdl::ID CTextureManager::CreateUnorderedAccessTexture(const vdl::uint2& _Texture
   pDevice_->CreateUnorderedAccessTexture(&pUnorderedAccessTexture, _TextureSize, _Format);
 
   return Textures_.Add(pUnorderedAccessTexture);
+}
+
+//--------------------------------------------------
+
+vdl::Image CTextureManager::GetImageFromFilePath(const char* _FilePath, bool _isSerialize)const
+{
+  const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
+  const std::filesystem::path BinaryFilePath = (BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).concat(Constants::kBinaryFileFormat);
+
+  vdl::Image Image;
+  if (_isSerialize)
+  {
+    //  バイナリファイルが存在する場合ファイルから読み込む
+    if (std::filesystem::exists(BinaryFilePath))
+    {
+      vdl::CompressionImage CompressionImage;
+      ::ImportFromBinary(BinaryFilePath.string().c_str(), CompressionImage);
+      Image = CompressionImage;
+    }
+  }
+
+  if (Image.isEmpty())
+  {
+    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
+      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
+
+    Image = TextureLoader().LoadFromFile(_FilePath);
+
+    if (_isSerialize)
+    {
+      //  フォルダが存在しない場合作成
+      if (!std::filesystem::exists(BinaryFileDirectory))
+      {
+        std::filesystem::create_directories(BinaryFileDirectory);
+      }
+
+      //  バイナリファイルに書き出し
+      vdl::CompressionImage CompressionImage = Image;
+      ::ExportToBinary(BinaryFilePath.string().c_str(), CompressionImage);
+    }
+  }
+
+  return Image;
 }

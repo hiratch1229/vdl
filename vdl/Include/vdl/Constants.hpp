@@ -18,15 +18,15 @@ namespace vdl::Constants
 
   constexpr uint kMaxRenderTextureNum = 8;
 
-  constexpr uint kMaxSamplerNum = 16;
+  constexpr uint kMaxSamplerNum = 8;
 
-  constexpr uint kMaxShaderResourceNum = 128;
+  constexpr uint kMaxShaderResourceNum = 32;
 
   constexpr uint kMaxConstantBufferNum = 14;
 
   constexpr uint kMaxUnorderedAccessObjectNum = 8;
 
-  constexpr const char kDefaultTextureVertexShaderCode[] = {
+  constexpr const char kDefaultTextureShaderCode[] = {
     "struct VS_IN"
     "{"
     "  float4 Position : POSITION;"
@@ -44,42 +44,34 @@ namespace vdl::Constants
     "  float4 Color : COLOR;"
     "  float2 Texcoord : TEXCOORD;"
     "};"
-    "PS_IN main(VS_IN In)"
+    ""
+    "PS_IN VSMain(VS_IN In)"
     "{"
-    "PS_IN Out;"
+    "  PS_IN Out;"
     ""
-    "Out.Position = mul(In.Position, In.NDCTransform);"
-    "Out.Color = In.Color;"
-    "Out.Texcoord = In.Texcoord * In.TexcoordScale + In.TexcoordTranslate;"
+    "  Out.Position = mul(In.Position, In.NDCTransform);"
+    "  Out.Color = In.Color;"
+    "  Out.Texcoord = In.Texcoord * In.TexcoordScale + In.TexcoordTranslate;"
     ""
-    "return Out;"
-    "}" };
-
-  constexpr const char kDefaultTexturePixelShaderCode[] = {
-    "struct PS_IN"
-    "{"
-    "  float4 Position : SV_POSITION;"
-    "  float4 Color : COLOR;"
-    "  float2 Texcoord : TEXCOORD;"
-    "};"
+    "  return Out;"
+    "}"
     ""
-    "SamplerState Sampler : register(s0);"
     "Texture2D Texture : register(t0);"
+    "SamplerState Sampler : register(s0);"
     ""
-    "float4 main(PS_IN In) : SV_TARGET"
+    "float4 PSMain(PS_IN In) : SV_TARGET"
     "{"
     "  return Texture.Sample(Sampler, In.Texcoord) * In.Color;"
-    "}" };
+    "}"
+  };
 
-  constexpr const char kDefaultMeshVertexShaderCode[] = {
+  constexpr const char kDefaultStaticMeshShaderCode[] = {
     "struct VS_IN"
     "{"
     "  float4 Position : POSITION;"
-    "  float4 Normal : NORMAL;"
+    "  float3 Normal : NORMAL;"
     "  float3 Tangent : TANGENT;"
     "  float2 Texcoord : TEXCOORD;"
-    "  float4 BoneWeights : WEIGHTS;"
-    "  uint4 BoneIndices : BONES;"
     ""
     "  row_major float4x4 World : WORLD;"
     "  float4 Color : COLOR;"
@@ -92,49 +84,84 @@ namespace vdl::Constants
     "  float2 Texcoord : TEXCOORD;"
     "};"
     ""
-    "cbuffer CONSTANT_BUFFER : register(b0)"
+    "cbuffer ConstantBuffer : register(b0)"
     "{"
     "  row_major float4x4 ViewProjectionMatrix;"
     "};"
     ""
-    "PS_IN main(VS_IN In)"
+    "PS_IN VSMain(VS_IN In)"
     "{"
-    //"  float3 Position = float3(0.0f, 0.0f, 0.0f);"
-    //"  float3 Normal = float3(0.0f, 0.0f, 0.0f);"
-    //" "
-    //"  for (int i = 0; i < 4; ++i)"
-    //"  {"
-    //"    Position += (In.BoneWeights[i] * mul(In.Position, BoneTransforms[In.BoneIndices[i]])).xyz;"
-    //"    Normal += (In.BoneWeights[i] * mul(float4(In.Normal.xyz, 0.0f), BoneTransforms[In.BoneIndices[i]])).xyz;"
-    //"  }"
-    //" "
-    //"  In.Position = float4(Position, 1.0f);"
-    //"  In.Normal = float4(Normal, 0.0f);"
-    //""
     "  PS_IN Out;"
     ""
     "  const float4 World = mul(In.Position, In.World);"
     ""
     "  Out.Position = mul(World, ViewProjectionMatrix);"
-    "  Out.Color = In.Color;"
     "  Out.Texcoord = In.Texcoord;"
+    "  Out.Color = In.Color;"
     ""
     "  return Out;"
-    "}" };
-
-  constexpr const char kDefaultMeshPixelShaderCode[] = {
-    "struct PS_IN"
-    "{"
-    "  float4 Position : SV_POSITION;"
-    "  float4 Color : COLOR;"
-    "  float2 Texcoord : TEXCOORD;"
-    "};"
+    "}"
     ""
+    "Texture2D Diffuse : register(t0);"
+    "Texture2D NormalMap : register(t1);"
     "SamplerState Sampler : register(s0);"
-    "Texture2D Texture : register(t0);"
     ""
-    "float4 main(PS_IN In) : SV_TARGET"
+    "float4 PSMain(PS_IN In) : SV_TARGET"
     "{"
-    "  return Texture.Sample(Sampler, In.Texcoord) * In.Color;"
-    "}" };
+    "  return Diffuse.Sample(Sampler, In.Texcoord) * In.Color;"
+    "}"
+  };
+
+  constexpr const char kDefaultSkinnedMeshShaderCode[] = {
+  "struct VS_IN"
+  "{"
+  "  float4 Position : POSITION;"
+  "  float3 Normal : NORMAL;"
+  "  float3 Tangent : TANGENT;"
+  "  float2 Texcoord : TEXCOORD;"
+  "  float4 BoneWeights : WEIGHTS;"
+  "  uint4 BoneIndices : BONES;"
+  ""
+  "  row_major float4x4 World : WORLD;"
+  "  float4 Color : COLOR;"
+  "};"
+  ""
+  "struct PS_IN"
+  "{"
+  "  float4 Position : SV_POSITION;"
+  "  float4 Color : COLOR;"
+  "  float2 Texcoord : TEXCOORD;"
+  "};"
+  ""
+  "cbuffer ConstantBuffer : register(b0)"
+  "{"
+  "  row_major float4x4 ViewProjectionMatrix;"
+  "};"
+  ""
+  "PS_IN VSMain(VS_IN In)"
+  "{"
+  "  PS_IN Out;"
+  ""
+  "  const float4 World = mul(In.Position, In.World);"
+  ""
+  "  Out.Position = mul(World, ViewProjectionMatrix);"
+  "  Out.Texcoord = In.Texcoord;"
+  "  Out.Color = In.Color;"
+  ""
+  "  return Out;"
+  "}"
+  ""
+  "Texture2D Diffuse : register(t0);"
+  "Texture2D NormalMap : register(t1);"
+  "SamplerState Sampler : register(s0);"
+  ""
+  "float4 PSMain(PS_IN In) : SV_TARGET"
+  "{"
+  "  return Diffuse.Sample(Sampler, In.Texcoord) * In.Color;"
+  "}"
+  };
+
+  constexpr const char* kDefaultShaderEntryPointVS = "VSMain";
+
+  constexpr const char* kDefaultShaderEntryPointPS = "PSMain";
 }

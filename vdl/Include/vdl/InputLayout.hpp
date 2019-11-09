@@ -7,7 +7,8 @@ namespace vdl
   {
     eNone,
     eTexture,
-    eMesh,
+    eStaticMesh,
+    eSkinnedMesh,
 
     //  TODO:“à•”—p‚È‚Ì‚Å‰B‚·
     eGUI

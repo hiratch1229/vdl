@@ -55,7 +55,7 @@ void Main()
   const BlendState DefaultBlendState2D = BlendState::kDefault;
   const DepthStencilState DefaultDepthStencilState2D = DepthStencilState::kDefault2D;
   const RasterizerState DefaultRasterizerState2D = RasterizerState::kDefault2D;
-  const VertexShader DefaultVertexShader3D = VertexShader("Shader/Mesh/MeshVS.hlsl", InputLayoutType::eMesh);
+  const VertexShader DefaultVertexShader3D = VertexShader("Shader/Mesh/StaticMesh/StaticMeshVS.hlsl", InputLayoutType::eStaticMesh);
   const PixelShader DefaultPixelShader3D = PixelShader("Shader/Mesh/MeshPS.hlsl");
   const BlendState DefaultBlendState3D = BlendState::kDefault;
   const DepthStencilState DefaultDepthStencilState3D = DepthStencilState::kDefault3D;
@@ -100,7 +100,7 @@ void Main()
         Renderer2D::SetShaders(DefaultVertexShader2D, DefaultPixelShader2D);
         Renderer3D::SetTopology(TopologyType::eDefaultMesh);
         Renderer3D::SetGraphicsStates(DefaultBlendState3D, DefaultDepthStencilState3D, DefaultRasterizerState3D);
-        Renderer3D::SetShaders(DefaultVertexShader3D, DefaultPixelShader3D);
+        Renderer3D::SetStaticMeshShaders(DefaultVertexShader3D, DefaultPixelShader3D);
 
         pCurrentScene->Initialize();
       }

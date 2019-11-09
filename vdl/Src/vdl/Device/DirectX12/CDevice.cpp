@@ -45,6 +45,11 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
 
 }
 
+void CDevice::CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image)
+{
+
+}
+
 void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
 

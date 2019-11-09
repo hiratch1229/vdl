@@ -14,9 +14,13 @@ public:
 
   virtual void Initialize() = 0;
 
-  [[nodiscard]] virtual vdl::ID Load(const char* _FilePath, bool _isSerialize) = 0;
+  [[nodiscard]] virtual vdl::ID LoadTexture(const char* _FilePath, bool _isSerialize) = 0;
 
-  [[nodiscard]] virtual vdl::ID Load(const vdl::Image& _Image) = 0;
+  [[nodiscard]] virtual vdl::ID LoadTexture(const vdl::Image& _Image) = 0;
+
+  [[nodiscard]] virtual vdl::ID LoadCubeTexture(const char* _FilePath, bool _isSerialize) = 0;
+
+  [[nodiscard]] virtual vdl::ID LoadCubeTexture(const vdl::Image& _Image) = 0;
 
   [[nodiscard]] virtual vdl::ID CreateRenderTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
 

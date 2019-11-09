@@ -1,4 +1,4 @@
-#include "../Mesh/Mesh.hlsli"
+#include "../Mesh/StaticMesh/StaticMesh.hlsli"
 #include "Tessellation.hlsli"
 
 static const float4 kColors[4] =

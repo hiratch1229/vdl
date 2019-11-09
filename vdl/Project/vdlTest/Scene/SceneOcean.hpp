@@ -34,7 +34,7 @@ private:
     vdl::float2 Unused;
   };
 private:
-  vdl::Mesh WaterSurface_;
+  vdl::StaticMesh WaterSurface_;
   vdl::Camera Camera_;
   bool isWireframe_ = false;
 private:

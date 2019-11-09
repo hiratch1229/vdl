@@ -64,9 +64,12 @@ namespace vdl
   //  Vertex.hpp
   //-------------------------
   struct Vertex2D;
-  struct Vertex3D;
+  struct VertexStaticMesh;
+  struct VertexSkinnedMesh;
   using IndexType = uint32_t;
-  using Vertices = std::vector<Vertex3D>;
+  using Vertex2Ds = std::vector<Vertex2D>;
+  using VertexStaticMeshs = std::vector<VertexStaticMesh>;
+  using VertexSkinnedMeshs = std::vector<VertexSkinnedMesh>;
   using Indices = std::vector<IndexType>;
 
   //-------------------------
@@ -185,19 +188,24 @@ namespace vdl
   //-------------------------
   struct Material;
   using Materials = std::vector<Material>;
+  struct StaticMeshData;
+  using StaticMeshDatas = std::vector<StaticMeshData>;
+  struct StaticModelData;
   struct Bone;
   struct Skeletal;
   struct Animation;
   using Animations = std::vector<Animation>;
-  struct MeshData;
-  using MeshDatas = std::vector<MeshData>;
-  struct ModelData;
+  struct SkinnedMeshData;
+  using SkinnedMeshDatas = std::vector<SkinnedMeshData>;
+  struct SkinnedModelData;
 
   //-------------------------
   //  Model.hpp
   //-------------------------
-  class Mesh;
-  class Model;
+  class StaticMesh;
+  class StaticModel;
+  class SkinnedMesh;
+  class SkinnedModel;
 
   //-------------------------
   //  Cicle.hpp

@@ -26,6 +26,8 @@ private:
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
 private:
+  vdl::InputLayoutType CurrentInputLayoutType_ = vdl::InputLayoutType::eNone;
+private:
   std::unordered_map<vdl::InputLayoutType, Microsoft::WRL::ComPtr<ID3D11InputLayout>> InputLayouts_;
   std::unordered_map<vdl::BlendState, Microsoft::WRL::ComPtr<ID3D11BlendState>> BlendStates_;
   std::unordered_map<vdl::DepthStencilState, Microsoft::WRL::ComPtr<ID3D11DepthStencilState>> DepthStencilStates_;
@@ -40,6 +42,8 @@ private:
   ID3D11SamplerState* GetSamplerState(const vdl::Sampler& _Sampler);
   ID3D11Buffer* GetConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer);
   ID3D11UnorderedAccessView* GetUnorderedAccessView(const vdl::UnorderedAccessObject& _UnorderedAccessObject);
+  vdl::uint GetVertexBufferStride()const;
+  vdl::uint GetInstanceBufferStride()const;
 public:
   CDeviceContext() = default;
 

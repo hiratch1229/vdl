@@ -46,13 +46,13 @@ struct MeshData
   vdl::Matrix GlobalTransform;
   //Animations Animations;
 
-  CEREAL_SERIALIZE(IndexStart, IndexCount, MaterialIndex, GlobalTransform /*,Animations*/)
+  CEREAL_SERIALIZE(IndexStart, IndexCount, MaterialIndex, GlobalTransform/*, Animations*/)
 };
 using MeshDatas = std::vector<MeshData>;
 
 struct ModelData
 {
-  vdl::Vertices Vertices;
+  vdl::VertexSkinnedMeshs Vertices;
   vdl::Indices Indices;
   Materials Materials;
   MeshDatas MeshDatas;

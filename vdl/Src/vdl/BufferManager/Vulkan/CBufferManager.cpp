@@ -15,26 +15,26 @@ void CBufferManager::Initialize()
   ConstantBufferAllocater_.Initialize(kParentConstantBufferSize);
 }
 
-vdl::ID CBufferManager::CreateVertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+vdl::ID CBufferManager::CreateVertexBuffer(vdl::uint _BufferSize)
 {
   IBuffer* pBuffer;
-  pDevice_->CreateVertexBuffer(&pBuffer, _Stride, _BufferSize);
+  pDevice_->CreateVertexBuffer(&pBuffer, _BufferSize);
 
   return Buffers_.Add(pBuffer);
 }
 
-vdl::ID CBufferManager::CreateVertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)
+vdl::ID CBufferManager::CreateVertexBuffer(const void* _Vertices, vdl::uint _BufferSize)
 {
   IBuffer* pBuffer;
-  pDevice_->CreateVertexBuffer(&pBuffer, _Vertices, _Stride, _BufferSize);
+  pDevice_->CreateVertexBuffer(&pBuffer, _Vertices, _BufferSize);
 
   return Buffers_.Add(pBuffer);
 }
 
-vdl::ID CBufferManager::CreateInstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+vdl::ID CBufferManager::CreateInstanceBuffer(vdl::uint _BufferSize)
 {
   IBuffer* pBuffer;
-  pDevice_->CreateInstanceBuffer(&pBuffer, _Stride, _BufferSize);
+  pDevice_->CreateInstanceBuffer(&pBuffer, _BufferSize);
 
   return Buffers_.Add(pBuffer);
 }
@@ -90,7 +90,7 @@ void* CBufferManager::GetBuffer(const vdl::Detail::ConstantBufferData& _Constant
 {
   assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer || GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
 
-  IConstantBuffer* pConstantBuffer =static_cast<IConstantBuffer*>( GetBuffer(_ConstantBuffer.GetID()));
+  IConstantBuffer* pConstantBuffer = static_cast<IConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()));
   return pConstantBuffer->GetBuffer();
 }
 

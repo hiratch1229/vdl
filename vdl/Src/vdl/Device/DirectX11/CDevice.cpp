@@ -166,12 +166,11 @@ void CDevice::Initialize()
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 }
 
-void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _Stride, vdl::uint _BufferSize)
+void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _BufferSize)
 {
   assert(_ppVertexBuffer);
 
   CVertexBuffer* pVertexBuffer = new CVertexBuffer;
-  pVertexBuffer->Stride = _Stride;
 
   HRESULT hr = S_OK;
 
@@ -191,12 +190,11 @@ void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _Stride, v
   (*_ppVertexBuffer) = std::move(pVertexBuffer);
 }
 
-void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)
+void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _BufferSize)
 {
   assert(_ppVertexBuffer);
 
   CVertexBuffer* pVertexBuffer = new CVertexBuffer;
-  pVertexBuffer->Stride = _Stride;
 
   HRESULT hr = S_OK;
 
@@ -223,12 +221,11 @@ void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertice
   (*_ppVertexBuffer) = std::move(pVertexBuffer);
 }
 
-void CDevice::CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _Stride, vdl::uint _BufferSize)
+void CDevice::CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _BufferSize)
 {
   assert(_ppInstanceBuffer);
 
   CInstanceBuffer* pInstanceBuffer = new CInstanceBuffer;
-  pInstanceBuffer->Stride = _Stride;
 
   HRESULT hr = S_OK;
 
@@ -383,6 +380,59 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
     TextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     TextureDesc.CPUAccessFlags = 0;
     TextureDesc.MiscFlags = 0;
+  }
+
+  D3D11_SUBRESOURCE_DATA InitialData;
+  {
+    InitialData.pSysMem = _Image.Buffer();
+    InitialData.SysMemPitch = _Image.Stride();
+    InitialData.SysMemSlicePitch = _Image.BufferSize();
+  }
+
+  Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture2D;
+  {
+    hr = pD3D11Device_->CreateTexture2D(&TextureDesc, &InitialData, pTexture2D.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  }
+
+  D3D11_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+  {
+    ShaderResourceViewDesc.Format = kTextureFormat;
+    ShaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+    ShaderResourceViewDesc.Texture2D.MipLevels = 1;
+  }
+
+  hr = pD3D11Device_->CreateShaderResourceView(pTexture2D.Get(), &ShaderResourceViewDesc, pTexture->pShaderResourceView.GetAddressOf());
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+  (*_ppTexture) = std::move(pTexture);
+}
+
+void CDevice::CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image)
+{
+  assert(_ppTexture);
+
+  constexpr DXGI_FORMAT kTextureFormat = Cast(Constants::kTextureFormat);
+
+  CTexture* pTexture = new CTexture;
+  pTexture->TextureSize = _Image.GetTextureSize();
+
+  HRESULT hr = S_OK;
+
+  D3D11_TEXTURE2D_DESC TextureDesc;
+  {
+    TextureDesc.Width = pTexture->TextureSize.x;
+    TextureDesc.Height = pTexture->TextureSize.y;
+    TextureDesc.MipLevels = 1;
+    TextureDesc.ArraySize = 6;
+    TextureDesc.Format = kTextureFormat;
+    TextureDesc.SampleDesc.Count = 1;
+    TextureDesc.SampleDesc.Quality = 0;
+    TextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    TextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    TextureDesc.CPUAccessFlags = 0;
+    TextureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
   }
 
   D3D11_SUBRESOURCE_DATA InitialData;

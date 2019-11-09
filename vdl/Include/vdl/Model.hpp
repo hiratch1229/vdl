@@ -5,30 +5,30 @@
 
 namespace vdl
 {
-  class Mesh
+  class StaticMesh
   {
   protected:
     ID ID_;
   public:
-    Mesh() = default;
+    StaticMesh() = default;
 
-    Mesh(const Vertices& _Vertices, const Indices& _Indices, const MeshData& _MeshData);
+    StaticMesh(const VertexStaticMeshs& _Vertices, const Indices& _Indices, const StaticMeshData& _MeshData);
 
-    Mesh(const ModelData& _ModelData, vdl::uint _MeshIndex = 0);
+    StaticMesh(const StaticModelData& _StaticModelData, vdl::uint _MeshIndex = 0);
 
-    Mesh(const Mesh& _Mesh);
+    StaticMesh(const StaticMesh& _StaticMesh);
 
-    Mesh(Mesh&& _Mesh)noexcept;
+    StaticMesh(StaticMesh&& _StaticMesh)noexcept;
 
-    ~Mesh();
+    ~StaticMesh();
   public:
-    Mesh& operator=(const Mesh& _Mesh);
+    StaticMesh& operator=(const StaticMesh& _StaticMesh);
 
-    Mesh& operator=(Mesh&& _Mesh)noexcept;
+    StaticMesh& operator=(StaticMesh&& _StaticMesh)noexcept;
 
-    [[nodiscard]] constexpr bool operator==(const Mesh& _Mesh)const noexcept { return ID_ == _Mesh.ID_; }
+    [[nodiscard]] constexpr bool operator==(const StaticMesh& _StaticMesh)const noexcept { return ID_ == _StaticMesh.ID_; }
 
-    [[nodiscard]] constexpr bool operator!=(const Mesh& _Mesh)const noexcept { return ID_ != _Mesh.ID_; }
+    [[nodiscard]] constexpr bool operator!=(const StaticMesh& _StaticMesh)const noexcept { return ID_ != _StaticMesh.ID_; }
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }
 
@@ -37,21 +37,35 @@ namespace vdl
     [[nodiscard]] Matrix GetGlobalTransform()const;
   };
 
+  class SkinnedMesh : public StaticMesh
+  {
+  public:
+    SkinnedMesh() = default;
+
+    SkinnedMesh(const VertexSkinnedMeshs& _Vertices, const Indices& _Indices, const StaticMeshData& _MeshData);
+
+    SkinnedMesh(const SkinnedModelData& _SkinnedModelData, vdl::uint _MeshIndex = 0);
+  public:
+    [[nodiscard]] bool hasAnimation()const;
+  };
+
   class Model
   {
-    std::vector<Mesh> Meshes_;
+    std::vector<SkinnedMesh> Meshes_;
   public:
     Model() = default;
 
     //  ÉtÉ@ÉCÉãÇ©ÇÁçÏê¨
     Model(const char* _FilePath, bool _isSerialize = true);
 
-    Model(const ModelData& _ModelData);
+    Model(const SkinnedModelData& _SkinnedModelData);
 
-    Model(const std::vector<Mesh>& _Meshes);
+    Model(const std::vector<SkinnedMesh>& _Meshes);
   public:
     [[nodiscard]] bool isEmpty()const noexcept { return Meshes_.empty(); }
 
-    [[nodiscard]] const std::vector<Mesh>& GetMeshes()const { return Meshes_; }
+    [[nodiscard]] bool hasAnimation()const noexcept { return !isEmpty() && Meshes_[0].hasAnimation(); }
+
+    [[nodiscard]] const std::vector<SkinnedMesh>& GetMeshes()const { return Meshes_; }
   };
 }

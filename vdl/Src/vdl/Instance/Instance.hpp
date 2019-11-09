@@ -11,9 +11,14 @@ struct Instance2D
   vdl::float2 TexcoordTranslate;
   vdl::ColorF Color;
 };
-struct Instance3D
+
+struct InstanceStaticMesh
 {
   vdl::Matrix World;
   vdl::ColorF Color;
+};
+
+struct InstanceSkinnedMesh : public InstanceStaticMesh
+{
   //  TODO:SkinnedMesh
 };

@@ -14,9 +14,11 @@ public:
 
   virtual void Initialize() = 0;
 
-  [[nodiscard]] virtual vdl::ID Load(const vdl::Vertices& _Vertices, const vdl::Indices& _Indices, const vdl::MeshData& _MeshData) = 0;
+  [[nodiscard]] virtual vdl::ID Load(const vdl::VertexStaticMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::StaticMeshData& _StaticMeshData) = 0;
 
-  [[nodiscard]] virtual std::vector<vdl::Mesh> Load(const char* _FilePath, bool _isSerialize) = 0;
+  [[nodiscard]] virtual vdl::ID Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::SkinnedMeshData& _SkinnedMeshData) = 0;
+
+  [[nodiscard]] virtual std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize) = 0;
 
   virtual void AddRef(const vdl::ID& _ID) = 0;
 

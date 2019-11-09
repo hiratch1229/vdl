@@ -1,4 +1,4 @@
-#include "MultiRenderTexture.hlsli"
+#include "../Mesh/Mesh.hlsli"
 
 struct PS_OUT
 {
@@ -6,8 +6,8 @@ struct PS_OUT
   float4 Red : SV_TARGET1;
 };
 
+Texture2D Diffuse : register(t0);
 SamplerState Sampler : register(s0);
-Texture2D Texture : register(t0);
 
 PS_OUT main(PS_IN In)
 {

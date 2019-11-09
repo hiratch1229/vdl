@@ -95,7 +95,7 @@ void SceneTBDR::Initialize()
 
   //  GBufferPassÇÃèâä˙âª
   {
-    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eMesh);
+    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eStaticMesh);
     GBufferPassPixelShader_ = PixelShader("Shader/TBDR/GBufferPassPS.hlsl");
 
     GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
@@ -241,7 +241,7 @@ void SceneTBDR::Update()
   //  GBufferPass
   {
     Renderer::SetRenderTextures(GBufferRenderTextures_, GBufferDepthTexture_);
-    Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
+    Renderer3D::SetStaticMeshShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
 
     Renderer3D::Draw(Sponza_, Matrix::Identity());
   }

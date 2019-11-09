@@ -228,7 +228,7 @@ ModelData glTFLoader::Load(const char* _FilePath)const
 
         //  頂点データの取得
         {
-          vdl::Vertices Vertices;
+          vdl::VertexSkinnedMeshs Vertices;
 
           auto GetPrimitiveData = [&](const float** _pBuffer, const std::string& _Key)->size_t
           {
@@ -267,7 +267,7 @@ ModelData glTFLoader::Load(const char* _FilePath)const
           Vertices.resize(VertexNum);
           for (size_t VertexCount = 0; VertexCount < VertexNum; ++VertexCount)
           {
-            vdl::Vertex3D& Vertex = Vertices[VertexCount];
+            vdl::VertexSkinnedMesh& Vertex = Vertices[VertexCount];
             {
               Vertex.Position = LoadVec3(&PositionBuffer[VertexCount * 3]);
               Vertex.Normal = NormalBuffer ? LoadVec3(&NormalBuffer[VertexCount * 3]) : vdl::float3::Forward();

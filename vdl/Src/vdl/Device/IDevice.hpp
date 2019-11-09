@@ -19,11 +19,11 @@ public:
 
   virtual void Initialize() = 0;
 
-  virtual void CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  virtual void CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _BufferSize) = 0;
 
-  virtual void CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  virtual void CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _BufferSize) = 0;
 
-  virtual void CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  virtual void CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _BufferSize) = 0;
 
   virtual void CreateIndexBuffer(IBuffer** _ppIndexBuffer, vdl::uint _BufferSize, IndexType _IndexType) = 0;
 
@@ -34,6 +34,8 @@ public:
   virtual void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, const void* _Buffer) = 0;
 
   virtual void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image) = 0;
+
+  virtual void CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image) = 0;
 
   virtual void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
 

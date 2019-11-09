@@ -5,9 +5,9 @@
 
 namespace vdl
 {
-  ModelData ModelData::Rectangle(const Texture& _Diffuse, const Texture& _NormalMap)
+  StaticModelData StaticModelData::Rectangle(const Texture& _Diffuse, const Texture& _NormalMap)
   {
-    ModelData ModelData;
+    StaticModelData ModelData;
     {
       ModelData.Vertices.resize(4);
       {
@@ -39,9 +39,9 @@ namespace vdl
     return ModelData;
   }
 
-  ModelData ModelData::Box(const Texture& _Diffuse, const Texture& _NormalMap)
+  StaticModelData StaticModelData::Box(const Texture& _Diffuse, const Texture& _NormalMap)
   {
-    ModelData ModelData;
+    StaticModelData ModelData;
     {
       ModelData.Vertices.resize(24);
       {
@@ -134,12 +134,12 @@ namespace vdl
     return ModelData;
   }
 
-  ModelData ModelData::Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse, const Texture& _NormalMap)
+  StaticModelData StaticModelData::Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse, const Texture& _NormalMap)
   {
     //  îºåa
     constexpr float kRadius = 0.5f;
 
-    ModelData ModelData;
+    StaticModelData ModelData;
     {
       //  í∏ì_èÓïÒ
       {
@@ -154,7 +154,7 @@ namespace vdl
           const Radian Phi = PhiStep * i;
           for (uint j = 0; j <= _SliceCount; j++)
           {
-            Vertex3D& Vertex = ModelData.Vertices.emplace_back();
+            VertexStaticMesh& Vertex = ModelData.Vertices.emplace_back();
             {
               const Radian Theta = ThetaStep * j;
 

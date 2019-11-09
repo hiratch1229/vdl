@@ -9,12 +9,12 @@ namespace vdl
 {
   Texture::Texture(const char* _FilePath, bool _isSerialize)
   {
-    ID_ = Engine::Get<ITextureManager>()->Load(_FilePath, _isSerialize);
+    ID_ = Engine::Get<ITextureManager>()->LoadTexture(_FilePath, _isSerialize);
   }
 
   Texture::Texture(const Image& _Image)
   {
-    ID_ = Engine::Get<ITextureManager>()->Load(_Image);
+    ID_ = Engine::Get<ITextureManager>()->LoadTexture(_Image);
   }
 
   Texture::Texture(const Color& _Color)
@@ -25,7 +25,7 @@ namespace vdl
       Image.Buffer()[0] = _Color;
     }
 
-    ID_ = Engine::Get<ITextureManager>()->Load(Image);
+    ID_ = Engine::Get<ITextureManager>()->LoadTexture(Image);
   }
 
   Texture::Texture(const Texture& _Texture)

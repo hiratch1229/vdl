@@ -18,11 +18,11 @@ public:
 
   virtual void Initialize() = 0;
 
-  [[nodiscard]] virtual vdl::ID CreateVertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  [[nodiscard]] virtual vdl::ID CreateVertexBuffer(vdl::uint _BufferSize) = 0;
 
-  [[nodiscard]] virtual vdl::ID CreateVertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  [[nodiscard]] virtual vdl::ID CreateVertexBuffer(const void* _Vertices, vdl::uint _BufferSize) = 0;
 
-  [[nodiscard]] virtual vdl::ID CreateInstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize) = 0;
+  [[nodiscard]] virtual vdl::ID CreateInstanceBuffer(vdl::uint _BufferSize) = 0;
   
   [[nodiscard]] virtual vdl::ID CreateIndexBuffer(vdl::uint _BufferSize, IndexType _IndexType) = 0;
 

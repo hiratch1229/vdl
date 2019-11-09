@@ -12,9 +12,9 @@ namespace
 
 void SceneDeferred::Initialize()
 {
-  Rectangle_ = ModelData::Rectangle("Data/asphalt/asphalt.jpg", "Data/asphalt/asphalt_normal.jpg");
+  Rectangle_ = StaticModelData::Rectangle("Data/asphalt/asphalt.jpg", "Data/asphalt/asphalt_normal.jpg");
   RectangleSpecularMap_ = Texture("Data/asphalt/asphalt_specular.jpg");
-  Sphere_ = ModelData::Sphere(12, 12, "Data/earthmap/earthmap.jpg", "Data/earthmap/earthnormal.jpg");
+  Sphere_ = StaticModelData::Sphere(12, 12, "Data/earthmap/earthmap.jpg", "Data/earthmap/earthnormal.jpg");
   SphereSpecularMap_ = Texture("Data/earthmap/earthspec.jpg");
 
   Camera_ = Camera(float3(0.0f, 5.0f, -25.0f));
@@ -34,7 +34,7 @@ void SceneDeferred::Initialize()
 
   //  GBufferPassÇÃèâä˙âª
   {
-    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eMesh);
+    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eStaticMesh);
     GBufferPassPixelShader_ = PixelShader("Shader/Deferred/GBufferPassPS.hlsl");
 
     GBufferRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
@@ -45,7 +45,7 @@ void SceneDeferred::Initialize()
 
   //  ShadowMapÇÃèâä˙âª
   {
-    ShadowMapVertexShader_ = VertexShader("Shader/Deferred/ShadowMapVS.hlsl", InputLayoutType::eMesh);
+    ShadowMapVertexShader_ = VertexShader("Shader/Deferred/ShadowMapVS.hlsl", InputLayoutType::eStaticMesh);
     ShadowMapPixelShader_ = PixelShader();
     ShadowMap_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
 
@@ -187,7 +187,7 @@ void SceneDeferred::Update()
   //  GBufferPass
   {
     Renderer::SetRenderTextures(GBufferRenderTextures_, GBufferDepthTexture_);
-    Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
+    Renderer3D::SetStaticMeshShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
 
     Renderer3D::SetPixelStageShaderResources(2, 1, &RectangleSpecularMap_);
     Renderer3D::Draw(Rectangle_, Matrix::Scale(kRectangleScale) * Matrix::Rotate(Math::ToRadian(90.0f), 0.0f, 0.0f));
@@ -202,7 +202,7 @@ void SceneDeferred::Update()
   //  ShadowPass
   {
     Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
-    Renderer3D::SetShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
+    Renderer3D::SetStaticMeshShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
 
     for (auto& Data : Datas_)
     {

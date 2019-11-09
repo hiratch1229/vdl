@@ -454,7 +454,7 @@ CDevice::~CDevice()
 #endif
 }
 
-void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint, vdl::uint _BufferSize)
+void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _BufferSize)
 {
   assert(_ppVertexBuffer);
 
@@ -464,7 +464,7 @@ void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint, vdl::uint
   (*_ppVertexBuffer) = std::move(pVertexBuffer);
 }
 
-void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)
+void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertices, vdl::uint _BufferSize)
 {
   assert(_ppVertexBuffer);
 
@@ -478,7 +478,7 @@ void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, const void* _Vertice
   (*_ppVertexBuffer) = std::move(pVertexBuffer);
 }
 
-void CDevice::CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint, vdl::uint _BufferSize)
+void CDevice::CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _BufferSize)
 {
   assert(_ppInstanceBuffer);
 
@@ -654,6 +654,11 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
   }
 
   (*_ppTexture) = std::move(pTexture);
+}
+
+void CDevice::CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image)
+{
+
 }
 
 void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)

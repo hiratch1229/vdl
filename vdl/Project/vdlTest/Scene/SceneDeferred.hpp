@@ -45,9 +45,9 @@ private:
     vdl::Matrix InverseViewProjection;
   };
 private:
-  vdl::Mesh Rectangle_;
+  vdl::StaticMesh Rectangle_;
   vdl::Texture RectangleSpecularMap_;
-  vdl::Mesh Sphere_;
+  vdl::StaticMesh Sphere_;
   vdl::Texture SphereSpecularMap_;
   vdl::Camera Camera_;
   float PointLightItensity_;

@@ -80,10 +80,9 @@ namespace vdl
   inline constexpr ColorF::ColorF(const Color& _Color)noexcept
     : Red(_Color.Red / 255.0f), Green(_Color.Green / 255.0f), Blue(_Color.Blue / 255.0f), Alpha(_Color.Alpha / 255.0f) {}
 
-  //  原色カラー140色
   namespace Palette
   {
-    //  色見本
+    //  原色カラー140色
     //  https://www.colordic.org/
 
     //  ブラック
@@ -506,6 +505,12 @@ namespace vdl
     //  ミディアムスレートブルー
     //  #7B68EE
     constexpr Color MediumSlateBlue{ 123,104,238 };
+
+    //-------------------------
+
+    constexpr Color Diffuse{ 255, 255, 255 };
+
+    constexpr Color NormalMap{ 128, 128, 255 };
   };
 }
 

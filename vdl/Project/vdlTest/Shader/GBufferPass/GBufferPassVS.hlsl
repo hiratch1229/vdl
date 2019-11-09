@@ -1,4 +1,4 @@
-#include "../Mesh/Mesh.hlsli"
+#include "../Mesh/StaticMesh/StaticMesh.hlsli"
 #include "GBufferPass.hlsli"
 
 VS_OUT main(VS_IN In)

@@ -24,6 +24,8 @@ public:
 
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 
+  void CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
+
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
   void CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;

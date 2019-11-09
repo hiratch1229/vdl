@@ -1,16 +1,3 @@
-struct VS_IN
-{
-  float4 Position : POSITION;
-  float3 Normal : NORMAL;
-  float3 Tangent : TANGENT;
-  float2 Texcoord : TEXCOORD;
-  float4 BoneWeights : WEIGHTS;
-  uint4 BoneIndices : BONES;
-
-  row_major float4x4 World : WORLD;
-  float4 Color : COLOR;
-};
-
 struct HS_IN
 {
   float4 Position : SV_POSITION;
@@ -44,7 +31,7 @@ struct ConstantData
 #define DOMAIN "quad"
 #define CONTROL_POINT 4
 
-static const uint kMaxWaveNum = 50;
+static const uint kMaxWaveNum = 25;
 struct Wave
 {
   float3 Direction;

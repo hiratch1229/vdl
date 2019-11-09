@@ -24,7 +24,7 @@ private:
   };
 private:
   vdl::Model House_;
-  vdl::Mesh Ground_;
+  vdl::StaticMesh Ground_;
   vdl::Camera Camera_;
   vdl::Matrix HouseWorld_;
   vdl::Matrix GroundWorld_;

@@ -54,8 +54,10 @@ bool CSystem::Update()
     pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eNone);
     pRenderer_->SetViewport(Viewport, vdl::InputLayoutType::eTexture);
     pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eTexture);
-    pRenderer_->SetViewport(Viewport, vdl::InputLayoutType::eMesh);
-    pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eMesh);
+    pRenderer_->SetViewport(Viewport, vdl::InputLayoutType::eStaticMesh);
+    pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eStaticMesh);
+    pRenderer_->SetViewport(Viewport, vdl::InputLayoutType::eSkinnedMesh);
+    pRenderer_->SetScissor(Scissor, vdl::InputLayoutType::eSkinnedMesh);
 
     SystemState_ = SystemState::eRunning;
     LastTime_ = std::chrono::high_resolution_clock::now();

@@ -1,4 +1,5 @@
 #include "WaterSurface.hlsli"
+#include "../Mesh/StaticMesh/StaticMesh.hlsli"
 
 HS_IN main(VS_IN In)
 {

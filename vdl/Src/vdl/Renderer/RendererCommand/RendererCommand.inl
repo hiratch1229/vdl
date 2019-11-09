@@ -15,7 +15,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(vdl::To
   const vdl::Sampler& _Sampler, const vdl::VertexShader& _VertexShader, const vdl::PixelShader& _PixelShader)
 {
   pDevice_ = Engine::Get<IDevice>();
-  if constexpr (std::is_same<DisplayObject, vdl::Mesh>::value)
+  if constexpr (std::is_same<DisplayObject, vdl::StaticMesh>::value || std::is_same<DisplayObject, vdl::SkinnedMesh>::value)
   {
     pModelManager_ = Engine::Get<IModelManager>();
   }
@@ -249,7 +249,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
 
               _pDeviceContext->Draw(4, ContinuousDrawCallNum, 0, 0);
             }
-            else if constexpr (std::is_same<DisplayObject, vdl::Mesh>::value)
+            else if constexpr (std::is_same<DisplayObject, vdl::StaticMesh>::value || std::is_same<DisplayObject, vdl::SkinnedMesh>::value)
             {
               const Mesh* pMesh = pModelManager_->GetMesh(CurrentDisplayObjectID);
 

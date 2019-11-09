@@ -1,4 +1,4 @@
-#include "../Mesh/Mesh.hlsli"
+#include "../Mesh/StaticMesh/StaticMesh.hlsli"
 
 cbuffer Light : register(b1)
 {

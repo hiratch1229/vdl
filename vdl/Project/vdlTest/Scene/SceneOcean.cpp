@@ -10,7 +10,7 @@ void SceneOcean::Initialize()
 
   //  êÖñ 
   {
-    ModelData ModelData;
+    StaticModelData ModelData;
     ModelData.Vertices.resize(4);
     {
       ModelData.Vertices[0] = { { +50.0f, 0.0f, +50.0f }, { 0.0f, +1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } };
@@ -27,7 +27,7 @@ void SceneOcean::Initialize()
 
     WaterSurface_ = ModelData;
 
-    WaterSurfaceVertexShader_ = VertexShader("Shader/Ocean/WaterSurfaceVS.hlsl", InputLayoutType::eMesh);
+    WaterSurfaceVertexShader_ = VertexShader("Shader/Ocean/WaterSurfaceVS.hlsl", InputLayoutType::eStaticMesh);
     WaterSurfaceHullShader_ = HullShader("Shader/Ocean/WaterSurfaceHS.hlsl");
     WaterSurfaceDomainShader_ = DomainShader(kWaterSurfaceDomainShaderFilePath);
     WaterSurfacePixelShader_ = PixelShader("Shader/Ocean/WaterSurfacePS.hlsl");
@@ -118,7 +118,7 @@ void SceneOcean::Update()
 
   //  êÖÇÃï`âÊ
   {
-    Renderer3D::SetShaders(WaterSurfaceVertexShader_, WaterSurfaceHullShader_, WaterSurfaceDomainShader_, WaterSurfacePixelShader_);
+    Renderer3D::SetStaticMeshShaders(WaterSurfaceVertexShader_, WaterSurfaceHullShader_, WaterSurfaceDomainShader_, WaterSurfacePixelShader_);
     Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
 
     Renderer3D::Draw(WaterSurface_, Matrix::Identity(), Palette::LightSkyBlue);

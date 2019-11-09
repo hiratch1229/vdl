@@ -22,15 +22,14 @@ class CRenderer : public IRenderer
   { { -0.5f, +0.5f }, { 0.0f, 1.0f } },
   { { +0.5f, +0.5f }, { 1.0f, 1.0f } } };
 private:
-  struct ConstantBufferData
+  struct MeshConstantBufferData
   {
     vdl::Matrix ViewProjection;
-    vdl::Matrix BoneTransforms[Constants::kMaxBoneNum];
   };
   struct CameraData
   {
     vdl::Camera Camera;
-    vdl::ConstantBuffer<ConstantBufferData> ConstantBuffer;
+    vdl::ConstantBuffer<MeshConstantBufferData> ConstantBuffer;
     bool isChange;
   };
 private:
@@ -40,14 +39,16 @@ private:
   VertexBuffer TextureVertexBuffer_;
   InstanceBuffer NoneInstanceBuffer_;
   InstanceBuffer TextureInstanceBuffer_;
-  InstanceBuffer MeshInstanceBuffer_;
+  InstanceBuffer StaticMeshInstanceBuffer_;
+  InstanceBuffer SkinnedMeshInstanceBuffer_;
 private:
   std::unique_ptr<CameraData> pCameraData_;
 private:
   vdl::OutputManager OutputManager_;
   RendererCommandList<Empty, vdl::uint> EmptyRendererCommandList_;
   RendererCommandList<vdl::Texture, Instance2D> TextureRendererCommandList_;
-  RendererCommandList<vdl::Mesh, Instance3D> MeshRendererCommandList_;
+  RendererCommandList<vdl::StaticMesh, InstanceStaticMesh> StaticMeshRendererCommandList_;
+  RendererCommandList<vdl::SkinnedMesh, InstanceSkinnedMesh> SkinnedMeshRendererCommandList_;
 public:
   CRenderer() = default;
 
@@ -93,7 +94,9 @@ public:
 
   void Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::ColorF& _Color)override;
 
-  void Draw(const vdl::Mesh& _Mesh, const vdl::Matrix& _World, const vdl::MotionBlendDatas& _MotionBlendDatas, const vdl::ColorF& _Color)override;
+  void Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _World, const vdl::ColorF& _Color)override;
+
+  void Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const vdl::MotionBlendDatas& _MotionBlendDatas, const vdl::ColorF& _Color)override;
 
   void Clear(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)override;
 

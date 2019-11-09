@@ -13,10 +13,10 @@ class VertexBuffer
 public:
   VertexBuffer() = default;
 
-  VertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize);
+  VertexBuffer(vdl::uint _BufferSize);
 
-  VertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize);
-  
+  VertexBuffer(const void* _Vertices, vdl::uint _BufferSize);
+
   VertexBuffer(const VertexBuffer& _VertexBuffer);
 
   VertexBuffer(VertexBuffer&& _VertexBuffer)noexcept;
@@ -42,7 +42,7 @@ class InstanceBuffer
 public:
   InstanceBuffer() = default;
 
-  InstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize);
+  InstanceBuffer(vdl::uint _BufferSize);
 
   InstanceBuffer(const InstanceBuffer& _InstanceBuffer);
 

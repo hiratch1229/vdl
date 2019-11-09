@@ -10,11 +10,11 @@
 
 namespace vdl
 {
-  void UpdateMotion(const Mesh& _Mesh, MotionData* _pMotionData, float _DeltaTime, bool _isLoop)
+  void UpdateMotion(const SkinnedMesh& _SkinnedMesh, MotionData* _pMotionData, float _DeltaTime, bool _isLoop)
   {
-    assert(!_Mesh.isEmpty());
+    assert(!_SkinnedMesh.isEmpty());
 
-    ::Mesh* pMesh = Engine::Get<IModelManager>()->GetMesh(_Mesh.GetID());
+    Mesh* pMesh = Engine::Get<IModelManager>()->GetMesh(_SkinnedMesh.GetID());
 
     assert(!pMesh->Animations.empty());
 

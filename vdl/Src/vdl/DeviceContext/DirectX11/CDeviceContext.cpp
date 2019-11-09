@@ -15,11 +15,14 @@
 #include <vdl/Shader/DirectX11/CShader.hpp>
 
 #include <vdl/Constants/Constants.hpp>
-
+#include <vdl/Instance/Instance.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
+
+#include <ThirdParty/ImGui/imgui.h>
 
 #include <vdl/Texture.hpp>
 #include <vdl/Shader.hpp>
+#include <vdl/Vertex.hpp>
 #include <vdl/DetectMemoryLeak.hpp>
 
 #include <assert.h>
@@ -309,7 +312,8 @@ void CDeviceContext::SetVertexBuffer(const VertexBuffer& _VertexBuffer)
   const CVertexBuffer* pVertexBuffer = static_cast<CVertexBuffer*>(pBufferManager_->GetBuffer(_VertexBuffer.GetID()));
 
   constexpr vdl::uint kOffset = 0;
-  pD3D11ImmediateContext_->IASetVertexBuffers(0, 1, pVertexBuffer->pBuffer.GetAddressOf(), &pVertexBuffer->Stride, &kOffset);
+  const vdl::uint Stride = GetVertexBufferStride();
+  pD3D11ImmediateContext_->IASetVertexBuffers(0, 1, pVertexBuffer->pBuffer.GetAddressOf(), &Stride, &kOffset);
 }
 
 void CDeviceContext::SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer)
@@ -324,7 +328,8 @@ void CDeviceContext::SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer)
   const CInstanceBuffer* pInstanceBuffer = static_cast<CInstanceBuffer*>(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()));
 
   constexpr vdl::uint kOffset = 0;
-  pD3D11ImmediateContext_->IASetVertexBuffers(1, 1, pInstanceBuffer->pBuffer.GetAddressOf(), &pInstanceBuffer->Stride, &kOffset);
+  const vdl::uint Stride = GetInstanceBufferStride();
+  pD3D11ImmediateContext_->IASetVertexBuffers(1, 1, pInstanceBuffer->pBuffer.GetAddressOf(), &Stride, &kOffset);
 }
 
 void CDeviceContext::SetIndexBuffer(const IndexBuffer& _IndexBuffer)
@@ -346,6 +351,7 @@ void CDeviceContext::SetInputLayout(vdl::InputLayoutType _InputLayout)
 {
   assert(isFoundInputLayout(_InputLayout));
 
+  CurrentInputLayoutType_ = _InputLayout;
   pD3D11ImmediateContext_->IASetInputLayout(InputLayouts_[_InputLayout].Get());
 }
 
@@ -824,7 +830,6 @@ void CDeviceContext::CSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
 
 void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint _UnorderedAccessObjectNum, const vdl::UnorderedAccessObject _UnorderedAccessObjects[])
 {
-  //  TODO:
   //  シェーダーリソースの全解除
   {
     std::vector<ID3D11ShaderResourceView*> pShaderResourceViews(Constants::kMaxShaderResourceNum);
@@ -923,7 +928,21 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _p
       InputElementDesc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
     }
     break;
-    case vdl::InputLayoutType::eMesh:
+    case vdl::InputLayoutType::eStaticMesh:
+    {
+      InputElementDesc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+      InputElementDesc.push_back({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+      InputElementDesc.push_back({ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+      InputElementDesc.push_back({ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+
+      InputElementDesc.push_back({ "WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
+      InputElementDesc.push_back({ "WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
+      InputElementDesc.push_back({ "WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
+      InputElementDesc.push_back({ "WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
+      InputElementDesc.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 });
+    }
+    break;
+    case vdl::InputLayoutType::eSkinnedMesh:
     {
       InputElementDesc.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
       InputElementDesc.push_back({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
@@ -1078,4 +1097,31 @@ ID3D11UnorderedAccessView* CDeviceContext::GetUnorderedAccessView(const vdl::Uno
   }
 
   return pUnorderedAccessView;
+}
+
+vdl::uint CDeviceContext::GetVertexBufferStride()const
+{
+  switch (CurrentInputLayoutType_)
+  {
+  case vdl::InputLayoutType::eTexture: return sizeof(vdl::Vertex2D);
+  case vdl::InputLayoutType::eStaticMesh: return sizeof(vdl::VertexSkinnedMesh);
+  case vdl::InputLayoutType::eSkinnedMesh: return sizeof(vdl::VertexSkinnedMesh);
+  case vdl::InputLayoutType::eGUI: return sizeof(ImDrawVert);
+  default: assert(false);
+  }
+
+  return 0;
+}
+
+vdl::uint CDeviceContext::GetInstanceBufferStride()const
+{
+  switch (CurrentInputLayoutType_)
+  {
+  case vdl::InputLayoutType::eTexture: return sizeof(Instance2D);
+  case vdl::InputLayoutType::eStaticMesh: return sizeof(InstanceStaticMesh);
+  case vdl::InputLayoutType::eSkinnedMesh: return sizeof(InstanceSkinnedMesh);
+  default: assert(false);
+  }
+
+  return 0;
 }

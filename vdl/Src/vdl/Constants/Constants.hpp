@@ -30,21 +30,21 @@ namespace Constants
 
   constexpr vdl::uint kMaxUnorderedAccessObjectNum = vdl::Constants::kMaxUnorderedAccessObjectNum;
 
-  constexpr const char* kDefaultTextureVertexShaderCode = vdl::Constants::kDefaultTextureVertexShaderCode;
+  constexpr const char* kDefaultTextureShaderCode = vdl::Constants::kDefaultTextureShaderCode;
 
-  constexpr vdl::uint kDefaultTextureVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultTextureVertexShaderCode));
+  constexpr vdl::uint kDefaultTextureShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultTextureShaderCode));
 
-  constexpr const char* kDefaultTexturePixelShaderCode = vdl::Constants::kDefaultTexturePixelShaderCode;
+  constexpr const char* kDefaultStaticMeshShaderCode = vdl::Constants::kDefaultStaticMeshShaderCode;
 
-  constexpr vdl::uint kDefaultTexturePixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultTexturePixelShaderCode));
+  constexpr vdl::uint kDefaultStaticMeshShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultStaticMeshShaderCode));
 
-  constexpr const char* kDefaultMeshVertexShaderCode = vdl::Constants::kDefaultMeshVertexShaderCode;
+  constexpr const char* kDefaultSkinnedMeshShaderCode = vdl::Constants::kDefaultSkinnedMeshShaderCode;
 
-  constexpr vdl::uint kDefaultMeshVertexShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultMeshVertexShaderCode));
+  constexpr vdl::uint kDefaultSkinnedMeshShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultSkinnedMeshShaderCode));
 
-  constexpr const char* kDefaultMeshPixelShaderCode = vdl::Constants::kDefaultMeshPixelShaderCode;
+  constexpr const char* kDefaultShaderEntryPointVS = vdl::Constants::kDefaultShaderEntryPointVS;
 
-  constexpr vdl::uint kDefaultMeshPixelShaderSize = static_cast<vdl::uint>(vdl::Macro::ArraySize(vdl::Constants::kDefaultMeshPixelShaderCode));
+  constexpr const char* kDefaultShaderEntryPointPS = vdl::Constants::kDefaultShaderEntryPointPS;
 
   constexpr vdl::uint kAnimationSamplingRate = 24;
 
@@ -54,7 +54,9 @@ namespace Constants
 
   constexpr vdl::uint kMaxTextureBatchNum = 256;
 
-  constexpr vdl::uint kMaxMeshBatchNum = 128;
+  constexpr vdl::uint kMaxStaticMeshBatchNum = 256;
+
+  constexpr vdl::uint kMaxSkinnedMeshBatchNum = 128;
 
   constexpr const char* kBinaryFileDirectory = "Bin/";
 

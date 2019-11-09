@@ -18,26 +18,26 @@ void CBufferManager::Initialize()
   pD3D11Device_ = pDevice->GetDevice();
 }
 
-vdl::ID CBufferManager::CreateVertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+vdl::ID CBufferManager::CreateVertexBuffer(vdl::uint _BufferSize)
 {
   IBuffer* pBuffer;
-  pDevice_->CreateVertexBuffer(&pBuffer, _Stride, _BufferSize);
+  pDevice_->CreateVertexBuffer(&pBuffer, _BufferSize);
 
   return Buffers_.Add(pBuffer);
 }
 
-vdl::ID CBufferManager::CreateVertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)
+vdl::ID CBufferManager::CreateVertexBuffer(const void* _Vertices, vdl::uint _BufferSize)
 {
   IBuffer* pBuffer;
-  pDevice_->CreateVertexBuffer(&pBuffer, _Vertices, _Stride, _BufferSize);
+  pDevice_->CreateVertexBuffer(&pBuffer, _Vertices, _BufferSize);
 
   return Buffers_.Add(pBuffer);
 }
 
-vdl::ID CBufferManager::CreateInstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+vdl::ID CBufferManager::CreateInstanceBuffer(vdl::uint _BufferSize)
 {
   IBuffer* pBuffer;
-  pDevice_->CreateInstanceBuffer(&pBuffer, _Stride, _BufferSize);
+  pDevice_->CreateInstanceBuffer(&pBuffer, _BufferSize);
 
   return Buffers_.Add(pBuffer);
 }

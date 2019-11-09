@@ -30,7 +30,7 @@ namespace vdl::Renderer3D
   void SetDepthStencilState(const DepthStencilState& _DepthStencilState);
 
   void SetRasterizerState(const RasterizerState& _RasterizerState);
-  
+
   inline void SetGraphicsStates(const BlendState& _BlendState, const DepthStencilState& _DepthStencilState, const RasterizerState& _RasterizerState)
   {
     SetBlendState(_BlendState);
@@ -45,60 +45,107 @@ namespace vdl::Renderer3D
     SetRasterizerState(_GraphicsStates.RasterizerState);
   }
 
-  void SetVertexShader(const VertexShader& _VertexShader);
+  void SetStaticMeshVertexShader(const VertexShader& _VertexShader);
 
-  void SetHullShader(const HullShader& _HullShader);
+  //void SetSkinnedMeshVertexShader(const VertexShader& _VertexShader);
 
-  void SetDomainShader(const DomainShader& _DomainShader);
+  void SetMeshHullShader(const HullShader& _HullShader);
 
-  void SetGeometryShader(const GeometryShader& _GeometryShader);
+  void SetMeshDomainShader(const DomainShader& _DomainShader);
 
-  void SetPixelShader(const PixelShader& _PixelShader);
+  void SetMeshGeometryShader(const GeometryShader& _GeometryShader);
 
-  inline void SetShaders(const VertexShader& _VertexShader, const PixelShader& _PixelShader)
+  void SetMeshPixelShader(const PixelShader& _PixelShader);
+
+  inline void SetStaticMeshShaders(const VertexShader& _VertexShader, const PixelShader& _PixelShader)
   {
-    SetVertexShader(_VertexShader);
-    SetHullShader(HullShader());
-    SetDomainShader(DomainShader());
-    SetGeometryShader(GeometryShader());
-    SetPixelShader(_PixelShader);
+    SetStaticMeshVertexShader(_VertexShader);
+    SetMeshHullShader(HullShader());
+    SetMeshDomainShader(DomainShader());
+    SetMeshGeometryShader(GeometryShader());
+    SetMeshPixelShader(_PixelShader);
   }
 
-  inline void SetShaders(const VertexShader& _VertexShader, const GeometryShader& _GeometryShader, const PixelShader& _PixelShader)
+  inline void SetStaticMeshShaders(const VertexShader& _VertexShader, const GeometryShader& _GeometryShader, const PixelShader& _PixelShader)
   {
-    SetVertexShader(_VertexShader);
-    SetHullShader(HullShader());
-    SetDomainShader(DomainShader());
-    SetGeometryShader(_GeometryShader);
-    SetPixelShader(_PixelShader);
+    SetStaticMeshVertexShader(_VertexShader);
+    SetMeshHullShader(HullShader());
+    SetMeshDomainShader(DomainShader());
+    SetMeshGeometryShader(_GeometryShader);
+    SetMeshPixelShader(_PixelShader);
   }
 
-  inline void SetShaders(const VertexShader& _VertexShader, const HullShader& _HullShader, const DomainShader& _DomainShader, const PixelShader& _PixelShader)
+  inline void SetStaticMeshShaders(const VertexShader& _VertexShader, const HullShader& _HullShader, const DomainShader& _DomainShader, const PixelShader& _PixelShader)
   {
-    SetVertexShader(_VertexShader);
-    SetHullShader(_HullShader);
-    SetDomainShader(_DomainShader);
-    SetGeometryShader(GeometryShader());
-    SetPixelShader(_PixelShader);
+    SetStaticMeshVertexShader(_VertexShader);
+    SetMeshHullShader(_HullShader);
+    SetMeshDomainShader(_DomainShader);
+    SetMeshGeometryShader(GeometryShader());
+    SetMeshPixelShader(_PixelShader);
   }
 
-  inline void SetShaders(const VertexShader& _VertexShader, const HullShader& _HullShader, const DomainShader& _DomainShader, const GeometryShader& _GeometryShader, const PixelShader& _PixelShader)
+  inline void SetStaticMeshShaders(const VertexShader& _VertexShader, const HullShader& _HullShader, const DomainShader& _DomainShader, const GeometryShader& _GeometryShader, const PixelShader& _PixelShader)
   {
-    SetVertexShader(_VertexShader);
-    SetHullShader(_HullShader);
-    SetDomainShader(_DomainShader);
-    SetGeometryShader(_GeometryShader);
-    SetPixelShader(_PixelShader);
+    SetStaticMeshVertexShader(_VertexShader);
+    SetMeshHullShader(_HullShader);
+    SetMeshDomainShader(_DomainShader);
+    SetMeshGeometryShader(_GeometryShader);
+    SetMeshPixelShader(_PixelShader);
   }
 
-  inline void SetGraphicsShaders(const GraphicsShaders& _GraphicsShaders)
+  inline void SetStaticMeshGraphicsShaders(const GraphicsShaders& _GraphicsShaders)
   {
-    SetVertexShader(_GraphicsShaders.VertexShader);
-    SetHullShader(_GraphicsShaders.HullShader);
-    SetDomainShader(_GraphicsShaders.DomainShader);
-    SetGeometryShader(_GraphicsShaders.GeometryShader);
-    SetPixelShader(_GraphicsShaders.PixelShader);
+    SetStaticMeshVertexShader(_GraphicsShaders.VertexShader);
+    SetMeshHullShader(_GraphicsShaders.HullShader);
+    SetMeshDomainShader(_GraphicsShaders.DomainShader);
+    SetMeshGeometryShader(_GraphicsShaders.GeometryShader);
+    SetMeshPixelShader(_GraphicsShaders.PixelShader);
   }
+
+  //inline void SetSkinnedMeshShaders(const VertexShader& _VertexShader, const PixelShader& _PixelShader)
+  //{
+  //  SetSkinnedMeshVertexShader(_VertexShader);
+  //  SetMeshHullShader(HullShader());
+  //  SetMeshDomainShader(DomainShader());
+  //  SetMeshGeometryShader(GeometryShader());
+  //  SetMeshPixelShader(_PixelShader);
+  //}
+  //
+  //inline void SetSkinnedMeshShaders(const VertexShader& _VertexShader, const GeometryShader& _GeometryShader, const PixelShader& _PixelShader)
+  //{
+  //  SetSkinnedMeshVertexShader(_VertexShader);
+  //  SetMeshHullShader(HullShader());
+  //  SetMeshDomainShader(DomainShader());
+  //  SetMeshGeometryShader(_GeometryShader);
+  //  SetMeshPixelShader(_PixelShader);
+  //}
+  //
+  //inline void SetSkinnedMeshShaders(const VertexShader& _VertexShader, const HullShader& _HullShader, const DomainShader& _DomainShader, const PixelShader& _PixelShader)
+  //{
+  //  SetSkinnedMeshVertexShader(_VertexShader);
+  //  SetMeshHullShader(_HullShader);
+  //  SetMeshDomainShader(_DomainShader);
+  //  SetMeshGeometryShader(GeometryShader());
+  //  SetMeshPixelShader(_PixelShader);
+  //}
+  //
+  //inline void SetSkinnedMeshShaders(const VertexShader& _VertexShader, const HullShader& _HullShader, const DomainShader& _DomainShader, const GeometryShader& _GeometryShader, const PixelShader& _PixelShader)
+  //{
+  //  SetSkinnedMeshVertexShader(_VertexShader);
+  //  SetMeshHullShader(_HullShader);
+  //  SetMeshDomainShader(_DomainShader);
+  //  SetMeshGeometryShader(_GeometryShader);
+  //  SetMeshPixelShader(_PixelShader);
+  //}
+  //
+  //inline void SetSkinnedMeshGraphicsShaders(const GraphicsShaders& _GraphicsShaders)
+  //{
+  //  SetSkinnedMeshVertexShader(_GraphicsShaders.VertexShader);
+  //  SetMeshHullShader(_GraphicsShaders.HullShader);
+  //  SetMeshDomainShader(_GraphicsShaders.DomainShader);
+  //  SetMeshGeometryShader(_GraphicsShaders.GeometryShader);
+  //  SetMeshPixelShader(_GraphicsShaders.PixelShader);
+  //}
 
   void SetVertexStageShaderResources(uint _StartSlot, uint _ShaderResourceNum, const ShaderResource _ShaderResources[]);
 
@@ -400,7 +447,7 @@ namespace vdl::Renderer3D
     SetPixelStageConstantBuffers(_Slot, _BufferNum, ConstantBuffers.data());
   }
 
-  void Draw(const Mesh& _Mesh, const Matrix& _World, const ColorF& _Color = Palette::White);
+  void Draw(const StaticMesh& _StaticMesh, const Matrix& _World, const ColorF& _Color = Palette::White);
 
   inline void Draw(const Model& _Model, const Matrix& _World, const ColorF& _Color = Palette::White)
   {
@@ -412,9 +459,9 @@ namespace vdl::Renderer3D
     }
   }
 
-  //void Draw(const Mesh& _Mesh, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color = Palette::White);
+  //void Draw(const SkinnedMesh& _SkinnedMesh, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color = Palette::White);
   //
-  //void Draw(const Mesh& _Mesh, const Matrix& _World, const MotionBlendDatas& _MotionBlendDatas, const ColorF& _Color = Palette::White);
+  //void Draw(const SkinnedMesh& _SkinnedMesh, const Matrix& _World, const MotionBlendDatas& _MotionBlendDatas, const ColorF& _Color = Palette::White);
   //
   //inline void Draw(const Model& _Model, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color = Palette::White)
   //{

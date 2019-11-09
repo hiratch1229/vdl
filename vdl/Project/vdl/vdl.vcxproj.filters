@@ -175,6 +175,12 @@
     <Filter Include="Src\ThirdParty\meshoptimizer">
       <UniqueIdentifier>{434bbcd7-24a0-4006-ab81-4cbcaffebc91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Mesh\StaticMesh">
+      <UniqueIdentifier>{d3d4298e-3b5c-45fe-99f4-ee99d976e78b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Mesh\SkinnedMesh">
+      <UniqueIdentifier>{fcbf157e-1b7d-4324-b1b9-32a8effd0545}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -904,6 +910,12 @@
     <None Include="..\..\Shader\Option\GaussianBlur.hlsli">
       <Filter>Shader\Option</Filter>
     </None>
+    <None Include="..\..\Shader\Mesh\StaticMesh\StaticMesh.hlsli">
+      <Filter>Shader\Mesh\StaticMesh</Filter>
+    </None>
+    <None Include="..\..\Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli">
+      <Filter>Shader\Mesh\SkinnedMesh</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
@@ -915,11 +927,14 @@
     <FxCompile Include="..\..\Shader\Mesh\MeshPS.hlsl">
       <Filter>Shader\Mesh</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\Shader\Mesh\MeshVS.hlsl">
-      <Filter>Shader\Mesh</Filter>
-    </FxCompile>
     <FxCompile Include="..\..\Shader\Option\FullScreenTriangleVS.hlsl">
       <Filter>Shader\Option</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\Mesh\StaticMesh\StaticMeshVS.hlsl">
+      <Filter>Shader\Mesh\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\Mesh\SkinnedMesh\SkinnedMeshVS.hlsl">
+      <Filter>Shader\Mesh\SkinnedMesh</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

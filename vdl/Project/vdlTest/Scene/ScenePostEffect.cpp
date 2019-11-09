@@ -5,7 +5,7 @@ using namespace vdl;
 void ScenePostEffect::Initialize()
 {
   House_ = Model("Data/house_obj/house_obj.obj");
-  Ground_ = ModelData::Rectangle("Data/GRASSX1/GRASSX1.jpg", "Data/GRASSX1/GRASSX1_normal.jpg");
+  Ground_ = StaticModelData::Rectangle("Data/GRASSX1/GRASSX1.jpg", "Data/GRASSX1/GRASSX1_normal.jpg");
 
   Camera_ = Camera(float3(0.0f, 10.0f, -25.0f));
 
@@ -14,7 +14,7 @@ void ScenePostEffect::Initialize()
 
   //  GBufferPassÇÃèâä˙âª
   {
-    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eMesh);
+    GBufferPassVertexShader_ = VertexShader("Shader/GBufferPass/GBufferPassVS.hlsl", InputLayoutType::eStaticMesh);
     GBufferPassPixelShader_ = PixelShader("Shader/PostEffect/GBufferPassPS.hlsl");
 
     //  DiffuseMap
@@ -27,7 +27,7 @@ void ScenePostEffect::Initialize()
 
   //  ShadowMapÇÃèâä˙âª
   {
-    ShadowMapVertexShader_ = VertexShader("Shader/PostEffect/ShadowMapVS.hlsl", InputLayoutType::eMesh);
+    ShadowMapVertexShader_ = VertexShader("Shader/PostEffect/ShadowMapVS.hlsl", InputLayoutType::eStaticMesh);
     ShadowMapPixelShader_ = PixelShader();
     ShadowMap_ = DepthStencilTexture(kShadowMapSize, FormatType::eD32_Float);
 
@@ -175,7 +175,7 @@ void ScenePostEffect::Update()
   //  GBufferPass
   {
     Renderer::SetRenderTextures(GBufferRenderTextures_, GBufferDepthTexture_);
-    Renderer3D::SetShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
+    Renderer3D::SetStaticMeshShaders(GBufferPassVertexShader_, GBufferPassPixelShader_);
 
     Renderer3D::Draw(House_, HouseWorld_);
     Renderer3D::Draw(Ground_, GroundWorld_);
@@ -184,7 +184,7 @@ void ScenePostEffect::Update()
   //  ShadowPass
   {
     Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
-    Renderer3D::SetShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
+    Renderer3D::SetStaticMeshShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
 
     Renderer3D::Draw(House_, HouseWorld_);
   }

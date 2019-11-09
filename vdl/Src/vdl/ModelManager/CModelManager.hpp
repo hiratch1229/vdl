@@ -10,7 +10,7 @@ class CModelManager : public IModelManager
   struct VertexBufferData
   {
     VertexBuffer VertexBuffer;
-    vdl::Vertices Vertices;
+    vdl::VertexSkinnedMeshs Vertices;
   };
   struct IndexBufferData
   {
@@ -26,9 +26,11 @@ public:
 
   void Initialize()override {}
 
-  vdl::ID Load(const vdl::Vertices& _Vertices, const vdl::Indices& _Indices, const vdl::MeshData& _MeshData)override;
+  vdl::ID Load(const vdl::VertexStaticMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::StaticMeshData& _StaticMeshData)override;
 
-  std::vector<vdl::Mesh> Load(const char* _FilePath, bool _isSerialize)override;
+  vdl::ID Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::SkinnedMeshData& _SkinnedMeshData)override;
+
+  std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize)override;
 
   void AddRef(const vdl::ID& _ID)override
   {

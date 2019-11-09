@@ -43,6 +43,9 @@
     <Filter Include="Src\pch">
       <UniqueIdentifier>{34938c31-214a-4942-a159-f620b0563077}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\ThirdParty">
+      <UniqueIdentifier>{d059ec42-0894-4b0b-917d-2c6b9789bb17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.hpp">

@@ -8,7 +8,6 @@
 struct CVertexBuffer : public IBuffer
 {
   Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
-  vdl::uint Stride;
 public:
   CVertexBuffer() = default;
 
@@ -18,7 +17,6 @@ public:
 struct CInstanceBuffer : public IBuffer
 {
   Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
-  vdl::uint Stride;
 public:
   CInstanceBuffer() = default;
 

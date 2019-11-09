@@ -4,7 +4,7 @@ using namespace vdl;
 
 void SceneTessellation::Initialize()
 {
-  ModelData ModelData;
+  StaticModelData ModelData;
   ModelData.Vertices.resize(4);
   {
     ModelData.Vertices[0] = { { +0.5f, +0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f }, { +1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } };
@@ -22,7 +22,7 @@ void SceneTessellation::Initialize()
   Rectangle_ = ModelData;
   Camera_ = Camera(float3(0.0f, 0.0f, -5.0f));
 
-  Renderer3D::SetShaders(VertexShader("Shader/Tessellation/TessellationVS.hlsl", InputLayoutType::eMesh),
+  Renderer3D::SetStaticMeshShaders(VertexShader("Shader/Tessellation/TessellationVS.hlsl", InputLayoutType::eStaticMesh),
     HullShader("Shader/Tessellation/TessellationHS.hlsl"),
     DomainShader("Shader/Tessellation/TessellationDS.hlsl"),
     PixelShader("Shader/Tessellation/TessellationPS.hlsl"));

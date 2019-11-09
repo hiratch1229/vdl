@@ -19,7 +19,19 @@ namespace
   constexpr IndexType kIndexType = (sizeof(vdl::IndexType) == 2 ? IndexType::eUint16 : IndexType::eUint32);
 }
 
-vdl::ID CModelManager::Load(const vdl::Vertices& _Vertices, const vdl::Indices& _Indices, const vdl::MeshData& _MeshData)
+vdl::ID CModelManager::Load(const vdl::VertexStaticMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::StaticMeshData& _StaticMeshData)
+{
+  const size_t VertexNum = _Vertices.size();
+  vdl::VertexSkinnedMeshs Vertices(VertexNum);
+  for (size_t VertexCount = 0; VertexCount < VertexNum; ++VertexCount)
+  {
+    Vertices[VertexCount] = _Vertices[VertexCount];
+  }
+
+  return Load(Vertices, _Indices, _StaticMeshData);
+}
+
+vdl::ID CModelManager::Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::SkinnedMeshData& _SkinnedMeshData)
 {
   auto GetVertexBuffer = [&]()->VertexBuffer
   {
@@ -31,7 +43,7 @@ vdl::ID CModelManager::Load(const vdl::Vertices& _Vertices, const vdl::Indices& 
       }
     }
 
-    VertexBuffer Buffer = VertexBuffer(_Vertices.data(), sizeof(vdl::Vertex3D), static_cast<vdl::uint>(_Vertices.size() * sizeof(vdl::Vertex3D)));
+    VertexBuffer Buffer = VertexBuffer(_Vertices.data(), static_cast<vdl::uint>(_Vertices.size() * sizeof(vdl::VertexSkinnedMesh)));
     {
       if (VertexBufferDatas_.size() <= Buffer.GetID())
       {
@@ -80,17 +92,17 @@ vdl::ID CModelManager::Load(const vdl::Vertices& _Vertices, const vdl::Indices& 
   {
     pMesh->VertexBuffer = GetVertexBuffer();
     pMesh->IndexBuffer = GetIndexBuffer();
-    pMesh->IndexStart = _MeshData.IndexStart;
-    pMesh->IndexCount = _MeshData.IndexCount;
-    pMesh->Material = _MeshData.Material;
-    //pMesh->Animations = _MeshData.Animations;
-    pMesh->GlobalTransform = _MeshData.GlobalTransform;
+    pMesh->IndexStart = _SkinnedMeshData.IndexStart;
+    pMesh->IndexCount = _SkinnedMeshData.IndexCount;
+    pMesh->Material = _SkinnedMeshData.Material;
+    pMesh->Animations = _SkinnedMeshData.Animations;
+    pMesh->GlobalTransform = _SkinnedMeshData.GlobalTransform;
   }
 
   return Meshes_.Add(pMesh);
 }
 
-std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerialize)
+std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _isSerialize)
 {
   const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
   const std::filesystem::path BinaryFilePath = (BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).concat(Constants::kBinaryFileFormat);
@@ -102,7 +114,7 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
     //  バイナリファイルが存在する場合ファイルから読み込む
     if (_isSerialize && std::filesystem::exists(BinaryFilePath))
     {
-      ImportFromBinary(BinaryFilePath.string().c_str(), ModelData);
+      ::ImportFromBinary(BinaryFilePath.string().c_str(), ModelData);
     }
     else
     {
@@ -128,13 +140,13 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
         const size_t IndexNum = ModelData.Indices.size();
 
         std::vector<vdl::IndexType> Remap(VertexNum);
-        const size_t NewVertexNum = ::meshopt_generateVertexRemap(Remap.data(), ModelData.Indices.data(), IndexNum, ModelData.Vertices.data(), VertexNum, sizeof(vdl::Vertex3D));
+        const size_t NewVertexNum = ::meshopt_generateVertexRemap(Remap.data(), ModelData.Indices.data(), IndexNum, ModelData.Vertices.data(), VertexNum, sizeof(vdl::VertexSkinnedMesh));
 
         vdl::Indices Indices(IndexNum);
         ::meshopt_remapIndexBuffer(Indices.data(), ModelData.Indices.data(), IndexNum, Remap.data());
 
-        vdl::Vertices Vertices(NewVertexNum);
-        ::meshopt_remapVertexBuffer(Vertices.data(), ModelData.Vertices.data(), VertexNum, sizeof(vdl::Vertex3D), Remap.data());
+        vdl::VertexSkinnedMeshs Vertices(NewVertexNum);
+        ::meshopt_remapVertexBuffer(Vertices.data(), ModelData.Vertices.data(), VertexNum, sizeof(vdl::VertexSkinnedMesh), Remap.data());
 
         ModelData.Vertices = std::move(Vertices);
         ModelData.Indices = std::move(Indices);
@@ -149,7 +161,7 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
         }
 
         //  バイナリファイルに書き出し
-        ExportToBinary(BinaryFilePath.string().c_str(), ModelData);
+        ::ExportToBinary(BinaryFilePath.string().c_str(), ModelData);
       }
     }
   }
@@ -179,15 +191,15 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
     {
       vdl::Material& Material = Materials.emplace_back();
       Material.MaterialColor = ModelMaterial.MaterialColor;
-      Material.Diffuse = CreateTexture(ModelMaterial.Diffuse, vdl::Color(255, 255, 255));
-      Material.NormalMap = CreateTexture(ModelMaterial.NormalMap, vdl::Color(128, 128, 255));
+      Material.Diffuse = CreateTexture(ModelMaterial.Diffuse, vdl::Palette::Diffuse);
+      Material.NormalMap = CreateTexture(ModelMaterial.NormalMap, vdl::Palette::NormalMap);
       //Material.Specular = CreateTexture(ModelMaterial.Specular, vdl::Color(0, 0, 0));
       //Material.MetalicRoughness = CreateTexture(ModelMaterial.MetalicRoughness, vdl::Color(0, 0, 0));
       //Material.Emissive = CreateTexture(ModelMaterial.Emissive, vdl::Color(0, 0, 0));
     }
   }
 
-  std::vector<vdl::Mesh> Meshes;
+  std::vector<vdl::SkinnedMesh> Meshes;
   {
     const size_t MeshNum = ModelData.MeshDatas.size();
     Meshes.resize(MeshNum);
@@ -196,16 +208,16 @@ std::vector<vdl::Mesh> CModelManager::Load(const char* _FilePath, bool _isSerial
     {
       const MeshData& ModelMesh = ModelData.MeshDatas[MeshCount];
 
-      vdl::MeshData MeshData;
+      vdl::SkinnedMeshData MeshData;
       {
         MeshData.IndexStart = ModelMesh.IndexStart;
         MeshData.IndexCount = ModelMesh.IndexCount;
         MeshData.Material = Materials[ModelMesh.MaterialIndex];
-        //MeshData.Animations = ModelMesh.Animations;
         MeshData.GlobalTransform = ModelMesh.GlobalTransform;
+        //MeshData.Animations = ModelMesh.Animations;
       }
 
-      Meshes[MeshCount] = vdl::Mesh(ModelData.Vertices, ModelData.Indices, MeshData);
+      Meshes[MeshCount] = vdl::SkinnedMesh(ModelData.Vertices, ModelData.Indices, MeshData);
     }
   }
 

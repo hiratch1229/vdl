@@ -3,14 +3,14 @@
 #include <vdl/Engine.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 
-VertexBuffer::VertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+VertexBuffer::VertexBuffer(vdl::uint _BufferSize)
 {
-  ID_ = Engine::Get<IBufferManager>()->CreateVertexBuffer(_Stride, _BufferSize);
+  ID_ = Engine::Get<IBufferManager>()->CreateVertexBuffer(_BufferSize);
 }
 
-VertexBuffer::VertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)
+VertexBuffer::VertexBuffer(const void* _Vertices, vdl::uint _BufferSize)
 {
-  ID_ = Engine::Get<IBufferManager>()->CreateVertexBuffer(_Vertices, _Stride, _BufferSize);
+  ID_ = Engine::Get<IBufferManager>()->CreateVertexBuffer(_Vertices, _BufferSize);
 }
 
 VertexBuffer::VertexBuffer(const VertexBuffer& _VertexBuffer)
@@ -67,9 +67,9 @@ VertexBuffer::~VertexBuffer()
 
 //--------------------------------------------------
 
-InstanceBuffer::InstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
+InstanceBuffer::InstanceBuffer(vdl::uint _BufferSize)
 {
-  ID_ = Engine::Get<IBufferManager>()->CreateInstanceBuffer(_Stride, _BufferSize);
+  ID_ = Engine::Get<IBufferManager>()->CreateInstanceBuffer(_BufferSize);
 }
 
 InstanceBuffer::InstanceBuffer(const InstanceBuffer& _InstanceBuffer)

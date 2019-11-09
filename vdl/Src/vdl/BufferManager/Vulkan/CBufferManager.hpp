@@ -27,11 +27,11 @@ public:
 
   void Initialize()override;
 
-  vdl::ID CreateVertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize)override;
+  vdl::ID CreateVertexBuffer(vdl::uint _BufferSize)override;
 
-  vdl::ID CreateVertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)override;
+  vdl::ID CreateVertexBuffer(const void* _Vertices, vdl::uint _BufferSize)override;
 
-  vdl::ID CreateInstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize)override;
+  vdl::ID CreateInstanceBuffer(vdl::uint _BufferSize)override;
 
   vdl::ID CreateIndexBuffer(vdl::uint _BufferSize, IndexType _IndexType)override;
 

@@ -48,6 +48,12 @@
     <Filter Include="シェーダーファイル\Ocean">
       <UniqueIdentifier>{a3cd13b5-6af7-4ee7-9411-662809f90946}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Mesh\StaticMesh">
+      <UniqueIdentifier>{b69606c4-1688-4016-bd36-b48b304fc711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダーファイル\Mesh\SkinnedMesh">
+      <UniqueIdentifier>{ac924044-b160-496d-a4b6-41bc90e58be2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -117,9 +123,6 @@
     <FxCompile Include="Shader\MultiRenderTexture\MultiRenderTexturePS.hlsl">
       <Filter>シェーダーファイル\MultiRenderTexture</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\MultiRenderTexture\MultiRenderTextureVS.hlsl">
-      <Filter>シェーダーファイル\MultiRenderTexture</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\Tessellation\TessellationHS.hlsl">
       <Filter>シェーダーファイル\Tessellation</Filter>
     </FxCompile>
@@ -148,9 +151,6 @@
       <Filter>シェーダーファイル\GPUParticle</Filter>
     </FxCompile>
     <FxCompile Include="Shader\Mesh\MeshPS.hlsl">
-      <Filter>シェーダーファイル\Mesh</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\Mesh\MeshVS.hlsl">
       <Filter>シェーダーファイル\Mesh</Filter>
     </FxCompile>
     <FxCompile Include="Shader\Deferred\GBufferPassPS.hlsl">
@@ -216,11 +216,14 @@
     <FxCompile Include="Shader\Ocean\WaterSurfaceHS.hlsl">
       <Filter>シェーダーファイル\Ocean</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Mesh\StaticMesh\StaticMeshVS.hlsl">
+      <Filter>シェーダーファイル\Mesh\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Mesh\SkinnedMesh\SkinnedMeshVS.hlsl">
+      <Filter>シェーダーファイル\Mesh\SkinnedMesh</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\MultiRenderTexture\MultiRenderTexture.hlsli">
-      <Filter>シェーダーファイル\MultiRenderTexture</Filter>
-    </None>
     <None Include="Shader\Tessellation\Tessellation.hlsli">
       <Filter>シェーダーファイル\Tessellation</Filter>
     </None>
@@ -247,6 +250,12 @@
     </None>
     <None Include="Shader\Ocean\WaterSurface.hlsli">
       <Filter>シェーダーファイル\Ocean</Filter>
+    </None>
+    <None Include="Shader\Mesh\StaticMesh\StaticMesh.hlsli">
+      <Filter>シェーダーファイル\Mesh\StaticMesh</Filter>
+    </None>
+    <None Include="Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli">
+      <Filter>シェーダーファイル\Mesh\SkinnedMesh</Filter>
     </None>
   </ItemGroup>
 </Project>

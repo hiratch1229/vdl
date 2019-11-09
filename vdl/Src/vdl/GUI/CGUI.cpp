@@ -774,7 +774,7 @@ void CGUI::Draw()
     if (const vdl::uint VertexSize = static_cast<vdl::uint>(pDrawData->TotalVtxCount * sizeof(ImDrawVert));
       VertexBufferSize_ < VertexSize)
     {
-      VertexBuffer_ = VertexBuffer(sizeof(ImDrawVert), VertexBufferSize_ = VertexSize);
+      VertexBuffer_ = VertexBuffer(VertexBufferSize_ = VertexSize);
     }
     if (const vdl::uint IndexSize = static_cast<vdl::uint>(pDrawData->TotalIdxCount * sizeof(ImDrawIdx));
       IndexBufferSize_ < IndexSize)
@@ -807,7 +807,7 @@ void CGUI::Draw()
   }
 
   // Will project scissor/clipping rectangles into framebuffer space
-  const ImVec2 ClipOffset = pDrawData->DisplayPos;         // (0,0) unless using multi-viewports
+  const ImVec2 ClipOffset = pDrawData->DisplayPos;      // (0,0) unless using multi-viewports
   const ImVec2 ClipScale = pDrawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
 
   ConstantBufferData& ConstantBufferData = pConstantBuffer_->GetData();
@@ -818,11 +818,11 @@ void CGUI::Draw()
 
   Viewport_.Size = { pDrawData->DisplaySize.x, pDrawData->DisplaySize.y };
 
+  pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eGUI);
+  pDeviceContext_->SetTopology(vdl::TopologyType::eTriangleList);
   pDeviceContext_->SetVertexBuffer(VertexBuffer_);
   pDeviceContext_->SetInstanceBuffer(InstanceBuffer_);
   pDeviceContext_->SetIndexBuffer(IndexBuffer_);
-  pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eGUI);
-  pDeviceContext_->SetTopology(vdl::TopologyType::eTriangleList);
 
   pDeviceContext_->SetViewport(Viewport_);
   pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
