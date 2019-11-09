@@ -478,7 +478,7 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
   {
     pCameraData_->isChange = false;
     pCameraData_->ConstantBuffer.GetData().ViewProjection = GetView() * GetProjection();
-    SkinnedMeshRendererCommandList_.PushVertexStageConstantBuffers(0, 1, &pCameraData_->ConstantBuffer.GetDetail());
+    StaticMeshRendererCommandList_.PushVertexStageConstantBuffers(0, 1, &pCameraData_->ConstantBuffer.GetDetail());
   }
 
   InstanceStaticMesh Instance;
