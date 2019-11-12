@@ -13,7 +13,6 @@
 #include <vdl/Viewport/Vulkan/Viewport.hpp>
 #include <vdl/Buffer/Vulkan/CBuffer.hpp>
 
-#include <vdl/Instance/Instance.hpp>
 #include <vdl/Constants/Constants.hpp>
 
 #include <ThirdParty/ImGui/imgui.h>
@@ -488,16 +487,16 @@ void CDeviceContext::Initialize()
         //  インスタンスデータ
         {
           InputLayout.VertexInputBindingDescriptions[1].binding = 1;
-          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(Instance2D);
+          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(vdl::Instance2D);
           InputLayout.VertexInputBindingDescriptions[1].inputRate = vk::VertexInputRate::eInstance;
 
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::NDCTransform.r[0]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::NDCTransform.r[1]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::NDCTransform.r[2]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::NDCTransform.r[3]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(Instance2D::TexcoordScale));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(Instance2D::TexcoordTranslate));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(Instance2D::Color));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::Instance2D::NDCTransform.r[0]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::Instance2D::NDCTransform.r[1]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::Instance2D::NDCTransform.r[2]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::Instance2D::NDCTransform.r[3]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::Instance2D::TexcoordScale));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32Sfloat, sizeof(vdl::Instance2D::TexcoordTranslate));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::Instance2D::Color));
         }
       }
 
@@ -531,14 +530,14 @@ void CDeviceContext::Initialize()
         //  インスタンスデータ
         {
           InputLayout.VertexInputBindingDescriptions[1].binding = 1;
-          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(InstanceStaticMesh);
+          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(vdl::InstanceStaticMesh);
           InputLayout.VertexInputBindingDescriptions[1].inputRate = vk::VertexInputRate::eInstance;
 
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceStaticMesh::World.r[0]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceStaticMesh::World.r[1]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceStaticMesh::World.r[2]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceStaticMesh::World.r[3]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceStaticMesh::Color));        }
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceStaticMesh::World.r[0]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceStaticMesh::World.r[1]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceStaticMesh::World.r[2]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceStaticMesh::World.r[3]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceStaticMesh::Color));        }
       }
 
       InputLayouts_.insert(std::make_pair(vdl::InputLayoutType::eStaticMesh, std::move(InputLayout)));
@@ -573,14 +572,14 @@ void CDeviceContext::Initialize()
         //  インスタンスデータ
         {
           InputLayout.VertexInputBindingDescriptions[1].binding = 1;
-          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(InstanceSkinnedMesh);
+          InputLayout.VertexInputBindingDescriptions[1].stride = sizeof(vdl::InstanceSkinnedMesh);
           InputLayout.VertexInputBindingDescriptions[1].inputRate = vk::VertexInputRate::eInstance;
 
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceSkinnedMesh::World.r[0]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceSkinnedMesh::World.r[1]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceSkinnedMesh::World.r[2]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceSkinnedMesh::World.r[3]));
-          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(InstanceSkinnedMesh::Color));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceSkinnedMesh::World.r[0]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceSkinnedMesh::World.r[1]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceSkinnedMesh::World.r[2]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceSkinnedMesh::World.r[3]));
+          SetVertexInputAttibuteDescription(&InputLayout, vk::Format::eR32G32B32A32Sfloat, sizeof(vdl::InstanceSkinnedMesh::Color));
         }
       }
 
@@ -1125,8 +1124,8 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
   CRenderTexture* pRenderTexture = GetVkRenderTexture(_RenderTexture);
 
   const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
-  pRenderTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
-  CurrentGraphicsCommandBuffer.clearColorImage(pRenderTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, Cast(_ClearColor), SubresourceRange);
+  pRenderTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  CurrentGraphicsCommandBuffer.clearColorImage(pRenderTexture->TextureData.Image.get(), vk::ImageLayout::eTransferDstOptimal, Cast(_ClearColor), SubresourceRange);
 
   //  Clearするまで生存を保証
   {
@@ -1151,8 +1150,8 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   CDepthStencilTexture* pDepthStencilTexture = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(TextureID));
 
   const vk::ImageSubresourceRange SubresourceRange = { pDepthStencilTexture->ImageAspectFlag, 0, 1, 0, 1 };
-  pDepthStencilTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
-  CurrentGraphicsCommandBuffer.clearDepthStencilImage(pDepthStencilTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, { _ClearDepth, _ClearStencil }, SubresourceRange);
+  pDepthStencilTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  CurrentGraphicsCommandBuffer.clearDepthStencilImage(pDepthStencilTexture->TextureData.Image.get(), vk::ImageLayout::eTransferDstOptimal, { _ClearDepth, _ClearStencil }, SubresourceRange);
 
   //  Clearするまで生存を保証
   {
@@ -1179,8 +1178,8 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
   CUnorderedAccessTexture* pUnorderedAccessTexture = static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(TextureID));
 
   const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
-  pUnorderedAccessTexture->SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
-  CurrentGraphicsCommandBuffer.clearColorImage(pUnorderedAccessTexture->Image.get(), kImageLayout, Cast(_ClearColor), SubresourceRange);
+  pUnorderedAccessTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  CurrentGraphicsCommandBuffer.clearColorImage(pUnorderedAccessTexture->TextureData.Image.get(), kImageLayout, Cast(_ClearColor), SubresourceRange);
 
   //  Clearするまで生存を保証
   {
@@ -1229,60 +1228,75 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
       {
         const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
 
-        //  Texture
-        if (std::get_if<vdl::Texture>(&ShaderResource))
+        ITexture* pTexture = nullptr;
         {
-          const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
-          if (!Texture.isEmpty())
+          if (std::get_if<vdl::Texture>(&ShaderResource))
           {
-            constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-
-            DescriptorImageData& ImageData = TextureDatas.emplace_back();
+            const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
+            if (!Texture.isEmpty())
             {
-              ImageData.Info.imageLayout = kImageLayout;
-              ImageData.Bind = ShaderResourceCount;
+              pTexture = pTextureManager_->GetTexture(Texture.GetID());
             }
-
-            ITexture* pTexture = pTextureManager_->GetTexture(Texture.GetID());
-
-            switch (pTexture->GetType())
+          }
+          else if (std::get_if<vdl::CubeTexture>(&ShaderResource))
+          {
+            const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(ShaderResource);
+            if (!CubeTexture.isEmpty())
             {
-            case TextureType::eDepthStencilTexture:
-              assert(false);
-            case TextureType::eDepthTexture:
-            {
-              CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
-              ImageData.Info.imageView = pDepthTexture->View.get();
+              pTexture = pTextureManager_->GetTexture(CubeTexture.GetID());
+            }
+          }
+        }
 
-              if (pDepthTexture->pParent->CurrentLayout != kImageLayout)
-              {
-                pDepthTexture->pParent->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
-              }
-            }
-            break;
-            case TextureType::eStencilTexture:
-            {
-              CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
-              ImageData.Info.imageView = pStencilTexture->View.get();
 
-              if (pStencilTexture->pParent->CurrentLayout != kImageLayout)
-              {
-                pStencilTexture->pParent->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
-              }
-            }
-            break;
-            default:
-            {
-              CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
-              ImageData.Info.imageView = pColorTexture->View.get();
+        //  Texture
+        if (pTexture)
+        {
+          constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
-              if (pColorTexture->CurrentLayout != kImageLayout)
-              {
-                pColorTexture->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-              }
+          DescriptorImageData& ImageData = TextureDatas.emplace_back();
+          {
+            ImageData.Info.imageLayout = kImageLayout;
+            ImageData.Bind = ShaderResourceCount;
+          }
+
+          switch (pTexture->GetType())
+          {
+          case TextureType::eDepthStencilTexture:
+            assert(false);
+          case TextureType::eDepthTexture:
+          {
+            CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+            ImageData.Info.imageView = pDepthTexture->View.get();
+
+            if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
+            {
+              pDepthTexture->pParent->TextureData.SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
             }
-            break;
+          }
+          break;
+          case TextureType::eStencilTexture:
+          {
+            CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+            ImageData.Info.imageView = pStencilTexture->View.get();
+
+            if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
+            {
+              pStencilTexture->pParent->TextureData.SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
             }
+          }
+          break;
+          default:
+          {
+            CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+            ImageData.Info.imageView = pColorTexture->TextureData.View.get();
+
+            if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
+            {
+              pColorTexture->TextureData.SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+            }
+          }
+          break;
           }
         }
         //  UnorderedAccessBuffer
@@ -1537,14 +1551,14 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
             assert(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID())->GetType() == TextureType::eUnorderedAccessTexture);
             CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()));
-            if (pTexture->CurrentLayout != kImageLayout)
+            if (pTexture->TextureData.CurrentLayout != kImageLayout)
             {
-              pTexture->SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+              pTexture->TextureData.SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
             }
 
             DescriptorImageData& ImageData = UnorderedAccessTextureDatas.emplace_back();
             {
-              ImageData.Info.imageView = pTexture->View.get();
+              ImageData.Info.imageView = pTexture->TextureData.View.get();
               ImageData.Info.imageLayout = kImageLayout;
               ImageData.Bind = UnorderedAccessObjectCount;
             }
@@ -1817,7 +1831,7 @@ void CDeviceContext::Present()
   }
 
   //  バックバッファをPresent可能状態に変更
-  pSwapChain_->GetVkRenderTexture()->SetImageLayout(CurrentCommandBuffer, vk::ImageLayout::ePresentSrcKHR, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+  pSwapChain_->GetVkRenderTexture()->TextureData.SetImageLayout(CurrentCommandBuffer, vk::ImageLayout::ePresentSrcKHR, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
 
   Flush();
 
@@ -1898,8 +1912,8 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
               AttachmentDescription.samples = vk::SampleCountFlagBits::e1;
               AttachmentDescription.loadOp = vk::AttachmentLoadOp::eLoad;
               AttachmentDescription.storeOp = vk::AttachmentStoreOp::eStore;
-              AttachmentDescription.initialLayout = _pRenderTexture->CurrentLayout;
-              _pRenderTexture->CurrentLayout = AttachmentDescription.finalLayout = kImageLayout;
+              AttachmentDescription.initialLayout = _pRenderTexture->TextureData.CurrentLayout;
+              _pRenderTexture->TextureData.CurrentLayout = AttachmentDescription.finalLayout = kImageLayout;
             }
 
             vk::AttachmentReference& AttachmentReference = AttachmentReferences[AttachmentCount];
@@ -1908,7 +1922,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
               AttachmentReference.layout = kImageLayout;
             }
 
-            Attachments[AttachmentCount] = _pRenderTexture->View.get();
+            Attachments[AttachmentCount] = _pRenderTexture->TextureData.View.get();
           };
 
           for (; AttachmentCount < Constants::kMaxRenderTextureNum; ++AttachmentCount)
@@ -1939,8 +1953,8 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
             AttachmentDescription.samples = vk::SampleCountFlagBits::e1;
             AttachmentDescription.stencilLoadOp = vk::AttachmentLoadOp::eLoad;
             AttachmentDescription.stencilStoreOp = vk::AttachmentStoreOp::eStore;
-            AttachmentDescription.initialLayout = pDepthStencilTexture->CurrentLayout;
-            pDepthStencilTexture->CurrentLayout = AttachmentDescription.finalLayout = kImageLayout;
+            AttachmentDescription.initialLayout = pDepthStencilTexture->TextureData.CurrentLayout;
+            pDepthStencilTexture->TextureData.CurrentLayout = AttachmentDescription.finalLayout = kImageLayout;
           }
 
           vk::AttachmentReference& AttachmentReference = AttachmentReferences[AttachmentCount];
@@ -1949,7 +1963,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
             AttachmentReference.layout = kImageLayout;
           }
 
-          Attachments[AttachmentCount] = pDepthStencilTexture->View.get();
+          Attachments[AttachmentCount] = pDepthStencilTexture->TextureData.View.get();
           ++AttachmentCount;
         }
       }
@@ -2014,55 +2028,67 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
       {
         const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
 
-        //  Texture
-        if (std::get_if<vdl::Texture>(&ShaderResource))
+        ITexture* pTexture = nullptr;
         {
-          const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
-
-          if (!Texture.isEmpty())
+          if (std::get_if<vdl::Texture>(&ShaderResource))
           {
-            constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-
-            ITexture* pTexture = pTextureManager_->GetTexture(Texture.GetID());
-
-            switch (pTexture->GetType())
+            const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
+            if (!Texture.isEmpty())
             {
-            case TextureType::eDepthStencilTexture:
-              assert(false);
-            case TextureType::eDepthTexture:
+              pTexture = pTextureManager_->GetTexture(Texture.GetID());
+            }
+          }
+          else if (std::get_if<vdl::CubeTexture>(&ShaderResource))
+          {
+            const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(ShaderResource);
+            if (!CubeTexture.isEmpty())
             {
-              CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
-
-              if (pDepthTexture->pParent->CurrentLayout != kImageLayout)
-              {
-                BeginGraphicsCommandBuffer();
-                pDepthTexture->pParent->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pDepthTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
-              }
+              pTexture = pTextureManager_->GetTexture(CubeTexture.GetID());
             }
-            break;
-            case TextureType::eStencilTexture:
+          }
+        }
+
+        if (pTexture)
+        {
+          constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+          switch (pTexture->GetType())
+          {
+          case TextureType::eDepthStencilTexture:
+            assert(false);
+          case TextureType::eDepthTexture:
+          {
+            CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+
+            if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
             {
-              CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
-
-              if (pStencilTexture->pParent->CurrentLayout != kImageLayout)
-              {
-                BeginGraphicsCommandBuffer();
-                pStencilTexture->pParent->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pStencilTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
-              }
+              BeginGraphicsCommandBuffer();
+              pDepthTexture->pParent->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pDepthTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
             }
-            break;
-            default:
+          }
+          break;
+          case TextureType::eStencilTexture:
+          {
+            CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+
+            if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
             {
-              CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+              BeginGraphicsCommandBuffer();
+              pStencilTexture->pParent->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pStencilTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
+            }
+          }
+          break;
+          default:
+          {
+            CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
 
-              if (pColorTexture->CurrentLayout != kImageLayout)
-              {
-                BeginGraphicsCommandBuffer();
-                pColorTexture->SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-              }
+            if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
+            {
+              BeginGraphicsCommandBuffer();
+              pColorTexture->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
             }
-            break;
-            }
+          }
+          break;
           }
         }
       }
@@ -2328,45 +2354,59 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
           {
             const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
 
-            //  Texture
-            if (std::get_if<vdl::Texture>(&ShaderResource))
+            ITexture* pTexture = nullptr;
             {
-              const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
-              if (!Texture.isEmpty())
+              if (std::get_if<vdl::Texture>(&ShaderResource))
               {
-                constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+                const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
+                if (!Texture.isEmpty())
+                {
+                  pTexture = pTextureManager_->GetTexture(Texture.GetID());
+                }
+              }
+              else if (std::get_if<vdl::CubeTexture>(&ShaderResource))
+              {
+                const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(ShaderResource);
+                if (!CubeTexture.isEmpty())
+                {
+                  pTexture = pTextureManager_->GetTexture(CubeTexture.GetID());
+                }
+              }
+            }
 
-                ITexture* pTexture = pTextureManager_->GetTexture(Texture.GetID());
+            //  Texture
+            if (pTexture)
+            {
+              constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
-                DescriptorImageData& ImageData = TextureDatas.emplace_back();
-                {
-                  ImageData.Info.imageLayout = kImageLayout;
-                  ImageData.Bind = ShaderResourceCount;
-                }
+              DescriptorImageData& ImageData = TextureDatas.emplace_back();
+              {
+                ImageData.Info.imageLayout = kImageLayout;
+                ImageData.Bind = ShaderResourceCount;
+              }
 
-                switch (pTexture->GetType())
-                {
-                case TextureType::eDepthStencilTexture:
-                  assert(false);
-                case TextureType::eDepthTexture:
-                {
-                  CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
-                  ImageData.Info.imageView = pDepthTexture->View.get();
-                }
-                break;
-                case TextureType::eStencilTexture:
-                {
-                  CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
-                  ImageData.Info.imageView = pStencilTexture->View.get();
-                }
-                break;
-                default:
-                {
-                  CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
-                  ImageData.Info.imageView = pColorTexture->View.get();
-                }
-                break;
-                }
+              switch (pTexture->GetType())
+              {
+              case TextureType::eDepthStencilTexture:
+                assert(false);
+              case TextureType::eDepthTexture:
+              {
+                CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+                ImageData.Info.imageView = pDepthTexture->View.get();
+              }
+              break;
+              case TextureType::eStencilTexture:
+              {
+                CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+                ImageData.Info.imageView = pStencilTexture->View.get();
+              }
+              break;
+              default:
+              {
+                CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+                ImageData.Info.imageView = pColorTexture->TextureData.View.get();
+              }
+              break;
               }
             }
             //  UnorderedAccessBuffer

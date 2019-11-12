@@ -34,9 +34,10 @@ class Empty {};
 template<class DisplayObject, class InstanceData>
 class RendererCommandList
 {
-  static_assert(std::is_same<DisplayObject, Empty>::value || std::is_same<DisplayObject, vdl::Texture>::value || std::is_same<DisplayObject, vdl::StaticMesh>::value || std::is_same<DisplayObject, vdl::SkinnedMesh>::value);
-  static constexpr vdl::uint kMaxBatchNum = (std::is_same<DisplayObject, Empty>::value ? 1 : std::is_same<DisplayObject, vdl::Texture>::value ? Constants::kMaxTextureBatchNum 
-    : std::is_same<DisplayObject, vdl::StaticMesh>::value ? Constants::kMaxStaticMeshBatchNum : Constants::kMaxSkinnedMeshBatchNum);
+  static_assert(std::is_same<DisplayObject, Empty>::value || std::is_same<DisplayObject, vdl::Texture>::value || std::is_same<DisplayObject, vdl::CubeTexture>::value
+    || std::is_same<DisplayObject, vdl::StaticMesh>::value || std::is_same<DisplayObject, vdl::SkinnedMesh>::value);
+  static constexpr vdl::uint kMaxBatchNum = (std::is_same<DisplayObject, Empty>::value ? 1 : std::is_same<DisplayObject, vdl::Texture>::value ? Constants::kMaxTextureBatchNum
+    : std::is_same<DisplayObject, vdl::CubeTexture>::value ? Constants::kMaxSkyboxBatchNum : std::is_same<DisplayObject, vdl::StaticMesh>::value ? Constants::kMaxStaticMeshBatchNum : Constants::kMaxSkinnedMeshBatchNum);
 private:
   enum class RendererCommandType
   {

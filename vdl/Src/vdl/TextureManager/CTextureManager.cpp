@@ -37,8 +37,32 @@ vdl::ID CTextureManager::LoadCubeTexture(const char* _FilePath, bool _isSerializ
 
 vdl::ID CTextureManager::LoadCubeTexture(const vdl::Image& _Image)
 {
+  const vdl::uint2 TextureSize = _Image.GetTextureSize() / vdl::uint2(4, 3);
+
+  auto LoadTexture = [&_Image, &TextureSize](vdl::Image* _pImage, const vdl::uint2& _LeftTopPos)->void
+  {
+    _pImage->Resize(TextureSize);
+    vdl::Color* Buffer = _pImage->Buffer();
+
+    for (vdl::uint y = 0; y < TextureSize.y; ++y)
+    {
+      for (vdl::uint x = 0; x < TextureSize.x; ++x)
+      {
+        Buffer[x + y * TextureSize.x] = _Image.GetColor(_LeftTopPos + vdl::uint2(x, y));
+      }
+    }
+  };
+
+  std::array<vdl::Image, 6> Images;
+  LoadTexture(&Images[0], TextureSize * vdl::uint2(2, 1)/* Right */);
+  LoadTexture(&Images[1], TextureSize * vdl::uint2(0, 1)/* Left */);
+  LoadTexture(&Images[2], TextureSize * vdl::uint2(1, 0)/* Top */);
+  LoadTexture(&Images[3], TextureSize * vdl::uint2(1, 2)/* Bottom */);
+  LoadTexture(&Images[4], TextureSize * vdl::uint2(1, 1)/* Front */);
+  LoadTexture(&Images[5], TextureSize * vdl::uint2(3, 1)/* Back */);
+
   ITexture* pTexture;
-  pDevice_->CreateCubeTexture(&pTexture, _Image);
+  pDevice_->CreateCubeTexture(&pTexture, Images);
 
   return Textures_.Add(pTexture);
 }

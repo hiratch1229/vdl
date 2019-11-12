@@ -91,7 +91,7 @@ void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk:
 
 //--------------------------------------------------
 
-void CTexture::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange& _SubresourceRange)
+void TextureData::SetImageLayout(const vk::CommandBuffer& _CommandBuffer, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange& _SubresourceRange)
 {
   assert(_NewImageLayout != CurrentLayout);
 
@@ -112,7 +112,7 @@ const vdl::Texture& CDepthStencilTexture::GetDepthTexture()
 
     vk::ImageViewCreateInfo ImageViewInfo;
     {
-      ImageViewInfo.image = Image.get();
+      ImageViewInfo.image = TextureData.Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
       ImageViewInfo.format = VkFormat;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
@@ -153,7 +153,7 @@ const vdl::Texture& CDepthStencilTexture::GetStencilTexture()
 
     vk::ImageViewCreateInfo ImageViewInfo;
     {
-      ImageViewInfo.image = Image.get();
+      ImageViewInfo.image = TextureData.Image.get();
       ImageViewInfo.viewType = vk::ImageViewType::e2D;
       ImageViewInfo.format = VkFormat;
       ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
@@ -181,14 +181,6 @@ const vdl::Texture& CDepthStencilTexture::GetStencilTexture()
   }
 
   return StencilTexture;
-}
-
-void CDepthStencilTexture::SetImageLayout(const vk::CommandBuffer & _CommandBuffer, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange & _SubresourceRange)
-{
-  assert(_NewImageLayout != CurrentLayout);
-
-  CTexture::SetImageLayout(_CommandBuffer, Image.get(), CurrentLayout, _NewImageLayout, _SubresourceRange);
-  CurrentLayout = _NewImageLayout;
 }
 
 //--------------------------------------------------

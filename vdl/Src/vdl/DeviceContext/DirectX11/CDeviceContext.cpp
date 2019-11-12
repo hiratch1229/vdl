@@ -15,7 +15,6 @@
 #include <vdl/Shader/DirectX11/CShader.hpp>
 
 #include <vdl/Constants/Constants.hpp>
-#include <vdl/Instance/Instance.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
 #include <ThirdParty/ImGui/imgui.h>
@@ -1006,6 +1005,14 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
         pShaderResourceView = static_cast<CTexture*>(pTextureManager_->GetTexture(Texture.GetID()))->pShaderResourceView.Get();
       }
     }
+    if (std::get_if<vdl::CubeTexture>(&_ShaderResource))
+    {
+      const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(_ShaderResource);
+      if (!CubeTexture.isEmpty())
+      {
+        pShaderResourceView = static_cast<CCubeTexture*>(pTextureManager_->GetTexture(CubeTexture.GetID()))->pShaderResourceView.Get();
+      }
+    }
     //  UnorderedAccessBuffer
     else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_ShaderResource))
     {
@@ -1117,9 +1124,9 @@ vdl::uint CDeviceContext::GetInstanceBufferStride()const
 {
   switch (CurrentInputLayoutType_)
   {
-  case vdl::InputLayoutType::eTexture: return sizeof(Instance2D);
-  case vdl::InputLayoutType::eStaticMesh: return sizeof(InstanceStaticMesh);
-  case vdl::InputLayoutType::eSkinnedMesh: return sizeof(InstanceSkinnedMesh);
+  case vdl::InputLayoutType::eTexture: return sizeof(vdl::Instance2D);
+  case vdl::InputLayoutType::eStaticMesh: return sizeof(vdl::InstanceStaticMesh);
+  case vdl::InputLayoutType::eSkinnedMesh: return sizeof(vdl::InstanceSkinnedMesh);
   default: assert(false);
   }
 

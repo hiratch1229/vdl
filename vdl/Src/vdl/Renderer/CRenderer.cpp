@@ -33,10 +33,11 @@ void CRenderer::Initialize()
 
   //  バッファの作成
   {
-    TextureVertexBuffer_ = VertexBuffer(kRectangle, static_cast<vdl::uint>(sizeof(vdl::Vertex2D) * vdl::Macro::ArraySize(kRectangle)));
-    TextureInstanceBuffer_ = InstanceBuffer(sizeof(Instance2D) * Constants::kMaxTextureBatchNum);
-    StaticMeshInstanceBuffer_ = InstanceBuffer(sizeof(InstanceStaticMesh) * Constants::kMaxStaticMeshBatchNum);
-    StaticMeshInstanceBuffer_ = InstanceBuffer(sizeof(InstanceSkinnedMesh) * Constants::kMaxSkinnedMeshBatchNum);
+    TextureVertexBuffer_ = VertexBuffer(kRectangleVertices, static_cast<vdl::uint>(vdl::Macro::ArraySize(kRectangleVertices)) * sizeof(vdl::Vertex2D));
+
+    TextureInstanceBuffer_ = InstanceBuffer(sizeof(vdl::Instance2D) * Constants::kMaxTextureBatchNum);
+    StaticMeshInstanceBuffer_ = InstanceBuffer(sizeof(vdl::InstanceStaticMesh) * Constants::kMaxStaticMeshBatchNum);
+    SkinnedMeshInstanceBuffer_ = InstanceBuffer(sizeof(vdl::InstanceSkinnedMesh) * Constants::kMaxSkinnedMeshBatchNum);
   }
 
   //  描画コマンドリストの初期化
@@ -444,7 +445,7 @@ void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftT
     return;
   }
 
-  Instance2D Instance;
+  vdl::Instance2D Instance;
   {
     const vdl::Viewport& CurrentViewport = TextureRendererCommandList_.GetCurrentViewport();
 
@@ -476,12 +477,12 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
 
   if (pCameraData_->isChange)
   {
-    pCameraData_->isChange = false;
+    //pCameraData_->isChange = false;
     pCameraData_->ConstantBuffer.GetData().ViewProjection = GetView() * GetProjection();
     StaticMeshRendererCommandList_.PushVertexStageConstantBuffers(0, 1, &pCameraData_->ConstantBuffer.GetDetail());
   }
 
-  InstanceStaticMesh Instance;
+  vdl::InstanceStaticMesh Instance;
   {
     Instance.World = _World * _StaticMesh.GetGlobalTransform();
     Instance.Color = _Color;
@@ -499,12 +500,12 @@ void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _W
 
   if (pCameraData_->isChange)
   {
-    pCameraData_->isChange = false;
+    //pCameraData_->isChange = false;
     pCameraData_->ConstantBuffer.GetData().ViewProjection = GetView() * GetProjection();
     SkinnedMeshRendererCommandList_.PushVertexStageConstantBuffers(0, 1, &pCameraData_->ConstantBuffer.GetDetail());
   }
 
-  InstanceSkinnedMesh Instance;
+  vdl::InstanceSkinnedMesh Instance;
   {
     Instance.World = _World * _SkinnedMesh.GetGlobalTransform();
     Instance.Color = _Color;
@@ -536,19 +537,23 @@ void CRenderer::Clear(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture
 void CRenderer::Flush()
 {
   const bool HasEmptyDrawCommand = EmptyRendererCommandList_.HasDrawCommand();
+  const bool HasTextureDrawCommand = TextureRendererCommandList_.HasDrawCommand();
   const bool HasStaticMeshDrawCommand = StaticMeshRendererCommandList_.HasDrawCommand();
   const bool HasSkinnedMeshDrawCommand = SkinnedMeshRendererCommandList_.HasDrawCommand();
-  const bool HasTextureDrawCommand = TextureRendererCommandList_.HasDrawCommand();
 
   pDeviceContext_->SetRenderTextures(OutputManager_.RenderTextures, OutputManager_.DepthStencilTexture);
 
-  if (HasEmptyDrawCommand || HasStaticMeshDrawCommand || HasSkinnedMeshDrawCommand || HasTextureDrawCommand)
+  if (HasEmptyDrawCommand || HasTextureDrawCommand || HasStaticMeshDrawCommand || HasSkinnedMeshDrawCommand)
   {
     //  それぞれのドローコールをソート(マルチスレッド)
     {
       if (HasEmptyDrawCommand)
       {
         EmptyRendererCommandList_.Adjust();
+      }
+      if (HasTextureDrawCommand)
+      {
+        TextureRendererCommandList_.Adjust();
       }
       if (HasStaticMeshDrawCommand)
       {
@@ -557,10 +562,6 @@ void CRenderer::Flush()
       if (HasSkinnedMeshDrawCommand)
       {
         SkinnedMeshRendererCommandList_.Adjust();
-      }
-      if (HasTextureDrawCommand)
-      {
-        TextureRendererCommandList_.Adjust();
       }
     }
 

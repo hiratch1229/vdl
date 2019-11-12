@@ -1,7 +1,6 @@
 #include "CDevice.hpp"
 
 #include <vdl/Format/Vulkan/Format.hpp>
-#include <vdl/Texture/Vulkan/CTexture.hpp>
 #include <vdl/Shader/Vulkan/CShader.hpp>
 #include <vdl/Misc/Misc.hpp>
 
@@ -553,74 +552,131 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
   CTexture* pTexture = new CTexture;
   pTexture->TextureSize = _Image.GetTextureSize();
 
-  BufferData StagingBuffer;
-  CreateStagingBuffer(&StagingBuffer, _Image.Buffer(), _Image.BufferSize());
-
-  //  イメージ作成
+  vk::ImageCreateInfo ImageInfo;
   {
-    vk::ImageCreateInfo ImageInfo;
-    {
-      ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = kTextureFormat;
-      ImageInfo.extent = { pTexture->TextureSize.x, pTexture->TextureSize.y, 1 };
-      ImageInfo.mipLevels = 1;
-      ImageInfo.arrayLayers = 1;
-      ImageInfo.samples = vk::SampleCountFlagBits::e1;
-      ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
-      ImageInfo.sharingMode = vk::SharingMode::eExclusive;
-      ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
-    }
-
-    pTexture->Image = VkDevice_->createImageUnique(ImageInfo);
-    assert(pTexture->Image);
+    ImageInfo.imageType = vk::ImageType::e2D;
+    ImageInfo.format = kTextureFormat;
+    ImageInfo.extent = { pTexture->TextureSize.x, pTexture->TextureSize.y, 1 };
+    ImageInfo.mipLevels = 1;
+    ImageInfo.arrayLayers = 1;
+    ImageInfo.samples = vk::SampleCountFlagBits::e1;
+    ImageInfo.tiling = vk::ImageTiling::eOptimal;
+    ImageInfo.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+    ImageInfo.sharingMode = vk::SharingMode::eExclusive;
+    ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
   }
+  CreateImage(&pTexture->TextureData, ImageInfo);
 
-  //  メモリの確保
+  vk::ImageSubresourceRange SubresourceRange;
   {
-    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(pTexture->Image.get());
-
-    vk::MemoryAllocateInfo MemoryAllocateInfo;
-    {
-      MemoryAllocateInfo.allocationSize = MemoryRequirement.size;
-      MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-    }
-
-    pTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
-    assert(pTexture->Memory);
-    VkDevice_->bindImageMemory(pTexture->Image.get(), pTexture->Memory.get(), 0);
+    SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+    SubresourceRange.baseMipLevel = 0;
+    SubresourceRange.levelCount = 1;
+    SubresourceRange.baseArrayLayer = 0;
+    SubresourceRange.layerCount = 1;
   }
 
   //  メモリのコピー
   {
-    CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+    BufferData StagingBuffer;
+    CreateStagingBuffer(&StagingBuffer, _Image.Buffer(), _Image.BufferSize());
 
     vk::BufferImageCopy CopyRegion;
     {
       CopyRegion.bufferOffset = 0;
       CopyRegion.bufferRowLength = 0;
       CopyRegion.bufferImageHeight = 0;
-      CopyRegion.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+      CopyRegion.imageSubresource.aspectMask = SubresourceRange.aspectMask;
       CopyRegion.imageSubresource.mipLevel = 0;
       CopyRegion.imageSubresource.baseArrayLayer = 0;
       CopyRegion.imageSubresource.layerCount = 1;
       CopyRegion.imageOffset = { 0, 0, 0 };
-      CopyRegion.imageExtent = { pTexture->TextureSize.x, pTexture->TextureSize.y , 1 };
+      CopyRegion.imageExtent = ImageInfo.extent;
     }
 
-    vk::ImageSubresourceRange SubresourceRange;
+    CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+    pTexture->TextureData.SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+    CommandBuffer_->copyBufferToImage(StagingBuffer.Buffer.get(), pTexture->TextureData.Image.get(), vk::ImageLayout::eTransferDstOptimal, CopyRegion);
+    pTexture->TextureData.SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eShaderReadOnlyOptimal, SubresourceRange);
+    CommandBuffer_->end();
+
+
+    vk::SubmitInfo SubmitInfo;
     {
-      SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-      SubresourceRange.baseMipLevel = 0;
-      SubresourceRange.levelCount = 1;
-      SubresourceRange.baseArrayLayer = 0;
-      SubresourceRange.layerCount = 1;
+      SubmitInfo.commandBufferCount = 1;
+      SubmitInfo.pCommandBuffers = &CommandBuffer_.get();
+    }
+    SubmitAndWait(SubmitInfo);
+  }
+
+  CreateImageView(&pTexture->TextureData, kTextureFormat, SubresourceRange, vk::ImageViewType::e2D);
+
+  (*_ppTexture) = std::move(pTexture);
+}
+
+void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images)
+{
+  assert(_ppTexture);
+
+  constexpr vk::Format kTextureFormat = Cast(Constants::kTextureFormat);
+
+  CCubeTexture* pCubeTexture = new CCubeTexture;
+  pCubeTexture->TextureSize = _Images[0].GetTextureSize();
+
+  vk::ImageCreateInfo ImageInfo;
+  {
+    ImageInfo.imageType = vk::ImageType::e2D;
+    ImageInfo.format = kTextureFormat;
+    ImageInfo.extent = { pCubeTexture->TextureSize.x, pCubeTexture->TextureSize.y, 1 };
+    ImageInfo.mipLevels = 1;
+    ImageInfo.arrayLayers = 6;
+    ImageInfo.samples = vk::SampleCountFlagBits::e1;
+    ImageInfo.tiling = vk::ImageTiling::eOptimal;
+    ImageInfo.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+    ImageInfo.sharingMode = vk::SharingMode::eExclusive;
+    ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
+    ImageInfo.flags = vk::ImageCreateFlagBits::eCubeCompatible;
+  }
+  CreateImage(&pCubeTexture->TextureData, ImageInfo);
+
+  vk::ImageSubresourceRange SubresourceRange;
+  {
+    SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+    SubresourceRange.baseMipLevel = 0;
+    SubresourceRange.levelCount = 1;
+    SubresourceRange.baseArrayLayer = 0;
+    SubresourceRange.layerCount = 6;
+  }
+
+  //  メモリのコピー
+  {
+    const vdl::uint BufferSize = _Images[0].BufferSize();
+
+    BufferData StagingBuffer;
+    CreateStagingBuffer(&StagingBuffer, nullptr, BufferSize * 6);
+
+    std::array<vk::BufferImageCopy, 6> CopyRegions;
+    {
+      for (vdl::uint i = 0; i < 6; ++i)
+      {
+        CopyRegions[i].bufferOffset = i * BufferSize;
+        CopyRegions[i].bufferRowLength = 0;
+        CopyRegions[i].bufferImageHeight = 0;
+        CopyRegions[i].imageSubresource.aspectMask = SubresourceRange.aspectMask;
+        CopyRegions[i].imageSubresource.mipLevel = 0;
+        CopyRegions[i].imageSubresource.baseArrayLayer = i;
+        CopyRegions[i].imageSubresource.layerCount = 1;
+        CopyRegions[i].imageOffset = { 0, 0, 0 };
+        CopyRegions[i].imageExtent = ImageInfo.extent;
+
+        ::memcpy(static_cast<vdl::uint8_t*>(StagingBuffer.pData) + CopyRegions[i].bufferOffset, _Images[i].Buffer(), BufferSize);
+      }
     }
 
-    pTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
-    CommandBuffer_->copyBufferToImage(StagingBuffer.Buffer.get(), pTexture->Image.get(), vk::ImageLayout::eTransferDstOptimal, CopyRegion);
-    pTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eShaderReadOnlyOptimal, SubresourceRange);
-
+    CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+    pCubeTexture->TextureData.SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+    CommandBuffer_->copyBufferToImage(StagingBuffer.Buffer.get(), pCubeTexture->TextureData.Image.get(), vk::ImageLayout::eTransferDstOptimal, CopyRegions);
+    pCubeTexture->TextureData.SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eShaderReadOnlyOptimal, SubresourceRange);
     CommandBuffer_->end();
 
     vk::SubmitInfo SubmitInfo;
@@ -631,34 +687,9 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
     SubmitAndWait(SubmitInfo);
   }
 
-  //  ビューの作成
-  {
-    vk::ImageViewCreateInfo ImageViewInfo;
-    {
-      ImageViewInfo.image = pTexture->Image.get();
-      ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = kTextureFormat;
-      ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
-      ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
-      ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
-      ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
-      ImageViewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-      ImageViewInfo.subresourceRange.baseArrayLayer = 0;
-      ImageViewInfo.subresourceRange.baseMipLevel = 0;
-      ImageViewInfo.subresourceRange.layerCount = 1;
-      ImageViewInfo.subresourceRange.levelCount = 1;
-    }
+  CreateImageView(&pCubeTexture->TextureData, kTextureFormat, SubresourceRange, vk::ImageViewType::eCube);
 
-    pTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
-    assert(pTexture->View);
-  }
-
-  (*_ppTexture) = std::move(pTexture);
-}
-
-void CDevice::CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image)
-{
-
+  (*_ppTexture) = std::move(pCubeTexture);
 }
 
 void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
@@ -670,40 +701,20 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
   pRenderTexture->Format = _Format;
   pRenderTexture->VkFormat = Cast(_Format);
 
-  //  イメージ作成
+  vk::ImageCreateInfo ImageInfo;
   {
-    vk::ImageCreateInfo ImageInfo;
-    {
-      ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = pRenderTexture->VkFormat;
-      ImageInfo.extent = { pRenderTexture->TextureSize.x, pRenderTexture->TextureSize.y, 1 };
-      ImageInfo.mipLevels = 1;
-      ImageInfo.arrayLayers = 1;
-      ImageInfo.samples = vk::SampleCountFlagBits::e1;
-      ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eTransferDst;
-      ImageInfo.sharingMode = vk::SharingMode::eExclusive;
-      ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
-    }
-
-    pRenderTexture->Image = VkDevice_->createImageUnique(ImageInfo);
-    assert(pRenderTexture->Image);
+    ImageInfo.imageType = vk::ImageType::e2D;
+    ImageInfo.format = pRenderTexture->VkFormat;
+    ImageInfo.extent = { pRenderTexture->TextureSize.x, pRenderTexture->TextureSize.y, 1 };
+    ImageInfo.mipLevels = 1;
+    ImageInfo.arrayLayers = 1;
+    ImageInfo.samples = vk::SampleCountFlagBits::e1;
+    ImageInfo.tiling = vk::ImageTiling::eOptimal;
+    ImageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+    ImageInfo.sharingMode = vk::SharingMode::eExclusive;
+    ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
   }
-
-  //  メモリの確保
-  {
-    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(pRenderTexture->Image.get());
-
-    vk::MemoryAllocateInfo MemoryAllocateInfo;
-    {
-      MemoryAllocateInfo.allocationSize = MemoryRequirement.size;
-      MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-    }
-
-    pRenderTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
-    assert(pRenderTexture->Memory);
-    VkDevice_->bindImageMemory(pRenderTexture->Image.get(), pRenderTexture->Memory.get(), 0);
-  }
+  CreateImage(&pRenderTexture->TextureData, ImageInfo);
 
   vk::ImageSubresourceRange SubresourceRange;
   {
@@ -714,28 +725,12 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
     SubresourceRange.layerCount = 1;
   }
 
-  //  ビューの作成
-  {
-    vk::ImageViewCreateInfo ImageViewInfo;
-    {
-      ImageViewInfo.image = pRenderTexture->Image.get();
-      ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = pRenderTexture->VkFormat;
-      ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
-      ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
-      ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
-      ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
-      ImageViewInfo.subresourceRange = SubresourceRange;
-    }
-
-    pRenderTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
-    assert(pRenderTexture->View);
-  }
+  CreateImageView(&pRenderTexture->TextureData, pRenderTexture->VkFormat, SubresourceRange, vk::ImageViewType::e2D);
 
   //  レイアウトの変更
   {
     CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-    pRenderTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
+    pRenderTexture->TextureData.SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
     CommandBuffer_->end();
 
     vk::SubmitInfo SubmitInfo;
@@ -764,40 +759,20 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     pDepthStencilTexture->ImageAspectFlag |= vk::ImageAspectFlagBits::eStencil;
   }
 
-  //  イメージ作成
+  vk::ImageCreateInfo ImageInfo;
   {
-    vk::ImageCreateInfo ImageInfo;
-    {
-      ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = pDepthStencilTexture->VkFormat;
-      ImageInfo.extent = { _TextureSize.x, _TextureSize.y, 1 };
-      ImageInfo.mipLevels = 1;
-      ImageInfo.arrayLayers = 1;
-      ImageInfo.samples = vk::SampleCountFlagBits::e1;
-      ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eTransferDst;
-      ImageInfo.sharingMode = vk::SharingMode::eExclusive;
-      ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
-    }
-
-    pDepthStencilTexture->Image = VkDevice_->createImageUnique(ImageInfo);
-    assert(pDepthStencilTexture->Image);
+    ImageInfo.imageType = vk::ImageType::e2D;
+    ImageInfo.format = pDepthStencilTexture->VkFormat;
+    ImageInfo.extent = { pDepthStencilTexture->TextureSize.x, pDepthStencilTexture->TextureSize.y, 1 };
+    ImageInfo.mipLevels = 1;
+    ImageInfo.arrayLayers = 1;
+    ImageInfo.samples = vk::SampleCountFlagBits::e1;
+    ImageInfo.tiling = vk::ImageTiling::eOptimal;
+    ImageInfo.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+    ImageInfo.sharingMode = vk::SharingMode::eExclusive;
+    ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
   }
-
-  //  メモリの確保
-  {
-    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(pDepthStencilTexture->Image.get());
-
-    vk::MemoryAllocateInfo MemoryAllocateInfo;
-    {
-      MemoryAllocateInfo.allocationSize = MemoryRequirement.size;
-      MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-    }
-
-    pDepthStencilTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
-    assert(pDepthStencilTexture->Memory);
-    VkDevice_->bindImageMemory(pDepthStencilTexture->Image.get(), pDepthStencilTexture->Memory.get(), 0);
-  }
+  CreateImage(&pDepthStencilTexture->TextureData, ImageInfo);
 
   vk::ImageSubresourceRange SubresourceRange;
   {
@@ -808,28 +783,12 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     SubresourceRange.layerCount = 1;
   }
 
-  //  ビューの作成
-  {
-    vk::ImageViewCreateInfo ImageViewInfo;
-    {
-      ImageViewInfo.image = pDepthStencilTexture->Image.get();
-      ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = pDepthStencilTexture->VkFormat;
-      ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
-      ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
-      ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
-      ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
-      ImageViewInfo.subresourceRange = SubresourceRange;
-    }
-
-    pDepthStencilTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
-    assert(pDepthStencilTexture->View);
-  }
+  CreateImageView(&pDepthStencilTexture->TextureData, pDepthStencilTexture->VkFormat, SubresourceRange, vk::ImageViewType::e2D);
 
   //  レイアウトの変更
   {
     CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-    pDepthStencilTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eDepthStencilAttachmentOptimal, SubresourceRange);
+    pDepthStencilTexture->TextureData.SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eDepthStencilAttachmentOptimal, SubresourceRange);
     CommandBuffer_->end();
 
     vk::SubmitInfo SubmitInfo;
@@ -851,77 +810,38 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
   CUnorderedAccessTexture* pUnorderedAccessTexture = new CUnorderedAccessTexture;
   pUnorderedAccessTexture->TextureSize = _TextureSize;
   pUnorderedAccessTexture->Format = _Format;
+  const vk::Format VkFormat = Cast(pUnorderedAccessTexture->Format);
 
-  //  イメージ作成
+  vk::ImageCreateInfo ImageInfo;
   {
-    vk::ImageCreateInfo ImageInfo;
-    {
-      ImageInfo.imageType = vk::ImageType::e2D;
-      ImageInfo.format = Cast(pUnorderedAccessTexture->Format);
-      ImageInfo.extent = { pUnorderedAccessTexture->TextureSize.x, pUnorderedAccessTexture->TextureSize.y, 1 };
-      ImageInfo.mipLevels = 1;
-      ImageInfo.arrayLayers = 1;
-      ImageInfo.samples = vk::SampleCountFlagBits::e1;
-      ImageInfo.tiling = vk::ImageTiling::eOptimal;
-      ImageInfo.usage = vk::ImageUsageFlagBits::eStorage | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
-      ImageInfo.sharingMode = vk::SharingMode::eExclusive;
-      ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
-    }
+    ImageInfo.imageType = vk::ImageType::e2D;
+    ImageInfo.format = VkFormat;
+    ImageInfo.extent = { pUnorderedAccessTexture->TextureSize.x, pUnorderedAccessTexture->TextureSize.y, 1 };
+    ImageInfo.mipLevels = 1;
+    ImageInfo.arrayLayers = 1;
+    ImageInfo.samples = vk::SampleCountFlagBits::e1;
+    ImageInfo.tiling = vk::ImageTiling::eOptimal;
+    ImageInfo.usage = vk::ImageUsageFlagBits::eStorage | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+    ImageInfo.sharingMode = vk::SharingMode::eExclusive;
+    ImageInfo.initialLayout = vk::ImageLayout::eUndefined;
+  }
+  CreateImage(&pUnorderedAccessTexture->TextureData, ImageInfo);
 
-    pUnorderedAccessTexture->Image = VkDevice_->createImageUnique(ImageInfo);
-    assert(pUnorderedAccessTexture->Image);
+  vk::ImageSubresourceRange SubresourceRange;
+  {
+    SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+    SubresourceRange.baseMipLevel = 0;
+    SubresourceRange.levelCount = 1;
+    SubresourceRange.baseArrayLayer = 0;
+    SubresourceRange.layerCount = 1;
   }
 
-  //  メモリの確保
-  {
-    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(pUnorderedAccessTexture->Image.get());
-
-    vk::MemoryAllocateInfo MemoryAllocateInfo;
-    {
-      MemoryAllocateInfo.allocationSize = MemoryRequirement.size;
-      MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-    }
-
-    pUnorderedAccessTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
-    assert(pUnorderedAccessTexture->Memory);
-    VkDevice_->bindImageMemory(pUnorderedAccessTexture->Image.get(), pUnorderedAccessTexture->Memory.get(), 0);
-  }
-
-  //  ビューの作成
-  {
-    vk::ImageViewCreateInfo ImageViewInfo;
-    {
-      ImageViewInfo.image = pUnorderedAccessTexture->Image.get();
-      ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = Cast(pUnorderedAccessTexture->Format);
-      ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
-      ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
-      ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
-      ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
-      ImageViewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-      ImageViewInfo.subresourceRange.baseArrayLayer = 0;
-      ImageViewInfo.subresourceRange.baseMipLevel = 0;
-      ImageViewInfo.subresourceRange.layerCount = 1;
-      ImageViewInfo.subresourceRange.levelCount = 1;
-    }
-
-    pUnorderedAccessTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
-    assert(pUnorderedAccessTexture->View);
-  }
+  CreateImageView(&pUnorderedAccessTexture->TextureData, VkFormat, SubresourceRange, vk::ImageViewType::e2D);
 
   //  レイアウトの変更
   {
-    vk::ImageSubresourceRange SubresourceRange;
-    {
-      SubresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-      SubresourceRange.baseMipLevel = 0;
-      SubresourceRange.levelCount = 1;
-      SubresourceRange.baseArrayLayer = 0;
-      SubresourceRange.layerCount = 1;
-    }
-
     CommandBuffer_->begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-    pUnorderedAccessTexture->SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eShaderReadOnlyOptimal, SubresourceRange);
+    pUnorderedAccessTexture->TextureData.SetImageLayout(CommandBuffer_.get(), vk::ImageLayout::eShaderReadOnlyOptimal, SubresourceRange);
     CommandBuffer_->end();
 
     vk::SubmitInfo SubmitInfo;
@@ -1152,7 +1072,7 @@ void CDevice::WaitIdle()
 
 //--------------------------------------------------
 
-vdl::uint CDevice::FindQueue(vk::QueueFlags _QueueFlag, vk::QueueFlags _NotFlag, const vk::SurfaceKHR& _Surface)const
+vdl::uint CDevice::FindQueue(const vk::QueueFlags& _QueueFlag, const vk::QueueFlags& _NotFlag, const vk::SurfaceKHR& _Surface)const
 {
   std::vector<vk::QueueFamilyProperties> QueueFamilyProperties = PhysicalDevice_.getQueueFamilyProperties();
   const vdl::uint QueueFamiliyNum = static_cast<vdl::uint>(QueueFamilyProperties.size());
@@ -1195,7 +1115,15 @@ vdl::uint CDevice::GetMemoryTypeIndex(vdl::uint _MemoryTypeBits, const vk::Memor
   return 0;
 }
 
-void CDevice::CreateBuffer(BufferData* _pBuffer, vk::DeviceSize _BufferSize, vk::BufferUsageFlags _Usage, vk::MemoryPropertyFlags _Properties)const
+void CDevice::SubmitAndWait(vk::SubmitInfo _SubmitInfo)const
+{
+  GraphicsQueue_.submit(_SubmitInfo, vk::Fence());
+  GraphicsQueue_.waitIdle();
+}
+
+//--------------------------------------------------
+
+void CDevice::CreateBuffer(BufferData* _pBuffer, vk::DeviceSize _BufferSize, const vk::BufferUsageFlags& _Usage, const vk::MemoryPropertyFlags& _Properties)const
 {
   assert(_pBuffer);
 
@@ -1243,7 +1171,10 @@ void CDevice::CreateStagingBuffer(BufferData* _pStagingBuffer, const void* _Buff
   CreateBuffer(_pStagingBuffer, _BufferSize, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 
   //  メモリへ書き込み
-  ::memcpy(_pStagingBuffer->pData, _Buffer, _BufferSize);
+  if (_Buffer)
+  {
+    ::memcpy(_pStagingBuffer->pData, _Buffer, _BufferSize);
+  }
 }
 
 void CDevice::CopyBuffer(vk::Buffer _SrcBuffer, vk::Buffer _DstBuffer, vdl::uint _BufferSize)const
@@ -1273,8 +1204,46 @@ void CDevice::CopyBuffer(vk::Buffer _SrcBuffer, vk::Buffer _DstBuffer, vdl::uint
   }
 }
 
-void CDevice::SubmitAndWait(vk::SubmitInfo _SubmitInfo)const
+void CDevice::CreateImage(TextureData* _pTexture, const vk::ImageCreateInfo& _ImageInfo)const
 {
-  GraphicsQueue_.submit(_SubmitInfo, vk::Fence());
-  GraphicsQueue_.waitIdle();
+  assert(_pTexture);
+
+  //  イメージ作成
+  _pTexture->Image = VkDevice_->createImageUnique(_ImageInfo);
+  assert(_pTexture->Image);
+
+  //  メモリの確保
+  {
+    vk::MemoryRequirements MemoryRequirement = VkDevice_->getImageMemoryRequirements(_pTexture->Image.get());
+
+    vk::MemoryAllocateInfo MemoryAllocateInfo;
+    {
+      MemoryAllocateInfo.allocationSize = MemoryRequirement.size;
+      MemoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(MemoryRequirement.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+    }
+
+    _pTexture->Memory = VkDevice_->allocateMemoryUnique(MemoryAllocateInfo);
+    assert(_pTexture->Memory);
+    VkDevice_->bindImageMemory(_pTexture->Image.get(), _pTexture->Memory.get(), 0);
+  }
+}
+
+void CDevice::CreateImageView(TextureData* _pTexture, vk::Format _Format, const vk::ImageSubresourceRange& _SubresourceRange, vk::ImageViewType _ViewType)const
+{
+  assert(_pTexture);
+
+  vk::ImageViewCreateInfo ImageViewInfo;
+  {
+    ImageViewInfo.image = _pTexture->Image.get();
+    ImageViewInfo.viewType = _ViewType;
+    ImageViewInfo.format = _Format;
+    ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
+    ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
+    ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
+    ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
+    ImageViewInfo.subresourceRange = _SubresourceRange;
+  }
+
+  _pTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
+  assert(_pTexture->View);
 }

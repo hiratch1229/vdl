@@ -8,6 +8,8 @@
 #include <vdl/Buffer/IBuffer.hpp>
 #include <vdl/Texture/ITexture.hpp>
 
+#include <array>
+
 class IDevice
 {
 public:
@@ -35,7 +37,7 @@ public:
 
   virtual void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image) = 0;
 
-  virtual void CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image) = 0;
+  virtual void CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images) = 0;
 
   virtual void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
 

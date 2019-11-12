@@ -29,6 +29,8 @@ namespace vdl
 
     [[nodiscard]] const Color* Buffer()const { return Buffer_.data(); }
 
+    [[nodiscard]] const Color GetColor(const uint2& _Pos)const { return Buffer_[_Pos.x + _Pos.y * Size_.x]; }
+
     void Resize(const uint2& _Size) { Size_ = _Size; Buffer_.resize(static_cast<size_t>(Size_.x) * Size_.y); }
   public:
     [[nodiscard]] std::vector<uint8_t> EncodePNG()const;

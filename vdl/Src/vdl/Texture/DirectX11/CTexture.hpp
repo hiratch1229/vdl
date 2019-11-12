@@ -21,6 +21,20 @@ public:
   vdl::FormatType GetFormat()const override { return Constants::kTextureFormat; }
 };
 
+struct CCubeTexture : public ITexture
+{
+  Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pShaderResourceView;
+  vdl::uint2 TextureSize;
+public:
+  CCubeTexture() = default;
+
+  TextureType GetType()const override { return TextureType::eTexture; }
+
+  vdl::uint2 GetSize()const final { return TextureSize; }
+
+  vdl::FormatType GetFormat()const override { return Constants::kTextureFormat; }
+};
+
 struct CRenderTexture : public CTexture
 {
   Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView;

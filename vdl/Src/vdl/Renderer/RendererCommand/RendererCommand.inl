@@ -272,6 +272,14 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
 
               _pDeviceContext->DrawIndexed(pMesh->IndexCount, ContinuousDrawCallNum, pMesh->IndexStart, 0, 0);
             }
+            else if constexpr (std::is_same<DisplayObject, vdl::CubeTexture>::value)
+            {
+              pDevice_->WriteMemory(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()), Instances.data(), sizeof(InstanceData) * ContinuousDrawCallNum);
+
+              _pDeviceContext->PSSetShaderResources(0, 1, &vdl::ShaderResource(ReservedDisplayObjects_[CurrentDisplayObjectID]));
+
+              _pDeviceContext->DrawIndexed(36, ContinuousDrawCallNum, 0, 0, 0);
+            }
 
             if (DrawState == DrawStateType::eEnd)
             {

@@ -614,9 +614,9 @@ namespace vdl
 
     void SetSkinnedMeshVertexShader(const VertexShader& _VertexShader)
     {
-      assert(!_VertexShader.isEmpty() && _VertexShader.GetInputLayout() == InputLayoutType::eStaticMesh);
+      assert(!_VertexShader.isEmpty() && _VertexShader.GetInputLayout() == InputLayoutType::eSkinnedMesh);
 
-      Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, InputLayoutType::eStaticMesh);
+      Engine::Get<IRenderer>()->SetVertexShader(_VertexShader, InputLayoutType::eSkinnedMesh);
     }
 
     void SetMeshHullShader(const HullShader& _HullShader)

@@ -141,14 +141,14 @@ void CSwapChain::Initialize()
     for (vdl::uint i = 0; i < SwapChainImageNum; ++i)
     {
       CRenderTexture& VkRenderTexture = VkRenderTextures_[i];
-      VkRenderTexture.Image = vk::UniqueImage(Images[i]);
-      ImageViewInfo.image = VkRenderTexture.Image.get();
-      VkRenderTexture.View = VkDevice_.createImageViewUnique(ImageViewInfo);
+      VkRenderTexture.TextureData.Image = vk::UniqueImage(Images[i]);
+      ImageViewInfo.image = VkRenderTexture.TextureData.Image.get();
+      VkRenderTexture.TextureData.View = VkDevice_.createImageViewUnique(ImageViewInfo);
       VkRenderTexture.Format = vdl::FormatType::eSwapChain;
       VkRenderTexture.VkFormat = Format;
       VkRenderTexture.TextureSize = Constants::kDefaultWindowSize;
 
-      VkRenderTexture.SetImageLayout(CommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
+      VkRenderTexture.TextureData.SetImageLayout(CommandBuffer, vk::ImageLayout::eColorAttachmentOptimal, SubresourceRange);
     }
   }
 
@@ -211,8 +211,8 @@ CSwapChain::~CSwapChain()
 {
   for (auto& VkRenderTexture : VkRenderTextures_)
   {
-    VkRenderTexture.Image.release();
-    VkRenderTexture.View.reset();
+    VkRenderTexture.TextureData.Image.release();
+    VkRenderTexture.TextureData.View.reset();
   };
 }
 

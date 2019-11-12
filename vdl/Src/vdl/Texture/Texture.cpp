@@ -89,6 +89,70 @@ namespace vdl
 
   //--------------------------------------------------
 
+  CubeTexture::CubeTexture(const char* _FilePath, bool _isSerialize)
+  {
+    ID_ = Engine::Get<ITextureManager>()->LoadCubeTexture(_FilePath, _isSerialize);
+  }
+
+  CubeTexture::CubeTexture(const Image& _Image)
+  {
+    ID_ = Engine::Get<ITextureManager>()->LoadCubeTexture(_Image);
+  }
+
+  CubeTexture::CubeTexture(const CubeTexture& _CubeTexture)
+  {
+    if (ID_ = _CubeTexture.ID_)
+    {
+      Engine::Get<ITextureManager>()->AddRef(ID_);
+    }
+  }
+
+  CubeTexture::CubeTexture(CubeTexture&& _CubeTexture)noexcept
+  {
+    ID_ = _CubeTexture.ID_;
+    _CubeTexture.ID_ = std::nullopt;
+  }
+
+  CubeTexture& CubeTexture::operator=(const CubeTexture& _CubeTexture)
+  {
+    if (ID_ != _CubeTexture.ID_)
+    {
+      if (ID_)
+      {
+        Engine::Get<ITextureManager>()->Release(ID_);
+      }
+      if (ID_ = _CubeTexture.ID_)
+      {
+        Engine::Get<ITextureManager>()->AddRef(ID_);
+      }
+    }
+
+    return *this;
+  }
+
+  CubeTexture& CubeTexture::operator=(CubeTexture&& _CubeTexture)noexcept
+  {
+    if (ID_)
+    {
+      Engine::Get<ITextureManager>()->Release(ID_);
+    }
+
+    ID_ = _CubeTexture.ID_;
+    _CubeTexture.ID_ = std::nullopt;
+
+    return *this;
+  }
+
+  CubeTexture::~CubeTexture()
+  {
+    if (ID_)
+    {
+      Engine::Get<ITextureManager>()->Release(ID_);
+    }
+  }
+
+  //--------------------------------------------------
+
   RenderTexture::RenderTexture(const uint2& _TextureSize, FormatType _Format)
   {
     ID_ = Engine::Get<ITextureManager>()->CreateRenderTexture(_TextureSize, _Format);

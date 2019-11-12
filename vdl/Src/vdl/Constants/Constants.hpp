@@ -58,6 +58,8 @@ namespace Constants
 
   constexpr vdl::uint kMaxSkinnedMeshBatchNum = 128;
 
+  constexpr vdl::uint kMaxSkyboxBatchNum = 8;
+
   constexpr const char* kBinaryFileDirectory = "Bin/";
 
   constexpr const char* kBinaryFileFormat = ".bin";

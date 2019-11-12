@@ -35,8 +35,13 @@ private:
   };
 private:
   vdl::StaticMesh WaterSurface_;
+  vdl::StaticMesh Sphere_;
+  vdl::CubeTexture SkyboxTexture_;
   vdl::Camera Camera_;
   bool isWireframe_ = false;
+private:
+  vdl::VertexShader SkyboxVertexShader_;
+  vdl::PixelShader SkyboxPixelShader_;
 private:
   vdl::VertexShader WaterSurfaceVertexShader_;
   vdl::HullShader WaterSurfaceHullShader_;

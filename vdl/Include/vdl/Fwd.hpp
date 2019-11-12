@@ -67,10 +67,12 @@ namespace vdl
   struct VertexStaticMesh;
   struct VertexSkinnedMesh;
   using IndexType = uint32_t;
-  using Vertex2Ds = std::vector<Vertex2D>;
   using VertexStaticMeshs = std::vector<VertexStaticMesh>;
   using VertexSkinnedMeshs = std::vector<VertexSkinnedMesh>;
   using Indices = std::vector<IndexType>;
+  struct Instance2D;
+  struct InstanceStaticMesh;
+  struct InstanceSkinnedMesh;
 
   //-------------------------
   //  InputLayout.hpp
@@ -152,6 +154,7 @@ namespace vdl
   using RenderTextures = std::array<RenderTexture, Constants::kMaxRenderTextureNum>;
   class DepthStencilTexture;
   class UnorderedAccessTexture;
+  class CubeTexture;
   struct OutputManager;
 
   //-------------------------
@@ -247,6 +250,6 @@ namespace vdl
   //-------------------------
   //-------------------------
   using ID = std::optional<uint>;
-  using ShaderResource = std::variant<Texture, Detail::UnorderedAccessBufferData>;
+  using ShaderResource = std::variant<Texture, CubeTexture, Detail::UnorderedAccessBufferData>;
   using UnorderedAccessObject = std::variant<UnorderedAccessTexture, Detail::UnorderedAccessBufferData>;
 }

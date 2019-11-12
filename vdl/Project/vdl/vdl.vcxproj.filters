@@ -118,9 +118,6 @@
     <Filter Include="Src\StateChangeFlags">
       <UniqueIdentifier>{93635aff-8966-4c98-99d5-0218a40a6187}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Instance">
-      <UniqueIdentifier>{6cef4ef4-1aa3-4822-898c-156d86c90132}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader\Mesh">
       <UniqueIdentifier>{e2bc3319-67bc-4ff8-9d17-5018242379d7}</UniqueIdentifier>
     </Filter>
@@ -180,6 +177,9 @@
     </Filter>
     <Filter Include="Shader\Mesh\SkinnedMesh">
       <UniqueIdentifier>{fcbf157e-1b7d-4324-b1b9-32a8effd0545}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Option\Skybox">
+      <UniqueIdentifier>{0876d6cd-d93a-4226-8550-1e7c9dcc5e75}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -446,9 +446,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Include\vdl\GraphicsStates.hpp">
       <Filter>Include\vdl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\Instance\Instance.hpp">
-      <Filter>Src\Instance</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Buffer\Buffer.hpp">
       <Filter>Src\Buffer</Filter>
@@ -916,6 +913,9 @@
     <None Include="..\..\Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli">
       <Filter>Shader\Mesh\SkinnedMesh</Filter>
     </None>
+    <None Include="..\..\Shader\Option\Skybox\Skybox.hlsli">
+      <Filter>Shader\Option\Skybox</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
@@ -935,6 +935,12 @@
     </FxCompile>
     <FxCompile Include="..\..\Shader\Mesh\SkinnedMesh\SkinnedMeshVS.hlsl">
       <Filter>Shader\Mesh\SkinnedMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\Option\Skybox\SkyboxPS.hlsl">
+      <Filter>Shader\Option\Skybox</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Shader\Option\Skybox\SkyboxVS.hlsl">
+      <Filter>Shader\Option\Skybox</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

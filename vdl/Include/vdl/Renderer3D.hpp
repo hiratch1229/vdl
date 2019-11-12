@@ -162,6 +162,19 @@ namespace vdl::Renderer3D
     SetVertexStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
   }
 
+  inline void SetVertexStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetVertexStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
+  }
+
   inline void SetVertexStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
   {
     std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
@@ -202,6 +215,19 @@ namespace vdl::Renderer3D
     }
 
     SetHullStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetHullStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetHullStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
   }
 
   inline void SetHullStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
@@ -246,6 +272,19 @@ namespace vdl::Renderer3D
     SetDomainStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
   }
 
+  inline void SetDomainStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetDomainStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
+  }
+
   inline void SetDomainStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
   {
     std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
@@ -288,6 +327,19 @@ namespace vdl::Renderer3D
     SetGeometryStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
   }
 
+  inline void SetGeometryStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetGeometryStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
+  }
+
   inline void SetGeometryStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
   {
     std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
@@ -328,6 +380,19 @@ namespace vdl::Renderer3D
     }
 
     SetPixelStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetPixelStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetPixelStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
   }
 
   inline void SetPixelStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
@@ -447,9 +512,9 @@ namespace vdl::Renderer3D
     SetPixelStageConstantBuffers(_Slot, _BufferNum, ConstantBuffers.data());
   }
 
-  void Draw(const StaticMesh& _StaticMesh, const Matrix& _World, const ColorF& _Color = Palette::White);
+  void Draw(const StaticMesh& _StaticMesh, const Matrix& _World = Matrix::Identity(), const ColorF& _Color = Palette::White);
 
-  inline void Draw(const Model& _Model, const Matrix& _World, const ColorF& _Color = Palette::White)
+  inline void Draw(const Model& _Model, const Matrix& _World = Matrix::Identity(), const ColorF& _Color = Palette::White)
   {
     assert(!_Model.isEmpty());
 

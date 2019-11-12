@@ -6,6 +6,7 @@
 enum class TextureType
 {
   eTexture,
+  eCubeTexture,
   eRenderTexture,
   eSwapChainRenderTexture,
   eDepthStencilTexture,

@@ -7,12 +7,35 @@
 
 #include <vdl/Constants/Constants.hpp>
 
-struct CTexture : public ITexture
+struct TextureData
 {
   vk::UniqueImage Image;
   vk::UniqueImageView View;
   vk::UniqueDeviceMemory Memory;
   vk::ImageLayout CurrentLayout = vk::ImageLayout::eUndefined;
+public:
+  TextureData() = default;
+
+  TextureData(TextureData&& _Data)noexcept
+    : Image(std::move(_Data.Image)), View(std::move(_Data.View)), Memory(std::move(_Data.Memory))
+    , CurrentLayout(std::move(_Data.CurrentLayout)) {}
+
+  TextureData& operator=(TextureData&& _Data)noexcept
+  {
+    Image = std::move(_Data.Image);
+    View = std::move(_Data.View);
+    Memory = std::move(_Data.Memory);
+    CurrentLayout = std::move(_Data.CurrentLayout);
+
+    return *this;
+  }
+public:
+  void SetImageLayout(const vk::CommandBuffer& _CommandBuffer, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange& _SubresourceRange);
+};
+
+struct CTexture : public ITexture
+{
+  TextureData TextureData;
   vdl::uint2 TextureSize;
 public:
   CTexture() = default;
@@ -23,10 +46,16 @@ public:
 
   vdl::FormatType GetFormat()const override { return Constants::kTextureFormat; }
 public:
-  void SetImageLayout(const vk::CommandBuffer& _CommandBuffer, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange& _SubresourceRange);
-public:
   static void SetImageLayout(const vk::CommandBuffer& _CommandBuffer, const vk::Image& _Image,
     vk::ImageLayout _OldImageLayout, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange& _SubresourceRange);
+};
+
+struct CCubeTexture : public CTexture
+{
+public:
+  CCubeTexture() = default;
+
+  TextureType GetType()const final { return TextureType::eCubeTexture; }
 };
 
 struct CRenderTexture : public CTexture
@@ -55,10 +84,7 @@ public:
 
 struct CDepthStencilTexture : public IDepthStencilTexture
 {
-  vk::UniqueImage Image;
-  vk::UniqueImageView View;
-  vk::UniqueDeviceMemory Memory;
-  vk::ImageLayout CurrentLayout = vk::ImageLayout::eUndefined;
+  TextureData TextureData;
   vdl::uint2 TextureSize;
   vdl::Texture DepthTexture;
   vdl::Texture StencilTexture;
@@ -77,8 +103,6 @@ public:
   const vdl::Texture& GetDepthTexture()final;
 
   const vdl::Texture& GetStencilTexture()final;
-public:
-  void SetImageLayout(const vk::CommandBuffer& _CommandBuffer, vk::ImageLayout _NewImageLayout, const vk::ImageSubresourceRange& _SubresourceRange);
 };
 
 struct CDepthTexture : public ITexture
@@ -92,7 +116,7 @@ public:
 
   TextureType GetType()const final { return TextureType::eDepthTexture; }
 
-  vdl::uint2 GetSize()const final { return pParent->TextureSize; }
+  vdl::uint2 GetSize()const final { return pParent->GetSize(); }
 
   vdl::FormatType GetFormat()const final { return vdl::FormatType::eUnknown; }
 };
@@ -108,7 +132,7 @@ public:
 
   TextureType GetType()const final { return TextureType::eStencilTexture; }
 
-  vdl::uint2 GetSize()const final { return pParent->TextureSize; }
+  vdl::uint2 GetSize()const final { return pParent->GetSize(); }
 
   vdl::FormatType GetFormat()const final { return vdl::FormatType::eUnknown; }
 };

@@ -2,6 +2,7 @@
 #include "../IDevice.hpp"
 
 #include <vdl/Buffer/Vulkan/CBuffer.hpp>
+#include <vdl/Texture/Vulkan/CTexture.hpp>
 
 #include <vdl/pch/Vulkan/pch.hpp>
 
@@ -38,10 +39,12 @@ public:
   [[nodiscard]] vdl::uint GetMemoryTypeIndex(vdl::uint _MemoryTypeBits, const vk::MemoryPropertyFlags& _MemoryPropertys)const;
   void SubmitAndWait(vk::SubmitInfo _SubmitInfo)const;
 private:
-  [[nodiscard]] vdl::uint FindQueue(vk::QueueFlags _QueueFlag, vk::QueueFlags _NotFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const;
-  void CreateBuffer(BufferData* _pBuffer, vk::DeviceSize _BufferSize, vk::BufferUsageFlags _Usage, vk::MemoryPropertyFlags _Properties)const;
+  [[nodiscard]] vdl::uint FindQueue(const vk::QueueFlags& _QueueFlag, const vk::QueueFlags& _NotFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const;
+  void CreateBuffer(BufferData* _pBuffer, vk::DeviceSize _BufferSize, const vk::BufferUsageFlags& _Usage, const vk::MemoryPropertyFlags& _Properties)const;
   void CreateStagingBuffer(BufferData* _pStagingBuffer, const void* _Buffer, vdl::uint _BufferSize)const;
   void CopyBuffer(vk::Buffer _SrcBuffer, vk::Buffer _DstBuffer, vdl::uint _BufferSize)const;
+  void CreateImage(TextureData* _pTexture, const vk::ImageCreateInfo& ImageInfo)const;
+  void CreateImageView(TextureData* _pTexture, vk::Format _Format, const vk::ImageSubresourceRange& _SubresourceRange, vk::ImageViewType _ViewType)const;
 public:
   CDevice() = default;
 
@@ -65,7 +68,7 @@ public:
 
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 
-  void CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
+  void CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images)override;
 
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 

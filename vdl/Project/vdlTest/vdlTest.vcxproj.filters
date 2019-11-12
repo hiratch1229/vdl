@@ -54,6 +54,9 @@
     <Filter Include="シェーダーファイル\Mesh\SkinnedMesh">
       <UniqueIdentifier>{ac924044-b160-496d-a4b6-41bc90e58be2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Skybox">
+      <UniqueIdentifier>{4d2d9a4a-c210-4a30-8454-df0578c8b989}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -222,6 +225,12 @@
     <FxCompile Include="Shader\Mesh\SkinnedMesh\SkinnedMeshVS.hlsl">
       <Filter>シェーダーファイル\Mesh\SkinnedMesh</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Skybox\SkyboxVS.hlsl">
+      <Filter>シェーダーファイル\Skybox</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Skybox\SkyboxPS.hlsl">
+      <Filter>シェーダーファイル\Skybox</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Tessellation\Tessellation.hlsli">
@@ -256,6 +265,9 @@
     </None>
     <None Include="Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli">
       <Filter>シェーダーファイル\Mesh\SkinnedMesh</Filter>
+    </None>
+    <None Include="Shader\Skybox\Skybox.hlsli">
+      <Filter>シェーダーファイル\Skybox</Filter>
     </None>
   </ItemGroup>
 </Project>

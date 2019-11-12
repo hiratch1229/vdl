@@ -29,7 +29,7 @@ namespace vdl
 
       ModelData.MeshDatas.resize(1);
       {
-        ModelData.MeshDatas[0].IndexCount = static_cast<vdl::uint>(ModelData.Indices.size());
+        ModelData.MeshDatas[0].IndexCount = static_cast<uint>(ModelData.Indices.size());
         ModelData.MeshDatas[0].Material.Diffuse = _Diffuse;;
         ModelData.MeshDatas[0].Material.MaterialColor = Palette::White;
         ModelData.MeshDatas[0].Material.NormalMap = _NormalMap;
@@ -124,7 +124,7 @@ namespace vdl
 
       ModelData.MeshDatas.resize(1);
       {
-        ModelData.MeshDatas[0].IndexCount = static_cast<vdl::uint>(ModelData.Indices.size());
+        ModelData.MeshDatas[0].IndexCount = static_cast<uint>(ModelData.Indices.size());
         ModelData.MeshDatas[0].Material.Diffuse = _Diffuse;;
         ModelData.MeshDatas[0].Material.MaterialColor = Palette::White;
         ModelData.MeshDatas[0].Material.NormalMap = _NormalMap;
@@ -142,73 +142,41 @@ namespace vdl
     StaticModelData ModelData;
     {
       //  頂点情報
+      for (uint i = 0; i <= _StackCount; ++i)
       {
-        //  一番上の頂点
-        ModelData.Vertices.push_back({ { 0.0f, +kRadius, 0.0f }, { 0.0f, +1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
+        const float V = i / static_cast<float>(_StackCount);
+        const float Phi = V * Math::kPI;
 
-        const Radian PhiStep = Math::kPI / _StackCount;
-        const Radian ThetaStep = Math::kTwoPI / _SliceCount;
-
-        for (uint i = 1; i <= _StackCount - 1; i++)
+        for (uint j = 0; j <= _SliceCount; ++j)
         {
-          const Radian Phi = PhiStep * i;
-          for (uint j = 0; j <= _SliceCount; j++)
-          {
-            VertexStaticMesh& Vertex = ModelData.Vertices.emplace_back();
-            {
-              const Radian Theta = ThetaStep * j;
+          const float U = j / static_cast<float>(_SliceCount);
+          const float Theta = U * Math::kTwoPI;
 
-              Vertex.Position = float3(kRadius * sinf(Phi) * cosf(Theta), kRadius * cosf(Phi), kRadius * sinf(Phi) * sinf(Theta));
-              Vertex.Tangent = float3(-kRadius * sinf(Phi) * sinf(Theta), 0.0f, kRadius * sinf(Phi) * cosf(Theta)).Normalize();
-              Vertex.Normal = Vertex.Position.Normalize();
-              Vertex.Texcoord = float2(Theta / Math::kTwoPI, Phi / Math::kPI);
-            }
+          VertexStaticMesh& Vertex = ModelData.Vertices.emplace_back();
+          {
+            Vertex.Position = float3(kRadius * sinf(Phi) * cosf(Theta), kRadius * cosf(Phi), kRadius * sinf(Phi) * sinf(Theta));
+            Vertex.Tangent = float3(-kRadius * sinf(Phi) * sinf(Theta), 0.0f, kRadius * sinf(Phi) * cosf(Theta)).Normalize();
+            Vertex.Normal = Vertex.Position.Normalize();
+            Vertex.Texcoord = float2(U, V);
           }
         }
-
-        //  一番下の頂点
-        ModelData.Vertices.push_back({ { 0.0f, -kRadius, 0.0f }, { 0.0f, -1.0f, 0.0f }, { +1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } });
       }
 
       //  インデックス情報
+      for (uint i = 0; i < _SliceCount * _StackCount + _SliceCount; ++i)
       {
-        for (uint i = 1; i <= _StackCount; i++)
-        {
-          ModelData.Indices.emplace_back(0);
-          ModelData.Indices.emplace_back(i + 1);
-          ModelData.Indices.emplace_back(i);
-        }
+        ModelData.Indices.emplace_back(i);
+        ModelData.Indices.emplace_back(i + _SliceCount + 1);
+        ModelData.Indices.emplace_back(i + _SliceCount);
 
-        uint baseIndex = 1;
-        uint ringVertexCount = _StackCount + 1;
-        for (uint i = 0; i < _StackCount - 2; i++)
-        {
-          for (uint j = 0; j < _SliceCount; j++)
-          {
-            ModelData.Indices.emplace_back(baseIndex + i * ringVertexCount + j);
-            ModelData.Indices.emplace_back(baseIndex + i * ringVertexCount + j + 1);
-            ModelData.Indices.emplace_back(baseIndex + (i + 1) * ringVertexCount + j);
-
-            ModelData.Indices.emplace_back(baseIndex + (i + 1) * ringVertexCount + j);
-            ModelData.Indices.emplace_back(baseIndex + i * ringVertexCount + j + 1);
-            ModelData.Indices.emplace_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
-          }
-        }
-
-        uint southPoleIndex = static_cast<vdl::uint>(ModelData.Vertices.size()) - 1;
-        baseIndex = southPoleIndex - ringVertexCount;
-
-        for (uint i = 0; i < _SliceCount; i++)
-        {
-          ModelData.Indices.emplace_back(southPoleIndex);
-          ModelData.Indices.emplace_back(baseIndex + i);
-          ModelData.Indices.emplace_back(baseIndex + i + 1);
-        }
+        ModelData.Indices.emplace_back(i + _SliceCount + 1);
+        ModelData.Indices.emplace_back(i);
+        ModelData.Indices.emplace_back(i + 1);
       }
 
       ModelData.MeshDatas.resize(1);
       {
-        ModelData.MeshDatas[0].IndexCount = static_cast<vdl::uint>(ModelData.Indices.size());
+        ModelData.MeshDatas[0].IndexCount = static_cast<uint>(ModelData.Indices.size());
         ModelData.MeshDatas[0].Material.Diffuse = _Diffuse;;
         ModelData.MeshDatas[0].Material.MaterialColor = Palette::White;
         ModelData.MeshDatas[0].Material.NormalMap = _NormalMap;

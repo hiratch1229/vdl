@@ -3,6 +3,7 @@
 #include "Type2.hpp"
 #include "Type3.hpp"
 #include "Types.hpp"
+#include "Matrix.hpp"
 #include "Constants.hpp"
 #include <array>
 
@@ -40,5 +41,24 @@ namespace vdl
   public:
     [[nodiscard]] bool operator==(const VertexSkinnedMesh& _Vertex)const { return Position == _Vertex.Position && Normal == _Vertex.Normal && Tangent == _Vertex.Tangent && Texcoord == _Vertex.Texcoord && BoneWeights == _Vertex.BoneWeights && BoneIndices == _Vertex.BoneIndices; }
     [[nodiscard]] bool operator!=(const VertexSkinnedMesh& _Vertex)const { return Position != _Vertex.Position || Normal != _Vertex.Normal || Tangent != _Vertex.Tangent || Texcoord != _Vertex.Texcoord || BoneWeights != _Vertex.BoneWeights || BoneIndices != _Vertex.BoneIndices; }
+  };
+
+  struct Instance2D
+  {
+    Matrix NDCTransform;
+    float2 TexcoordScale;
+    float2 TexcoordTranslate;
+    ColorF Color;
+  };
+
+  struct InstanceStaticMesh
+  {
+    Matrix World;
+    ColorF Color;
+  };
+
+  struct InstanceSkinnedMesh : public InstanceStaticMesh
+  {
+    //  TODO:SkinnedMesh
   };
 }

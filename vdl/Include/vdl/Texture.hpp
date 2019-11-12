@@ -96,6 +96,38 @@ namespace vdl
     [[nodiscard]] vdl::Texture GetStencilTexture()const;
   };
 
+  class CubeTexture
+  {
+  protected:
+    ID ID_;
+  public:
+    CubeTexture() = default;
+
+    //  ファイルから作成
+    CubeTexture(const char* _FilePath, bool _isSerialize = true);
+
+    //  データから作成
+    CubeTexture(const Image& _Image);
+
+    CubeTexture(const CubeTexture& _CubeTexture);
+
+    CubeTexture(CubeTexture&& _CubeTexture)noexcept;
+
+    virtual ~CubeTexture();
+  public:
+    CubeTexture& operator=(const CubeTexture& _CubeTexture);
+
+    CubeTexture& operator=(CubeTexture&& _CubeTexture)noexcept;
+
+    [[nodiscard]] constexpr bool operator==(const CubeTexture& _CubeTexture)const noexcept { return ID_ == _CubeTexture.ID_; }
+
+    [[nodiscard]] constexpr bool operator!=(const CubeTexture& _CubeTexture)const noexcept { return ID_ != _CubeTexture.ID_; }
+  public:
+    [[nodiscard]] ID GetID()const noexcept { return ID_; }
+
+    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
+  };
+
   struct OutputManager
   {
     vdl::RenderTextures RenderTextures;

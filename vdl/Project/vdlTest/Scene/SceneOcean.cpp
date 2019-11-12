@@ -4,9 +4,14 @@ using namespace vdl;
 
 void SceneOcean::Initialize()
 {
-  Camera_ = Camera(float3(0.0f, 25.0f, -60.0f));
+  Sphere_ = StaticModelData::Sphere(20, 20);
+  SkyboxTexture_ = CubeTexture("Data/skybox.png");
+  Camera_ = Camera(float3(0.0f, 15.0f, -60.0f));
   SwapchainRenderTexture_ = Window::GetRenderTexture();
   SwapchainDepthTexture_ = Window::GetDepthStencilTexture();
+  
+  SkyboxVertexShader_ = VertexShader("Shader/Skybox/SkyboxVS.hlsl",InputLayoutType::eStaticMesh);
+  SkyboxPixelShader_ = PixelShader("Shader/Skybox/SkyboxPS.hlsl");
 
   //  êÖñ 
   {
@@ -78,6 +83,8 @@ void SceneOcean::Update()
   //  çXêV
   {
     FreeCamera(&Camera_);
+    Renderer3D::SetCamera(Camera_);
+
     ViewProjectionConstantBuffer_.GetData() = Camera_.View() * Camera_.Projection(Constants::kDefaultWindowSize);
     WaterSurfaceGerstnerConstantBuffer_.GetData().Time += System::GetDeltaTime();
 
@@ -116,11 +123,22 @@ void SceneOcean::Update()
     ImGui::End();
   }
 
+  //  ãÛÇÃï`âÊ
+  {
+    Renderer3D::SetTopology(TopologyType::eDefaultMesh);
+    Renderer3D::SetStaticMeshShaders(SkyboxVertexShader_, SkyboxPixelShader_);
+    Renderer3D::SetPixelStageShaderResources(2, 1, &SkyboxTexture_);
+    Renderer3D::SetRasterizerState(RasterizerState::kSolidCullFront);
+
+    Renderer3D::Draw(Sphere_, Matrix::Scale(1000.0f));
+  }
+
   //  êÖÇÃï`âÊ
   {
     Renderer3D::SetStaticMeshShaders(WaterSurfaceVertexShader_, WaterSurfaceHullShader_, WaterSurfaceDomainShader_, WaterSurfacePixelShader_);
     Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
-
+    Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
+  
     Renderer3D::Draw(WaterSurface_, Matrix::Identity(), Palette::LightSkyBlue);
   }
 }

@@ -6,7 +6,6 @@
 #include <vdl/ConstantBuffer.hpp>
 
 #include <vdl/Buffer/Buffer.hpp>
-#include <vdl/Instance/Instance.hpp>
 
 #include <memory>
 
@@ -16,11 +15,11 @@ class IDeviceContext;
 class CRenderer : public IRenderer
 {
   static constexpr vdl::uint kShaderTypes = static_cast<vdl::uint>(ShaderType::eGraphicsNum);
-  static constexpr vdl::Vertex2D kRectangle[] = {
-  { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
-  { { +0.5f, -0.5f }, { 1.0f, 0.0f } },
-  { { -0.5f, +0.5f }, { 0.0f, 1.0f } },
-  { { +0.5f, +0.5f }, { 1.0f, 1.0f } } };
+  static constexpr vdl::Vertex2D kRectangleVertices[] = {
+    { { -0.5f, -0.5f }, { 0.0f, 0.0f } },
+    { { +0.5f, -0.5f }, { 1.0f, 0.0f } },
+    { { -0.5f, +0.5f }, { 0.0f, 1.0f } },
+    { { +0.5f, +0.5f }, { 1.0f, 1.0f } } };
 private:
   struct MeshConstantBufferData
   {
@@ -37,18 +36,21 @@ private:
   IDeviceContext* pDeviceContext_;
 private:
   VertexBuffer TextureVertexBuffer_;
+  VertexBuffer SkyboxVertexBuffer_;
+  IndexBuffer SkyboxIndexBuffer_;
   InstanceBuffer NoneInstanceBuffer_;
   InstanceBuffer TextureInstanceBuffer_;
   InstanceBuffer StaticMeshInstanceBuffer_;
   InstanceBuffer SkinnedMeshInstanceBuffer_;
+  InstanceBuffer SkyboxInstanceBuffer_;
 private:
   std::unique_ptr<CameraData> pCameraData_;
 private:
   vdl::OutputManager OutputManager_;
   RendererCommandList<Empty, vdl::uint> EmptyRendererCommandList_;
-  RendererCommandList<vdl::Texture, Instance2D> TextureRendererCommandList_;
-  RendererCommandList<vdl::StaticMesh, InstanceStaticMesh> StaticMeshRendererCommandList_;
-  RendererCommandList<vdl::SkinnedMesh, InstanceSkinnedMesh> SkinnedMeshRendererCommandList_;
+  RendererCommandList<vdl::Texture, vdl::Instance2D> TextureRendererCommandList_;
+  RendererCommandList<vdl::StaticMesh, vdl::InstanceStaticMesh> StaticMeshRendererCommandList_;
+  RendererCommandList<vdl::SkinnedMesh, vdl::InstanceSkinnedMesh> SkinnedMeshRendererCommandList_;
 public:
   CRenderer() = default;
 

@@ -11,7 +11,7 @@ struct BufferData
 public:
   BufferData() = default;
 
-  BufferData(BufferData &&_Data)noexcept
+  BufferData(BufferData&& _Data)noexcept
     : Buffer(std::move(_Data.Buffer)), Memory(std::move(_Data.Memory)), pData(std::move(_Data.pData)) {}
 
   BufferData& operator=(BufferData&& _Data)noexcept

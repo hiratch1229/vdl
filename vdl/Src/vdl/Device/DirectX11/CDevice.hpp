@@ -37,7 +37,7 @@ public:
 
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 
-  void CreateCubeTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
+  void CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images)override;
 
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
