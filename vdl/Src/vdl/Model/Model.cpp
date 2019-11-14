@@ -76,7 +76,7 @@ namespace vdl
 
   //--------------------------------------------------
 
-  SkinnedMesh::SkinnedMesh(const VertexSkinnedMeshs& _Vertices, const Indices& _Indices, const StaticMeshData& _MeshData)
+  SkinnedMesh::SkinnedMesh(const VertexSkinnedMeshs& _Vertices, const Indices& _Indices, const SkinnedMeshData& _MeshData)
   {
     ID_ = Engine::Get<IModelManager>()->Load(_Vertices, _Indices, _MeshData);
   }
@@ -96,6 +96,23 @@ namespace vdl
   Model::Model(const char* _FilePath, bool _isSerialize)
   {
     Meshes_ = Engine::Get<IModelManager>()->Load(_FilePath, _isSerialize);
+  }
+
+  Model::Model(const StaticModelData& _StaticModelData)
+  {
+    const size_t VertexNum = _StaticModelData.Vertices.size();
+    VertexSkinnedMeshs Vertices(VertexNum);
+    for (size_t VertexCount = 0; VertexCount < VertexNum; ++VertexCount)
+    {
+      Vertices[VertexCount] = _StaticModelData.Vertices[VertexCount];
+    }
+
+    const size_t MeshNum = _StaticModelData.MeshDatas.size();
+    Meshes_.resize(MeshNum);
+    for (size_t MeshCount = 0; MeshCount < MeshNum; ++MeshCount)
+    {
+      Meshes_[MeshCount] = SkinnedMesh(Vertices, _StaticModelData.Indices, _StaticModelData.MeshDatas[MeshCount]);
+    }
   }
 
   Model::Model(const SkinnedModelData& _SkinnedModelData)

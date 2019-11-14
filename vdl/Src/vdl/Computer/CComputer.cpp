@@ -179,6 +179,8 @@ void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::
 
   StateChangeFlags_.Clear();
 
+  pDeviceContext_->SetRenderTextures(vdl::RenderTextures(), vdl::DepthStencilTexture());
+
   const vdl::uint PreviousShaderResourcesNum = static_cast<vdl::uint>(PreviousShaderResources_.size());
   pDeviceContext_->CSSetShaderResources(0, PreviousShaderResourcesNum, PreviousShaderResources_.data());
 

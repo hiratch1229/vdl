@@ -42,7 +42,7 @@ namespace vdl
   public:
     SkinnedMesh() = default;
 
-    SkinnedMesh(const VertexSkinnedMeshs& _Vertices, const Indices& _Indices, const StaticMeshData& _MeshData);
+    SkinnedMesh(const VertexSkinnedMeshs& _Vertices, const Indices& _Indices, const SkinnedMeshData& _MeshData);
 
     SkinnedMesh(const SkinnedModelData& _SkinnedModelData, vdl::uint _MeshIndex = 0);
   public:
@@ -58,11 +58,17 @@ namespace vdl
     //  ÉtÉ@ÉCÉãÇ©ÇÁçÏê¨
     Model(const char* _FilePath, bool _isSerialize = true);
 
+    Model(const StaticModelData& _StaticModelData);
+
     Model(const SkinnedModelData& _SkinnedModelData);
 
     Model(const std::vector<SkinnedMesh>& _Meshes);
   public:
+    [[nodiscard]] SkinnedMesh& operator[](uint _Index) { return Meshes_[_Index]; }
+  public:
     [[nodiscard]] bool isEmpty()const noexcept { return Meshes_.empty(); }
+
+    [[nodiscard]] uint Size()const noexcept { return static_cast<uint>(Meshes_.size()); }
 
     [[nodiscard]] bool hasAnimation()const noexcept { return !isEmpty() && Meshes_[0].hasAnimation(); }
 

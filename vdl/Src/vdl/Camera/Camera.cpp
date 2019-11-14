@@ -38,7 +38,7 @@ namespace vdl
     {
       if (const int2 MouseDelta = pMouse->GetDelta(); MouseDelta != 0)
       {
-        constexpr float3 kMultiple = { 0.01f, 0.01f, 0.1f };
+        constexpr float3 kMultiple = { 0.01f, 0.01f, 0.6f };
 
         const float3 ViewVector = _pCamera->ViewVector();
 

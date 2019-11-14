@@ -166,11 +166,13 @@ void SceneTBDR::Update()
     {
       DirectinalLight& DirectinalLight = DirectinalLightConstantBuffer_.GetData();
 
+#if defined _DEBUG | DEBUG
       if (ImGui::Button("Reload TileBaseCS"))
       {
         TileBaseComputeShader_ = ComputeShader(kTileBaseComputeShaderFilePath);
         Computer::SetShader(TileBaseComputeShader_);
       }
+#endif
       ImGui::Checkbox("TileBased", &isTileBase);
       int CurrentPointLightNum = static_cast<int>(RenderingData.PointLightNum);
       if (ImGui::SliderInt("PointLightNum", &CurrentPointLightNum, 0, kMaxDataNum))

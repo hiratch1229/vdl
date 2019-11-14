@@ -106,11 +106,13 @@ void SceneDeferred::Update()
 
     ImGui::Begin("SceneDeferred");
     {
+#if defined _DEBUG | DEBUG
       if (ImGui::Button("Reload LightPassPS"))
       {
         LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
         Renderer::SetPixelShader(LightPassPixelShader_);
       }
+#endif
       ImGui::Checkbox("SphereUpdate", &isUpdate_);
       ImGui::InputFloat("SpecularPower", &RenderingData.SpecularPower);
       ImGui::ColorEdit3("Ambient", &RenderingData.Ambient);

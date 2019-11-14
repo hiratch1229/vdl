@@ -206,9 +206,8 @@ namespace vdl
   //  Model.hpp
   //-------------------------
   class StaticMesh;
-  class StaticModel;
   class SkinnedMesh;
-  class SkinnedModel;
+  class Model;
 
   //-------------------------
   //  Cicle.hpp

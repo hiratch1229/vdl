@@ -112,28 +112,20 @@ namespace vdl
       return DirectX::XMMatrixRotationQuaternion(_Orientation);
     }
   };
-
-  [[nodiscard]] inline float2 operator*(const float2& _v, const Matrix& _m)
-  {
-    const DirectX::XMVECTOR v = DirectX::XMVector2Transform({ _v.x, _v.y, 0.0f, 0.0f }, _m);
-
-    return { v.m128_f32[0], v.m128_f32[1] };
-  }
-
+  
   [[nodiscard]] inline float3 operator*(const float3& _v, const Matrix& _m)
   {
-    const DirectX::XMVECTOR v = DirectX::XMVector3Transform({ _v.x, _v.y, _v.z, 0.0f }, _m);
-
+    const DirectX::XMVECTOR v = DirectX::XMVector3TransformCoord({ _v.x, _v.y, _v.z, 1.0f }, _m);
+  
     return { v.m128_f32[0], v.m128_f32[1], v.m128_f32[2] };
   }
-
+  
   [[nodiscard]] inline float4 operator*(const float4& _v, const Matrix& _m)
   {
-    const DirectX::XMVECTOR v = DirectX::XMVector3Transform({ _v.x, _v.y, _v.z, _v.w }, _m);
-
+    const DirectX::XMVECTOR v = DirectX::XMVector4Transform({ _v.x, _v.y, _v.z, _v.w }, _m);
+  
     return { v.m128_f32[0], v.m128_f32[1], v.m128_f32[2], v.m128_f32[3] };
   }
-
 }
 
 namespace std

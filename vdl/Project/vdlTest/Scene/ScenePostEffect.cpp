@@ -108,11 +108,13 @@ void ScenePostEffect::Update()
 
     ImGui::Begin("ScenePostEffect");
     {
+#if defined _DEBUG | DEBUG
       if (ImGui::Button("Reload LightPassPS"))
       {
         LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
         Renderer::SetPixelShader(LightPassPixelShader_);
       }
+#endif
       ImGui::ColorEdit3("Shadow", &RenderingData.Shadow);
       ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha);
       ImGui::ColorEdit3("Fog", &RenderingData.Fog);

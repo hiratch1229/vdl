@@ -178,9 +178,6 @@
     <Filter Include="Shader\Mesh\SkinnedMesh">
       <UniqueIdentifier>{fcbf157e-1b7d-4324-b1b9-32a8effd0545}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader\Option\Skybox">
-      <UniqueIdentifier>{0876d6cd-d93a-4226-8550-1e7c9dcc5e75}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -913,9 +910,6 @@
     <None Include="..\..\Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli">
       <Filter>Shader\Mesh\SkinnedMesh</Filter>
     </None>
-    <None Include="..\..\Shader\Option\Skybox\Skybox.hlsli">
-      <Filter>Shader\Option\Skybox</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Shader\Texture\TexturePS.hlsl">
@@ -935,12 +929,6 @@
     </FxCompile>
     <FxCompile Include="..\..\Shader\Mesh\SkinnedMesh\SkinnedMeshVS.hlsl">
       <Filter>Shader\Mesh\SkinnedMesh</Filter>
-    </FxCompile>
-    <FxCompile Include="..\..\Shader\Option\Skybox\SkyboxPS.hlsl">
-      <Filter>Shader\Option\Skybox</Filter>
-    </FxCompile>
-    <FxCompile Include="..\..\Shader\Option\Skybox\SkyboxVS.hlsl">
-      <Filter>Shader\Option\Skybox</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

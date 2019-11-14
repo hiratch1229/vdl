@@ -55,7 +55,13 @@
       <UniqueIdentifier>{ac924044-b160-496d-a4b6-41bc90e58be2}</UniqueIdentifier>
     </Filter>
     <Filter Include="シェーダーファイル\Skybox">
-      <UniqueIdentifier>{4d2d9a4a-c210-4a30-8454-df0578c8b989}</UniqueIdentifier>
+      <UniqueIdentifier>{ba8ec358-40df-4075-8cdc-69f385749f9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダーファイル\Ocean\Terrain">
+      <UniqueIdentifier>{34557065-7a2d-40c9-9ff7-ecde6d7d40b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダーファイル\Ocean\WaterSurface">
+      <UniqueIdentifier>{a2f7edf0-fae8-4be5-862d-cfa5f2dfa9b9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -168,9 +174,6 @@
     <FxCompile Include="Shader\Texture\TextureVS.hlsl">
       <Filter>シェーダーファイル\Texture</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Deferred\ShadowMapVS.hlsl">
-      <Filter>シェーダーファイル\Deferred</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\PostEffect\GBufferPassPS.hlsl">
       <Filter>シェーダーファイル\PostEffect</Filter>
     </FxCompile>
@@ -207,29 +210,53 @@
     <FxCompile Include="Shader\GBufferPass\GBufferPassVS.hlsl">
       <Filter>シェーダーファイル\GBufferPass</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Ocean\WaterSurfaceVS.hlsl">
-      <Filter>シェーダーファイル\Ocean</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\Ocean\WaterSurfacePS.hlsl">
-      <Filter>シェーダーファイル\Ocean</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\Ocean\WaterSurfaceDS.hlsl">
-      <Filter>シェーダーファイル\Ocean</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\Ocean\WaterSurfaceHS.hlsl">
-      <Filter>シェーダーファイル\Ocean</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\Mesh\StaticMesh\StaticMeshVS.hlsl">
       <Filter>シェーダーファイル\Mesh\StaticMesh</Filter>
     </FxCompile>
     <FxCompile Include="Shader\Mesh\SkinnedMesh\SkinnedMeshVS.hlsl">
       <Filter>シェーダーファイル\Mesh\SkinnedMesh</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Skybox\SkyboxPS.hlsl">
+      <Filter>シェーダーファイル\Skybox</Filter>
+    </FxCompile>
     <FxCompile Include="Shader\Skybox\SkyboxVS.hlsl">
       <Filter>シェーダーファイル\Skybox</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Skybox\SkyboxPS.hlsl">
-      <Filter>シェーダーファイル\Skybox</Filter>
+    <FxCompile Include="Shader\Ocean\LightPassPS.hlsl">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Deferred\ShadowMapVS.hlsl">
+      <Filter>シェーダーファイル\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\Terrain\TerrainDS.hlsl">
+      <Filter>シェーダーファイル\Ocean\Terrain</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\Terrain\TerrainHS.hlsl">
+      <Filter>シェーダーファイル\Ocean\Terrain</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\Terrain\TerrainPS.hlsl">
+      <Filter>シェーダーファイル\Ocean\Terrain</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\Terrain\TerrainVS.hlsl">
+      <Filter>シェーダーファイル\Ocean\Terrain</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurface\WaterSurfaceDS.hlsl">
+      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurface\WaterSurfaceHS.hlsl">
+      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurface\WaterSurfacePS.hlsl">
+      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurface\WaterSurfaceVS.hlsl">
+      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\Terrain\TerrainUpdateCS.hlsl">
+      <Filter>シェーダーファイル\Ocean\Terrain</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\Terrain\TerrainHeightMapUpdateCS.hlsl">
+      <Filter>シェーダーファイル\Ocean\Terrain</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -257,17 +284,26 @@
     <None Include="Shader\GBufferPass\GBufferPass.hlsli">
       <Filter>シェーダーファイル\GBufferPass</Filter>
     </None>
-    <None Include="Shader\Ocean\WaterSurface.hlsli">
-      <Filter>シェーダーファイル\Ocean</Filter>
-    </None>
     <None Include="Shader\Mesh\StaticMesh\StaticMesh.hlsli">
       <Filter>シェーダーファイル\Mesh\StaticMesh</Filter>
     </None>
     <None Include="Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli">
       <Filter>シェーダーファイル\Mesh\SkinnedMesh</Filter>
     </None>
+    <None Include="Shader\Ocean\Tessellation.hlsli">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </None>
     <None Include="Shader\Skybox\Skybox.hlsli">
       <Filter>シェーダーファイル\Skybox</Filter>
+    </None>
+    <None Include="Shader\Ocean\Terrain\Terrain.hlsli">
+      <Filter>シェーダーファイル\Ocean\Terrain</Filter>
+    </None>
+    <None Include="Shader\Ocean\WaterSurface\WaterSurface.hlsli">
+      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    </None>
+    <None Include="Shader\Ocean\Deferred.hlsli">
+      <Filter>シェーダーファイル\Ocean</Filter>
     </None>
   </ItemGroup>
 </Project>

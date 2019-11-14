@@ -1,4 +1,5 @@
-#include "WaterSurface.hlsli"
+#include "Terrain.hlsli"
+#include "../Tessellation.hlsli"
 
 cbuffer ConstantBuffer : register(b0)
 {
@@ -10,7 +11,7 @@ ConstantData CulcQuadConstantData(InputPatch<HS_IN, CONTROL_POINT> IPatch)
 {
   ConstantData Out;
 
-  Out.TessFactor[0] = Out.TessFactor[1] = Out.TessFactor[2] = Out.TessFactor[3] = TessFactor.x;
+  Out.TessFactor[0] = Out.TessFactor[1] = Out.TessFactor[2] = Out.TessFactor[3] = TessFactor;
   Out.InsideTessFactor[0] = Out.InsideTessFactor[1] = InsideFactor;
 
   return Out;
@@ -27,6 +28,7 @@ DS_IN main(InputPatch<HS_IN, CONTROL_POINT> IPatch, uint ID : SV_OutputControlPo
 
   Out.Position = IPatch[ID].Position;
   Out.Normal = IPatch[ID].Normal;
+  Out.Tangent = IPatch[ID].Tangent;
   Out.Color = IPatch[ID].Color;
   Out.Texcoord = IPatch[ID].Texcoord;
 

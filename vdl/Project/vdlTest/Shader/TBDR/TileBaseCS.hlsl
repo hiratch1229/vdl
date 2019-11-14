@@ -34,7 +34,6 @@ groupshared uint gMinZ; //  タイルの最小深度
 groupshared uint gMaxZ; //  タイルの最大深度
 groupshared uint gTileLightIndices[kMaxPointLightNum]; //  タイルに接触しているポイントライトのインデックス
 groupshared uint gTileNumLights; //  タイルに接触しているポイントライトの数
-groupshared uint gNumPerSamplePixels;
 
 [numthreads(kTileSize.x, kTileSize.y, 1)]
 void main(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID, uint3 GroupThreadID : SV_GroupThreadID)
@@ -62,7 +61,6 @@ void main(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThread
   if (GroupIndex == 0)
   {
     gTileNumLights = 0;
-    gNumPerSamplePixels = 0;
     gMinZ = 0x7F7FFFFF; // floatの最大値
     gMaxZ = 0;
   }
