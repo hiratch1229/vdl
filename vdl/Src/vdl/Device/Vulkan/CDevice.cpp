@@ -700,6 +700,10 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
   pRenderTexture->TextureSize = _TextureSize;
   pRenderTexture->Format = _Format;
   pRenderTexture->VkFormat = Cast(_Format);
+  if (!(PhysicalDevice_.getFormatProperties(pRenderTexture->VkFormat).optimalTilingFeatures & vk::FormatFeatureFlagBits::eColorAttachment))
+  {
+    pRenderTexture->VkFormat = EmulateFormat(_Format);
+  }
 
   vk::ImageCreateInfo ImageInfo;
   {
@@ -753,6 +757,10 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
   pDepthStencilTexture->TextureSize = _TextureSize;
   pDepthStencilTexture->Format = _Format;
   pDepthStencilTexture->VkFormat = Cast(_Format);
+  if (!(PhysicalDevice_.getFormatProperties(pDepthStencilTexture->VkFormat).optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment))
+  {
+    pDepthStencilTexture->VkFormat = EmulateFormat(_Format);
+  }
   pDepthStencilTexture->ImageAspectFlag = vk::ImageAspectFlagBits::eDepth;
   if (hasStencil(pDepthStencilTexture->Format))
   {
@@ -810,7 +818,11 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
   CUnorderedAccessTexture* pUnorderedAccessTexture = new CUnorderedAccessTexture;
   pUnorderedAccessTexture->TextureSize = _TextureSize;
   pUnorderedAccessTexture->Format = _Format;
-  const vk::Format VkFormat = Cast(pUnorderedAccessTexture->Format);
+  vk::Format VkFormat = Cast(pUnorderedAccessTexture->Format);
+  if (!(PhysicalDevice_.getFormatProperties(VkFormat).optimalTilingFeatures & vk::FormatFeatureFlagBits::eStorageImage))
+  {
+    VkFormat = EmulateFormat(_Format);
+  }
 
   vk::ImageCreateInfo ImageInfo;
   {

@@ -655,7 +655,7 @@ void CDeviceContext::Initialize()
         auto SetTypeCount = [&TypeCounts, this](DescriptorType _Type)->void
         {
           TypeCounts[static_cast<vdl::uint>(_Type)].type = Cast(_Type);
-          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = GetPerCount(_Type);
+          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = kDescriptorPoolMax;
         };
 
         //  テクスチャ
@@ -772,7 +772,7 @@ void CDeviceContext::Initialize()
         auto SetTypeCount = [&TypeCounts, this](DescriptorType _Type)->void
         {
           TypeCounts[static_cast<vdl::uint>(_Type)].type = Cast(_Type);
-          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = GetPerCount(_Type);
+          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = kDescriptorPoolMax;
         };
 
         //  テクスチャ
@@ -1221,11 +1221,14 @@ void CDeviceContext::DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount
 
 void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ)
 {
-  const vk::CommandBuffer& CurrentCommandBuffer = GetCurrentComputeCommandBuffer();
   ComputeReserveData& CurrentReserveData = ComputeReserveDatas_[ComputeCommandBufferIndex_];
 
-  CurrentCommandBuffer.reset(vk::CommandBufferResetFlags());
-  CurrentCommandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+  const vk::CommandBuffer& CurrentComputeCommandBuffer = GetCurrentComputeCommandBuffer();
+  CurrentComputeCommandBuffer.reset(vk::CommandBufferResetFlags());
+  CurrentComputeCommandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+
+  BeginGraphicsCommandBuffer();
+  const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
 
   //  シェーダーリソースのバインド
   {
@@ -1261,7 +1264,6 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
           }
         }
 
-
         //  Texture
         if (pTexture)
         {
@@ -1284,7 +1286,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
             if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
             {
-              pDepthTexture->pParent->TextureData.SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
+              pDepthTexture->pParent->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
             }
           }
           break;
@@ -1295,7 +1297,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
             if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
             {
-              pStencilTexture->pParent->TextureData.SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
+              pStencilTexture->pParent->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
             }
           }
           break;
@@ -1306,7 +1308,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
             if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
             {
-              pColorTexture->TextureData.SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+              pColorTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
             }
           }
           break;
@@ -1368,7 +1370,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
       VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
 
-      CurrentCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
 
       CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
 
@@ -1407,7 +1409,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
       VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
 
-      CurrentCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
 
       CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
 
@@ -1471,7 +1473,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
       VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
 
-      CurrentCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
 
       CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
     }
@@ -1532,7 +1534,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
       VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
 
-      CurrentCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
 
       CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
 
@@ -1566,7 +1568,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()));
             if (pTexture->TextureData.CurrentLayout != kImageLayout)
             {
-              pTexture->TextureData.SetImageLayout(CurrentCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+              pTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
             }
 
             DescriptorImageData& ImageData = UnorderedAccessTextureDatas.emplace_back();
@@ -1633,7 +1635,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
       VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
 
-      CurrentCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
 
       CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
 
@@ -1672,7 +1674,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
       VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
 
-      CurrentCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
 
       CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
 
@@ -1684,6 +1686,8 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
       CurrentReserveData.UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
     }
   }
+
+  Flush();
 
   //  パイプラインのバインド
   {
@@ -1710,12 +1714,12 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
     assert(CurrentReserveData.Pipeline);
 
     LastComputePipeline_ = CurrentReserveData.Pipeline.get();
-    CurrentCommandBuffer.bindPipeline(vk::PipelineBindPoint::eCompute, LastComputePipeline_);
+    CurrentComputeCommandBuffer.bindPipeline(vk::PipelineBindPoint::eCompute, LastComputePipeline_);
   }
 
-  CurrentCommandBuffer.dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
+  CurrentComputeCommandBuffer.dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
 
-  CurrentCommandBuffer.end();
+  CurrentComputeCommandBuffer.end();
 
   std::vector<vk::Semaphore> WaitSemaphores;
   {
@@ -1740,7 +1744,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
     SubmitInfo.pWaitSemaphores = WaitSemaphores.data();
     SubmitInfo.pWaitDstStageMask = PipelineStageFlags.data();
     SubmitInfo.commandBufferCount = 1;
-    SubmitInfo.pCommandBuffers = &CurrentCommandBuffer;
+    SubmitInfo.pCommandBuffers = &CurrentComputeCommandBuffer;
     SubmitInfo.signalSemaphoreCount = 1;
     SubmitInfo.pSignalSemaphores = &CurrentSemaphore;
   }

@@ -30,10 +30,11 @@ class IShaderManager;
 
 class CDeviceContext : public IDeviceContext
 {
+  static constexpr vdl::uint kDescriptorPoolMax = 500;
   static constexpr vdl::uint kGraphicsCommandBufferNum = 5;
-  static constexpr vdl::uint kGraphicsDescriptorPoolMaxSet = kGraphicsDescriptorLayoutNum * kGraphicsCommandBufferNum * 10;
+  static constexpr vdl::uint kGraphicsDescriptorPoolMaxSet = kGraphicsDescriptorLayoutNum * kGraphicsCommandBufferNum * kDescriptorPoolMax;
   static constexpr vdl::uint kComputeCommandBufferNum = 3;
-  static constexpr vdl::uint kComputeDescriptorPoolMaxSet = kComputeDescriptorTypeNum * kComputeCommandBufferNum;
+  static constexpr vdl::uint kComputeDescriptorPoolMaxSet = kComputeDescriptorTypeNum * kComputeCommandBufferNum * kDescriptorPoolMax;
 private:
   using Texture = std::variant<vdl::Texture, vdl::DepthStencilTexture>;
   using ShaderResources = std::vector<vdl::ShaderResource>;

@@ -157,6 +157,18 @@ inline constexpr vk::Format Cast(vdl::FormatType _Format)
   return vk::Format::eUndefined;
 }
 
+inline constexpr vk::Format EmulateFormat(vdl::FormatType _Format)
+{
+  switch (_Format)
+  {
+  case vdl::FormatType::eD24_Unorm_S8_Uint:
+    return vk::Format::eD32SfloatS8Uint;
+  default: assert(false);
+  }
+
+  return vk::Format::eUndefined;
+}
+
 //inline constexpr vk::Format DepthFormatFromDepthStencilFormat(vdl::FormatType _Format)
 //{
 //  switch (_Format)

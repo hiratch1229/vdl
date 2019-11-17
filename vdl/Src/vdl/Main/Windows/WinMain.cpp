@@ -60,13 +60,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
   case WM_EXITSIZEMOVE:
     Engine::Get<ISystem>()->Resume();
     break;
-  case WM_CHAR:
-    //// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-    //if (wParam > 0 && wParam < 0x10000)
-    //{
-    //  ImGui::GetIO().AddInputCharacter(static_cast<vdl::uint>(wParam));
-    //}
-    break;
   default:
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
   }
@@ -96,29 +89,36 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR,
     WindowClass.cbClsExtra = 0;
     WindowClass.cbWndExtra = 0;
     WindowClass.hInstance = hInstance;
-    WindowClass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON));
+    WindowClass.hIcon = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON));
     WindowClass.hCursor = nullptr;
     WindowClass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
     WindowClass.lpszMenuName = nullptr;
     WindowClass.lpszClassName = L"vdl";
-    WindowClass.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MINI_ICON));
+    WindowClass.hIconSm = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MINI_ICON));
   }
-  RegisterClassEx(&WindowClass);
+  ::RegisterClassEx(&WindowClass);
 
-  //  エンジンの作成
-  Engine Engine;
-
-  const std::future<void> Future = std::async(std::launch::async, Main);
-
-  MSG Msg = {};
-  while (!Future._Is_ready())
+  try
   {
-    //  メッセージを全て処理
-    while (PeekMessage(&Msg, nullptr, 0, 0, PM_REMOVE))
+    //  エンジンの作成
+    Engine Engine;
+
+    const std::future<void> Future = std::async(std::launch::async, Main);
+
+    MSG Msg = {};
+    while (!Future._Is_ready())
     {
-      TranslateMessage(&Msg);
-      DispatchMessage(&Msg);
+      //  メッセージを全て処理
+      while (::PeekMessage(&Msg, nullptr, 0, 0, PM_REMOVE))
+      {
+        ::TranslateMessage(&Msg);
+        ::DispatchMessage(&Msg);
+      }
     }
+  }
+  catch (const std::exception& e)
+  {
+    ::OutputDebugStringA(e.what());
   }
 
   return 0;
