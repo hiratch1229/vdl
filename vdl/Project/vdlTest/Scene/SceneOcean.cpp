@@ -73,9 +73,9 @@ void SceneOcean::Initialize()
 
   //  ínñ ÇÃèâä˙âª
   {
-    TerrainTexcoordMap_ = RenderTexture(kGBufferSize, FormatType::eR32G32_Float);
+    TerrainTexcoordMap_ = RenderTexture(kGBufferSize, FormatType::eR16G16_Float);
     TerrainHeightMap_ = UnorderedAccessTexture(kHeightMapSize, FormatType::eR32_Float);
-    TerrainNormalMap_ = UnorderedAccessTexture(kHeightMapSize, FormatType::eR32G32B32A32_Float);
+    TerrainNormalMap_ = UnorderedAccessTexture(kHeightMapSize, FormatType::eR8G8B8A8_Unorm);
     TerrainTexcoordDepthTexture_ = DepthStencilTexture(kGBufferSize, FormatType::eD32_Float);
     TerrainHeightMapUpdateComputeShader_ = ComputeShader(kTerrainHeightMapUpdateComputeShaderFilePath);
     TerrainNormalMapUpdateComputeShader_ = ComputeShader(kTerrainNormalMapUpdateComputeShaderFilePath);

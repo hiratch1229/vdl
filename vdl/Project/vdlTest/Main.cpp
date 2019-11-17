@@ -5,7 +5,7 @@
 //#include "Scene/SceneMultiRenderTexture.hpp"
 //#include "Scene/SceneTessellation.hpp"
 //#include "Scene/SceneGPUParticle.hpp"
-//#include "Scene/SceneDeferred.hpp"
+#include "Scene/SceneDeferred.hpp"
 #include "Scene/ScenePostEffect.hpp"
 #include "Scene/SceneTBDR.hpp"
 #include "Scene/SceneOcean.hpp"
@@ -21,10 +21,12 @@ namespace
     switch (i)
     {
     case 0:
-      return new ScenePostEffect;
+      return new SceneDeferred;
     case 1:
-      return new SceneTBDR;
+      return new ScenePostEffect;
     case 2:
+      return new SceneTBDR;
+    case 3:
       return new SceneOcean;
     default: assert(false);
     }
@@ -41,13 +43,13 @@ void Main()
     //"MultiRenderTexture",
     //"Tessellation",
     //"GPUParticle",
-    //"Deferred",
+    "Deferred",
     "PostEffect",
     "TBDR",
     "Ocean"
   };
   static constexpr uint kSceneTypeNum = static_cast<uint>(Macro::ArraySize(kSceneTypes));
-  static constexpr uint kInitSceneType = 2;
+  static constexpr uint kInitSceneType = 3;
   static_assert(kInitSceneType < kSceneTypeNum);
 
   const VertexShader DefaultVertexShader2D = VertexShader("Shader/Texture/TextureVS.hlsl", InputLayoutType::eTexture);

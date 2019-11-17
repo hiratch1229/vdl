@@ -15,12 +15,6 @@ inline constexpr vk::Format Cast(vdl::FormatType _Format)
     return vk::Format::eR32G32B32A32Uint;
   case vdl::FormatType::eR32G32B32A32_Sint:
     return vk::Format::eR32G32B32A32Sint;
-  case vdl::FormatType::eR32G32B32_Float:
-    return vk::Format::eR32G32B32Sfloat;
-  case vdl::FormatType::eR32G32B32_Uint:
-    return vk::Format::eR32G32B32Uint;
-  case vdl::FormatType::eR32G32B32_Sint:
-    return vk::Format::eR32G32B32Sint;
   case vdl::FormatType::eR16G16B16A16_Float:
     return vk::Format::eR16G16B16A16Sfloat;
   case vdl::FormatType::eR16G16B16A16_Unorm:

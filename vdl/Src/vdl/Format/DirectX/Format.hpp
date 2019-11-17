@@ -16,12 +16,6 @@ inline constexpr DXGI_FORMAT Cast(vdl::FormatType _Format)
     return DXGI_FORMAT_R32G32B32A32_UINT;
   case vdl::FormatType::eR32G32B32A32_Sint:
     return DXGI_FORMAT_R32G32B32A32_SINT;
-  case vdl::FormatType::eR32G32B32_Float:
-    return DXGI_FORMAT_R32G32B32_FLOAT;
-  case vdl::FormatType::eR32G32B32_Uint:
-    return DXGI_FORMAT_R32G32B32_UINT;
-  case vdl::FormatType::eR32G32B32_Sint:
-    return DXGI_FORMAT_R32G32B32_SINT;
   case vdl::FormatType::eR16G16B16A16_Float:
     return DXGI_FORMAT_R16G16B16A16_FLOAT;
   case vdl::FormatType::eR16G16B16A16_Unorm:

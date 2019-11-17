@@ -12,9 +12,6 @@ namespace vdl
     eR32G32B32A32_Float,
     eR32G32B32A32_Uint,
     eR32G32B32A32_Sint,
-    eR32G32B32_Float,
-    eR32G32B32_Uint,
-    eR32G32B32_Sint,
     eR16G16B16A16_Float,
     eR16G16B16A16_Unorm,
     eR16G16B16A16_Uint,
@@ -96,9 +93,6 @@ namespace std
     case vdl::FormatType::eR32G32B32A32_Float: return "R32G32B32A32_Float";
     case vdl::FormatType::eR32G32B32A32_Uint: return "R32G32B32A32_Uint";
     case vdl::FormatType::eR32G32B32A32_Sint: return "R32G32B32A32_Sint";
-    case vdl::FormatType::eR32G32B32_Float: return "R32G32B32_Float";
-    case vdl::FormatType::eR32G32B32_Uint: return "R32G32B32_Uint";
-    case vdl::FormatType::eR32G32B32_Sint: return "R32G32B32_Sint";
     case vdl::FormatType::eR16G16B16A16_Float: return "R16G16B16A16_Float";
     case vdl::FormatType::eR16G16B16A16_Unorm: return "R16G16B16A16_Unorm";
     case vdl::FormatType::eR16G16B16A16_Uint: return "R16G16B16A16_Uint";
@@ -176,9 +170,6 @@ namespace std
     case vdl::FormatType::eR32G32B32A32_Float: return L"R32G32B32A32_Float";
     case vdl::FormatType::eR32G32B32A32_Uint: return L"R32G32B32A32_Uint";
     case vdl::FormatType::eR32G32B32A32_Sint: return L"R32G32B32A32_Sint";
-    case vdl::FormatType::eR32G32B32_Float: return L"R32G32B32_Float";
-    case vdl::FormatType::eR32G32B32_Uint: return L"R32G32B32_Uint";
-    case vdl::FormatType::eR32G32B32_Sint: return L"R32G32B32_Sint";
     case vdl::FormatType::eR16G16B16A16_Float: return L"R16G16B16A16_Float";
     case vdl::FormatType::eR16G16B16A16_Unorm: return L"R16G16B16A16_Unorm";
     case vdl::FormatType::eR16G16B16A16_Uint: return L"R16G16B16A16_Uint";
