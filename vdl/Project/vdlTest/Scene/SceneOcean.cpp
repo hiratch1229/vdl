@@ -75,11 +75,16 @@ void SceneOcean::Initialize()
   {
     TerrainTexcoordMap_ = RenderTexture(kGBufferSize, FormatType::eR32G32_Float);
     TerrainHeightMap_ = UnorderedAccessTexture(kHeightMapSize, FormatType::eR32_Float);
+    TerrainNormalMap_ = UnorderedAccessTexture(kHeightMapSize, FormatType::eR32G32B32A32_Float);
     TerrainTexcoordDepthTexture_ = DepthStencilTexture(kGBufferSize, FormatType::eD32_Float);
     TerrainHeightMapUpdateComputeShader_ = ComputeShader(kTerrainHeightMapUpdateComputeShaderFilePath);
+    TerrainNormalMapUpdateComputeShader_ = ComputeShader(kTerrainNormalMapUpdateComputeShaderFilePath);
+    Renderer::Clear(TerrainTexcoordMap_, kTerrainTexcoordMapClearColor);
+    Renderer::Clear(TerrainNormalMap_, Palette::NormalMap);
     Renderer3D::SetDomainStageShaderResources(0, 1, &TerrainHeightMap_);
     Computer::SetShaderResources(0, 1, &TerrainTexcoordMap_);
     Computer::SetUnorderedAccessObjects(0, 1, &TerrainHeightMap_);
+    Computer::SetUnorderedAccessObjects(1, 1, &TerrainNormalMap_);
 
     TerrainUpdateData& TerrainUpdateData = TerrainUpdateDataConstantBuffer_.GetData();
     {
@@ -207,6 +212,7 @@ void SceneOcean::Update()
         if (ImGui::Button("Clear HeightMap"))
         {
           Renderer::Clear(TerrainHeightMap_);
+          Renderer::Clear(TerrainNormalMap_, Palette::NormalMap);
         }
         ImGui::SliderFloat("BlushSize", &TerrainUpdateData.BlushSize, 0.1f, 32.0f);
         ImGui::SliderFloat("BlushHardness", &TerrainUpdateData.BlushHardness, 0.0f, 1.0f);
@@ -243,7 +249,7 @@ void SceneOcean::Update()
 
       //  ハイトマップの更新
       {
-        Renderer::Clear(TerrainTexcoordMap_);
+        Renderer::Clear(TerrainTexcoordMap_, kTerrainTexcoordMapClearColor);
         Renderer::Clear(TerrainTexcoordDepthTexture_);
 
         Renderer::SetRenderTexture(TerrainTexcoordMap_, TerrainTexcoordDepthTexture_);
@@ -259,7 +265,8 @@ void SceneOcean::Update()
 
       //  法線マップの更新
       {
-
+        Computer::SetShader(TerrainNormalMapUpdateComputeShader_);
+        Computer::Dispatch(kTerrainNormalMapDispatchNum);
       }
     }
   }
@@ -273,15 +280,15 @@ void SceneOcean::Update()
     Renderer::Clear(ShadowMap_);
   }
 
-  ////  ShadowPass
-  //{
-  //  Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
-  //  Renderer3D::SetTopology(TopologyType::eDefaultMesh);
-  //  Renderer3D::SetStaticMeshShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
-  //  Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
-  //
-  //  DrawTerrain();
-  //}
+  //  ShadowPass
+  {
+    Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
+    Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
+    Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainShadowDomainShader_, PixelShader());
+    Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
+  
+    DrawTerrain();
+  }
 
   //  GBufferPass
   {
@@ -292,6 +299,7 @@ void SceneOcean::Update()
       Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
       Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainDomainShader_, TerrainPixelShader_);
       Renderer3D::SetRasterizerState(WaterSurfaceRasterizerState_);
+      Renderer3D::SetPixelStageShaderResources(2, 1, &TerrainNormalMap_);
 
       DrawTerrain();
     }
@@ -340,10 +348,15 @@ void SceneOcean::Update()
   {
     ImGui::Begin("ShaderResources");
     {
-      if (ImGui::CollapsingHeader("HeightMap"))
+      if (ImGui::CollapsingHeader("Terrain"))
       {
         ImGui::Image(TerrainTexcoordMap_, kGBufferDisplaySize);
         ImGui::Image(TerrainHeightMap_, kHeightMapDisplaySize);
+        ImGui::Image(TerrainNormalMap_, kHeightMapDisplaySize);
+      }
+      if (ImGui::CollapsingHeader("ShadowMap"))
+      {
+        ImGui::Image(ShadowMap_.GetDepthTexture(), kGBufferDisplaySize);
       }
       if (ImGui::CollapsingHeader("GBuffer"))
       {

@@ -25,7 +25,7 @@ cbuffer Camera : register(b3)
   row_major float4x4 Projection;
 };
 
-static const uint2 kTileSize = uint2(16, 16);
+static const uint2 kTileSize = uint2(32, 32);
 static const uint kTilePerThreadNum = kTileSize.x * kTileSize.y;
 static const uint2 kWindowSize = uint2(1280, 720);
 

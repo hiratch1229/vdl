@@ -23,6 +23,11 @@ void main(uint3 DID : SV_DispatchThreadID)
 {
   const uint Index = DID.x;
 
+  if (Index >= kMaxPointLightNum)
+  {
+    return;
+  }
+
   //  データの更新
   {
     Datas[Index].Timer += DeltaTime;

@@ -258,6 +258,9 @@
     <FxCompile Include="Shader\Ocean\Terrain\TerrainHeightMapUpdateCS.hlsl">
       <Filter>シェーダーファイル\Ocean\Terrain</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Ocean\Terrain\TerrainNormalMapUpdateCS.hlsl">
+      <Filter>シェーダーファイル\Ocean\Terrain</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Tessellation\Tessellation.hlsli">

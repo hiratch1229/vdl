@@ -36,7 +36,7 @@ private:
   static constexpr vdl::uint3 kPointLightUpdateDispatchNum = vdl::uint3(kMaxDataNum / kPointLightUpdateThreadNum + (kMaxDataNum % kPointLightUpdateThreadNum == 0 ? 0 : 1), 1, 1);
   static constexpr float kMinUpdateTime = 5.0f;
   static constexpr float kMaxUpdateTime = 15.0f;
-  static constexpr vdl::uint2 kTileSize = vdl::uint2(16, 16);
+  static constexpr vdl::uint2 kTileSize = vdl::uint2(32, 32);
   static constexpr vdl::uint3 kTileBaseDispatchNum = vdl::uint3((kWindowSize.x + kTileSize.x - 1) / kTileSize.x, (kWindowSize.y + kTileSize.y - 1) / kTileSize.y, 1);
   static constexpr const char* kTileBaseComputeShaderFilePath = "Shader/TBDR/TileBaseCS.hlsl";
 private:

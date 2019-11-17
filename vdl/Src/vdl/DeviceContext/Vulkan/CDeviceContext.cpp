@@ -1116,6 +1116,8 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
 {
   assert(!_RenderTexture.isEmpty());
 
+  constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eTransferDstOptimal;
+
   BeginGraphicsCommandBuffer();
 
   const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
@@ -1124,7 +1126,10 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
   CRenderTexture* pRenderTexture = GetVkRenderTexture(_RenderTexture);
 
   const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
-  pRenderTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  if (pRenderTexture->TextureData.CurrentLayout != kImageLayout)
+  {
+    pRenderTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, SubresourceRange);
+  }
   CurrentGraphicsCommandBuffer.clearColorImage(pRenderTexture->TextureData.Image.get(), vk::ImageLayout::eTransferDstOptimal, Cast(_ClearColor), SubresourceRange);
 
   //  ClearÇ∑ÇÈÇ‹Ç≈ê∂ë∂Çï€èÿ
@@ -1142,6 +1147,8 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
 {
   assert(!_DepthStencilTexture.isEmpty());
 
+  constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eTransferDstOptimal;
+
   BeginGraphicsCommandBuffer();
 
   const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
@@ -1150,7 +1157,10 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   CDepthStencilTexture* pDepthStencilTexture = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(TextureID));
 
   const vk::ImageSubresourceRange SubresourceRange = { pDepthStencilTexture->ImageAspectFlag, 0, 1, 0, 1 };
-  pDepthStencilTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  if (pDepthStencilTexture->TextureData.CurrentLayout != kImageLayout)
+  {
+    pDepthStencilTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, SubresourceRange);
+  }
   CurrentGraphicsCommandBuffer.clearDepthStencilImage(pDepthStencilTexture->TextureData.Image.get(), vk::ImageLayout::eTransferDstOptimal, { _ClearDepth, _ClearStencil }, SubresourceRange);
 
   //  ClearÇ∑ÇÈÇ‹Ç≈ê∂ë∂Çï€èÿ
@@ -1178,7 +1188,10 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
   CUnorderedAccessTexture* pUnorderedAccessTexture = static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(TextureID));
 
   const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
-  pUnorderedAccessTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, vk::ImageLayout::eTransferDstOptimal, SubresourceRange);
+  if (pUnorderedAccessTexture->TextureData.CurrentLayout != kImageLayout)
+  {
+    pUnorderedAccessTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, SubresourceRange);
+  }
   CurrentGraphicsCommandBuffer.clearColorImage(pUnorderedAccessTexture->TextureData.Image.get(), kImageLayout, Cast(_ClearColor), SubresourceRange);
 
   //  ClearÇ∑ÇÈÇ‹Ç≈ê∂ë∂Çï€èÿ

@@ -16,16 +16,20 @@ static const uint2 kHeightMapSize = uint2(1024, 1024);
 void main(uint3 DTid : SV_DispatchThreadID)
 {
   const float2 Texcoord = TexcoordMap[(MousePosition / (float2) kWindowSize) * kTexcoordMapSize].xy;
-  //const float BlushRadius = (BlushSize * 0.5f) / kHeightMapSize;
+  if (Texcoord.x < 0.0f || Texcoord.y < 0.0f)
+  {
+    return;
+  }
+
   const float BlushRadius = BlushSize * 0.5f;
 
   for (float y = -BlushRadius; y < BlushRadius; ++y)
   {
     for (float x = -BlushRadius; x < BlushRadius; ++x)
     {
-      float2 Offset = float2(x, y) / kHeightMapSize;
+      float2 Offset = float2(x, y);
 
-      HeightMap[(Texcoord + Offset) * kHeightMapSize].r += BlushHardness * smoothstep(0.0f, 1.0f, clamp(BlushSize - length(Offset), 0.0f, 1.0f));
+      HeightMap[(Texcoord + (Offset / kHeightMapSize)) * kHeightMapSize] += BlushHardness * smoothstep(0.0f, 1.0f, clamp(BlushRadius - length(Offset), 0.0f, 1.0f));
     }
   }
 }

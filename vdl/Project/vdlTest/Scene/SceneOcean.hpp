@@ -11,6 +11,10 @@ class SceneOcean : public IScene
   static constexpr vdl::uint2 kShadowMapSize = vdl::Constants::kDefaultWindowSize * 5;
   static constexpr vdl::uint2 kHeightMapSize = vdl::uint2(1024, 1024);
   static constexpr const char* kTerrainHeightMapUpdateComputeShaderFilePath = "Shader/Ocean/Terrain/TerrainHeightMapUpdateCS.hlsl";
+  static constexpr const char* kTerrainNormalMapUpdateComputeShaderFilePath = "Shader/Ocean/Terrain/TerrainNormalMapUpdateCS.hlsl";
+  static constexpr vdl::ColorF kTerrainTexcoordMapClearColor = vdl::ColorF(-1.0f, -1.0f, -1.0f, 0.0f);
+  static constexpr vdl::uint2 kThreadGroupNum = vdl::uint2(32, 32);
+  static constexpr vdl::uint3 kTerrainNormalMapDispatchNum = vdl::uint3(kHeightMapSize.x / kThreadGroupNum.x + (kHeightMapSize.x % kThreadGroupNum.x == 0 ? 0 : 1), kHeightMapSize.y / kThreadGroupNum.y + (kHeightMapSize.y % kThreadGroupNum.y == 0 ? 0 : 1), 1);
   static constexpr vdl::uint kMaxWaveNum = 25;
   static constexpr float kWaveMedianLength = 2.0f;
   static constexpr float kWaveMinLength = kWaveMedianLength * 0.5f;
@@ -97,9 +101,10 @@ private:
 
   vdl::RenderTexture TerrainTexcoordMap_;
   vdl::UnorderedAccessTexture TerrainHeightMap_;
+  vdl::UnorderedAccessTexture TerrainNormalMap_;
   vdl::DepthStencilTexture TerrainTexcoordDepthTexture_;
-  vdl::RenderTexture TerrainNormalMap_;
   vdl::ComputeShader TerrainHeightMapUpdateComputeShader_;
+  vdl::ComputeShader TerrainNormalMapUpdateComputeShader_;
 
   vdl::VertexShader TerrainVertexShader_;
   vdl::HullShader TerrainHullShader_;

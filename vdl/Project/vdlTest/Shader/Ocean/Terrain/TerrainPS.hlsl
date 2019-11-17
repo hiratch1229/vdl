@@ -8,7 +8,7 @@ struct PS_OUT_TEXCOORD
 
 SamplerState Sampler : register(s0);
 Texture2D Texture : register(t0);
-Texture2D NormalMap : register(t1);
+Texture2D NormalMap : register(t2);
 
 PS_OUT_GBUFFER GBufferPass(PS_IN_COLOR In)
 {
