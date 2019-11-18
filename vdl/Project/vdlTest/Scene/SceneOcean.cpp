@@ -118,7 +118,7 @@ void SceneOcean::Initialize()
     for (uint i = 0; i < kWaterSurfaceNormalMapNum; ++i)
     {
       char FIlePath[256];
-      sprintf_s(FIlePath, "Data/Ocean/WaterNormalMap%d.png", i);
+      sprintf_s(FIlePath, "Data/Ocean/WaterSurface/WaterNormalMap%d.png", i);
       WaterSurfaceNormalMaps_[i] = FIlePath;
     }
 
@@ -286,7 +286,7 @@ void SceneOcean::Update()
     Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
     Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainShadowDomainShader_, PixelShader());
     Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
-  
+
     DrawTerrain();
   }
 

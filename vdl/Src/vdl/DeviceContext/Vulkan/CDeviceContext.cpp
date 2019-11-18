@@ -89,7 +89,7 @@ namespace
 
   inline vk::ClearColorValue Cast(const vdl::ColorF& _Color)
   {
-    return std::array<float, 4>({ _Color.Red, _Color.Blue, _Color.Green, _Color.Alpha });
+    return std::array<float, 4>({ _Color.Red, _Color.Green, _Color.Blue, _Color.Alpha });
   }
 
   inline vk::PolygonMode Cast(vdl::FillModeType _Type)
@@ -284,7 +284,7 @@ namespace
       return vk::Filter::eLinear;
     case vdl::FilterType::eAnisotropic:
     case vdl::FilterType::eComparisonAnisotropic:
-      break;
+      return vk::Filter::eLinear;
     default: assert(false);
     }
 
@@ -315,14 +315,14 @@ namespace
       return vk::Filter::eLinear;
     case vdl::FilterType::eAnisotropic:
     case vdl::FilterType::eComparisonAnisotropic:
-      break;
+      return vk::Filter::eLinear;
     default: assert(false);
     }
 
     return vk::Filter::eNearest;
   }
 
-  inline vk::SamplerMipmapMode GetMimap(vdl::FilterType _Type)
+  inline vk::SamplerMipmapMode GetMipmap(vdl::FilterType _Type)
   {
     switch (_Type)
     {
@@ -346,7 +346,7 @@ namespace
       return vk::SamplerMipmapMode::eLinear;
     case vdl::FilterType::eAnisotropic:
     case vdl::FilterType::eComparisonAnisotropic:
-      break;
+      return vk::SamplerMipmapMode::eLinear;
     default: assert(false);
     }
 
@@ -655,7 +655,7 @@ void CDeviceContext::Initialize()
         auto SetTypeCount = [&TypeCounts, this](DescriptorType _Type)->void
         {
           TypeCounts[static_cast<vdl::uint>(_Type)].type = Cast(_Type);
-          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = kDescriptorPoolMax;
+          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = GetPerCount(_Type) * kDescriptorMultipleNum;
         };
 
         //  テクスチャ
@@ -772,7 +772,7 @@ void CDeviceContext::Initialize()
         auto SetTypeCount = [&TypeCounts, this](DescriptorType _Type)->void
         {
           TypeCounts[static_cast<vdl::uint>(_Type)].type = Cast(_Type);
-          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = kDescriptorPoolMax;
+          TypeCounts[static_cast<vdl::uint>(_Type)].descriptorCount = GetPerCount(_Type) * kDescriptorMultipleNum;
         };
 
         //  テクスチャ
@@ -2928,7 +2928,7 @@ const vk::Sampler& CDeviceContext::GetSampler(const vdl::Sampler& _Sampler)
     {
       SamplerInfo.magFilter = GetMag(_Sampler.Filter);
       SamplerInfo.minFilter = GetMin(_Sampler.Filter);
-      SamplerInfo.mipmapMode = GetMimap(_Sampler.Filter);
+      SamplerInfo.mipmapMode = GetMipmap(_Sampler.Filter);
       SamplerInfo.addressModeU = Cast(_Sampler.AddressModeU);
       SamplerInfo.addressModeV = Cast(_Sampler.AddressModeV);;
       SamplerInfo.addressModeW = Cast(_Sampler.AddressModeW);
