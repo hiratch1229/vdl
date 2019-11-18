@@ -27,9 +27,16 @@ void main(uint3 DTid : SV_DispatchThreadID)
   {
     for (float x = -BlushRadius; x < BlushRadius; ++x)
     {
-      float2 Offset = float2(x, y);
+      const float2 Offset = float2(x, y);
 
-      HeightMap[(Texcoord + (Offset / kHeightMapSize)) * kHeightMapSize] += BlushHardness * smoothstep(0.0f, 1.0f, clamp(BlushRadius - length(Offset), 0.0f, 1.0f));
+      const int2 HeightMapTexcoord = (Texcoord + (Offset / kHeightMapSize)) * kHeightMapSize;
+
+      if (HeightMapTexcoord.x < 0 || HeightMapTexcoord.y < 0 || kHeightMapSize.x < HeightMapTexcoord.x || kHeightMapSize.y < HeightMapTexcoord.y)
+      {
+        continue;
+      }
+
+      HeightMap[HeightMapTexcoord] += BlushHardness * lerp(0.0f, 1.0f, clamp(BlushRadius - length(Offset), 0.0f, 1.0f));
     }
   }
 }

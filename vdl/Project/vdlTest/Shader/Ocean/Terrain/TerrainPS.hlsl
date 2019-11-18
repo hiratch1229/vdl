@@ -7,17 +7,45 @@ struct PS_OUT_TEXCOORD
 };
 
 SamplerState Sampler : register(s0);
-Texture2D Texture : register(t0);
-Texture2D NormalMap : register(t2);
+Texture2D SandTexture : register(t2);
+Texture2D RockTexture : register(t3);
+Texture2D SlopeTexture : register(t4);
+Texture2D GrassTexture : register(t5);
+Texture2D NormalMap : register(t6);
+Texture2D HeightMap : register(t7);
+
+cbuffer ConstantBuffer : register(b2)
+{
+  uint TextureLoopNum;
+  float SandThreshold;
+  float RockThreshold;
+  float SlopeThreshold;
+};
 
 PS_OUT_GBUFFER GBufferPass(PS_IN_COLOR In)
 {
   PS_OUT_GBUFFER Out;
 
-  Out.Diffuse = Texture.Sample(Sampler, In.Texcoord) * In.Color;
+  const float3 Normal = NormalMap.Sample(Sampler, In.Texcoord).xyz;
+  Out.Normal = float4(normalize(mul(Normal * 2.0f - 1.0f, float3x3(In.Tangent, In.Binormal, In.Normal))), 1.0f);
 
-  float3 Normal = NormalMap.Sample(Sampler, In.Texcoord).xyz * 2.0f - 1.0f;
-  Out.Normal = float4(normalize(mul(Normal, float3x3(In.Tangent, In.Binormal, In.Normal))), 1.0f);
+  const float Height = HeightMap.Sample(Sampler, In.Texcoord).x;
+
+  In.Texcoord *= TextureLoopNum;
+    
+  const float SandHeightDifference = max(0.0f, Height - SandThreshold);
+  const float3 SandColor = SandTexture.Sample(Sampler, In.Texcoord).rgb * clamp(1.0f - SandHeightDifference, 0.0f, 1.0f);
+
+  const float RockHeightDifference = max(0.0f, Height - RockThreshold);
+  const float3 RockColor = RockTexture.Sample(Sampler, In.Texcoord).rgb * (clamp(SandHeightDifference, 0.0f, 1.0f) - clamp(RockHeightDifference, 0.0f, 1.0f));
+  
+  const float SlopeHeightDifference = max(0.0f, Height - SlopeThreshold);
+  const float3 SlopeColor = SlopeTexture.Sample(Sampler, In.Texcoord).rgb * (clamp(RockHeightDifference, 0.0f, 1.0f) - clamp(SlopeHeightDifference, 0.0f, 1.0f));
+ 
+  const float3 GrassColor = GrassTexture.Sample(Sampler, In.Texcoord).rgb * clamp(SlopeHeightDifference, 0.0f, 1.0f);
+
+  Out.Diffuse = float4(SandColor + RockColor + SlopeColor + GrassColor, 1.0f);
+
 
   return Out;
 }

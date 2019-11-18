@@ -10,8 +10,11 @@ class SceneOcean : public IScene
   static constexpr vdl::uint2 kGBufferSize = vdl::Constants::kDefaultWindowSize;
   static constexpr vdl::uint2 kShadowMapSize = vdl::Constants::kDefaultWindowSize * 5;
   static constexpr vdl::uint2 kHeightMapSize = vdl::uint2(1024, 1024);
+  static constexpr vdl::uint kTerrainTextureNum = 4;
   static constexpr const char* kTerrainHeightMapUpdateComputeShaderFilePath = "Shader/Ocean/Terrain/TerrainHeightMapUpdateCS.hlsl";
   static constexpr const char* kTerrainNormalMapUpdateComputeShaderFilePath = "Shader/Ocean/Terrain/TerrainNormalMapUpdateCS.hlsl";
+  static constexpr const char* kTerrainPixelShaderFilePath = "Shader/Ocean/Terrain/TerrainPS.hlsl";
+  static constexpr const char* kTerrainPixelShaderEntryPoint = "GBufferPass";
   static constexpr vdl::ColorF kTerrainTexcoordMapClearColor = vdl::ColorF(-1.0f, -1.0f, -1.0f, 0.0f);
   static constexpr vdl::uint2 kThreadGroupNum = vdl::uint2(32, 32);
   static constexpr vdl::uint3 kTerrainNormalMapDispatchNum = vdl::uint3(kHeightMapSize.x / kThreadGroupNum.x + (kHeightMapSize.x % kThreadGroupNum.x == 0 ? 0 : 1), kHeightMapSize.y / kThreadGroupNum.y + (kHeightMapSize.y % kThreadGroupNum.y == 0 ? 0 : 1), 1);
@@ -68,6 +71,13 @@ private:
     float BlushSize;
     float BlushHardness;
   };
+  struct TerrainData
+  {
+    vdl::uint TextureLoopNum;
+    float SandThreshold;
+    float RockThreshold;
+    float SlopeThreshold;
+  };
   struct WaterSurfaceGerstnerData
   {
     float Time;
@@ -99,6 +109,7 @@ private:
   //vdl::UnorderedAccessTexture TerrainHeightMap_;
   //vdl::ComputeShader TerrainUpdateComputeShader_;
 
+  std::array<vdl::Texture, kTerrainTextureNum> TerrainTextures_;
   vdl::RenderTexture TerrainTexcoordMap_;
   vdl::UnorderedAccessTexture TerrainHeightMap_;
   vdl::UnorderedAccessTexture TerrainNormalMap_;
@@ -114,6 +125,7 @@ private:
   vdl::DomainShader TerrainTexcoordMapDomainShader_;
   vdl::PixelShader TerrainTexcoordMapPixelShader_;
   vdl::ConstantBuffer<TerrainUpdateData> TerrainUpdateDataConstantBuffer_;
+  vdl::ConstantBuffer<TerrainData> TerrainDataConstantBuffer_;
 private:
   vdl::VertexShader WaterSurfaceVertexShader_;
   vdl::HullShader WaterSurfaceHullShader_;

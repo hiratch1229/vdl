@@ -55,6 +55,8 @@ void SceneOcean::Initialize()
     LightPassData& LightPassData = LightPassDataConstantBuffer_.GetData();
     {
       LightPassData.Shadow = ColorF(Palette::DimGray, 0.0001f);
+      Camera Light = Camera(DirectionalLightPosition_);
+      LightPassData.LightViewProjection = Light.View() * Light.Projection(Constants::kDefaultWindowSize);
     }
 
     Renderer::SetPixelStageConstantBuffers(0, 1, &LightDataConstantBuffer_);
@@ -73,6 +75,11 @@ void SceneOcean::Initialize()
 
   //  地面の初期化
   {
+    TerrainTextures_[0] = Texture("Data/Ocean/Terrain/sand_diffuse.png");
+    TerrainTextures_[1] = Texture("Data/Ocean/Terrain/terrain_rock4.png");
+    TerrainTextures_[2] = Texture("Data/Ocean/Terrain/terrain_slope.png");
+    TerrainTextures_[3] = Texture("Data/Ocean/Terrain/terrain_grass.png");
+
     TerrainTexcoordMap_ = RenderTexture(kGBufferSize, FormatType::eR16G16_Float);
     TerrainHeightMap_ = UnorderedAccessTexture(kHeightMapSize, FormatType::eR32_Float);
     TerrainNormalMap_ = UnorderedAccessTexture(kHeightMapSize, FormatType::eR8G8B8A8_Unorm);
@@ -93,10 +100,19 @@ void SceneOcean::Initialize()
     }
     Computer::SetConstantBuffers(0, 1, &TerrainUpdateDataConstantBuffer_);
 
+    TerrainData& TerrainData = TerrainDataConstantBuffer_.GetData();
+    {
+      TerrainData.TextureLoopNum = 5;
+      TerrainData.SandThreshold = 5.0f;
+      TerrainData.RockThreshold = 7.5f;
+      TerrainData.SlopeThreshold = 10.0f;
+    }
+    Renderer3D::SetPixelStageConstantBuffers(2, 1, &TerrainDataConstantBuffer_);
+
     TerrainVertexShader_ = VertexShader("Shader/Ocean/Terrain/TerrainVS.hlsl", InputLayoutType::eStaticMesh);
     TerrainHullShader_ = HullShader("Shader/Ocean/Terrain/TerrainHS.hlsl");
     TerrainDomainShader_ = DomainShader("Shader/Ocean/Terrain/TerrainDS.hlsl", "Color");
-    TerrainPixelShader_ = PixelShader("Shader/Ocean/Terrain/TerrainPS.hlsl", "GBufferPass");
+    TerrainPixelShader_ = PixelShader(kTerrainPixelShaderFilePath, kTerrainPixelShaderEntryPoint);
     TerrainShadowDomainShader_ = DomainShader("Shader/Ocean/Terrain/TerrainDS.hlsl", "Shadow");
     TerrainTexcoordMapDomainShader_ = DomainShader("Shader/Ocean/Terrain/TerrainDS.hlsl", "Texcoord");
     TerrainTexcoordMapPixelShader_ = PixelShader("Shader/Ocean/Terrain/TerrainPS.hlsl", "HeightMapUpdatePrePass");
@@ -181,6 +197,8 @@ void SceneOcean::Update()
         if (ImGui::InputFloat3("Position", &DirectionalLightPosition_.x))
         {
           LightData.DirectionalLight.Direction = -DirectionalLightPosition_.Normalize();
+          Camera Light = Camera(DirectionalLightPosition_);
+          LightPassData.LightViewProjection = Light.View() * Light.Projection(Constants::kDefaultWindowSize);
         }
         ImGui::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
         ImGui::InputFloat("Itensity", &LightData.DirectionalLight.Itensity);
@@ -208,6 +226,10 @@ void SceneOcean::Update()
         {
           TerrainHeightMapUpdateComputeShader_ = ComputeShader(kTerrainHeightMapUpdateComputeShaderFilePath);
         }
+        if (ImGui::Button("Reload TerrainPS"))
+        {
+          TerrainPixelShader_ = PixelShader(kTerrainPixelShaderFilePath, kTerrainPixelShaderEntryPoint);
+        }
 #endif
         if (ImGui::Button("Clear HeightMap"))
         {
@@ -216,6 +238,16 @@ void SceneOcean::Update()
         }
         ImGui::SliderFloat("BlushSize", &TerrainUpdateData.BlushSize, 0.1f, 32.0f);
         ImGui::SliderFloat("BlushHardness", &TerrainUpdateData.BlushHardness, 0.0f, 1.0f);
+        TerrainData& TerrainData = TerrainDataConstantBuffer_.GetData();
+
+        int TextureLoopNum = static_cast<int>(TerrainData.TextureLoopNum);
+        if (ImGui::InputInt("TextureLoopNum", &TextureLoopNum) && TextureLoopNum > 0)
+        {
+          TerrainData.TextureLoopNum = TextureLoopNum;
+        }
+        ImGui::InputFloat("SandThreshold", &TerrainData.SandThreshold);
+        ImGui::InputFloat("RockThreshold", &TerrainData.RockThreshold);
+        ImGui::InputFloat("SlopeThreshold", &TerrainData.SlopeThreshold);
         ImGui::TreePop();
       }
       if (ImGui::TreeNode("WaterSurface"))
@@ -247,26 +279,30 @@ void SceneOcean::Update()
     {
       TerrainUpdateData.MousePosition = Input::Mouse::GetPos();
 
-      //  ハイトマップの更新
+      if (TerrainUpdateData.MousePosition.x > 0 && TerrainUpdateData.MousePosition.y
+        && TerrainUpdateData.MousePosition.x < static_cast<int>(Constants::kDefaultWindowSize.x) && TerrainUpdateData.MousePosition.y < static_cast<int>(Constants::kDefaultWindowSize.y))
       {
-        Renderer::Clear(TerrainTexcoordMap_, kTerrainTexcoordMapClearColor);
-        Renderer::Clear(TerrainTexcoordDepthTexture_);
+        //  ハイトマップの更新
+        {
+          Renderer::Clear(TerrainTexcoordMap_, kTerrainTexcoordMapClearColor);
+          Renderer::Clear(TerrainTexcoordDepthTexture_);
 
-        Renderer::SetRenderTexture(TerrainTexcoordMap_, TerrainTexcoordDepthTexture_);
-        Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
-        Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainTexcoordMapDomainShader_, TerrainTexcoordMapPixelShader_);
-        Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
+          Renderer::SetRenderTexture(TerrainTexcoordMap_, TerrainTexcoordDepthTexture_);
+          Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
+          Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainTexcoordMapDomainShader_, TerrainTexcoordMapPixelShader_);
+          Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
 
-        DrawTerrain();
+          DrawTerrain();
 
-        Computer::SetShader(TerrainHeightMapUpdateComputeShader_);
-        Computer::Dispatch(1, 1, 1);
-      }
+          Computer::SetShader(TerrainHeightMapUpdateComputeShader_);
+          Computer::Dispatch(1, 1, 1);
+        }
 
-      //  法線マップの更新
-      {
-        Computer::SetShader(TerrainNormalMapUpdateComputeShader_);
-        Computer::Dispatch(kTerrainNormalMapDispatchNum);
+        //  法線マップの更新
+        {
+          Computer::SetShader(TerrainNormalMapUpdateComputeShader_);
+          Computer::Dispatch(kTerrainNormalMapDispatchNum);
+        }
       }
     }
   }
@@ -299,7 +335,9 @@ void SceneOcean::Update()
       Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
       Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainDomainShader_, TerrainPixelShader_);
       Renderer3D::SetRasterizerState(WaterSurfaceRasterizerState_);
-      Renderer3D::SetPixelStageShaderResources(2, 1, &TerrainNormalMap_);
+      Renderer3D::SetPixelStageShaderResources(2, kTerrainTextureNum, TerrainTextures_.data());
+      Renderer3D::SetPixelStageShaderResources(2 + kTerrainTextureNum, 1, &TerrainNormalMap_);
+      Renderer3D::SetPixelStageShaderResources(2 + kTerrainTextureNum + 1, 1, &TerrainHeightMap_);
 
       DrawTerrain();
     }
