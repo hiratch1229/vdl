@@ -51,6 +51,8 @@ void SceneDeferred::Initialize()
 
     DirectionLightPosition_ = Camera_.Position;
 
+    const Camera Light = Camera(DirectionLightPosition_);
+    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
     Renderer3D::SetVertexStageConstantBuffers(1, 1, &LightViewProjectionConstantBuffer_);
   }
 
@@ -104,8 +106,10 @@ void SceneDeferred::Update()
       RenderingData.InverseViewProjection = (Renderer3D::GetView() * Renderer3D::GetProjection()).Inverse();
     }
 
-    ImGui::Begin("SceneDeferred");
+    ImGui::Begin("SceneDeferred", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     {
+      ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
+      ImGui::SetWindowSize(kSceneWindowSize);
 #if defined _DEBUG | DEBUG
       if (ImGui::Button("Reload LightPassPS"))
       {
@@ -114,44 +118,33 @@ void SceneDeferred::Update()
       }
 #endif
       ImGui::Checkbox("SphereUpdate", &isUpdate_);
-      ImGui::InputFloat("SpecularPower", &RenderingData.SpecularPower);
+      ImGui::DragFloat("SpecularPower", &RenderingData.SpecularPower, 0.01f);
       ImGui::ColorEdit3("Ambient", &RenderingData.Ambient);
       ImGui::ColorEdit3("Shadow", &RenderingData.Shadow);
-      ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha);
+      ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha, 0.0f, 0.0f, "%.6f");
       if (ImGui::TreeNode("DirectionalLight"))
       {
-        if (ImGui::InputFloat3("Position", &DirectionLightPosition_.x))
+        if (ImGui::DragFloat3("Position", &DirectionLightPosition_))
         {
           LightData.DirectionalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
+
+          const Camera Light = Camera(DirectionLightPosition_);
+          LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
         }
         ImGui::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
-        ImGui::InputFloat("Itensity", &LightData.DirectionalLight.Itensity);
+        ImGui::DragFloat("Itensity", &LightData.DirectionalLight.Itensity, 0.01f);
         ImGui::ColorEdit3("Color", &LightData.DirectionalLight.Color);
         ImGui::TreePop();
       }
       if (ImGui::TreeNode("PointLight"))
       {
-        ImGui::InputFloat("Itensity", &PointLightItensity_);
-        ImGui::InputFloat("Range", &PointLightRange_);
-        ImGui::TreePop();
-      }
-      if (ImGui::TreeNode("ShaderResources"))
-      {
-        for (vdl::uint i = 0; i < kShaderResourceNum; ++i)
-        {
-          if (ImGui::CollapsingHeader(kShaderResourceNames[i]))
-          {
-            ImGui::Image(ShaderResources_[i], kGBufferDisplaySize);
-          }
-        }
+        ImGui::DragFloat("Itensity", &PointLightItensity_, 0.01f);
+        ImGui::DragFloat("Range", &PointLightRange_, 0.01f);
         ImGui::TreePop();
       }
     }
     ImGui::End();
-
-    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up());
-    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
-
+    
     if (isUpdate_)
     {
       const float DeltaTime = System::GetDeltaTime();
@@ -219,4 +212,27 @@ void SceneDeferred::Update()
 
     Renderer::Draw(3);
   }
+
+  ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  {
+    ImGui::SetWindowPos(ImGuiHelper::kRenderingFlowWindowPos);
+    ImGui::SetWindowSize(ImGuiHelper::kRenderingFlowWindowSize);
+
+    if (ImGui::TreeNode("GBufferPass"))
+    {
+      ImGuiHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawRenderTexture("Specular", GBufferRenderTextures_[2], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawDepthTexture("Depth", GBufferDepthTexture_, ImGuiHelper::kGBufferDisplaySize);
+
+      ImGui::TreePop();
+    }
+    if (ImGui::TreeNode("ShadowPass"))
+    {
+      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, ImGuiHelper::kGBufferDisplaySize);
+
+      ImGui::TreePop();
+    }
+  }
+  ImGui::End();
 }

@@ -30,8 +30,6 @@ private:
   static constexpr vdl::float3 kPointLightAxisMargin = vdl::float3(3.5f, 0.5f, 3.25f);
   static constexpr vdl::uint kMaxDataNum = 4096;
   static constexpr vdl::uint kGBufferNum = 2; /* Diffuse + NormalMap */
-  static constexpr const char* kGBufferNames[] = { "Diffuse", "NormalMap" };
-  static constexpr vdl::float2 kGBufferDisplaySize = kWindowSize / 5.0f;
   static constexpr vdl::uint kPointLightUpdateThreadNum = 1024;
   static constexpr vdl::uint3 kPointLightUpdateDispatchNum = vdl::uint3(kMaxDataNum / kPointLightUpdateThreadNum + (kMaxDataNum % kPointLightUpdateThreadNum == 0 ? 0 : 1), 1, 1);
   static constexpr float kMinUpdateTime = 5.0f;
@@ -39,6 +37,7 @@ private:
   static constexpr vdl::uint2 kTileSize = vdl::uint2(32, 32);
   static constexpr vdl::uint3 kTileBaseDispatchNum = vdl::uint3((kWindowSize.x + kTileSize.x - 1) / kTileSize.x, (kWindowSize.y + kTileSize.y - 1) / kTileSize.y, 1);
   static constexpr const char* kTileBaseComputeShaderFilePath = "Shader/TBDR/TileBaseCS.hlsl";
+  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(325, ImGuiHelper::kSceneWindowSize.y);
 private:
   struct UpdateData
   {

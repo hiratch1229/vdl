@@ -2,9 +2,8 @@
 #include "../../Option/Light.hlsli"
 
 SamplerState Sampler : register(s0);
-Texture2D Texture : register(t0);
-Texture2D NormalMap0 : register(t2);
-Texture2D NormalMap1 : register(t3);
+Texture2D NormalMap0 : register(t9);
+Texture2D NormalMap1 : register(t10);
 
 cbuffer ConstantBuffer : register(b0)
 {
@@ -30,5 +29,5 @@ float4 main(PS_IN In) : SV_TARGET
   float3 Normal = normalize(mul(normalize(Normal0 + Normal1), float3x3(In.Tangent, In.Binormal, In.Normal)));
   //return float4(Normal, 1.0f);
 
-  return Texture.Sample(Sampler, In.Texcoord) * In.Color * float4(Calc(DLight, Normal) + Ambient.rgb, 1.0f);
+  return float4(Calc(DLight, Normal) + Ambient.rgb, 1.0f) * In.Color;
 }

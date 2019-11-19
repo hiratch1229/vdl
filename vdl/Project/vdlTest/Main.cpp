@@ -71,7 +71,9 @@ void Main()
 
   while (vdl::System::Update())
   {
-    ImGui::Begin("Information");
+    ImGui::Begin("Information", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    ImGui::SetWindowPos(ImGuiHelper::kInformationWindowPos);
+    ImGui::SetWindowSize(ImGuiHelper::kInformationWindowSize);
     ImGui::Text("FPS:%d(1 / %f)", System::GetFPS(), System::GetDeltaTime());
     ImGui::Text("CPU:%f%%", System::GetCPUUseRate());
     ImGui::Text("Memory:%f%%", System::GetMemoryUseRate());

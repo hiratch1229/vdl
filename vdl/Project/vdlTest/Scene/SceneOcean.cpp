@@ -22,9 +22,10 @@ void SceneOcean::Initialize()
   Rectangle_ = ModelData;
 
   Camera_ = Camera(float3(0.0f, 15.0f, -60.0f));
+  Camera_.Near = 5.0f;
+  DirectionalLightPosition_ = float3(0.0f, 150.0f, -500.0f);
   SwapchainRenderTexture_ = Window::GetRenderTexture();
-  SwapchainDepthTexture_ = Window::GetDepthStencilTexture();
-  DirectionalLightPosition_ = Camera_.Position;
+  RasterizerState_ = RasterizerState::kSolidCullNone;
 
   LightData& LightData = LightDataConstantBuffer_.GetData();
   {
@@ -38,6 +39,7 @@ void SceneOcean::Initialize()
   {
     DeferredGBufferTextures_[static_cast<uint>(GBufferType::eDiffuse)] = RenderTexture(kGBufferSize, FormatType::eR8G8B8A8_Unorm);
     DeferredGBufferTextures_[static_cast<uint>(GBufferType::eNormal)] = RenderTexture(kGBufferSize, FormatType::eR8G8B8A8_Unorm);
+    DepthTexture_ = DepthStencilTexture(kGBufferSize, FormatType::eD32_Float);
 
     Renderer3D::SetPixelStageConstantBuffers(0, 1, &LightDataConstantBuffer_);
   }
@@ -55,12 +57,19 @@ void SceneOcean::Initialize()
     LightPassData& LightPassData = LightPassDataConstantBuffer_.GetData();
     {
       LightPassData.Shadow = ColorF(Palette::DimGray, 0.0001f);
-      Camera Light = Camera(DirectionalLightPosition_);
-      LightPassData.LightViewProjection = Light.View() * Light.Projection(Constants::kDefaultWindowSize);
     }
+
+    Camera Light = Camera(DirectionalLightPosition_);
+    Light.isPerspective = false;
+    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(Constants::kDefaultWindowSize / 4.0f);
 
     Renderer::SetPixelStageConstantBuffers(0, 1, &LightDataConstantBuffer_);
     Renderer::SetPixelStageConstantBuffers(1, 1, &LightPassDataConstantBuffer_);
+    Renderer::SetPixelStageConstantBuffers(2, 1, &LightViewProjectionConstantBuffer_);
+    Sampler Sampler = Sampler::kDefault3D;
+    Sampler.AddressModeU = Sampler.AddressModeV = Sampler.AddressModeW = AddressModeType::eBorder;
+    Sampler.BorderColor = BorderColorType::eWhite;
+    Renderer::SetPixelStageSamplers(1, 1, &Sampler);
     Renderer::SetTopology(TopologyType::eTriangleStrip);
   }
 
@@ -89,6 +98,9 @@ void SceneOcean::Initialize()
     Renderer::Clear(TerrainTexcoordMap_, kTerrainTexcoordMapClearColor);
     Renderer::Clear(TerrainNormalMap_, Palette::NormalMap);
     Renderer3D::SetDomainStageShaderResources(0, 1, &TerrainHeightMap_);
+    Renderer3D::SetPixelStageShaderResources(3, kTerrainTextureNum, TerrainTextures_.data());
+    Renderer3D::SetPixelStageShaderResources(3 + kTerrainTextureNum, 1, &TerrainNormalMap_);
+    Renderer3D::SetPixelStageShaderResources(3 + kTerrainTextureNum + 1, 1, &TerrainHeightMap_);
     Computer::SetShaderResources(0, 1, &TerrainTexcoordMap_);
     Computer::SetUnorderedAccessObjects(0, 1, &TerrainHeightMap_);
     Computer::SetUnorderedAccessObjects(1, 1, &TerrainNormalMap_);
@@ -137,8 +149,7 @@ void SceneOcean::Initialize()
       sprintf_s(FIlePath, "Data/Ocean/WaterSurface/WaterNormalMap%d.png", i);
       WaterSurfaceNormalMaps_[i] = FIlePath;
     }
-
-    Renderer3D::SetDomainStageConstantBuffers(0, 1, &ViewProjectionConstantBuffer_);
+    Renderer3D::SetPixelStageShaderResources(9, kWaterSurfaceNormalMapNum, WaterSurfaceNormalMaps_.data());
 
     std::array<Wave, kMaxWaveNum>& Waves = WaterSurfaceWaveDatasConstantBuffer_.GetData();
     {
@@ -163,8 +174,6 @@ void SceneOcean::Initialize()
     }
     Renderer3D::SetDomainStageConstantBuffers(2, 1, &WaterSurfaceGerstnerConstantBuffer_);
     Renderer3D::SetPixelStageConstantBuffers(1, 1, &WaterSurfaceGerstnerConstantBuffer_);
-
-    WaterSurfaceRasterizerState_ = RasterizerState::kSolidCullNone;
   }
 }
 
@@ -185,23 +194,27 @@ void SceneOcean::Update()
     }
     TerrainUpdateData& TerrainUpdateData = TerrainUpdateDataConstantBuffer_.GetData();
 
-    ImGui::Begin("SceneOcean");
+    ImGui::Begin("SceneOcean", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     {
+      ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
+      ImGui::SetWindowSize(kSceneWindowSize);
       if (ImGui::Checkbox("Wireframe", &isWireframe_))
       {
-        WaterSurfaceRasterizerState_ = (isWireframe_ ? RasterizerState::kWireframeCullNone : RasterizerState::kSolidCullNone);
+        RasterizerState_ = (isWireframe_ ? RasterizerState::kWireframeCullNone : RasterizerState::kSolidCullNone);
       }
       if (ImGui::TreeNode("DirectinalLight"))
       {
         LightData& LightData = LightDataConstantBuffer_.GetData();
-        if (ImGui::InputFloat3("Position", &DirectionalLightPosition_.x))
+        if (ImGui::DragFloat3("Position", &DirectionalLightPosition_))
         {
           LightData.DirectionalLight.Direction = -DirectionalLightPosition_.Normalize();
           Camera Light = Camera(DirectionalLightPosition_);
-          LightPassData.LightViewProjection = Light.View() * Light.Projection(Constants::kDefaultWindowSize);
+          Light.isPerspective = false;
+          Light.Near = 5.0f;
+          LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(Constants::kDefaultWindowSize / 4.0f);
         }
         ImGui::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
-        ImGui::InputFloat("Itensity", &LightData.DirectionalLight.Itensity);
+        ImGui::DragFloat("Itensity", &LightData.DirectionalLight.Itensity, 0.01f);
         ImGui::ColorEdit3("Color", &LightData.DirectionalLight.Color);
         ImGui::ColorEdit3("Ambient", &LightData.Ambient);
         ImGui::TreePop();
@@ -209,7 +222,7 @@ void SceneOcean::Update()
       if (ImGui::TreeNode("Shadow"))
       {
         ImGui::ColorEdit3("Color", &LightPassData.Shadow);
-        ImGui::InputFloat("Bias", &LightPassData.Shadow.Alpha);
+        ImGui::DragFloat("Bias", &LightPassData.Shadow.Alpha, 1.0f, 0.0f, 0.0f, "%.6f");
         ImGui::TreePop();
       }
       if (ImGui::TreeNode("Tessellation"))
@@ -236,8 +249,8 @@ void SceneOcean::Update()
           Renderer::Clear(TerrainHeightMap_);
           Renderer::Clear(TerrainNormalMap_, Palette::NormalMap);
         }
-        ImGui::SliderFloat("BlushSize", &TerrainUpdateData.BlushSize, 0.1f, 32.0f);
-        ImGui::SliderFloat("BlushHardness", &TerrainUpdateData.BlushHardness, 0.0f, 1.0f);
+        ImGui::SliderFloat("BlushSize", &TerrainUpdateData.BlushSize, 0.1f, 150.0f);
+        ImGui::SliderFloat("BlushHardness", &TerrainUpdateData.BlushHardness, -1.0f, 1.0f);
         TerrainData& TerrainData = TerrainDataConstantBuffer_.GetData();
 
         int TextureLoopNum = static_cast<int>(TerrainData.TextureLoopNum);
@@ -245,9 +258,9 @@ void SceneOcean::Update()
         {
           TerrainData.TextureLoopNum = TextureLoopNum;
         }
-        ImGui::InputFloat("SandThreshold", &TerrainData.SandThreshold);
-        ImGui::InputFloat("RockThreshold", &TerrainData.RockThreshold);
-        ImGui::InputFloat("SlopeThreshold", &TerrainData.SlopeThreshold);
+        ImGui::DragFloat("SandThreshold", &TerrainData.SandThreshold, 0.01f);
+        ImGui::DragFloat("RockThreshold", &TerrainData.RockThreshold, 0.01f);
+        ImGui::DragFloat("SlopeThreshold", &TerrainData.SlopeThreshold, 0.01f);
         ImGui::TreePop();
       }
       if (ImGui::TreeNode("WaterSurface"))
@@ -264,7 +277,11 @@ void SceneOcean::Update()
 #endif
         ImGui::Checkbox("isUpdate", &isWaterSurfaceUpdate_);
         WaterSurfaceGerstnerData& WaterSurfaceGerstnerData = WaterSurfaceGerstnerConstantBuffer_.GetData();
-        ImGui::SliderInt("WaveNum", reinterpret_cast<int*>(&WaterSurfaceGerstnerData.WaveNum), 1, kMaxWaveNum);
+        int WaveNum = static_cast<int>(WaterSurfaceGerstnerData.WaveNum);
+        if (ImGui::SliderInt("WaveNum", &WaveNum, 1, kMaxWaveNum) && WaveNum > 0)
+        {
+          WaterSurfaceGerstnerData.WaveNum = WaveNum;
+        }
         ImGui::TreePop();
       }
     }
@@ -313,31 +330,37 @@ void SceneOcean::Update()
     {
       Renderer::Clear(DeferredGBufferTextures_[i]);
     }
+    Renderer::Clear(DepthTexture_);
     Renderer::Clear(ShadowMap_);
   }
 
   //  ShadowPass
   {
     Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
+
+    Viewport Viewport = { float2(0.0f), kShadowMapSize };
+    Renderer3D::SetViewport(Viewport);
     Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
     Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainShadowDomainShader_, PixelShader());
     Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
+    Renderer3D::SetDomainStageConstantBuffers(0, 1, &LightViewProjectionConstantBuffer_);
 
     DrawTerrain();
+
+    Viewport.Size = Constants::kDefaultWindowSize;
+    Renderer3D::SetViewport(Viewport);
   }
 
   //  GBufferPass
   {
-    Renderer::SetRenderTextures(DeferredGBufferTextures_, SwapchainDepthTexture_);
+    Renderer::SetRenderTextures(DeferredGBufferTextures_, DepthTexture_);
 
     //  ínñ ÇÃï`âÊ
     {
       Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
       Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainDomainShader_, TerrainPixelShader_);
-      Renderer3D::SetRasterizerState(WaterSurfaceRasterizerState_);
-      Renderer3D::SetPixelStageShaderResources(2, kTerrainTextureNum, TerrainTextures_.data());
-      Renderer3D::SetPixelStageShaderResources(2 + kTerrainTextureNum, 1, &TerrainNormalMap_);
-      Renderer3D::SetPixelStageShaderResources(2 + kTerrainTextureNum + 1, 1, &TerrainHeightMap_);
+      Renderer3D::SetRasterizerState(RasterizerState_);
+      Renderer3D::SetDomainStageConstantBuffers(0, 1, &ViewProjectionConstantBuffer_);
 
       DrawTerrain();
     }
@@ -348,13 +371,13 @@ void SceneOcean::Update()
     Renderer::SetRenderTexture(SwapchainRenderTexture_, DepthStencilTexture());
     Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
     Renderer::SetPixelStageShaderResources(0, kGBufferNum, DeferredGBufferTextures_.data());
-    Renderer::SetPixelStageShaderResources(kGBufferNum, 1, &SwapchainDepthTexture_.GetDepthTexture());
+    Renderer::SetPixelStageShaderResources(kGBufferNum, 1, &DepthTexture_.GetDepthTexture());
     Renderer::SetPixelStageShaderResources(kGBufferNum + 1, 1, &ShadowMap_.GetDepthTexture());
 
     Renderer::Draw(3);
   }
 
-  Renderer::SetRenderTexture(SwapchainRenderTexture_, SwapchainDepthTexture_);
+  Renderer::SetRenderTexture(SwapchainRenderTexture_, DepthTexture_);
 
   //  ãÛÇÃï`âÊ
   {
@@ -363,15 +386,14 @@ void SceneOcean::Update()
     Renderer3D::SetPixelStageShaderResources(2, 1, &SkyboxTexture_);
     Renderer3D::SetRasterizerState(RasterizerState::kSolidCullFront);
 
-    Renderer3D::Draw(Sphere_, Matrix::Scale(1000.0f));
+    Renderer3D::Draw(Sphere_, Matrix::Scale(500.0f));
   }
 
   //  êÖÇÃï`âÊ
   {
     Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
     Renderer3D::SetStaticMeshShaders(WaterSurfaceVertexShader_, WaterSurfaceHullShader_, WaterSurfaceDomainShader_, WaterSurfacePixelShader_);
-    Renderer3D::SetRasterizerState(WaterSurfaceRasterizerState_);
-    Renderer3D::SetPixelStageShaderResources(2, kWaterSurfaceNormalMapNum, WaterSurfaceNormalMaps_.data());
+    Renderer3D::SetRasterizerState(RasterizerState_);
 
     for (uint y = 0; y < kRetangleNum.y; ++y)
     {
@@ -382,30 +404,34 @@ void SceneOcean::Update()
     }
   }
 
-  //  ShaderResourceÇÃï`âÊ
+  ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
   {
-    ImGui::Begin("ShaderResources");
+    ImGui::SetWindowPos(ImGuiHelper::kRenderingFlowWindowPos);
+    ImGui::SetWindowSize(ImGuiHelper::kRenderingFlowWindowSize);
+    if (ImGui::TreeNode("HeightMapUpdatePass"))
     {
-      if (ImGui::CollapsingHeader("Terrain"))
-      {
-        ImGui::Image(TerrainTexcoordMap_, kGBufferDisplaySize);
-        ImGui::Image(TerrainHeightMap_, kHeightMapDisplaySize);
-        ImGui::Image(TerrainNormalMap_, kHeightMapDisplaySize);
-      }
-      if (ImGui::CollapsingHeader("ShadowMap"))
-      {
-        ImGui::Image(ShadowMap_.GetDepthTexture(), kGBufferDisplaySize);
-      }
-      if (ImGui::CollapsingHeader("GBuffer"))
-      {
-        for (uint i = 0; i < kGBufferNum; ++i)
-        {
-          ImGui::Image(DeferredGBufferTextures_[i], kGBufferDisplaySize);
-        }
-      }
+      ImGuiHelper::DrawRenderTexture("TexcoordMap", TerrainTexcoordMap_, kHeightMapDisplaySize);
+      ImGuiHelper::DrawUnorderedAccessTexture("HeightMap", TerrainHeightMap_, kHeightMapDisplaySize);
+      ImGuiHelper::DrawUnorderedAccessTexture("NormalMap", TerrainNormalMap_, kHeightMapDisplaySize);
+
+      ImGui::TreePop();
     }
-    ImGui::End();
+    if (ImGui::TreeNode("GBufferPass"))
+    {
+      ImGuiHelper::DrawRenderTexture("Diffuse", DeferredGBufferTextures_[0], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawRenderTexture("Normal", DeferredGBufferTextures_[1], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawDepthTexture("Depth", DepthTexture_, ImGuiHelper::kGBufferDisplaySize);
+
+      ImGui::TreePop();
+    }
+    if (ImGui::TreeNode("ShadowPass"))
+    {
+      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kHeightMapDisplaySize);
+
+      ImGui::TreePop();
+    }
   }
+  ImGui::End();
 }
 
 //--------------------------------------------------

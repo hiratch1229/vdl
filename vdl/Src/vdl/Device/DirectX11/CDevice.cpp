@@ -596,6 +596,7 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
 
   CUnorderedAccessTexture* pUnorderedAccessTexture = new CUnorderedAccessTexture;
   pUnorderedAccessTexture->TextureSize = _TextureSize;
+  pUnorderedAccessTexture->Format = _Format;
 
   HRESULT hr = S_OK;
 

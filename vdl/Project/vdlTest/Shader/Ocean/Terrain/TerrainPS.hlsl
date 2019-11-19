@@ -7,12 +7,12 @@ struct PS_OUT_TEXCOORD
 };
 
 SamplerState Sampler : register(s0);
-Texture2D SandTexture : register(t2);
-Texture2D RockTexture : register(t3);
-Texture2D SlopeTexture : register(t4);
-Texture2D GrassTexture : register(t5);
-Texture2D NormalMap : register(t6);
-Texture2D HeightMap : register(t7);
+Texture2D SandTexture : register(t3);
+Texture2D RockTexture : register(t4);
+Texture2D SlopeTexture : register(t5);
+Texture2D GrassTexture : register(t6);
+Texture2D NormalMap : register(t7);
+Texture2D HeightMap : register(t8);
 
 cbuffer ConstantBuffer : register(b2)
 {
@@ -45,8 +45,8 @@ PS_OUT_GBUFFER GBufferPass(PS_IN_COLOR In)
   const float3 GrassColor = GrassTexture.Sample(Sampler, In.Texcoord).rgb * clamp(SlopeHeightDifference, 0.0f, 1.0f);
 
   Out.Diffuse = float4(SandColor + RockColor + SlopeColor + GrassColor, 1.0f);
-
-
+  //Out.Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
+       
   return Out;
 }
 

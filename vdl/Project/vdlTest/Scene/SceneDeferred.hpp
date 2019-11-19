@@ -27,9 +27,8 @@ private:
   static constexpr vdl::uint kDataNum = 128;
   static constexpr vdl::uint kGBufferNum = 3; /* Diffuse + NormalMap + Specular */
   static constexpr vdl::uint kShaderResourceNum = kGBufferNum + 2;  /* GBuffer + Depth + ShadowMap */
-  static constexpr const char* kShaderResourceNames[] = { "Diffuse", "NormalMap", "Specular", "Depth", "ShadowMap" };
-  static constexpr vdl::uint2 kGBufferDisplaySize = kWindowSize / 5;
   static constexpr const char* kLigthPassPSFilePath = "Shader/Deferred/LightPassPS.hlsl";
+  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(300, ImGuiHelper::kSceneWindowSize.y);
 private:
   struct LightData
   {

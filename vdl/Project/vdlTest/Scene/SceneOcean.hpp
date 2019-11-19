@@ -8,7 +8,7 @@ class SceneOcean : public IScene
   static constexpr vdl::float2 kRetangleSize = 25.0f;
   static constexpr vdl::float2 kRetangleHalfSize = kRetangleSize / 2.0f;
   static constexpr vdl::uint2 kGBufferSize = vdl::Constants::kDefaultWindowSize;
-  static constexpr vdl::uint2 kShadowMapSize = vdl::Constants::kDefaultWindowSize * 5;
+  static constexpr vdl::uint2 kShadowMapSize = vdl::uint2(4096, 4096);
   static constexpr vdl::uint2 kHeightMapSize = vdl::uint2(1024, 1024);
   static constexpr vdl::uint kTerrainTextureNum = 4;
   static constexpr const char* kTerrainHeightMapUpdateComputeShaderFilePath = "Shader/Ocean/Terrain/TerrainHeightMapUpdateCS.hlsl";
@@ -26,8 +26,8 @@ class SceneOcean : public IScene
   static constexpr vdl::uint kWaterSurfaceNormalMapNum = 2;
   static constexpr const char* kWaterSurfaceDomainShaderFilePath = "Shader/Ocean/WaterSurface/WaterSurfaceDS.hlsl";
   static constexpr const char* kWaterSurfacePixelShaderFilePath = "Shader/Ocean/WaterSurface/WaterSurfacePS.hlsl";
-  static constexpr vdl::uint2 kHeightMapDisplaySize = kHeightMapSize / 3;
-  static constexpr vdl::uint2 kGBufferDisplaySize = kGBufferSize / 5;
+  static constexpr vdl::uint2 kHeightMapDisplaySize = vdl::uint2(ImGuiHelper::kGBufferDisplaySize.x);
+  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(400, ImGuiHelper::kSceneWindowSize.y);
 private:
   enum class GBufferType
   {
@@ -57,7 +57,6 @@ private:
   {
     vdl::ColorF Shadow; /* Color + Bias*/
     vdl::Matrix InverseViewProjection;
-    vdl::Matrix LightViewProjection;
   };
   struct TessellationData
   {
@@ -91,11 +90,12 @@ private:
   vdl::Camera Camera_;
   vdl::float3 DirectionalLightPosition_;
   vdl::RenderTexture SwapchainRenderTexture_;
-  vdl::DepthStencilTexture SwapchainDepthTexture_;
   bool isWireframe_ = false;
   bool isWaterSurfaceUpdate_ = true;
+  vdl::RasterizerState RasterizerState_;
 private:
   vdl::RenderTextures DeferredGBufferTextures_;
+  vdl::DepthStencilTexture DepthTexture_;
   vdl::VertexShader LightPassVertexShader_;
   vdl::PixelShader LightPassPixelShader_;
   vdl::ConstantBuffer<LightData> LightDataConstantBuffer_;
@@ -105,10 +105,8 @@ private:
   vdl::VertexShader SkyboxVertexShader_;
   vdl::PixelShader SkyboxPixelShader_;
   vdl::ConstantBuffer<TessellationData> TessellationConstantBuffer_;
+  vdl::ConstantBuffer<vdl::Matrix> LightViewProjectionConstantBuffer_;
 private:
-  //vdl::UnorderedAccessTexture TerrainHeightMap_;
-  //vdl::ComputeShader TerrainUpdateComputeShader_;
-
   std::array<vdl::Texture, kTerrainTextureNum> TerrainTextures_;
   vdl::RenderTexture TerrainTexcoordMap_;
   vdl::UnorderedAccessTexture TerrainHeightMap_;
@@ -132,7 +130,6 @@ private:
   vdl::DomainShader WaterSurfaceDomainShader_;
   vdl::PixelShader WaterSurfacePixelShader_;
   std::array<vdl::Texture, kWaterSurfaceNormalMapNum> WaterSurfaceNormalMaps_;
-  vdl::RasterizerState WaterSurfaceRasterizerState_;
   vdl::ConstantBuffer<vdl::Matrix> ViewProjectionConstantBuffer_;
   vdl::ConstantBuffer<std::array<Wave, kMaxWaveNum>> WaterSurfaceWaveDatasConstantBuffer_;
   vdl::ConstantBuffer<WaterSurfaceGerstnerData> WaterSurfaceGerstnerConstantBuffer_;

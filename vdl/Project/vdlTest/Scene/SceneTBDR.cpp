@@ -162,10 +162,10 @@ void SceneTBDR::Update()
     }
     UpdateData& UpdateData = UpdateConstantBuffer_.GetData();
 
-    ImGui::Begin("SceneTBDR");
+    ImGui::Begin("SceneTBDR", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     {
-      DirectinalLight& DirectinalLight = DirectinalLightConstantBuffer_.GetData();
-
+      ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
+      ImGui::SetWindowSize(kSceneWindowSize);
 #if defined _DEBUG | DEBUG
       if (ImGui::Button("Reload TileBaseCS"))
       {
@@ -185,27 +185,17 @@ void SceneTBDR::Update()
       ImGui::ColorEdit3("Ambient", &RenderingData.AmbientColor.x);
       if (ImGui::TreeNode("DirectionalLight"))
       {
-        ImGui::InputFloat3("Direction", &DirectinalLight.Direction);
+        DirectinalLight& DirectinalLight = DirectinalLightConstantBuffer_.GetData();
+        ImGui::DragFloat3("Direction", &DirectinalLight.Direction);
         ImGui::Text(std::string("Direction:" + std::to_string(DirectinalLight.Direction)).c_str());
-        ImGui::InputFloat("Itensity", &DirectinalLight.Itensity);
+        ImGui::DragFloat("Itensity", &DirectinalLight.Itensity, 0.01f);
         ImGui::ColorEdit3("Color", &DirectinalLight.Color);
         ImGui::TreePop();
       }
       if (ImGui::TreeNode("PointLight"))
       {
-        ImGui::InputFloat("Itensity", &UpdateData.PointLightItensity);
-        ImGui::InputFloat("Range", &UpdateData.PointLightRange);
-        ImGui::TreePop();
-      }
-      if (ImGui::TreeNode("GBuffer"))
-      {
-        for (vdl::uint i = 0; i < kGBufferNum; ++i)
-        {
-          if (ImGui::CollapsingHeader(kGBufferNames[i]))
-          {
-            ImGui::Image(GBufferRenderTextures_[i], kGBufferDisplaySize);
-          }
-        }
+        ImGui::DragFloat("Itensity", &UpdateData.PointLightItensity, 0.01f);
+        ImGui::DragFloat("Range", &UpdateData.PointLightRange, 0.01f);
         ImGui::TreePop();
       }
     }
@@ -267,4 +257,19 @@ void SceneTBDR::Update()
       Renderer::Draw(3);
     }
   }
+
+  ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  {
+    ImGui::SetWindowPos(ImGuiHelper::kRenderingFlowWindowPos);
+    ImGui::SetWindowSize(ImGuiHelper::kRenderingFlowWindowSize);
+
+    if (ImGui::TreeNode("GBufferPass"))
+    {
+      ImGuiHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
+
+      ImGui::TreePop();
+    }
+  }
+  ImGui::End();
 }

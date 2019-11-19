@@ -47,11 +47,7 @@ void ScenePostEffect::Initialize()
     //  Luminance
     RenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
 
-    ShadowMapSampler_ = Sampler(AddressModeType::eBorder, AddressModeType::eBorder, AddressModeType::eBorder,
-      FilterType::eAnisotropic, 16, BorderColorType::eWhite);
-    Renderer::SetPixelStageSamplers(0, 1, &ShadowMapSampler_);
-
-    for (vdl::uint i = 0; i < kGBufferNum; ++i)
+    for (uint i = 0; i < kGBufferNum; ++i)
     {
       ShaderResources_[i] = GBufferRenderTextures_[i];
     }
@@ -79,12 +75,11 @@ void ScenePostEffect::Initialize()
     BloomPixelShader_ = PixelShader("Shader/PostEffect/BloomPS.hlsl");
     TexturePixelShader_ = PixelShader("Shader/Texture/TexturePS.hlsl");
 
-    vdl::uint2 TextureSize = kWindowSize;
-    for (vdl::uint i = 0; i < kShrinkBuffeNum; ++i)
+    uint2 TextureSize = kWindowSize;
+    for (uint i = 0; i < kShrinkBuffeNum; ++i)
     {
       ShrinkBuffers_[i] = RenderTexture(TextureSize, FormatType::eR8G8B8A8_Unorm);
       ShrinkDepthBuffer_[i] = DepthStencilTexture(TextureSize, FormatType::eD16_Unorm);
-      BloomShaderResources_[i] = ShrinkBuffers_[i];
 
       TextureSize /= 2;
     }
@@ -98,7 +93,7 @@ void ScenePostEffect::Update()
     FreeCamera(&Camera_);
     Renderer3D::SetCamera(Camera_);
 
-    vdl::DirectinalLight& DirectionalLight = DirectionalLightConstantBuffer_.GetData();
+    DirectinalLight& DirectionalLight = DirectionalLightConstantBuffer_.GetData();
 
     RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
     {
@@ -106,8 +101,10 @@ void ScenePostEffect::Update()
       RenderingData.InverseViewProjection = (Renderer3D::GetView() * Renderer3D::GetProjection()).Inverse();
     }
 
-    ImGui::Begin("ScenePostEffect");
+    ImGui::Begin("ScenePostEffect", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     {
+      ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
+      ImGui::SetWindowSize(kSceneWindowSize);
 #if defined _DEBUG | DEBUG
       if (ImGui::Button("Reload LightPassPS"))
       {
@@ -116,42 +113,21 @@ void ScenePostEffect::Update()
       }
 #endif
       ImGui::ColorEdit3("Shadow", &RenderingData.Shadow);
-      ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha);
+      ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha, 0.0f, 0.0f, "%.6f");
       ImGui::ColorEdit3("Fog", &RenderingData.Fog);
       ImGui::SliderFloat("LuminanceThreshold", &RenderingData.LuminanceThreshold, 0.0f, 1.0f);
-      ImGui::InputFloat("Exposure", &RenderingData.Fog.Alpha);
+      ImGui::DragFloat("Exposure", &RenderingData.Fog.Alpha, 0.01f);
       if (ImGui::TreeNode("DirectionalLight"))
       {
-        if (ImGui::InputFloat3("Position", &DirectionLightPosition_.x))
+        if (ImGui::DragFloat3("Position", &DirectionLightPosition_))
         {
           DirectionalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
         }
         ImGui::Text(std::string("Direction:" + std::to_string(DirectionalLight.Direction)).c_str());
-        ImGui::InputFloat("Itensity", &DirectionalLight.Itensity);
+        ImGui::DragFloat("Itensity", &DirectionalLight.Itensity, 0.01f);
         ImGui::ColorEdit3("Color", &DirectionalLight.Color);
         ImGui::TreePop();
       }
-      if (ImGui::TreeNode("ShaderResources"))
-      {
-        for (vdl::uint i = 0; i < kShaderResourceNum; ++i)
-        {
-          if (ImGui::CollapsingHeader(kShaderResourceNames[i]))
-          {
-            ImGui::Image(ShaderResources_[i], kGBufferDisplaySize);
-          }
-        }
-        if (ImGui::CollapsingHeader(kShaderResourceNames[kShaderResourceNum + 0]))
-        {
-          for (vdl::uint ShrinkBufferCount = 0; ShrinkBufferCount < kShrinkBuffeNum; ++ShrinkBufferCount)
-          {
-            ImGui::Text(std::string("TextureSize:" + std::to_string(ShrinkBuffers_[ShrinkBufferCount].GetSize())).c_str());
-            ImGui::Image(ShrinkBuffers_[ShrinkBufferCount], kGBufferDisplaySize);
-          }
-        }
-
-        ImGui::TreePop();
-      }
-
     }
     ImGui::End();
 
@@ -201,7 +177,7 @@ void ScenePostEffect::Update()
 
   //  PostProcess
   {
-    decltype(BloomShaderResources_) ShaderResources;
+    std::array<vdl::ShaderResource, kShrinkBuffeNum> ShaderResources;
     Renderer2D::SetPixelStageShaderResources(1, static_cast<uint>(ShaderResources.size()), ShaderResources.data());
 
     //  Blur
@@ -233,9 +209,47 @@ void ScenePostEffect::Update()
     {
       Renderer::SetRenderTexture(Window::GetRenderTexture(), Window::GetDepthStencilTexture());
       Renderer2D::SetPixelShader(BloomPixelShader_);
-      Renderer2D::SetPixelStageShaderResources(1, kShrinkBuffeNum, BloomShaderResources_.data());
+      Renderer2D::SetPixelStageShaderResources(1, kShrinkBuffeNum, ShrinkBuffers_.data());
 
       Renderer2D::Draw(RenderTextures_[0]);
     }
   }
+
+  ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  {
+    ImGui::SetWindowPos(ImGuiHelper::kRenderingFlowWindowPos);
+    ImGui::SetWindowSize(ImGuiHelper::kRenderingFlowWindowSize);
+
+    if (ImGui::TreeNode("GBufferPass"))
+    {
+      ImGuiHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawDepthTexture("Depth", GBufferDepthTexture_, ImGuiHelper::kGBufferDisplaySize);
+
+      ImGui::TreePop();
+    }
+    if (ImGui::TreeNode("ShadowPass"))
+    {
+      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, ImGuiHelper::kGBufferDisplaySize);
+
+      ImGui::TreePop();
+    }
+    if (ImGui::TreeNode("LightPass"))
+    {
+      ImGuiHelper::DrawRenderTexture("Color", RenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawRenderTexture("Luminance", RenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
+
+      ImGui::TreePop();
+    }
+    if (ImGui::TreeNode("PostProcess"))
+    {
+      for (vdl::uint ShrinkBufferCount = 0; ShrinkBufferCount < kShrinkBuffeNum; ++ShrinkBufferCount)
+      {
+        ImGuiHelper::DrawRenderTexture(std::string("ShrinkBuffer" + std::to_string(ShrinkBufferCount)).c_str(), ShrinkBuffers_[ShrinkBufferCount], ImGuiHelper::kGBufferDisplaySize);
+      }
+
+      ImGui::TreePop();
+    }
+  }
+  ImGui::End();
 }
