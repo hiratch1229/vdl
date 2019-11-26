@@ -1,5 +1,6 @@
 #include "Terrain.hlsli"
 #include "../Deferred.hlsli"
+#include "../ConstantBuffers.hlsli"
 
 struct PS_OUT_TEXCOORD
 {
@@ -13,14 +14,10 @@ Texture2D SlopeTexture : register(t5);
 Texture2D GrassTexture : register(t6);
 Texture2D NormalMap : register(t7);
 Texture2D HeightMap : register(t8);
-
-cbuffer ConstantBuffer : register(b2)
+cbuffer ConstantBuffer : register(b0)
 {
-  uint TextureLoopNum;
-  float SandThreshold;
-  float RockThreshold;
-  float SlopeThreshold;
-};
+  TerrainData TerrainConstantData;
+}
 
 PS_OUT_GBUFFER GBufferPass(PS_IN_COLOR In)
 {
@@ -30,23 +27,25 @@ PS_OUT_GBUFFER GBufferPass(PS_IN_COLOR In)
   Out.Normal = float4(normalize(mul(Normal * 2.0f - 1.0f, float3x3(In.Tangent, In.Binormal, In.Normal))), 1.0f);
 
   const float Height = HeightMap.Sample(Sampler, In.Texcoord).x;
+  //float Slope = (1.0f - Out.Normal.y) / 2.0f;
 
-  In.Texcoord *= TextureLoopNum;
+  In.Texcoord *= TerrainConstantData.TextureLoopNum;
     
-  const float SandHeightDifference = max(0.0f, Height - SandThreshold);
+  const float SandHeightDifference = max(0.0f, Height - TerrainConstantData.SandThreshold);
   const float3 SandColor = SandTexture.Sample(Sampler, In.Texcoord).rgb * clamp(1.0f - SandHeightDifference, 0.0f, 1.0f);
 
-  const float RockHeightDifference = max(0.0f, Height - RockThreshold);
+  const float RockHeightDifference = max(0.0f, Height - TerrainConstantData.RockThreshold);
   const float3 RockColor = RockTexture.Sample(Sampler, In.Texcoord).rgb * (clamp(SandHeightDifference, 0.0f, 1.0f) - clamp(RockHeightDifference, 0.0f, 1.0f));
   
-  const float SlopeHeightDifference = max(0.0f, Height - SlopeThreshold);
+  const float SlopeHeightDifference = max(0.0f, Height - TerrainConstantData.SlopeThreshold);
   const float3 SlopeColor = SlopeTexture.Sample(Sampler, In.Texcoord).rgb * (clamp(RockHeightDifference, 0.0f, 1.0f) - clamp(SlopeHeightDifference, 0.0f, 1.0f));
  
   const float3 GrassColor = GrassTexture.Sample(Sampler, In.Texcoord).rgb * clamp(SlopeHeightDifference, 0.0f, 1.0f);
 
   Out.Diffuse = float4(SandColor + RockColor + SlopeColor + GrassColor, 1.0f);
-  //Out.Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
        
+  Out.Depth = float4(In.Position.z, 0.0f, 0.0f, 1.0f);
+
   return Out;
 }
 

@@ -1,18 +1,23 @@
 #include "Terrain.hlsli"
 #include "../Tessellation.hlsli"
+#include "../ConstantBuffers.hlsli"
 
 cbuffer ConstantBuffer : register(b0)
 {
-  float TessFactor;
-  float InsideFactor;
+  CameraData CameraConstantData;
 }
 
 ConstantData CulcQuadConstantData(InputPatch<HS_IN, CONTROL_POINT> IPatch)
 {
   ConstantData Out;
 
-  Out.TessFactor[0] = Out.TessFactor[1] = Out.TessFactor[2] = Out.TessFactor[3] = TessFactor;
-  Out.InsideTessFactor[0] = Out.InsideTessFactor[1] = InsideFactor;
+  for (uint i = 0; i < CONTROL_POINT; ++i)
+  {
+    Out.TessFactor[i] = GetTessLevel(distance(CameraConstantData.EyePosition, IPatch[i].Position.xyz));
+  }
+
+  Out.InsideTessFactor[0] = (Out.TessFactor[0] + Out.TessFactor[1]) / 2.0f;
+  Out.InsideTessFactor[1] = (Out.TessFactor[2] + Out.TessFactor[3]) / 2.0f;
 
   return Out;
 }

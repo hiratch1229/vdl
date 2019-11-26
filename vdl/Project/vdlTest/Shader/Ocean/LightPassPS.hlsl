@@ -39,7 +39,7 @@ float4 main(float4 _Position : SV_POSITION) : SV_TARGET
 
   float4 Diffuse = DiffuseGBuffer.Load(TexCoord);
   float3 AmbientColor = Diffuse.rgb * Ambient.rgb;
-  float3 Normal = NormalGBuffer.Load(TexCoord).rgb;
+  float3 Normal = NormalGBuffer.Load(TexCoord).xyz;
   Diffuse.rgb *= Calc(DLight, Normal);
      
   float4 ShadowPosition = mul(Position, LightViewProjection);

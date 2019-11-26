@@ -1,20 +1,21 @@
 #include "WaterSurface.hlsli"
 #include "../Tessellation.hlsli"
+#include "../ConstantBuffers.hlsli"
 
 cbuffer ConstantBuffer : register(b0)
 {
-  row_major float4x4 ViewProjection;
-}
-cbuffer ConstantBuffer : register(b1)
-{
-  Wave Waves[kMaxWaveNum];
+  CameraData CameraConstantData;
 }
 cbuffer ConstantBuffer : register(b2)
 {
-  float Time;
-  uint WaveNum;
+  WaveData WaveConstantData;
+}
+cbuffer ConstantBuffer : register(b3)
+{
+  WaterSurfaceData WaterSurfaceConstantData;
 }
 
+//  https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch01.html
 [domain(DOMAIN)]
 PS_IN main(ConstantData Input, float2 UV : SV_DomainLocation, const OutputPatch<DS_IN, CONTROL_POINT> OPatch)
 {
@@ -28,53 +29,55 @@ PS_IN main(ConstantData Input, float2 UV : SV_DomainLocation, const OutputPatch<
   float3 ResultNormal = float3(0.0f, 0.0f, 0.0f);
   float3 ResultTangent = float3(0.0f, 0.0f, 0.0f);
   float3 ResultBinormal = float3(0.0f, 0.0f, 0.0f);
-  for (uint i = 0; i < WaveNum; ++i)
+  for (uint i = 0; i < WaterSurfaceConstantData.WaveNum; ++i)
   {
-    float Wi = 2.0f / Waves[i].Length;
-    float PhaseConstant = Waves[i].Speed * Wi;
-    float Qi = Waves[i].Steepness / (Waves[i].Amplitude * Wi * WaveNum);
+    Wave Wave = WaveConstantData.Waves[i];
+
+    float Wi = 2.0f / Wave.Length;
+    float PhaseConstant = Wave.Speed * Wi;
+    float Qi = Wave.Steepness / (Wave.Amplitude * Wi * WaterSurfaceConstantData.WaveNum);
   
-    float Radian = Wi * dot(Waves[i].Direction.xz, Out.Position.xz) + Time * PhaseConstant;
+    float Radian = Wi * dot(Wave.Direction.xz, Out.Position.xz) + WaterSurfaceConstantData.Time * PhaseConstant;
     float3 Position;
-    Position.xz = Out.Position.xz + Qi * Waves[i].Amplitude * Waves[i].Direction.xz * cos(Radian);
-    Position.y = Waves[i].Amplitude * sin(Radian);
+    Position.xz = Out.Position.xz + Qi * Wave.Amplitude * Wave.Direction.xz * cos(Radian);
+    Position.y = Wave.Amplitude * sin(Radian);
   
     ResultPosition += Position;
    
-    float WA = Wi * Waves[i].Amplitude;
-    Radian = Wi * dot(Waves[i].Direction, Position) + Time * PhaseConstant;
+    float WA = Wi * Wave.Amplitude;
+    Radian = Wi * dot(Wave.Direction, Position) + WaterSurfaceConstantData.Time * PhaseConstant;
     float Cos = cos(Radian);
     float Sin = sin(Radian);
 
     float3 Normal;
-    Normal.x = -(Waves[i].Direction.x * WA * Cos);
-    Normal.z = -(Waves[i].Direction.z * WA * Cos);
+    Normal.x = -(Wave.Direction.x * WA * Cos);
+    Normal.z = -(Wave.Direction.z * WA * Cos);
     Normal.y = 1.0f - (Qi * WA * Sin);
                
     ResultNormal += normalize(Normal);
 
     float3 Tangent;
-    Tangent.x = -(Qi * Waves[i].Direction.x * Waves[i].Direction.z * WA * Sin);
-    Tangent.z = 1.0f - (Qi * Waves[i].Direction.z * Waves[i].Direction.z * WA * Sin);
-    Tangent.y = (Waves[i].Direction.z * WA * Cos);
+    Tangent.x = -(Qi * Wave.Direction.x * Wave.Direction.z * WA * Sin);
+    Tangent.z = 1.0f - (Qi * Wave.Direction.z * Wave.Direction.z * WA * Sin);
+    Tangent.y = (Wave.Direction.z * WA * Cos);
 
     ResultTangent += normalize(Tangent);
 
     float3 Binormal;
-    Binormal.x = 1.0f - (Qi * Waves[i].Direction.x * Waves[i].Direction.x * WA * Sin);
-    Binormal.z = -(Qi * Waves[i].Direction.x * Waves[i].Direction.z * WA * Sin);
-    Binormal.y = (Waves[i].Direction.x * WA * Cos);
+    Binormal.x = 1.0f - (Qi * Wave.Direction.x * Wave.Direction.x * WA * Sin);
+    Binormal.z = -(Qi * Wave.Direction.x * Wave.Direction.z * WA * Sin);
+    Binormal.y = (Wave.Direction.x * WA * Cos);
 
     ResultBinormal += normalize(Binormal);
   }
   
-  ResultPosition.xz -= Out.Position.xz * (WaveNum - 1);
+  ResultPosition.xz -= Out.Position.xz * (WaterSurfaceConstantData.WaveNum - 1);
   ResultPosition.y += Out.Position.y;
   ResultNormal = normalize(ResultNormal);
   ResultTangent = normalize(ResultTangent);
   ResultBinormal = normalize(ResultBinormal);
   
-  Out.Position = mul(float4(ResultPosition, 1.0f), ViewProjection);
+  Out.Position = mul(float4(ResultPosition, 1.0f), CameraConstantData.ViewProjection);
   Out.Normal = ResultNormal;
   Out.Tangent = ResultTangent;
   Out.Binormal = ResultBinormal;

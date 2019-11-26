@@ -122,6 +122,19 @@ namespace vdl::Renderer
     SetVertexStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
   }
 
+  inline void SetVertexStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetVertexStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
+  }
+
   inline void SetVertexStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
   {
     std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
@@ -162,6 +175,19 @@ namespace vdl::Renderer
     }
 
     SetHullStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetHullStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetHullStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
   }
 
   inline void SetHullStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
@@ -248,6 +274,19 @@ namespace vdl::Renderer
     SetGeometryStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
   }
 
+  inline void SetGeometryStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetGeometryStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
+  }
+
   inline void SetGeometryStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])
   {
     std::vector<ShaderResource> ShaderResources(_UnorderedAccessBufferDataNum);
@@ -288,6 +327,19 @@ namespace vdl::Renderer
     }
 
     SetPixelStageShaderResources(_StartSlot, _TextureNum, ShaderResources.data());
+  }
+
+  inline void SetPixelStageShaderResources(uint _StartSlot, uint _CubeTextureNum, const CubeTexture _CubeTextures[])
+  {
+    std::vector<ShaderResource> ShaderResources(_CubeTextureNum);
+    {
+      for (uint CubeTextureCount = 0; CubeTextureCount < _CubeTextureNum; ++CubeTextureCount)
+      {
+        ShaderResources[CubeTextureCount] = _CubeTextures[CubeTextureCount];
+      }
+    }
+
+    SetPixelStageShaderResources(_StartSlot, _CubeTextureNum, ShaderResources.data());
   }
 
   inline void SetPixelStageShaderResources(uint _StartSlot, uint _UnorderedAccessBufferDataNum, const Detail::UnorderedAccessBufferData _UnorderedAccessBufferDatas[])

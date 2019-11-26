@@ -63,6 +63,9 @@
     <Filter Include="シェーダーファイル\Ocean\WaterSurface">
       <UniqueIdentifier>{a2f7edf0-fae8-4be5-862d-cfa5f2dfa9b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Ocean\StaticMesh">
+      <UniqueIdentifier>{f887b4a6-0df5-445a-86a0-e6495588adf0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -261,6 +264,18 @@
     <FxCompile Include="Shader\Ocean\Terrain\TerrainNormalMapUpdateCS.hlsl">
       <Filter>シェーダーファイル\Ocean\Terrain</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurface\ScreenSpaceReflectionPS.hlsl">
+      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\StaticMesh\StaticMeshPS.hlsl">
+      <Filter>シェーダーファイル\Ocean\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\StaticMesh\StaticMeshVS.hlsl">
+      <Filter>シェーダーファイル\Ocean\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\WaterSurface\ScreenSpaceRefractionPS.hlsl">
+      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Tessellation\Tessellation.hlsli">
@@ -306,6 +321,18 @@
       <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
     </None>
     <None Include="Shader\Ocean\Deferred.hlsli">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </None>
+    <None Include="Shader\Ocean\StaticMesh\StaticMesh.hlsli">
+      <Filter>シェーダーファイル\Ocean\StaticMesh</Filter>
+    </None>
+    <None Include="Shader\Ocean\ConstantBuffers.hlsli">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </None>
+    <None Include="Shader\Ocean\PostProcess.hlsli">
+      <Filter>シェーダーファイル\Ocean</Filter>
+    </None>
+    <None Include="Shader\Ocean\Shadow.hlsli">
       <Filter>シェーダーファイル\Ocean</Filter>
     </None>
   </ItemGroup>
