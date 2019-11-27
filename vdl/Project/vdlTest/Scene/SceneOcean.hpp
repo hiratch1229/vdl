@@ -32,7 +32,8 @@ class SceneOcean : public IScene
   static constexpr const char* kWaterSurfacePixelShaderFilePath = "Shader/Ocean/WaterSurface/WaterSurfacePS.hlsl";
   static constexpr const char* kWaterSurfaceReflectionPixelShaderFilePath = "Shader/Ocean/WaterSurface/ScreenSpaceReflectionPS.hlsl";
   static constexpr const char* kWaterSurfaceRefractionPixelShaderFilePath = "Shader/Ocean/WaterSurface/ScreenSpaceRefractionPS.hlsl";
-  static constexpr vdl::uint kMaxRayMarchSampleNum = 1000;
+  static constexpr vdl::uint kShrinkBuffeNum = 4;
+  static constexpr vdl::uint kMaxRayMarchNum = 100;
   static constexpr vdl::uint2 kHeightMapDisplaySize = vdl::uint2(ImGuiHelper::kGBufferDisplaySize.x);
   static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(400, ImGuiHelper::kSceneWindowSize.y);
 private:
@@ -64,6 +65,8 @@ private:
     vdl::Matrix InverseViewProjection;
     vdl::float3 EyePostion;
     vdl::uint Unused;
+    vdl::float3 ViewVector;
+    vdl::uint Unused2;
   };
   struct LightData
   {
@@ -92,6 +95,13 @@ private:
   struct ShadowData
   {
     vdl::ColorF Shadow; /* Color + Bias*/
+  };
+  struct RayMarchData
+  {
+    vdl::uint SampleNum;
+    float MaxStep;
+    float Step;
+    float Unused;
   };
 private:
   vdl::StaticMesh Rectangle_;
@@ -144,9 +154,17 @@ private:
   vdl::PixelShader WaterSurfacePixelShader_;
   vdl::ConstantBuffer<std::array<Wave, kMaxWaveNum>> WaterSurfaceWaveDatasConstantBuffer_;
   vdl::ConstantBuffer<WaterSurfaceData> WaterSurfaceDataConstantBuffer_;
+  vdl::ConstantBuffer<RayMarchData> RayMarchConstantBuffer_;
 
   vdl::PixelShader WaterSurfaceRefractionPixelShader_;
   vdl::PixelShader WaterSurfaceReflectionPixelShader_;
+//private:
+//  vdl::RenderTextures OutputRenderTextures_;
+//  vdl::RenderTextures ShrinkBuffers_;
+//
+//  vdl::PixelShader VerticalGaussianBlurPixelShader_;
+//  vdl::PixelShader HorizontalGaussianBlurPixelShader_;
+//  vdl::PixelShader BloomPixelShader_;
 private:
   void UpdateLightViewProjecion();
   void DrawTerrain()const;

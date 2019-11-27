@@ -1,3 +1,4 @@
+#include "ScreenSpaceRayMarch.hlsli"
 #include "../ConstantBuffers.hlsli"
 #include "../PostProcess.hlsli"
 #include "../Shadow.hlsli"
@@ -25,61 +26,48 @@ cbuffer ConstantBuffer : register(b2)
 {
   ShadowData ShadowConstantData;
 }
+cbuffer ConstantBuffer : register(b3)
+{
+  RayMarchData RayMarchConstantData;
+}
 
-static const float kMaxReflectionRayMarchStep = 1.0f;
-static const uint kMaxRayMarchSampleNum = 50;
-static const float kReflectionRayMarchStep = kMaxReflectionRayMarchStep / kMaxRayMarchSampleNum;
-//static const float kEdge = 0.05f;
-static const float kFadeDistance = 0.5f;
-static const float kFadeEdge = 2.5f;
+static const float kFresnelReflectivity = 0.02f;
+//static const float kLuminaneThreshold = 0.5f;
+//static const float kExposure = 5.0f;
+
+float Fresnel(float f0, float f90, float3 l, float3 n)
+{
+  return f0 + (f90 - f0) * pow(1.0 - dot(l, n), 5.0);
+}
 
 bool Reflection(int3 _Texcoord, inout float4 _DiffuseColor)
 {
-  float3 ScreenSpacePosition = float3(_Texcoord.xy / kWindowSize, WaterSurfaceDepthBuffer.Load(_Texcoord).r);
-  float4 Position = GetWorldPosition(ScreenSpacePosition, CameraConstantData.InverseViewProjection);
-  //float3 Normal = WaterSurfaceNormalGBuffer.Load(_Texcoord).rgb;
-  float3 Normal = float3(0.0f, 1.0f, 0.0f);
+  const float3 ScreenSpacePosition = float3(_Texcoord.xy / kWindowSize, WaterSurfaceDepthBuffer.Load(_Texcoord).r);
+  const float4 Position = GetWorldPosition(ScreenSpacePosition, CameraConstantData.InverseViewProjection);
+  //const float3 Normal = WaterSurfaceNormalGBuffer.Load(_Texcoord).rgb;
+  const float3 Normal = float3(0.0f, 1.0f, 0.0f);
 
-  float3 CameraVector = normalize(Position.xyz - CameraConstantData.EyePosition);
-  float3 ReflectionVector = reflect(CameraVector, Normal);
+  const float3 CameraVector = normalize(Position.xyz - CameraConstantData.EyePosition);
+  const float3 ReflectionVector = reflect(CameraVector, Normal);
 
-  float4 PointAlongReflectionVector = float4(Position.xyz + 10.0f * ReflectionVector, 1.0f);
-  float4 ScreenSpaceReflectionPoint = mul(PointAlongReflectionVector, CameraConstantData.ViewProjection);
-  ScreenSpaceReflectionPoint /= ScreenSpaceReflectionPoint.w;
-  ScreenSpaceReflectionPoint.xy = float2(ScreenSpaceReflectionPoint.x, -ScreenSpaceReflectionPoint.y) * 0.5f + 0.5f;
-                            
-  float3 ScreenSpaceReflectionVector = normalize(ScreenSpaceReflectionPoint.xyz - ScreenSpacePosition);
-
-  for (uint i = 1; i < kMaxRayMarchSampleNum; ++i)
+  const float3 ScreenSpaceReflectionVector = GetScreenSpaceReflectionVector(ScreenSpacePosition, Position.xyz, ReflectionVector, CameraConstantData.ViewProjection) * RayMarchConstantData.Step;
+  
+  float3 RayPosition;
+  float ZBuffer;
+  if (!ScreenSpaceRayMarch(DepthBuffer, ClampSampler, ScreenSpacePosition, ScreenSpaceReflectionVector, RayMarchConstantData.SampleNum, RayPosition, ZBuffer))
   {
-    float3 RayPosition = (i * kReflectionRayMarchStep) * ScreenSpaceReflectionVector + ScreenSpacePosition;
-
-    ////  ‰æ–ÊŠO
-    //if (RayPosition.x < kEdge || RayPosition.y < kEdge || RayPosition.x > (1.0f - kEdge) || RayPosition.y > (1.0f - kEdge) || RayPosition.z >= 1.0f)
-    //{
-    //  continue;
-    //}
-
-    float ZBuffer = DepthBuffer.Sample(Sampler, RayPosition.xy).x;
-    if (ZBuffer <= RayPosition.z)
-    {
-      float DistanceFactor = length(ScreenSpacePosition.xy - RayPosition.xy) / kFadeDistance;
-      float Alpha = saturate(1.0f - (DistanceFactor * DistanceFactor));
-
-      float EdgeFactor = kFadeEdge * length(RayPosition.xy - float2(0.5f, 0.5f));
-      float Edge = saturate(1.0f - (EdgeFactor * EdgeFactor));
-      Alpha *= Edge;
-
-      _DiffuseColor = _DiffuseColor * (1.0f - Alpha) + DiffuseGBuffer.Sample(ClampSampler, RayPosition.xy) * Alpha;
-
-      return true;
-    }
+    return false;
   }
-
-  return false;
+  //BinarySearch(DepthBuffer, ClampSampler, ScreenSpaceReflectionVector, RayPosition, ZBuffer);
+  
+  float Alpha = DistanceFead(ScreenSpacePosition.xy, RayPosition.xy) * EdgeFead(RayPosition.xy);
+  Alpha *= Fresnel(kFresnelReflectivity, 1.0f, CameraConstantData.ViewVector, Normal);
+      
+  _DiffuseColor = _DiffuseColor * (1.0f - Alpha) + DiffuseGBuffer.Sample(ClampSampler, RayPosition.xy) * Alpha;
+    
+  return true;
 }
 
-//  http://casual-effects.blogspot.com/2014/08/screen-space-ray-tracing.html
 float4 main(float4 _Position : SV_POSITION) : SV_TARGET
 {
   int3 Texcoord = int3(_Position.xy, 0);

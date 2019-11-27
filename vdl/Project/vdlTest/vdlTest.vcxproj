@@ -90,6 +90,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">
       </ExcludedFromBuild>
     </None>
+    <None Include="Shader\Ocean\WaterSurface\ScreenSpaceRayMarch.hlsli" />
     <None Include="Shader\Ocean\WaterSurface\WaterSurface.hlsli" />
     <None Include="Shader\Option\GaussianBlur.hlsli" />
     <None Include="Shader\Option\Light.hlsli" />

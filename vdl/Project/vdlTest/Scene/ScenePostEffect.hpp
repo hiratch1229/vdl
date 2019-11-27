@@ -8,6 +8,7 @@ class ScenePostEffect : public IScene
   static constexpr vdl::uint2 kGBufferSize = kWindowSize;
   static constexpr vdl::uint2 kShadowMapSize = kWindowSize * 1;
   static constexpr vdl::uint kGBufferNum = 2; /* Diffuse + NormalMap */
+  static constexpr vdl::uint kLightPassRenderTextureNum = 2;  /* Color + Luminance */
   static constexpr vdl::uint kShaderResourceNum = kGBufferNum + 2;  /* GBuffer + Depth + ShadowMap */
   static constexpr vdl::uint kShrinkBuffeNum = 4;
   static constexpr const char* kLigthPassPSFilePath = "Shader/PostEffect/LightPassPS.hlsl";
@@ -41,7 +42,7 @@ private:
 private:
   vdl::VertexShader LightPassVertexShader_;
   vdl::PixelShader LightPassPixelShader_;
-  vdl::RenderTextures RenderTextures_;
+  vdl::RenderTextures LightPassRenderTextures_;
   std::array<vdl::Texture, kShaderResourceNum> ShaderResources_;
   vdl::ConstantBuffer<vdl::DirectinalLight> DirectionalLightConstantBuffer_;
   vdl::ConstantBuffer<RenderingData> RenderingConstantBuffer_;
@@ -51,7 +52,6 @@ private:
   vdl::PixelShader BloomPixelShader_;
   vdl::PixelShader TexturePixelShader_;
   vdl::RenderTextures ShrinkBuffers_;
-  std::array<vdl::DepthStencilTexture, kShrinkBuffeNum> ShrinkDepthBuffer_;
 public:
   ScenePostEffect() = default;
 

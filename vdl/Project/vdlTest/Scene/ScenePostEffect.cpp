@@ -43,9 +43,9 @@ void ScenePostEffect::Initialize()
     Renderer::SetShaders(LightPassVertexShader_, LightPassPixelShader_);
 
     //  Color
-    RenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
+    LightPassRenderTextures_[0] = RenderTexture(kWindowSize, FormatType::eR8G8B8A8_Unorm);
     //  Luminance
-    RenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
+    LightPassRenderTextures_[1] = RenderTexture(kWindowSize, FormatType::eR16G16B16A16_Float);
 
     for (uint i = 0; i < kGBufferNum; ++i)
     {
@@ -79,7 +79,6 @@ void ScenePostEffect::Initialize()
     for (uint i = 0; i < kShrinkBuffeNum; ++i)
     {
       ShrinkBuffers_[i] = RenderTexture(TextureSize, FormatType::eR8G8B8A8_Unorm);
-      ShrinkDepthBuffer_[i] = DepthStencilTexture(TextureSize, FormatType::eD16_Unorm);
 
       TextureSize /= 2;
     }
@@ -143,10 +142,13 @@ void ScenePostEffect::Update()
     }
     Renderer::Clear(GBufferDepthTexture_);
     Renderer::Clear(ShadowMap_);
+    for (uint i = 0; i < kLightPassRenderTextureNum; ++i)
+    {
+      Renderer::Clear(LightPassRenderTextures_[i]);
+    }
     for (uint i = 0; i < kShrinkBuffeNum; ++i)
     {
       Renderer::Clear(ShrinkBuffers_[i]);
-      Renderer::Clear(ShrinkDepthBuffer_[i]);
     }
   }
 
@@ -169,7 +171,7 @@ void ScenePostEffect::Update()
 
   //  LightPass
   {
-    Renderer::SetRenderTextures(RenderTextures_, DepthStencilTexture());
+    Renderer::SetRenderTextures(LightPassRenderTextures_, DepthStencilTexture());
     Renderer::SetPixelStageShaderResources(0, static_cast<uint>(ShaderResources_.size()), ShaderResources_.data());
 
     Renderer::Draw(3);
@@ -182,12 +184,12 @@ void ScenePostEffect::Update()
 
     //  Blur
     {
-      Texture SrcTexture = RenderTextures_[1];
+      Texture SrcTexture = LightPassRenderTextures_[1];
       Viewport Viewport = { 0, 0 };
 
       for (uint i = 0; i < kShrinkBuffeNum; ++i)
       {
-        Renderer::SetRenderTexture(ShrinkBuffers_[i], ShrinkDepthBuffer_[i]);
+        Renderer::SetRenderTexture(ShrinkBuffers_[i], DepthStencilTexture());
 
         Viewport.Size = ShrinkBuffers_[i].GetSize();
         Renderer2D::SetViewport(Viewport);
@@ -211,7 +213,7 @@ void ScenePostEffect::Update()
       Renderer2D::SetPixelShader(BloomPixelShader_);
       Renderer2D::SetPixelStageShaderResources(1, kShrinkBuffeNum, ShrinkBuffers_.data());
 
-      Renderer2D::Draw(RenderTextures_[0]);
+      Renderer2D::Draw(LightPassRenderTextures_[0]);
     }
   }
 
@@ -236,8 +238,8 @@ void ScenePostEffect::Update()
     }
     if (ImGui::TreeNode("LightPass"))
     {
-      ImGuiHelper::DrawRenderTexture("Color", RenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
-      ImGuiHelper::DrawRenderTexture("Luminance", RenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawRenderTexture("Color", LightPassRenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawRenderTexture("Luminance", LightPassRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
 
       ImGui::TreePop();
     }

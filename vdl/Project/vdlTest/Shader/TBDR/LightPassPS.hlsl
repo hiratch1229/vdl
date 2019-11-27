@@ -40,6 +40,7 @@ float4 main(float4 _Position : SV_POSITION) : SV_TARGET
     for (int i = 0; i < PointLightNum; ++i)
     {
       LightColor += Calc(PointLights[i], Position.xyz, Normal);
+
     }
   }
     

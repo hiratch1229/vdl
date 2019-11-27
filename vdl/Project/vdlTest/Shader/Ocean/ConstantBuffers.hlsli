@@ -6,6 +6,8 @@ struct CameraData
   row_major float4x4 InverseViewProjection;
   float3 EyePosition;
   uint Unused;
+  float3 ViewVector;
+  uint Unused2;
 };
 
 struct LightData

@@ -335,5 +335,8 @@
     <None Include="Shader\Ocean\Shadow.hlsli">
       <Filter>シェーダーファイル\Ocean</Filter>
     </None>
+    <None Include="Shader\Ocean\WaterSurface\ScreenSpaceRayMarch.hlsli">
+      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    </None>
   </ItemGroup>
 </Project>
