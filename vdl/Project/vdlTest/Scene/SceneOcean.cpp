@@ -34,6 +34,7 @@ void SceneOcean::Initialize()
     CameraData.ViewProjection = Camera_.View() * Camera_.Projection(Constants::kDefaultWindowSize);
     CameraData.InverseViewProjection = CameraData.ViewProjection.Inverse();
     CameraData.ViewVector = Camera_.ViewVector().Normalize();
+    CameraData.FocalLength = 0.5f;
   }
   LightData& LightData = LightDataConstantBuffer_.GetData();
   {
@@ -62,6 +63,23 @@ void SceneOcean::Initialize()
     StaticMeshVertexShader_ = VertexShader("Shader/Ocean/StaticMesh/StaticMeshVS.hlsl", InputLayoutType::eStaticMesh);
     StaticMeshPixelShader_ = PixelShader("Shader/Ocean/StaticMesh/StaticMeshPS.hlsl");
     FullScreenVertexShader_ = VertexShader("Shader/Option/FullScreenTriangleVS.hlsl", InputLayoutType::eNone);
+  }
+
+  //  PostProcessの初期化
+  {
+    LightPassRenderTextures_[static_cast<uint>(LightPassOutputType::eColor)] = RenderTexture(Constants::kDefaultWindowSize, FormatType::eR8G8B8A8_Unorm);
+    //LightPassRenderTextures_[static_cast<uint>(LightPassOutputType::eLuminance)] = RenderTexture(Constants::kDefaultWindowSize, FormatType::eR8G8B8A8_Unorm);
+
+    uint2 TextureSize = Constants::kDefaultWindowSize;
+    for (uint i = 0; i < kShrinkBuffeNum; ++i)
+    {
+      ShrinkBuffers_[i] = RenderTexture(TextureSize, FormatType::eR8G8B8A8_Unorm);
+      TextureSize /= 2;
+    }
+
+    VerticalGaussianBlurPixelShader_ = PixelShader("Shader/PostEffect/GaussianBlurPS.hlsl", "VertexBlur");
+    HorizontalGaussianBlurPixelShader_ = PixelShader("Shader/PostEffect/GaussianBlurPS.hlsl", "HorizontalBlur");
+    DepthOfFieldPixelShader_ = PixelShader("Shader/Ocean/PostProcess/DepthOfFieldPS.hlsl");
   }
 
   ////  PostProcessの初期化
@@ -194,6 +212,13 @@ void SceneOcean::Initialize()
     Renderer::SetPixelStageConstantBuffers(3, 1, &RayMarchConstantBuffer_);
   }
 
+  //  Renderer2Dのステートの設定
+  {
+    Renderer2D::SetPixelStageShaderResources(2, 1, &DepthTexture_.GetDepthTexture());
+    Renderer2D::SetPixelStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
+    Renderer2D::SetPixelStageConstantBuffers(1, 1, &DepthOfFieldConstantBuffer_);
+  }
+
   //  Renderer3Dのステートの設定
   {
     Renderer3D::SetHullStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
@@ -228,6 +253,7 @@ void SceneOcean::Update()
   {
     TerrainUpdateData& TerrainUpdateData = TerrainUpdateDataConstantBuffer_.GetData();
     WaterSurfaceData& WaterSurfaceData = WaterSurfaceDataConstantBuffer_.GetData();
+    CameraData& CameraData = CameraDataConstantBuffer_.GetData();
 
     ImGui::Begin("SceneOcean", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     {
@@ -236,6 +262,15 @@ void SceneOcean::Update()
       if (ImGui::Checkbox("Wireframe", &isWireframe_))
       {
         RasterizerState_ = (isWireframe_ ? RasterizerState::kWireframeCullNone : RasterizerState::kSolidCullNone);
+      }
+      if (ImGui::TreeNode("Camera"))
+      {
+        float FocalLength = CameraData.FocalLength;
+        if (ImGui::SliderFloat("FocalLength", &FocalLength, 0.0f, 1.0f) && 0.0f <= FocalLength && FocalLength <= 1.0f)
+        {
+          CameraData.FocalLength = FocalLength;
+        }
+        ImGui::TreePop();
       }
       if (ImGui::TreeNode("DirectinalLight"))
       {
@@ -288,7 +323,7 @@ void SceneOcean::Update()
       }
       if (ImGui::TreeNode("WaterSurface"))
       {
-        //#if defined _DEBUG | DEBUG
+#if defined _DEBUG | DEBUG
         if (ImGui::Button("Reload WaterSurfaceDS"))
         {
           WaterSurfaceDomainShader_ = DomainShader(kWaterSurfaceDomainShaderFilePath);
@@ -305,7 +340,7 @@ void SceneOcean::Update()
         {
           WaterSurfaceReflectionPixelShader_ = PixelShader(kWaterSurfaceReflectionPixelShaderFilePath);
         }
-        //#endif
+#endif
         ImGui::Checkbox("isUpdate", &isWaterSurfaceUpdate_);
         int WaveNum = static_cast<int>(WaterSurfaceData.WaveNum);
         if (ImGui::SliderInt("WaveNum", &WaveNum, 1, kMaxWaveNum) && (WaveNum > 0 && WaveNum <= kMaxWaveNum))
@@ -338,49 +373,57 @@ void SceneOcean::Update()
       WaterSurfaceData.Time += System::GetDeltaTime();
     }
 
-    if (Input::isPressed(Input::Mouse::ButtonLeft))
+    if (!ImGui::IsAnyItemActive())
     {
-      Renderer::Clear(TerrainTexcoordMap_, kTerrainTexcoordMapClearColor);
-      Renderer::Clear(TerrainTexcoordDepthTexture_);
-
-      Renderer::SetRenderTexture(TerrainTexcoordMap_, TerrainTexcoordDepthTexture_);
-      Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
-      Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainTexcoordMapDomainShader_, TerrainTexcoordMapPixelShader_);
-      Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
-
-      DrawTerrain();
-    }
-
-    if (Input::isPress(Input::Mouse::ButtonLeft))
-    {
-      TerrainUpdateData.MousePosition = Input::Mouse::GetPos();
-
-      if (TerrainUpdateData.MousePosition.x > 0 && TerrainUpdateData.MousePosition.y > 0
-        && TerrainUpdateData.MousePosition.x < static_cast<int>(Constants::kDefaultWindowSize.x) && TerrainUpdateData.MousePosition.y < static_cast<int>(Constants::kDefaultWindowSize.y))
+      if (Input::isPressed(Input::Mouse::ButtonLeft))
       {
-        //  ハイトマップの更新
-        {
-          Computer::SetShader(TerrainHeightMapUpdateComputeShader_);
-          Computer::Dispatch(1, 1, 1);
-        }
+        Renderer::Clear(TerrainTexcoordMap_, kTerrainTexcoordMapClearColor);
+        Renderer::Clear(TerrainTexcoordDepthTexture_);
 
-        //  法線マップの更新
+        Renderer::SetRenderTexture(TerrainTexcoordMap_, TerrainTexcoordDepthTexture_);
+        Renderer3D::SetTopology(TopologyType::ePatchList4ControlPoint);
+        Renderer3D::SetStaticMeshShaders(TerrainVertexShader_, TerrainHullShader_, TerrainTexcoordMapDomainShader_, TerrainTexcoordMapPixelShader_);
+        Renderer3D::SetRasterizerState(RasterizerState::kSolidCullBack);
+
+        DrawTerrain();
+      }
+
+      if (Input::isPress(Input::Mouse::ButtonLeft))
+      {
+        TerrainUpdateData.MousePosition = Input::Mouse::GetPos();
+
+        if (TerrainUpdateData.MousePosition.x > 0 && TerrainUpdateData.MousePosition.y > 0
+          && TerrainUpdateData.MousePosition.x < static_cast<int>(Constants::kDefaultWindowSize.x) && TerrainUpdateData.MousePosition.y < static_cast<int>(Constants::kDefaultWindowSize.y))
         {
-          Computer::SetShader(TerrainNormalMapUpdateComputeShader_);
-          Computer::Dispatch(kTerrainNormalMapDispatchNum);
+          //  ハイトマップの更新
+          {
+            Computer::SetShader(TerrainHeightMapUpdateComputeShader_);
+            Computer::Dispatch(1, 1, 1);
+          }
+
+          //  法線マップの更新
+          {
+            Computer::SetShader(TerrainNormalMapUpdateComputeShader_);
+            Computer::Dispatch(kTerrainNormalMapDispatchNum);
+          }
         }
       }
-    }
-    else
-    {
-      FreeCamera(&Camera_);
-      Renderer3D::SetCamera(Camera_);
+      else
+      {
+        FreeCamera(&Camera_);
+        Renderer3D::SetCamera(Camera_);
 
-      CameraData& CameraData = CameraDataConstantBuffer_.GetData();
-      CameraData.EyePostion = Camera_.Position;
-      CameraData.ViewProjection = Camera_.View() * Camera_.Projection(Constants::kDefaultWindowSize);
-      CameraData.InverseViewProjection = CameraData.ViewProjection.Inverse();
-      CameraData.ViewVector = Camera_.ViewVector().Normalize();
+        const vdl::Matrix View = Camera_.View();
+
+        CameraData.EyePostion = Camera_.Position;
+        CameraData.ViewProjection = View * Camera_.Projection(Constants::kDefaultWindowSize);
+        CameraData.InverseViewProjection = CameraData.ViewProjection.Inverse();
+        CameraData.ViewVector = Camera_.ViewVector().Normalize();
+
+        Camera_.isPerspective = false;
+        DepthOfFieldConstantBuffer_.GetData().OrthographicViewProjection = View * Camera_.Projection(Constants::kDefaultWindowSize);
+        Camera_.isPerspective = true;
+      }
     }
   }
 
@@ -394,14 +437,14 @@ void SceneOcean::Update()
     Renderer::Clear(DepthTexture_);
     Renderer::Clear(ShadowMap_);
 
-    //for (uint i = 0; i < 2; ++i)
-    //{
-    //  Renderer::Clear(OutputRenderTextures_[i]);
-    //}
-    //for (uint i = 0; i < kShrinkBuffeNum; ++i)
-    //{
-    //  Renderer::Clear(ShrinkBuffers_[i]);
-    //}
+    for (uint i = 0; i < kLightPassOutNum; ++i)
+    {
+      Renderer::Clear(LightPassRenderTextures_[i]);
+    }
+    for (uint i = 0; i < kShrinkBuffeNum; ++i)
+    {
+      Renderer::Clear(ShrinkBuffers_[i]);
+    }
   }
 
   //  ShadowPass
@@ -436,7 +479,7 @@ void SceneOcean::Update()
 
   //  空の描画
   {
-    Renderer::SetRenderTexture(SwapchainRenderTexture_, DepthTexture_);
+    Renderer::SetRenderTexture(LightPassRenderTextures_[0], DepthTexture_);
 
     Renderer3D::SetTopology(TopologyType::eDefaultMesh);
     Renderer3D::SetStaticMeshShaders(SkyboxVertexShader_, SkyboxPixelShader_);
@@ -462,7 +505,7 @@ void SceneOcean::Update()
     }
   }
 
-  Renderer::SetRenderTexture(SwapchainRenderTexture_, DepthStencilTexture());
+  Renderer::SetRenderTextures(LightPassRenderTextures_, DepthStencilTexture());
   //Renderer::SetRenderTextures(OutputRenderTextures_, DepthStencilTexture());
 
   //  Refraction
@@ -481,31 +524,38 @@ void SceneOcean::Update()
     Renderer::Draw(3);
   }
 
-  ////  GaussianBlur
-  //{
-  //  Texture SrcTexture = OutputRenderTextures_[1];
-  //  Viewport Viewport = { 0, 0 };
-  //
-  //  for (uint i = 0; i < kShrinkBuffeNum; ++i)
-  //  {
-  //    Renderer::SetRenderTexture(ShrinkBuffers_[i], DepthStencilTexture());
-  //
-  //    Viewport.Size = ShrinkBuffers_[i].GetSize();
-  //    Renderer2D::SetViewport(Viewport);
-  //
-  //    Renderer2D::SetPixelShader(VerticalGaussianBlurPixelShader_);
-  //    Renderer2D::Draw(SrcTexture, 0.0f, Viewport.Size);
-  //
-  //    Renderer2D::SetPixelShader(HorizontalGaussianBlurPixelShader_);
-  //    Renderer2D::Draw(SrcTexture, 0.0f, Viewport.Size);
-  //
-  //    SrcTexture = ShrinkBuffers_[i];
-  //  }
-  //
-  //  Viewport.Size = Constants::kDefaultWindowSize;
-  //  Renderer2D::SetViewport(Viewport);
-  //}
-  //
+  //  GaussianBlur
+  {
+    Texture SrcTexture = LightPassRenderTextures_[0];
+    Viewport Viewport = { 0, 0 };
+
+    for (uint i = 0; i < kShrinkBuffeNum; ++i)
+    {
+      Renderer::SetRenderTexture(ShrinkBuffers_[i], DepthStencilTexture());
+
+      Viewport.Size = ShrinkBuffers_[i].GetSize();
+      Renderer2D::SetViewport(Viewport);
+
+      Renderer2D::SetPixelShader(VerticalGaussianBlurPixelShader_);
+      Renderer2D::Draw(SrcTexture, 0.0f, Viewport.Size);
+
+      Renderer2D::SetPixelShader(HorizontalGaussianBlurPixelShader_);
+      Renderer2D::Draw(SrcTexture, 0.0f, Viewport.Size);
+
+      SrcTexture = ShrinkBuffers_[i];
+    }
+
+    Viewport.Size = Constants::kDefaultWindowSize;
+    Renderer2D::SetViewport(Viewport);
+  }
+
+  Renderer::SetRenderTexture(SwapchainRenderTexture_, DepthStencilTexture());
+  Renderer2D::SetPixelShader(DepthOfFieldPixelShader_);
+  Renderer2D::SetPixelStageShaderResources(1, 1, &ShrinkBuffers_[kShrinkBuffeNum - 1]);
+  Renderer2D::Draw(LightPassRenderTextures_[0]);
+  Texture Texture;
+  Renderer2D::SetPixelStageShaderResources(1, 1, &Texture);
+
   ////  Bloom
   //{
   //  Renderer::SetRenderTexture(SwapchainRenderTexture_, DepthStencilTexture());
@@ -552,19 +602,23 @@ void SceneOcean::Update()
 
       ImGui::TreePop();
     }
-    //if (ImGui::TreeNode("LightPass"))
-    //{
-    //  ImGuiHelper::DrawRenderTexture("Luminance", OutputRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
-    //  ImGui::TreePop();
-    //}
-    //if (ImGui::TreeNode("BlurPass"))
-    //{
-    //  for (uint i = 0; i < kShrinkBuffeNum; ++i)
-    //  {
-    //    ImGuiHelper::DrawRenderTexture(std::string("ShirnkBuffer" + std::to_string(i)).c_str(), ShrinkBuffers_[i], ImGuiHelper::kGBufferDisplaySize);
-    //  }
-    //  ImGui::TreePop();
-    //}
+    if (ImGui::TreeNode("LightPass"))
+    {
+      for (uint i = 0; i < kLightPassOutNum; ++i)
+      {
+        ImGuiHelper::DrawRenderTexture(kLightPassOutNames[i], LightPassRenderTextures_[i], ImGuiHelper::kGBufferDisplaySize);
+      }
+
+      ImGui::TreePop();
+    }
+    if (ImGui::TreeNode("BlurPass"))
+    {
+      for (uint i = 0; i < kShrinkBuffeNum; ++i)
+      {
+        ImGuiHelper::DrawRenderTexture(std::string("ShirnkBuffer" + std::to_string(i)).c_str(), ShrinkBuffers_[i], ImGuiHelper::kGBufferDisplaySize);
+      }
+      ImGui::TreePop();
+    }
   }
   ImGui::End();
 }

@@ -5,9 +5,9 @@ struct CameraData
   row_major float4x4 ViewProjection;
   row_major float4x4 InverseViewProjection;
   float3 EyePosition;
-  uint Unused;
+  float FocalLength;
   float3 ViewVector;
-  uint Unused2;
+  uint Unused;
 };
 
 struct LightData
@@ -65,4 +65,9 @@ struct RayMarchData
   uint SampleNum;
   float Step;
   float Unused;
+};
+
+struct DepthOfFieldData
+{
+  row_major float4x4 OrthographicViewProjection;
 };

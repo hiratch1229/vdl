@@ -30,8 +30,8 @@ class SceneOcean : public IScene
   static constexpr vdl::uint kWaterSurfaceNormalMapNum = 2;
   static constexpr const char* kWaterSurfaceDomainShaderFilePath = "Shader/Ocean/WaterSurface/WaterSurfaceDS.hlsl";
   static constexpr const char* kWaterSurfacePixelShaderFilePath = "Shader/Ocean/WaterSurface/WaterSurfacePS.hlsl";
-  static constexpr const char* kWaterSurfaceReflectionPixelShaderFilePath = "Shader/Ocean/WaterSurface/ScreenSpaceReflectionPS.hlsl";
-  static constexpr const char* kWaterSurfaceRefractionPixelShaderFilePath = "Shader/Ocean/WaterSurface/ScreenSpaceRefractionPS.hlsl";
+  static constexpr const char* kWaterSurfaceReflectionPixelShaderFilePath = "Shader/Ocean/PostProcess/ScreenSpaceReflectionPS.hlsl";
+  static constexpr const char* kWaterSurfaceRefractionPixelShaderFilePath = "Shader/Ocean/PostProcess/ScreenSpaceRefractionPS.hlsl";
   static constexpr vdl::uint kShrinkBuffeNum = 4;
   static constexpr vdl::uint kMaxRayMarchNum = 100;
   static constexpr vdl::uint2 kHeightMapDisplaySize = vdl::uint2(ImGuiHelper::kGBufferDisplaySize.x);
@@ -48,6 +48,15 @@ private:
   static constexpr vdl::uint kGBufferNum = static_cast<vdl::uint>(GBufferType::eNum);
   static constexpr const char* kGBufferNames[kGBufferNum] = { "Diffuse", "Normal", "Depth" };
   static constexpr vdl::ColorF kGBufferClearColors[kGBufferNum] = { vdl::ColorF(0.0f,0.0f,0.0f, 0.0f), vdl::ColorF(0.0f,0.0f,0.0f, 0.0f), vdl::ColorF(1.0f,0.0f,0.0f, 0.0f) };
+  enum class LightPassOutputType
+  {
+    eColor,
+    //eLuminance,
+
+    eNum
+  };
+  static constexpr vdl::uint kLightPassOutNum = static_cast<vdl::uint>(LightPassOutputType::eNum);
+  static constexpr const char* kLightPassOutNames[kLightPassOutNum] = { "Color"/*, "Luminance"*/ };
 private:
   struct Wave
   {
@@ -64,9 +73,9 @@ private:
     vdl::Matrix ViewProjection;
     vdl::Matrix InverseViewProjection;
     vdl::float3 EyePostion;
-    vdl::uint Unused;
+    float FocalLength;
     vdl::float3 ViewVector;
-    vdl::uint Unused2;
+    vdl::uint Unused;
   };
   struct LightData
   {
@@ -102,6 +111,10 @@ private:
     float MaxStep;
     float Step;
     float Unused;
+  };
+  struct DepthOfFieldData
+  {
+    vdl::Matrix OrthographicViewProjection;
   };
 private:
   vdl::StaticMesh Rectangle_;
@@ -158,13 +171,15 @@ private:
 
   vdl::PixelShader WaterSurfaceRefractionPixelShader_;
   vdl::PixelShader WaterSurfaceReflectionPixelShader_;
-//private:
-//  vdl::RenderTextures OutputRenderTextures_;
-//  vdl::RenderTextures ShrinkBuffers_;
-//
-//  vdl::PixelShader VerticalGaussianBlurPixelShader_;
-//  vdl::PixelShader HorizontalGaussianBlurPixelShader_;
-//  vdl::PixelShader BloomPixelShader_;
+private:
+  vdl::RenderTextures LightPassRenderTextures_;
+  vdl::RenderTextures ShrinkBuffers_;
+
+  vdl::PixelShader VerticalGaussianBlurPixelShader_;
+  vdl::PixelShader HorizontalGaussianBlurPixelShader_;
+  vdl::PixelShader DepthOfFieldPixelShader_;
+  //vdl::PixelShader BloomPixelShader_;
+  vdl::ConstantBuffer<DepthOfFieldData> DepthOfFieldConstantBuffer_;
 private:
   void UpdateLightViewProjecion();
   void DrawTerrain()const;

@@ -66,6 +66,9 @@
     <Filter Include="シェーダーファイル\Ocean\StaticMesh">
       <UniqueIdentifier>{f887b4a6-0df5-445a-86a0-e6495588adf0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Ocean\PostProcess">
+      <UniqueIdentifier>{120a88f2-2eab-4ddb-b734-01735d747f04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -264,17 +267,20 @@
     <FxCompile Include="Shader\Ocean\Terrain\TerrainNormalMapUpdateCS.hlsl">
       <Filter>シェーダーファイル\Ocean\Terrain</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Ocean\WaterSurface\ScreenSpaceReflectionPS.hlsl">
-      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\Ocean\StaticMesh\StaticMeshPS.hlsl">
       <Filter>シェーダーファイル\Ocean\StaticMesh</Filter>
     </FxCompile>
     <FxCompile Include="Shader\Ocean\StaticMesh\StaticMeshVS.hlsl">
       <Filter>シェーダーファイル\Ocean\StaticMesh</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Ocean\WaterSurface\ScreenSpaceRefractionPS.hlsl">
-      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    <FxCompile Include="Shader\Ocean\PostProcess\ScreenSpaceReflectionPS.hlsl">
+      <Filter>シェーダーファイル\Ocean\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\PostProcess\ScreenSpaceRefractionPS.hlsl">
+      <Filter>シェーダーファイル\Ocean\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Ocean\PostProcess\DepthOfFieldPS.hlsl">
+      <Filter>シェーダーファイル\Ocean\PostProcess</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -335,8 +341,8 @@
     <None Include="Shader\Ocean\Shadow.hlsli">
       <Filter>シェーダーファイル\Ocean</Filter>
     </None>
-    <None Include="Shader\Ocean\WaterSurface\ScreenSpaceRayMarch.hlsli">
-      <Filter>シェーダーファイル\Ocean\WaterSurface</Filter>
+    <None Include="Shader\Ocean\PostProcess\ScreenSpaceRayMarch.hlsli">
+      <Filter>シェーダーファイル\Ocean\PostProcess</Filter>
     </None>
   </ItemGroup>
 </Project>
