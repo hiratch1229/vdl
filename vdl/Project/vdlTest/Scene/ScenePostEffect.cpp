@@ -82,6 +82,10 @@ void ScenePostEffect::Initialize()
 
       TextureSize /= 2;
     }
+
+    Sampler ClampSampler = Sampler::kDefault3D;
+    ClampSampler.AddressModeU = ClampSampler.AddressModeV = ClampSampler.AddressModeW = AddressModeType::eClamp;
+    Renderer2D::SetPixelStageSamplers(1, 1, &ClampSampler);
   }
 }
 
@@ -97,7 +101,7 @@ void ScenePostEffect::Update()
     RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
     {
       RenderingData.EyePos = Camera_.Position;
-      RenderingData.InverseViewProjection = (Renderer3D::GetView() * Renderer3D::GetProjection()).Inverse();
+      RenderingData.InverseViewProjection = (Camera_.View() * Camera_.Projection(kWindowSize)).Inverse();
     }
 
     ImGui::Begin("ScenePostEffect", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
@@ -129,10 +133,10 @@ void ScenePostEffect::Update()
       }
     }
     ImGui::End();
-
-    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up());
-    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
   }
+
+  const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up(), 5.0f, 500.0f, 30.0f, false);
+  LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize / 4.0f);
 
   //  ‰æ–Ê‚ÌƒNƒŠƒA
   {
@@ -164,9 +168,16 @@ void ScenePostEffect::Update()
   //  ShadowPass
   {
     Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
+
+    Viewport Viewport = { float2(0.0f), kShadowMapSize };
+    Renderer3D::SetViewport(Viewport);
+
     Renderer3D::SetStaticMeshShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
 
     Renderer3D::Draw(House_, HouseWorld_);
+
+    Viewport.Size = Constants::kDefaultWindowSize;
+    Renderer3D::SetViewport(Viewport);
   }
 
   //  LightPass
@@ -232,7 +243,7 @@ void ScenePostEffect::Update()
     }
     if (ImGui::TreeNode("ShadowPass"))
     {
-      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kShadowMapDisplaySize);
 
       ImGui::TreePop();
     }

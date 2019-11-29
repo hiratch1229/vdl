@@ -68,7 +68,7 @@ void SceneOcean::Initialize()
   //  PostProcessの初期化
   {
     LightPassRenderTextures_[static_cast<uint>(LightPassOutputType::eColor)] = RenderTexture(Constants::kDefaultWindowSize, FormatType::eR8G8B8A8_Unorm);
-    //LightPassRenderTextures_[static_cast<uint>(LightPassOutputType::eLuminance)] = RenderTexture(Constants::kDefaultWindowSize, FormatType::eR8G8B8A8_Unorm);
+    LightPassRenderTextures_[static_cast<uint>(LightPassOutputType::eLuminance)] = RenderTexture(Constants::kDefaultWindowSize, FormatType::eR8G8B8A8_Unorm);
 
     uint2 TextureSize = Constants::kDefaultWindowSize;
     for (uint i = 0; i < kShrinkBuffeNum; ++i)
@@ -81,23 +81,6 @@ void SceneOcean::Initialize()
     HorizontalGaussianBlurPixelShader_ = PixelShader("Shader/PostEffect/GaussianBlurPS.hlsl", "HorizontalBlur");
     DepthOfFieldPixelShader_ = PixelShader("Shader/Ocean/PostProcess/DepthOfFieldPS.hlsl");
   }
-
-  ////  PostProcessの初期化
-  //{
-  //  OutputRenderTextures_[0] = SwapchainRenderTexture_;
-  //  OutputRenderTextures_[1] = RenderTexture(Constants::kDefaultWindowSize, FormatType::eR8G8B8A8_Unorm);
-  //
-  //  uint2 TextureSize = Constants::kDefaultWindowSize;
-  //  for (uint i = 0; i < kShrinkBuffeNum; ++i)
-  //  {
-  //    ShrinkBuffers_[i] = RenderTexture(TextureSize, FormatType::eR8G8B8A8_Unorm);
-  //    TextureSize /= 2;
-  //  }
-  //
-  //  VerticalGaussianBlurPixelShader_ = PixelShader("Shader/PostEffect/GaussianBlurPS.hlsl", "VertexBlur");
-  //  HorizontalGaussianBlurPixelShader_ = PixelShader("Shader/PostEffect/GaussianBlurPS.hlsl", "HorizontalBlur");
-  //  BloomPixelShader_ = PixelShader("Shader/PostEffect/BloomPS.hlsl");
-  //}
 
   //  空の初期化
   {
@@ -189,6 +172,9 @@ void SceneOcean::Initialize()
     WaterSurfaceReflectionPixelShader_ = PixelShader(kWaterSurfaceReflectionPixelShaderFilePath);
   }
 
+  Sampler ClampSampler = Sampler::kDefault3D;
+  ClampSampler.AddressModeU = ClampSampler.AddressModeV = ClampSampler.AddressModeW = AddressModeType::eClamp;
+
   //  Rendererのステートの設定
   {
     Renderer::SetTopology(TopologyType::eTriangleList);
@@ -199,8 +185,6 @@ void SceneOcean::Initialize()
     ShadowSampler.AddressModeU = ShadowSampler.AddressModeV = ShadowSampler.AddressModeW = AddressModeType::eBorder;
     ShadowSampler.BorderColor = BorderColorType::eWhite;
     Renderer::SetPixelStageSamplers(1, 1, &ShadowSampler);
-    Sampler ClampSampler = Sampler::kDefault3D;
-    ShadowSampler.AddressModeU = ShadowSampler.AddressModeV = ShadowSampler.AddressModeW = AddressModeType::eClamp;
     Renderer::SetPixelStageSamplers(2, 1, &ClampSampler);
     Renderer::SetPixelStageShaderResources(0, kGBufferNum, WaterSurfaceGBufferTextures_.data());
     Renderer::SetPixelStageShaderResources(kGBufferNum, kGBufferNum, GBufferTextures_.data());
@@ -214,6 +198,7 @@ void SceneOcean::Initialize()
 
   //  Renderer2Dのステートの設定
   {
+    Renderer2D::SetPixelStageSamplers(1, 1, &ClampSampler);
     Renderer2D::SetPixelStageShaderResources(2, 1, &DepthTexture_.GetDepthTexture());
     Renderer2D::SetPixelStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
     Renderer2D::SetPixelStageConstantBuffers(1, 1, &DepthOfFieldConstantBuffer_);
@@ -359,7 +344,7 @@ void SceneOcean::Update()
         if (ImGui::SliderInt("SampleNum", &SampleNum, 1, kMaxRayMarchNum) && (SampleNum > 0 && SampleNum <= kMaxRayMarchNum))
         {
           RayMarchData.SampleNum = SampleNum;
-        }
+      }
 
         RayMarchData.Step = RayMarchData.MaxStep / RayMarchData.SampleNum;
 
@@ -371,6 +356,12 @@ void SceneOcean::Update()
     if (isWaterSurfaceUpdate_)
     {
       WaterSurfaceData.Time += System::GetDeltaTime();
+    }
+
+    if (Input::isPressed(Input::Keyboard::KeyDelete))
+    {
+      Renderer::Clear(TerrainHeightMap_);
+      Renderer::Clear(TerrainNormalMap_, Palette::NormalMap);
     }
 
     if (!ImGui::IsAnyItemActive())
@@ -506,7 +497,6 @@ void SceneOcean::Update()
   }
 
   Renderer::SetRenderTextures(LightPassRenderTextures_, DepthStencilTexture());
-  //Renderer::SetRenderTextures(OutputRenderTextures_, DepthStencilTexture());
 
   //  Refraction
   {
@@ -526,15 +516,16 @@ void SceneOcean::Update()
 
   //  GaussianBlur
   {
-    Texture SrcTexture = LightPassRenderTextures_[0];
     Viewport Viewport = { 0, 0 };
+    Texture SrcTexture = LightPassRenderTextures_[0];
 
+    //  縮小バッファを使用
     for (uint i = 0; i < kShrinkBuffeNum; ++i)
     {
-      Renderer::SetRenderTexture(ShrinkBuffers_[i], DepthStencilTexture());
-
       Viewport.Size = ShrinkBuffers_[i].GetSize();
       Renderer2D::SetViewport(Viewport);
+
+      Renderer::SetRenderTexture(ShrinkBuffers_[i], DepthStencilTexture());
 
       Renderer2D::SetPixelShader(VerticalGaussianBlurPixelShader_);
       Renderer2D::Draw(SrcTexture, 0.0f, Viewport.Size);
@@ -550,22 +541,16 @@ void SceneOcean::Update()
   }
 
   Renderer::SetRenderTexture(SwapchainRenderTexture_, DepthStencilTexture());
-  Renderer2D::SetPixelShader(DepthOfFieldPixelShader_);
-  Renderer2D::SetPixelStageShaderResources(1, 1, &ShrinkBuffers_[kShrinkBuffeNum - 1]);
-  Renderer2D::Draw(LightPassRenderTextures_[0]);
-  Texture Texture;
-  Renderer2D::SetPixelStageShaderResources(1, 1, &Texture);
 
-  ////  Bloom
-  //{
-  //  Renderer::SetRenderTexture(SwapchainRenderTexture_, DepthStencilTexture());
-  //  Renderer2D::SetBlendState(BlendState::kAdd);
-  //
-  //  for (uint i = 0; i < kShrinkBuffeNum; ++i)
-  //  {
-  //    Renderer2D::Draw(ShrinkBuffers_[i], 0.0f, Constants::kDefaultWindowSize);
-  //  }
-  //}
+  //  DepthOfField
+  {
+    Renderer2D::SetPixelShader(DepthOfFieldPixelShader_);
+    Renderer2D::SetPixelStageShaderResources(1, 1, &ShrinkBuffers_[kShrinkBuffeNum - 1]);
+    Renderer2D::Draw(LightPassRenderTextures_[0]);
+
+    ShaderResource EmptyShaderResource;
+    Renderer2D::SetPixelStageShaderResources(1, 1, &EmptyShaderResource);
+  }
 
   ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
   {

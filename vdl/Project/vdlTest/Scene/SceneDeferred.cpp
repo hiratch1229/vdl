@@ -47,12 +47,11 @@ void SceneDeferred::Initialize()
   {
     ShadowMapVertexShader_ = VertexShader("Shader/Deferred/ShadowMapVS.hlsl", InputLayoutType::eStaticMesh);
     ShadowMapPixelShader_ = PixelShader();
-    ShadowMap_ = DepthStencilTexture(kWindowSize, FormatType::eD32_Float);
+    ShadowMap_ = DepthStencilTexture(kShadowMapSize, FormatType::eD32_Float);
 
     DirectionLightPosition_ = Camera_.Position;
-
-    const Camera Light = Camera(DirectionLightPosition_);
-    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
+    const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up(), 5.0f, 500.0f, 30.0f, false);
+    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize/4.0f);
     Renderer3D::SetVertexStageConstantBuffers(1, 1, &LightViewProjectionConstantBuffer_);
   }
 
@@ -128,8 +127,8 @@ void SceneDeferred::Update()
         {
           LightData.DirectionalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
 
-          const Camera Light = Camera(DirectionLightPosition_);
-          LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize);
+          const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up(), 5.0f, 500.0f, 30.0f, false);
+          LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize/4);
         }
         ImGui::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
         ImGui::DragFloat("Itensity", &LightData.DirectionalLight.Itensity, 0.01f);
@@ -197,12 +196,19 @@ void SceneDeferred::Update()
   //  ShadowPass
   {
     Renderer::SetRenderTexture(RenderTexture(), ShadowMap_);
+
+    Viewport Viewport = { float2(0.0f), kShadowMapSize };
+    Renderer3D::SetViewport(Viewport);
+
     Renderer3D::SetStaticMeshShaders(ShadowMapVertexShader_, ShadowMapPixelShader_);
 
     for (auto& Data : Datas_)
     {
       Renderer3D::Draw(Sphere_, SphereScale * Matrix::Translate(Data.Position), Data.Color);
     }
+
+    Viewport.Size = Constants::kDefaultWindowSize;
+    Renderer3D::SetViewport(Viewport);
   }
 
   //  LightPass
@@ -229,7 +235,7 @@ void SceneDeferred::Update()
     }
     if (ImGui::TreeNode("ShadowPass"))
     {
-      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, ImGuiHelper::kGBufferDisplaySize);
+      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kShadowMapDisplaySize);
 
       ImGui::TreePop();
     }

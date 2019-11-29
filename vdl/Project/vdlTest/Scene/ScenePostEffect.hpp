@@ -6,13 +6,14 @@ class ScenePostEffect : public IScene
   static constexpr float kGroundScale = 18.0f;
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
   static constexpr vdl::uint2 kGBufferSize = kWindowSize;
-  static constexpr vdl::uint2 kShadowMapSize = kWindowSize * 1;
+  static constexpr vdl::uint2 kShadowMapSize = vdl::uint2(4096, 4096);
   static constexpr vdl::uint kGBufferNum = 2; /* Diffuse + NormalMap */
   static constexpr vdl::uint kLightPassRenderTextureNum = 2;  /* Color + Luminance */
   static constexpr vdl::uint kShaderResourceNum = kGBufferNum + 2;  /* GBuffer + Depth + ShadowMap */
   static constexpr vdl::uint kShrinkBuffeNum = 4;
   static constexpr const char* kLigthPassPSFilePath = "Shader/PostEffect/LightPassPS.hlsl";
   static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(415, ImGuiHelper::kSceneWindowSize.y);
+  static constexpr vdl::uint2 kShadowMapDisplaySize = vdl::uint2(ImGuiHelper::kGBufferDisplaySize.x);
 private:
   struct RenderingData
   {

@@ -51,12 +51,12 @@ private:
   enum class LightPassOutputType
   {
     eColor,
-    //eLuminance,
+    eLuminance,
 
     eNum
   };
   static constexpr vdl::uint kLightPassOutNum = static_cast<vdl::uint>(LightPassOutputType::eNum);
-  static constexpr const char* kLightPassOutNames[kLightPassOutNum] = { "Color"/*, "Luminance"*/ };
+  static constexpr const char* kLightPassOutNames[kLightPassOutNum] = { "Color", "Luminance" };
 private:
   struct Wave
   {

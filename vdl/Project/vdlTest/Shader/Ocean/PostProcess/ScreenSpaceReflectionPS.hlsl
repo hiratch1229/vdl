@@ -52,6 +52,7 @@ bool Reflection(int3 _Texcoord, inout float4 _DiffuseColor)
 
   const float3 ScreenSpaceReflectionVector = GetScreenSpaceReflectionVector(ScreenSpacePosition, Position.xyz, ReflectionVector, CameraConstantData.ViewProjection) * RayMarchConstantData.Step;
   
+  _DiffuseColor = lerp(_DiffuseColor, Skybox.Sample(Sampler, ReflectionVector), 0.25f);
   float3 RayPosition;
   float ZBuffer;
   if (!ScreenSpaceRayMarch(DepthBuffer, ClampSampler, ScreenSpacePosition, ScreenSpaceReflectionVector, RayMarchConstantData.SampleNum, RayPosition, ZBuffer))
@@ -71,13 +72,16 @@ bool Reflection(int3 _Texcoord, inout float4 _DiffuseColor)
 float4 main(float4 _Position : SV_POSITION) : SV_TARGET
 {
   int3 Texcoord = int3(_Position.xy, 0);
+  float3 ScreenSpacePosition = float3(_Position.xy / kWindowSize, WaterSurfaceDepthBuffer.Load(Texcoord).r);
 
   float4 DiffuseColor = WaterSurfaceDiffuseGBuffer.Load(Texcoord);
-  Reflection(Texcoord, DiffuseColor);
+  if (ScreenSpacePosition.z < 1.0f)
+  {
+    Reflection(Texcoord, DiffuseColor);
+  }
   float3 Normal = WaterSurfaceNormalGBuffer.Load(Texcoord).xyz;
   DiffuseColor.rgb *= Calc(LightConstantData.DLight, Normal);
 
-  float3 ScreenSpacePosition = float3(_Position.xy / kWindowSize, WaterSurfaceDepthBuffer.Load(Texcoord).r);
   float4 Position = GetWorldPosition(ScreenSpacePosition, CameraConstantData.InverseViewProjection);
   float3 ShadowColor = GetShadowColor(ShadowMap, ShadowSampler, Position, LightConstantData.ViewProjection, ShadowConstantData.Color, ShadowConstantData.Bias);
 

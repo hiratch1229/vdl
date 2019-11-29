@@ -21,6 +21,7 @@ class SceneDeferred : public IScene
   };
 private:
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
+  static constexpr vdl::uint2 kShadowMapSize = vdl::uint2(4096, 4096);
   static constexpr float kRectangleScale = 15.0f;
   static constexpr float kRectangleHalfScale = kRectangleScale * 0.5f;
   static constexpr float kSphereScale = 0.5f;
@@ -29,6 +30,7 @@ private:
   static constexpr vdl::uint kShaderResourceNum = kGBufferNum + 2;  /* GBuffer + Depth + ShadowMap */
   static constexpr const char* kLigthPassPSFilePath = "Shader/Deferred/LightPassPS.hlsl";
   static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(300, ImGuiHelper::kSceneWindowSize.y);
+  static constexpr vdl::uint2 kShadowMapDisplaySize = vdl::uint2(ImGuiHelper::kGBufferDisplaySize.x);
 private:
   struct LightData
   {

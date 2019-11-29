@@ -56,12 +56,12 @@ bool Refraction(int3 _Texcoord, float _Depth, inout float4 _DiffuseColor, out fl
   }
   BinarySearch(DepthBuffer, ClampSampler, ScreenSpaceRefractionVector, RayPosition, ZBuffer);
   
-  float Alpha =  EdgeFead(RayPosition.xy);
+  float Alpha = EdgeFead(RayPosition.xy);
                  
   _ShadowColor = saturate(GetShadowColor(ShadowMap, ShadowSampler, GetWorldPosition(float3(RayPosition.xy, ZBuffer), CameraConstantData.InverseViewProjection),
             LightConstantData.ViewProjection, ShadowConstantData.Color, ShadowConstantData.Bias) * (1.0f / Alpha));
 
-  Alpha *= DistanceFead(ScreenSpacePosition.xy, RayPosition.xy) ;
+  Alpha *= DistanceFead(ScreenSpacePosition.xy, RayPosition.xy);
   float4 DiffuseColor = DiffuseGBuffer.Sample(ClampSampler, RayPosition.xy);
   DiffuseColor.rgb *= Calc(LightConstantData.DLight, NormalGBuffer.Sample(ClampSampler, RayPosition.xy).xyz);
   _DiffuseColor = _DiffuseColor * (1.0f - Alpha) + DiffuseColor * Alpha;
