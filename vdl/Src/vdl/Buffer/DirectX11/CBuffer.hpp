@@ -93,10 +93,6 @@ inline Buffer* Cast(IBuffer* _pBuffer)
 {
   static_assert(std::is_base_of<IBuffer, Buffer>::value);
 
-  if constexpr (std::is_same<IConstantBuffer, Buffer>::value)
-  {
-    assert(_pBuffer->GetType() == BufferType::eConstantBuffer || _pBuffer->GetType() == BufferType::eCopyConstantBuffer);
-  }
   if constexpr (std::is_same<CVertexBuffer, Buffer>::value)
   {
     assert(_pBuffer->GetType() == BufferType::eVertexBuffer);

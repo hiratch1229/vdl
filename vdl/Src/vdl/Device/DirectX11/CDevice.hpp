@@ -5,6 +5,7 @@
 
 class CDeviceContext;
 class ITextureManager;
+class IBufferManager;
 
 class CDevice : public IDevice
 {
@@ -13,6 +14,7 @@ class CDevice : public IDevice
 private:
   CDeviceContext* pDeviceContext_;
   ITextureManager* pTextureManager_;
+  IBufferManager* pBufferManager_;
 public:
   [[nodiscard]] ID3D11Device* GetDevice()const { return pD3D11Device_.Get(); }
   [[nodiscard]] ID3D11DeviceContext* GetImmediateContext()const { return pD3D11ImmediateContext_.Get(); }
@@ -34,6 +36,8 @@ public:
   void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize)override;
 
   void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, const void* _Buffer)override;
+
+  vdl::Detail::ConstantBufferData CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)override;
 
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 

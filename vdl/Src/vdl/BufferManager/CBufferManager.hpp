@@ -1,5 +1,5 @@
 #pragma once
-#include "../IBufferManager.hpp"
+#include "IBufferManager.hpp"
 
 #include <vdl/ReferenceCount/ReferenceCount.hpp>
 
@@ -14,11 +14,11 @@ public:
 
   void Initialize()override;
 
-  vdl::ID CreateVertexBuffer(vdl::uint _Stride, vdl::uint _BufferSize)override;
+  vdl::ID CreateVertexBuffer(vdl::uint _BufferSize)override;
 
-  vdl::ID CreateVertexBuffer(const void* _Vertices, vdl::uint _Stride, vdl::uint _BufferSize)override;
+  vdl::ID CreateVertexBuffer(const void* _Vertices, vdl::uint _BufferSize)override;
 
-  vdl::ID CreateInstanceBuffer(vdl::uint _Stride, vdl::uint _BufferSize)override;
+  vdl::ID CreateInstanceBuffer(vdl::uint _BufferSize)override;
 
   vdl::ID CreateIndexBuffer(vdl::uint _BufferSize, IndexType _IndexType)override;
 
@@ -39,4 +39,6 @@ public:
   void Release(const vdl::ID& _ID) override { Buffers_.Get(_ID).Release(); }
 
   IBuffer* GetBuffer(const vdl::ID& _ID)override { return Buffers_.Get(_ID).Get(); }
+
+  void SetBuffer(const vdl::ID& _ID, IBuffer* _pBuffer)override { Buffers_.Get(_ID) = _pBuffer; }
 };

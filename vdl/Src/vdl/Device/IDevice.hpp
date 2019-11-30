@@ -1,6 +1,7 @@
 #pragma once
 #include <vdl/Fwd.hpp>
 #include <vdl/Types.hpp>
+#include <vdl/ConstantBuffer.hpp>
 
 #include <vdl/Buffer/Buffer.hpp>
 
@@ -34,6 +35,8 @@ public:
   virtual void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize) = 0;
 
   virtual void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, const void* _Buffer) = 0;
+
+  virtual vdl::Detail::ConstantBufferData CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer) = 0;
 
   virtual void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image) = 0;
 

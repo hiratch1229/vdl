@@ -8,7 +8,7 @@
 namespace
 {
   template<class Texture>
-  Texture* Cast(ITexture* _pTexture)
+  inline Texture* Cast(ITexture* _pTexture)
   {
     static_assert(std::is_base_of<ITexture, Texture>::value);
 

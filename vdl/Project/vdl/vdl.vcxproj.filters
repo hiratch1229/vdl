@@ -178,6 +178,9 @@
     <Filter Include="Shader\Mesh\SkinnedMesh">
       <UniqueIdentifier>{fcbf157e-1b7d-4324-b1b9-32a8effd0545}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\ConstantBufferAllocater">
+      <UniqueIdentifier>{323b6ed6-2f6e-4fc2-aab1-4be19efd467d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -603,6 +606,12 @@
     <ClInclude Include="..\..\Src\ThirdParty\meshoptimizer\meshoptimizer.h">
       <Filter>Src\ThirdParty\meshoptimizer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\BufferManager\CBufferManager.hpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\ConstantBufferAllocater\ConstantBufferAllocater.hpp">
+      <Filter>Src\ConstantBufferAllocater</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Engine.cpp">
@@ -886,6 +895,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\ThirdParty\meshoptimizer\vfetchoptimizer.cpp">
       <Filter>Src\ThirdParty\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\BufferManager\CBufferManager.cpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\ConstantBufferAllocater\ConstantBufferAllocater.cpp">
+      <Filter>Src\ConstantBufferAllocater</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

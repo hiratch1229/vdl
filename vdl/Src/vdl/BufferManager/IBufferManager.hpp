@@ -43,4 +43,6 @@ public:
   virtual void Release(const vdl::ID& _ID) = 0;
 
   [[nodiscard]] virtual IBuffer* GetBuffer(const vdl::ID& _ID) = 0;
+
+  virtual void SetBuffer(const vdl::ID& _ID, IBuffer* _pBuffer) = 0;
 };

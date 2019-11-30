@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Src\vdl\BufferManager\DirectX11\CBufferManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\DirectX11\CBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\DirectX11\CDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\DirectX11\CDevice.hpp" />
@@ -33,7 +32,6 @@
     <ClInclude Include="..\..\Src\vdl\Viewport\DirectX11\Viewport.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX11\CBufferManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DirectX11\CDeviceContext.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\DirectX11\CDevice.cpp" />
     <ClCompile Include="..\..\Src\vdl\pch\DirectX11\pch.cpp">

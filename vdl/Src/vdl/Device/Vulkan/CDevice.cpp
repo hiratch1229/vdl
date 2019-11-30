@@ -1,5 +1,8 @@
 #include "CDevice.hpp"
 
+#include <vdl/Engine.hpp>
+#include <vdl/BufferManager/IBufferManager.hpp>
+
 #include <vdl/Format/Vulkan/Format.hpp>
 #include <vdl/Shader/Vulkan/CShader.hpp>
 #include <vdl/Misc/Misc.hpp>
@@ -291,6 +294,8 @@ namespace
 
 void CDevice::Initialize()
 {
+  pBufferManager_ = Engine::Get<IBufferManager>();
+
   const char* Layers[] = {
     "VK_LAYER_LUNARG_standard_validation",
     "VK_LAYER_GOOGLE_threading"
@@ -398,6 +403,8 @@ void CDevice::Initialize()
     VkDevice_ = PhysicalDevice_.createDeviceUnique(DeviceInfo);
     assert(VkDevice_);
   }
+
+  ConstantBufferAllocater_.Initialize(kParentConstantBufferSize);
 
   //  コマンドプールの作成
   {
@@ -541,6 +548,27 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
   }
 
   (*_ppUnorderedAccessBuffer) = std::move(pUnorderedAccessBuffer);
+}
+
+vdl::Detail::ConstantBufferData CDevice::CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
+{
+  const CConstantBuffer* pSrcConstantBuffer = Cast<CConstantBuffer>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()));
+
+  vdl::Detail::ConstantBufferData ConstantBuffer(pSrcConstantBuffer->BufferSize);
+  {
+    CCopyConstantBuffer* pCopyConstantBuffer = new CCopyConstantBuffer;
+    {
+      pCopyConstantBuffer->ParentBuffer = Cast<CConstantBuffer>(ConstantBufferAllocater_.GetConstantBuffer())->BufferData.Buffer.get();
+      pCopyConstantBuffer->BufferSize = pSrcConstantBuffer->BufferSize;
+      pCopyConstantBuffer->Offset = ConstantBufferAllocater_.Secure(pCopyConstantBuffer->BufferSize);
+    }
+
+    ::memcpy(ConstantBufferAllocater_.GetBuffer(pCopyConstantBuffer->Offset), pSrcConstantBuffer->BufferData.pData, pCopyConstantBuffer->BufferSize);
+
+    pBufferManager_->SetBuffer(ConstantBuffer.GetID(), pCopyConstantBuffer);
+  }
+
+  return ConstantBuffer;
 }
 
 void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)

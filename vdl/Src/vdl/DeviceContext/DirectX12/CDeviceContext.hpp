@@ -22,7 +22,7 @@ public:
 
   void SetViewport(const vdl::Viewport& _Viewport)override;
 
-  void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)override;
+  void SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)override;
 
   void SetBlendState(const vdl::BlendState& _BlendState)override;
 

@@ -7,9 +7,6 @@
     <Filter Include="Src\Buffer">
       <UniqueIdentifier>{184010d9-5de5-4674-a76e-04d8ac91e44f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\BufferManager">
-      <UniqueIdentifier>{d2b272c6-9938-4d74-aed0-0ed77dab0720}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Device">
       <UniqueIdentifier>{fe910d00-6c7e-4a90-b9c3-cd0452bb158f}</UniqueIdentifier>
     </Filter>
@@ -37,9 +34,6 @@
     <Filter Include="Src\Viewport">
       <UniqueIdentifier>{492eced0-ff43-463e-8ad9-1366c24395cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\BufferManager\ConstantBufferAllocater">
-      <UniqueIdentifier>{ca605c70-c835-482d-9e7b-a3cdf07599a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\pch">
       <UniqueIdentifier>{34938c31-214a-4942-a159-f620b0563077}</UniqueIdentifier>
     </Filter>
@@ -47,9 +41,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.hpp">
       <Filter>Src\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\BufferManager\Vulkan\CBufferManager.hpp">
-      <Filter>Src\BufferManager</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\Device\Vulkan\CDevice.hpp">
       <Filter>Src\Device</Filter>
@@ -78,17 +69,11 @@
     <ClInclude Include="..\..\Src\vdl\Scissor\Vulkan\Scissor.hpp">
       <Filter>Src\Scissor</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Src\vdl\BufferManager\Vulkan\ConstantBufferAllocater\ConstantBufferAllocater.hpp">
-      <Filter>Src\BufferManager\ConstantBufferAllocater</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Src\vdl\pch\Vulkan\pch.hpp">
       <Filter>Src\pch</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Src\vdl\BufferManager\Vulkan\CBufferManager.cpp">
-      <Filter>Src\BufferManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Device\Vulkan\CDevice.cpp">
       <Filter>Src\Device</Filter>
     </ClCompile>
@@ -100,9 +85,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Texture\Vulkan\CTexture.cpp">
       <Filter>Src\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Src\vdl\BufferManager\Vulkan\ConstantBufferAllocater\ConstantBufferAllocater.cpp">
-      <Filter>Src\BufferManager\ConstantBufferAllocater</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Buffer\Vulkan\CBuffer.cpp">
       <Filter>Src\Buffer</Filter>

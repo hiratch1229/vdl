@@ -1,14 +1,20 @@
 #pragma once
 #include "../IDevice.hpp"
 
+#include <vdl/ConstantBufferAllocater/ConstantBufferAllocater.hpp>
+
 #include <vdl/Buffer/Vulkan/CBuffer.hpp>
 #include <vdl/Texture/Vulkan/CTexture.hpp>
 
 #include <vdl/pch/Vulkan/pch.hpp>
 
+class IBufferManager;
+
 class CDevice : public IDevice
 {
   static constexpr vdl::uint kInstanceBufferSizeMultiple = 5;
+  static constexpr vdl::uint kParentConstantBufferSize = 51200;
+  static_assert(kParentConstantBufferSize % 256 == 0);
 private:
   vk::UniqueInstance Instance_;
   vk::UniqueDevice VkDevice_;
@@ -20,6 +26,9 @@ private:
 private:
   vdl::uint GraphicsQueueIndex_;
   vdl::uint ComputeQueueIndex_;
+private:
+  IBufferManager* pBufferManager_;
+  ConstantBufferAllocater ConstantBufferAllocater_;
 private:
 #if defined(DEBUG) | defined(_DEBUG)
   PFN_vkDestroyDebugReportCallbackEXT	DestroyReportFunction_;
@@ -34,6 +43,7 @@ public:
   [[nodiscard]] const vk::CommandBuffer& GetCommandBuffer()const { return CommandBuffer_.get(); }
   [[nodiscard]] vdl::uint GetGraphicsQueueIndex()const { return GraphicsQueueIndex_; }
   [[nodiscard]] vdl::uint GetComputeQueueIndex()const { return ComputeQueueIndex_; }
+  [[nodiscard]] ConstantBufferAllocater* GetConstantBufferAllocater() { return &ConstantBufferAllocater_; }
 public:
   [[nodiscard]] vdl::uint FindQueue(vk::QueueFlags _QueueFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const { return FindQueue(_QueueFlag, vk::QueueFlags(), _Surface); }
   [[nodiscard]] vdl::uint GetMemoryTypeIndex(vdl::uint _MemoryTypeBits, const vk::MemoryPropertyFlags& _MemoryPropertys)const;
@@ -65,6 +75,8 @@ public:
   void CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize)override;
 
   void CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vdl::uint _Stride, vdl::uint _BufferSize, const void* _Buffer)override;
+
+  vdl::Detail::ConstantBufferData CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)override;
 
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <vdl/Buffer/Vulkan/CBuffer.hpp>
+#include <vdl/Buffer/IBuffer.hpp>
 
 #include <memory>
 #include <vector>
@@ -19,16 +19,16 @@ class ConstantBufferAllocater
     [[nodiscard]] bool operator<(const MemorySpace& _MemorySpace)const noexcept { return Offset < _MemorySpace.Offset; }
   };
 private:
-  std::unique_ptr<CConstantBuffer> pConstantBuffer_;
+  std::unique_ptr<IConstantBuffer> pConstantBuffer_;
   std::vector<MemorySpace> MemorySpaces_;
 public:
   ConstantBufferAllocater() = default;
 
   void Initialize(vdl::uint _BufferSize);
 
-  [[nodiscard]] void* GetBuffer(vdl::uint _Offset)const { return static_cast<vdl::uint8_t*>(pConstantBuffer_->BufferData.pData) + _Offset; }
+  [[nodiscard]] void* GetBuffer(vdl::uint _Offset)const { return static_cast<vdl::uint8_t*>(pConstantBuffer_->GetBuffer()) + _Offset; }
 
-  [[nodiscard]] const vk::Buffer& GetVkBuffer()const { return pConstantBuffer_->BufferData.Buffer.get(); }
+  [[nodiscard]] IConstantBuffer* GetConstantBuffer()const { return pConstantBuffer_.get(); }
 
   [[nodiscard]] vdl::uint Secure(vdl::uint _BufferSize);
 

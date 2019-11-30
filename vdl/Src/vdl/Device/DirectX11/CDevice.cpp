@@ -3,6 +3,7 @@
 #include <vdl/Engine.hpp>
 #include <vdl/DeviceContext/DirectX11/CDeviceContext.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
+#include <vdl/BufferManager/IBufferManager.hpp>
 
 #include <vdl/Format/DirectX/Format.hpp>
 #include <vdl/Buffer/DirectX11/CBuffer.hpp>
@@ -77,6 +78,7 @@ void CDevice::Initialize()
 {
   pDeviceContext_ = static_cast<CDeviceContext*>(Engine::Get<IDeviceContext>());
   pTextureManager_ = Engine::Get<ITextureManager>();
+  pBufferManager_ = Engine::Get<IBufferManager>();
 
   //  エラーチェック用
   HRESULT hr = S_OK;
@@ -354,6 +356,45 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   (*_ppUnorderedAccessBuffer) = std::move(pUnordererdAccessBuffer);
+}
+
+vdl::Detail::ConstantBufferData CDevice::CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
+{
+  const CConstantBuffer* pSrcConstantBuffer = Cast<CConstantBuffer>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()));
+
+  vdl::Detail::ConstantBufferData ConstantBuffer(pSrcConstantBuffer->BufferSize);
+  {
+    CCopyConstantBuffer* pCopyConstantBuffer = new CCopyConstantBuffer(pSrcConstantBuffer->BufferSize);
+    {
+      ::memcpy(pCopyConstantBuffer->Buffer, pSrcConstantBuffer->Buffer, pCopyConstantBuffer->BufferSize);
+
+      HRESULT hr = S_OK;
+
+      D3D11_BUFFER_DESC BufferDesc;
+      {
+        BufferDesc.ByteWidth = pCopyConstantBuffer->BufferSize;
+        BufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+        BufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        BufferDesc.CPUAccessFlags = 0;
+        BufferDesc.MiscFlags = 0;
+        BufferDesc.StructureByteStride = 0;
+      }
+
+      D3D11_SUBRESOURCE_DATA InitialData;
+      {
+        InitialData.pSysMem = pCopyConstantBuffer->Buffer;
+        InitialData.SysMemPitch = 0;
+        InitialData.SysMemSlicePitch = 0;
+      }
+
+      hr = pD3D11Device_->CreateBuffer(&BufferDesc, &InitialData, pCopyConstantBuffer->pBuffer.GetAddressOf());
+      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    }
+
+    pBufferManager_->SetBuffer(ConstantBuffer.GetID(), pCopyConstantBuffer);
+  }
+
+  return ConstantBuffer;
 }
 
 void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)

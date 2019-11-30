@@ -3,11 +3,13 @@
 #include <vdl/Engine.hpp>
 #include <vdl/Device/IDevice.hpp>
 
+#include <assert.h>
+
 void ConstantBufferAllocater::Initialize(vdl::uint _BufferSize)
 {
   IBuffer* pConstantBuffer;
   Engine::Get<IDevice>()->CreateConstantBuffer(&pConstantBuffer, _BufferSize);
-  pConstantBuffer_.reset(std::move(static_cast<CConstantBuffer*>(pConstantBuffer)));
+  pConstantBuffer_.reset(std::move(static_cast<IConstantBuffer*>(pConstantBuffer)));
 
   MemorySpaces_.emplace_back(0, _BufferSize);
 }

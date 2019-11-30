@@ -11,7 +11,7 @@
 namespace
 {
   template<class Shader>
-  Shader* Cast(IShader* _pShader)
+  inline Shader* Cast(IShader* _pShader)
   {
     static_assert(std::is_base_of<IShader, Shader>::value);
 

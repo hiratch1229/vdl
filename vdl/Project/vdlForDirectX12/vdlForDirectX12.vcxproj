@@ -19,17 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.cpp" />
     <ClCompile Include="..\..\Src\vdl\DeviceContext\DirectX12\CDeviceContext.cpp" />
     <ClCompile Include="..\..\Src\vdl\Device\DirectX12\CDevice.cpp" />
+    <ClCompile Include="..\..\Src\vdl\pch\DirectX12\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Src\vdl\BufferManager\DirectX12\CBufferManager.hpp" />
     <ClInclude Include="..\..\Src\vdl\Buffer\DirectX12\CBuffer.hpp" />
     <ClInclude Include="..\..\Src\vdl\DeviceContext\DirectX12\CDeviceContext.hpp" />
     <ClInclude Include="..\..\Src\vdl\Device\DirectX12\CDevice.hpp" />
     <ClInclude Include="..\..\Src\vdl\Format\DirectX\Format.hpp" />
+    <ClInclude Include="..\..\Src\vdl\pch\DirectX12\pch.hpp" />
     <ClInclude Include="..\..\Src\vdl\Scissor\DirectX\Scissor.hpp" />
     <ClInclude Include="..\..\Src\vdl\Shader\DirectX12\CShader.hpp" />
     <ClInclude Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.hpp" />
@@ -104,17 +107,18 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,7 +165,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -169,7 +173,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>..\..\Include;..\..\Src;..\..\Include\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
