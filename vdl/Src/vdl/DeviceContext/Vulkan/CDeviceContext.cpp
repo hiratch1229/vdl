@@ -1154,7 +1154,7 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
 
   const vdl::ID TextureID = _DepthStencilTexture.GetID();
-  CDepthStencilTexture* pDepthStencilTexture = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(TextureID));
+  CDepthStencilTexture* pDepthStencilTexture = Cast<CDepthStencilTexture>(pTextureManager_->GetTexture(TextureID));
 
   const vk::ImageSubresourceRange SubresourceRange = { pDepthStencilTexture->ImageAspectFlag, 0, 1, 0, 1 };
   if (pDepthStencilTexture->TextureData.CurrentLayout != kImageLayout)
@@ -1185,7 +1185,7 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
   const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
 
   const vdl::ID TextureID = _UnorderedAccessTexture.GetID();
-  CUnorderedAccessTexture* pUnorderedAccessTexture = static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(TextureID));
+  CUnorderedAccessTexture* pUnorderedAccessTexture = Cast<CUnorderedAccessTexture>(pTextureManager_->GetTexture(TextureID));
 
   const vk::ImageSubresourceRange SubresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
   if (pUnorderedAccessTexture->TextureData.CurrentLayout != kImageLayout)
@@ -1281,7 +1281,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             assert(false);
           case TextureType::eDepthTexture:
           {
-            CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+            CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
             ImageData.Info.imageView = pDepthTexture->View.get();
 
             if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
@@ -1292,7 +1292,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
           break;
           case TextureType::eStencilTexture:
           {
-            CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+            CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
             ImageData.Info.imageView = pStencilTexture->View.get();
 
             if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
@@ -1303,7 +1303,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
           break;
           default:
           {
-            CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+            CTexture* pColorTexture = Cast<CTexture>(pTexture);
             ImageData.Info.imageView = pColorTexture->TextureData.View.get();
 
             if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
@@ -1321,9 +1321,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
           if (!UnorderedAccessBuffer.isEmpty())
           {
-            assert(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID())->GetType() == BufferType::eUnorderedAccessBuffer);
-
-            CUnordererdAccessBuffer* pUnorderedAccessBuffer = static_cast<CUnordererdAccessBuffer*>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
+            CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
             DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
             {
               BufferData.Info.buffer = pUnorderedAccessBuffer->BufferData.Buffer.get();
@@ -1490,8 +1488,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
       for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
       {
-        assert(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eCopyConstantBuffer);
-        CCopyConstantBuffer* pConstantBuffer = static_cast<CCopyConstantBuffer*>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
+        CCopyConstantBuffer* pConstantBuffer = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
 
         DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
         {
@@ -1564,8 +1561,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
           {
             constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eGeneral;
 
-            assert(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID())->GetType() == TextureType::eUnorderedAccessTexture);
-            CTexture* pTexture = static_cast<CTexture*>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()));
+            CTexture* pTexture = Cast<CTexture>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()));
             if (pTexture->TextureData.CurrentLayout != kImageLayout)
             {
               pTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
@@ -1586,9 +1582,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
           if (!UnorderedAccessBuffer.isEmpty())
           {
-            assert(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID())->GetType() == BufferType::eUnorderedAccessBuffer);
-
-            CUnordererdAccessBuffer* pUnorderedAccessBuffer = static_cast<CUnordererdAccessBuffer*>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
+            CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
             DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
             {
               BufferData.Info.buffer = pUnorderedAccessBuffer->BufferData.Buffer.get();
@@ -1691,8 +1685,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
   //  パイプラインのバインド
   {
-    assert(pShaderManager_->GetShader(CurrentComputeState_.ComputeShader.GetID())->GetType() == ShaderType::eComputeShader);
-    const CComputeShader* pComputeShader = static_cast<CComputeShader*>(pShaderManager_->GetShader(CurrentComputeState_.ComputeShader.GetID()));
+    const CComputeShader* pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(CurrentComputeState_.ComputeShader.GetID()));
 
     vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
     {
@@ -1960,7 +1953,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
         //  デプスステンシルバッファの設定
         if (!CurrentOutputManager.DepthStencilTexture.isEmpty())
         {
-          CDepthStencilTexture* pDepthStencilTexture = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(CurrentOutputManager.DepthStencilTexture.GetID()));
+          CDepthStencilTexture* pDepthStencilTexture = Cast<CDepthStencilTexture>(pTextureManager_->GetTexture(CurrentOutputManager.DepthStencilTexture.GetID()));
 
           constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
 
@@ -2075,7 +2068,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
             assert(false);
           case TextureType::eDepthTexture:
           {
-            CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+            CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
 
             if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
             {
@@ -2086,7 +2079,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
           break;
           case TextureType::eStencilTexture:
           {
-            CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+            CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
 
             if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
             {
@@ -2097,7 +2090,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
           break;
           default:
           {
-            CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+            CTexture* pColorTexture = Cast<CTexture>(pTexture);
 
             if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
             {
@@ -2159,8 +2152,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
       {
         if (!CurrentGraphicsState_.VertexShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID())->GetType() == ShaderType::eVertexShader);
-          const CVertexShader* pVertexShader = static_cast<CVertexShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID()));
+          const CVertexShader* pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
           {
@@ -2174,8 +2166,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
         if (!CurrentGraphicsState_.HullShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID())->GetType() == ShaderType::eHullShader);
-          const CHullShader* pHullShader = static_cast<CHullShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID()));
+          const CHullShader* pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
           {
@@ -2189,8 +2180,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
         if (!CurrentGraphicsState_.DomainShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID())->GetType() == ShaderType::eDomainShader);
-          const CDomainShader* pDomainShader = static_cast<CDomainShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID()));
+          const CDomainShader* pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
           {
@@ -2204,8 +2194,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
         if (!CurrentGraphicsState_.GeometryShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID())->GetType() == ShaderType::eGeometryShader);
-          const CGeometryShader* pGeometryShader = static_cast<CGeometryShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID()));
+          const CGeometryShader* pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
           {
@@ -2219,8 +2208,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
         if (!CurrentGraphicsState_.PixelShader.isEmpty())
         {
-          assert(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID())->GetType() == ShaderType::ePixelShader);
-          const CPixelShader* pPixelShader = static_cast<CPixelShader*>(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID()));
+          const CPixelShader* pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID()));
 
           vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
           {
@@ -2408,19 +2396,19 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
                 assert(false);
               case TextureType::eDepthTexture:
               {
-                CDepthTexture* pDepthTexture = static_cast<CDepthTexture*>(pTexture);
+                CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
                 ImageData.Info.imageView = pDepthTexture->View.get();
               }
               break;
               case TextureType::eStencilTexture:
               {
-                CStencilTexture* pStencilTexture = static_cast<CStencilTexture*>(pTexture);
+                CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
                 ImageData.Info.imageView = pStencilTexture->View.get();
               }
               break;
               default:
               {
-                CTexture* pColorTexture = static_cast<CTexture*>(pTexture);
+                CTexture* pColorTexture = Cast<CTexture>(pTexture);
                 ImageData.Info.imageView = pColorTexture->TextureData.View.get();
               }
               break;
@@ -2433,9 +2421,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
               if (!UnorderedAccessBuffer.isEmpty())
               {
-                assert(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID())->GetType() == BufferType::eUnorderedAccessBuffer);
-
-                CUnordererdAccessBuffer* pUnorderedAccessBuffer = static_cast<CUnordererdAccessBuffer*>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
+                CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
                 DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
                 {
                   BufferData.Info.buffer = pUnorderedAccessBuffer->BufferData.Buffer.get();
@@ -2671,8 +2657,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
               continue;
             }
 
-            assert(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID())->GetType() == BufferType::eCopyConstantBuffer);
-            CCopyConstantBuffer* pConstantBuffer = static_cast<CCopyConstantBuffer*>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
+            CCopyConstantBuffer* pConstantBuffer = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
 
             DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
             {
@@ -2756,9 +2741,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
   if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexBuffer) && !CurrentGraphicsState_.VertexBuffer.isEmpty())
   {
-    assert(pBufferManager_->GetBuffer(CurrentGraphicsState_.VertexBuffer.GetID())->GetType() == BufferType::eVertexBuffer);
-
-    const CVertexBuffer* pVertexBuffer = static_cast<const CVertexBuffer*>(pBufferManager_->GetBuffer(CurrentGraphicsState_.VertexBuffer.GetID()));
+    const CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.VertexBuffer.GetID()));
 
     constexpr vk::DeviceSize kOffset = 0;
     CurrentGraphicsCommandBuffer.bindVertexBuffers(0, pVertexBuffer->BufferData.Buffer.get(), kOffset);
@@ -2768,9 +2751,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
   if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetInstanceBuffer) && !CurrentGraphicsState_.InstanceBuffer.isEmpty())
   {
-    assert(pBufferManager_->GetBuffer(CurrentGraphicsState_.InstanceBuffer.GetID())->GetType() == BufferType::eInstanceBuffer);
-
-    const CInstanceBuffer* pInstanceBuffer = static_cast<const CInstanceBuffer*>(pBufferManager_->GetBuffer(CurrentGraphicsState_.InstanceBuffer.GetID()));
+    const CInstanceBuffer* pInstanceBuffer = Cast<CInstanceBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.InstanceBuffer.GetID()));
 
     CurrentGraphicsCommandBuffer.bindVertexBuffers(1, pInstanceBuffer->BufferData.Buffer.get(), pInstanceBuffer->PreviousOffset);
 
@@ -2779,9 +2760,7 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
 
   if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetIndexBuffer) && !CurrentGraphicsState_.IndexBuffer.isEmpty())
   {
-    assert(pBufferManager_->GetBuffer(CurrentGraphicsState_.IndexBuffer.GetID())->GetType() == BufferType::eIndexBuffer);
-
-    const CIndexBuffer* pIndexBuffer = static_cast<const CIndexBuffer*>(pBufferManager_->GetBuffer(CurrentGraphicsState_.IndexBuffer.GetID()));
+    const CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.IndexBuffer.GetID()));
 
     constexpr vk::DeviceSize kOffset = 0;
     CurrentGraphicsCommandBuffer.bindIndexBuffer(pIndexBuffer->BufferData.Buffer.get(), kOffset, pIndexBuffer->IndexType);
@@ -2825,7 +2804,7 @@ CRenderTexture* CDeviceContext::GetVkRenderTexture(const vdl::RenderTexture& _Re
 
   ITexture* pTexture = pTextureManager_->GetTexture(_RenderTexture.GetID());
 
-  return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? pSwapChain_->GetVkRenderTexture() : static_cast<CRenderTexture*>(pTexture));
+  return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? pSwapChain_->GetVkRenderTexture() : Cast<CRenderTexture>(pTexture));
 }
 
 const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState& _RasterizerState)

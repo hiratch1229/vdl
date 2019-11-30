@@ -42,6 +42,8 @@ namespace vdl
   template<class Type>
   struct Type4
   {
+    static_assert(std::is_fundamental<Type>::value);
+
     Type x, y, z, w;
   public:
     Type4() = default;

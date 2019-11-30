@@ -65,6 +65,8 @@ public:
   Engine();
   ~Engine();
 public:
+  [[nodiscard]] static bool isActive() { return pEngine != nullptr; }
+public:
   template<class T> [[nodiscard]] static T* Get() { return nullptr; }
   template<> [[nodiscard]] static ISystem* Get() { return pEngine->pSystem_.Get(); }
   template<> [[nodiscard]] static IWindow* Get() { return pEngine->pWindow_.Get(); }

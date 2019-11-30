@@ -638,7 +638,7 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   {
   case BufferType::eVertexBuffer:
   {
-    ID3D11Buffer* pBuffer = static_cast<CVertexBuffer*>(_pDstBuffer)->pBuffer.Get();
+    ID3D11Buffer* pBuffer = Cast<CVertexBuffer>(_pDstBuffer)->pBuffer.Get();
 
     D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
     hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
@@ -651,7 +651,7 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   break;
   case BufferType::eInstanceBuffer:
   {
-    ID3D11Buffer* pBuffer = static_cast<CInstanceBuffer*>(_pDstBuffer)->pBuffer.Get();
+    ID3D11Buffer* pBuffer = Cast<CInstanceBuffer>(_pDstBuffer)->pBuffer.Get();
 
     D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
     hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);
@@ -664,7 +664,7 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   break;
   case BufferType::eIndexBuffer:
   {
-    ID3D11Buffer* pBuffer = static_cast<CIndexBuffer*>(_pDstBuffer)->pBuffer.Get();
+    ID3D11Buffer* pBuffer = Cast<CIndexBuffer>(_pDstBuffer)->pBuffer.Get();
 
     D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
     hr = pD3D11ImmediateContext_->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubresorce);

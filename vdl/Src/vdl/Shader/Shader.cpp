@@ -8,6 +8,22 @@
 #include <filesystem>
 #include <assert.h>
 
+namespace
+{
+  template<class Shader>
+  Shader* Cast(IShader* _pShader)
+  {
+    static_assert(std::is_base_of<IShader, Shader>::value);
+
+    if constexpr (std::is_same<IVertexShader, Shader>::value)
+    {
+      assert(_pShader->GetType() == ShaderType::eVertexShader);
+    }
+
+    return static_cast<Shader*>(_pShader);
+  }
+}
+
 namespace vdl
 {
   VertexShader::VertexShader(const char* _FilePath, InputLayoutType _InputLayout, const char* _EntryPoint)
@@ -69,7 +85,7 @@ namespace vdl
 
   VertexShader::~VertexShader()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -78,8 +94,8 @@ namespace vdl
   InputLayoutType VertexShader::GetInputLayout()const
   {
     assert(!isEmpty());
-    assert(Engine::Get<IShaderManager>()->GetShader(ID_)->GetType() == ShaderType::eVertexShader);
-    return static_cast<IVertexShader*>(Engine::Get<IShaderManager>()->GetShader(ID_))->GetInputLayout();
+
+    return Cast<IVertexShader>(Engine::Get<IShaderManager>()->GetShader(ID_))->GetInputLayout();
   }
 
   //--------------------------------------------------
@@ -143,7 +159,7 @@ namespace vdl
 
   HullShader::~HullShader()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -210,7 +226,7 @@ namespace vdl
 
   DomainShader::~DomainShader()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -277,7 +293,7 @@ namespace vdl
 
   GeometryShader::~GeometryShader()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -344,7 +360,7 @@ namespace vdl
 
   PixelShader::~PixelShader()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -411,7 +427,7 @@ namespace vdl
 
   ComputeShader::~ComputeShader()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }

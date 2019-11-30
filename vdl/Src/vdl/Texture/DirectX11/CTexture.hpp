@@ -28,7 +28,7 @@ struct CCubeTexture : public ITexture
 public:
   CCubeTexture() = default;
 
-  TextureType GetType()const override { return TextureType::eTexture; }
+  TextureType GetType()const override { return TextureType::eCubeTexture; }
 
   vdl::uint2 GetSize()const final { return TextureSize; }
 
@@ -110,3 +110,45 @@ public:
 
   vdl::FormatType GetFormat()const final { return Format; }
 };
+
+template<class Texture>
+inline Texture* Cast(ITexture* _pTexture)
+{
+  static_assert(std::is_base_of<ITexture, Texture>::value);
+
+  if constexpr (std::is_same<CTexture, Texture>::value)
+  {
+    assert(_pTexture->GetType() == TextureType::eTexture || _pTexture->GetType() == TextureType::eRenderTexture || _pTexture->GetType() == TextureType::eDepthTexture
+      || _pTexture->GetType() == TextureType::eStencilTexture || _pTexture->GetType() == TextureType::eUnorderedAccessTexture);
+  }
+  if constexpr (std::is_same<CCubeTexture, Texture>::value)
+  {
+    assert(_pTexture->GetType() == TextureType::eCubeTexture);
+  }
+  if constexpr (std::is_same<CRenderTexture, Texture>::value)
+  {
+    assert(_pTexture->GetType() == TextureType::eRenderTexture);
+  }
+  if constexpr (std::is_same<CSwapChainRenderTexture, Texture>::value)
+  {
+    assert(_pTexture->GetType() == TextureType::eSwapChainRenderTexture);
+  }
+  if constexpr (std::is_same<CDepthStencilTexture, Texture>::value)
+  {
+    assert(_pTexture->GetType() == TextureType::eDepthStencilTexture);
+  }
+  if constexpr (std::is_same<CDepthTexture, Texture>::value)
+  {
+    assert(_pTexture->GetType() == TextureType::eDepthTexture);
+  }
+  if constexpr (std::is_same<CStencilTexture, Texture>::value)
+  {
+    assert(_pTexture->GetType() == TextureType::eStencilTexture);
+  }
+  if constexpr (std::is_same<CUnorderedAccessTexture, Texture>::value)
+  {
+    assert(_pTexture->GetType() == TextureType::eUnorderedAccessTexture);
+  }
+
+  return static_cast<Texture*>(_pTexture);
+}

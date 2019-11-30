@@ -68,7 +68,6 @@ void SceneOcean::Initialize()
   //  PostProcessの初期化
   {
     LightPassRenderTextures_[static_cast<uint>(LightPassOutputType::eColor)] = RenderTexture(Constants::kDefaultWindowSize, FormatType::eR8G8B8A8_Unorm);
-    LightPassRenderTextures_[static_cast<uint>(LightPassOutputType::eLuminance)] = RenderTexture(Constants::kDefaultWindowSize, FormatType::eR8G8B8A8_Unorm);
 
     uint2 TextureSize = Constants::kDefaultWindowSize;
     for (uint i = 0; i < kShrinkBuffeNum; ++i)
@@ -517,7 +516,7 @@ void SceneOcean::Update()
   //  GaussianBlur
   {
     Viewport Viewport = { 0, 0 };
-    Texture SrcTexture = LightPassRenderTextures_[0];
+    Texture SrcTexture = LightPassRenderTextures_[static_cast<uint>(LightPassOutputType::eColor)];
 
     //  縮小バッファを使用
     for (uint i = 0; i < kShrinkBuffeNum; ++i)

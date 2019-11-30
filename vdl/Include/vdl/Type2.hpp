@@ -38,6 +38,8 @@ namespace vdl
   template<class Type>
   struct Type2
   {
+    static_assert(std::is_fundamental<Type>::value);
+
     Type x, y;
   public:
     Type2() = default;

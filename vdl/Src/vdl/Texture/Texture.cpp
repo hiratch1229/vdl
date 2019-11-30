@@ -5,6 +5,22 @@
 
 #include <vdl/Image.hpp>
 
+namespace
+{
+  template<class Texture>
+  Texture* Cast(ITexture* _pTexture)
+  {
+    static_assert(std::is_base_of<ITexture, Texture>::value);
+
+    if constexpr (std::is_same<IDepthStencilTexture, Texture>::value)
+    {
+      assert(_pTexture->GetType() == TextureType::eDepthStencilTexture);
+    }
+
+    return static_cast<Texture*>(_pTexture);
+  }
+}
+
 namespace vdl
 {
   Texture::Texture(const char* _FilePath, bool _isSerialize)
@@ -74,7 +90,7 @@ namespace vdl
 
   Texture::~Texture()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }
@@ -145,7 +161,7 @@ namespace vdl
 
   CubeTexture::~CubeTexture()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }
@@ -218,7 +234,7 @@ namespace vdl
 
   DepthStencilTexture::~DepthStencilTexture()
   {
-    if (ID_)
+    if (ID_ && Engine::isActive())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }
@@ -235,14 +251,14 @@ namespace vdl
   {
     assert(!isEmpty());
 
-    return static_cast<IDepthStencilTexture*>(Engine::Get<ITextureManager>()->GetTexture(ID_))->GetDepthTexture();
+    return Cast<IDepthStencilTexture>(Engine::Get<ITextureManager>()->GetTexture(ID_))->GetDepthTexture();
   }
 
   vdl::Texture DepthStencilTexture::GetStencilTexture()const
   {
     assert(!isEmpty());
 
-    return static_cast<IDepthStencilTexture*>(Engine::Get<ITextureManager>()->GetTexture(ID_))->GetStencilTexture();
+    return Cast<IDepthStencilTexture>(Engine::Get<ITextureManager>()->GetTexture(ID_))->GetStencilTexture();
   }
 
   //--------------------------------------------------

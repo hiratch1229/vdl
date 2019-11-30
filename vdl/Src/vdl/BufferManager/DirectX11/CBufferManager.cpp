@@ -68,9 +68,7 @@ vdl::ID CBufferManager::CreateConstantBuffer(vdl::uint _BufferSize)
 
 vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
-  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer);
-
-  const CConstantBuffer* pSrcConstantBuffer = static_cast<CConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()));
+  const CConstantBuffer* pSrcConstantBuffer = Cast<CConstantBuffer>(GetBuffer(_ConstantBuffer.GetID()));
 
   vdl::Detail::ConstantBufferData ConstantBuffer(pSrcConstantBuffer->BufferSize);
   {
@@ -109,17 +107,13 @@ vdl::Detail::ConstantBufferData CBufferManager::CloneConstantBuffer(const vdl::D
 
 void* CBufferManager::GetBuffer(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
-  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer || GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
-
-  IConstantBuffer* pConstantBuffer = static_cast<IConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()));
+  IConstantBuffer* pConstantBuffer = Cast<IConstantBuffer>(GetBuffer(_ConstantBuffer.GetID()));
   return pConstantBuffer->GetBuffer();
 }
 
 vdl::uint CBufferManager::GetBufferSize(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
-  assert(GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eConstantBuffer || GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
-
-  IConstantBuffer* pConstantBuffer = static_cast<IConstantBuffer*>(GetBuffer(_ConstantBuffer.GetID()));
+  IConstantBuffer* pConstantBuffer = Cast<IConstantBuffer>(GetBuffer(_ConstantBuffer.GetID()));
   return pConstantBuffer->GetBufferSize();
 }
 

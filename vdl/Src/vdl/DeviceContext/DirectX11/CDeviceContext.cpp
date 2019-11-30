@@ -306,9 +306,7 @@ void CDeviceContext::SetVertexBuffer(const VertexBuffer& _VertexBuffer)
     return;
   }
 
-  assert(pBufferManager_->GetBuffer(_VertexBuffer.GetID())->GetType() == BufferType::eVertexBuffer);
-
-  const CVertexBuffer* pVertexBuffer = static_cast<CVertexBuffer*>(pBufferManager_->GetBuffer(_VertexBuffer.GetID()));
+  const CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(pBufferManager_->GetBuffer(_VertexBuffer.GetID()));
 
   constexpr vdl::uint kOffset = 0;
   const vdl::uint Stride = GetVertexBufferStride();
@@ -322,9 +320,7 @@ void CDeviceContext::SetInstanceBuffer(const InstanceBuffer& _InstanceBuffer)
     return;
   }
 
-  assert(pBufferManager_->GetBuffer(_InstanceBuffer.GetID())->GetType() == BufferType::eInstanceBuffer);
-
-  const CInstanceBuffer* pInstanceBuffer = static_cast<CInstanceBuffer*>(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()));
+  const CInstanceBuffer* pInstanceBuffer = Cast<CInstanceBuffer>(pBufferManager_->GetBuffer(_InstanceBuffer.GetID()));
 
   constexpr vdl::uint kOffset = 0;
   const vdl::uint Stride = GetInstanceBufferStride();
@@ -338,9 +334,7 @@ void CDeviceContext::SetIndexBuffer(const IndexBuffer& _IndexBuffer)
     return;
   }
 
-  assert(pBufferManager_->GetBuffer(_IndexBuffer.GetID())->GetType() == BufferType::eIndexBuffer);
-
-  const CIndexBuffer* pIndexBuffer = static_cast<CIndexBuffer*>(pBufferManager_->GetBuffer(_IndexBuffer.GetID()));
+  const CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(pBufferManager_->GetBuffer(_IndexBuffer.GetID()));
 
   constexpr vdl::uint kOffset = 0;
   pD3D11ImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), pIndexBuffer->IndexFormat, kOffset);
@@ -393,7 +387,7 @@ void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures
   {
     if (!_DepthStencilTexture.isEmpty())
     {
-      pDepthStencilView = static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(_DepthStencilTexture.GetID()))->pDepthStencilView.Get();
+      pDepthStencilView = Cast<CDepthStencilTexture>(pTextureManager_->GetTexture(_DepthStencilTexture.GetID()))->pDepthStencilView.Get();
     }
   }
 
@@ -515,8 +509,7 @@ void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
   {
     if (!_VertexShader.isEmpty())
     {
-      assert(pShaderManager_->GetShader(_VertexShader.GetID())->GetType() == ShaderType::eVertexShader);
-      pVertexShader = static_cast<CVertexShader*>(pShaderManager_->GetShader(_VertexShader.GetID()))->pVertexShader.Get();
+      pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(_VertexShader.GetID()))->pVertexShader.Get();
     }
   }
 
@@ -568,8 +561,7 @@ void CDeviceContext::HSSetShader(const vdl::HullShader& _HullShader)
   {
     if (!_HullShader.isEmpty())
     {
-      assert(pShaderManager_->GetShader(_HullShader.GetID())->GetType() == ShaderType::eHullShader);
-      pHullShader = static_cast<CHullShader*>(pShaderManager_->GetShader(_HullShader.GetID()))->pHullShader.Get();
+      pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(_HullShader.GetID()))->pHullShader.Get();
     }
   }
 
@@ -621,8 +613,7 @@ void CDeviceContext::DSSetShader(const vdl::DomainShader& _DomainShader)
   {
     if (!_DomainShader.isEmpty())
     {
-      assert(pShaderManager_->GetShader(_DomainShader.GetID())->GetType() == ShaderType::eDomainShader);
-      pDomainShader = static_cast<CDomainShader*>(pShaderManager_->GetShader(_DomainShader.GetID()))->pDomainShader.Get();
+      pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(_DomainShader.GetID()))->pDomainShader.Get();
     }
   }
 
@@ -674,8 +665,7 @@ void CDeviceContext::GSSetShader(const vdl::GeometryShader& _GeometryShader)
   {
     if (!_GeometryShader.isEmpty())
     {
-      assert(pShaderManager_->GetShader(_GeometryShader.GetID())->GetType() == ShaderType::eGeometryShader);
-      pGeometryShader = static_cast<CGeometryShader*>(pShaderManager_->GetShader(_GeometryShader.GetID()))->pGeometryShader.Get();
+      pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(_GeometryShader.GetID()))->pGeometryShader.Get();
     }
   }
 
@@ -727,8 +717,7 @@ void CDeviceContext::PSSetShader(const vdl::PixelShader& _PixelShader)
   {
     if (!_PixelShader.isEmpty())
     {
-      assert(pShaderManager_->GetShader(_PixelShader.GetID())->GetType() == ShaderType::ePixelShader);
-      pPixelShader = static_cast<CPixelShader*>(pShaderManager_->GetShader(_PixelShader.GetID()))->pPixelShader.Get();
+      pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(_PixelShader.GetID()))->pPixelShader.Get();
     }
   }
 
@@ -780,8 +769,7 @@ void CDeviceContext::CSSetShader(const vdl::ComputeShader& _ComputeShader)
   {
     if (!_ComputeShader.isEmpty())
     {
-      assert(pShaderManager_->GetShader(_ComputeShader.GetID())->GetType() == ShaderType::eComputeShader);
-      pComputeShader = static_cast<CComputeShader*>(pShaderManager_->GetShader(_ComputeShader.GetID()))->pComputeShader.Get();
+      pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(_ComputeShader.GetID()))->pComputeShader.Get();
     }
   }
 
@@ -862,15 +850,14 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
 {
   assert(!_DepthStencilTexture.isEmpty());
 
-  pD3D11ImmediateContext_->ClearDepthStencilView(static_cast<CDepthStencilTexture*>(pTextureManager_->GetTexture(_DepthStencilTexture.GetID()))->pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, _ClearDepth, _ClearStencil);
+  pD3D11ImmediateContext_->ClearDepthStencilView(Cast<CDepthStencilTexture>(pTextureManager_->GetTexture(_DepthStencilTexture.GetID()))->pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, _ClearDepth, _ClearStencil);
 }
 
 void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)
 {
   assert(!_UnorderedAccessTexture.isEmpty());
-  assert(pTextureManager_->GetTexture(_UnorderedAccessTexture.GetID())->GetType() == TextureType::eUnorderedAccessTexture);
 
-  pD3D11ImmediateContext_->ClearUnorderedAccessViewFloat(static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(_UnorderedAccessTexture.GetID()))->pUnorderedAccessView.Get(), &_ClearColor.Red);
+  pD3D11ImmediateContext_->ClearUnorderedAccessViewFloat(Cast<CUnorderedAccessTexture>(pTextureManager_->GetTexture(_UnorderedAccessTexture.GetID()))->pUnorderedAccessView.Get(), &_ClearColor.Red);
 }
 
 void CDeviceContext::Draw(vdl::uint _VertexCount, vdl::uint _InstanceCount, vdl::uint _FirstVertex, vdl::uint _FirstInstance)
@@ -988,7 +975,7 @@ ID3D11RenderTargetView* CDeviceContext::GetRenderTargetView(const vdl::RenderTex
   }
   else
   {
-    return static_cast<CRenderTexture*>(pTexture)->pRenderTargetView.Get();
+    return Cast<CRenderTexture>(pTexture)->pRenderTargetView.Get();
   }
 }
 
@@ -1002,7 +989,7 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
       const vdl::Texture& Texture = std::get<vdl::Texture>(_ShaderResource);
       if (!Texture.isEmpty())
       {
-        pShaderResourceView = static_cast<CTexture*>(pTextureManager_->GetTexture(Texture.GetID()))->pShaderResourceView.Get();
+        pShaderResourceView = Cast<CTexture>(pTextureManager_->GetTexture(Texture.GetID()))->pShaderResourceView.Get();
       }
     }
     if (std::get_if<vdl::CubeTexture>(&_ShaderResource))
@@ -1010,7 +997,7 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
       const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(_ShaderResource);
       if (!CubeTexture.isEmpty())
       {
-        pShaderResourceView = static_cast<CCubeTexture*>(pTextureManager_->GetTexture(CubeTexture.GetID()))->pShaderResourceView.Get();
+        pShaderResourceView = Cast<CCubeTexture>(pTextureManager_->GetTexture(CubeTexture.GetID()))->pShaderResourceView.Get();
       }
     }
     //  UnorderedAccessBuffer
@@ -1020,8 +1007,7 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
 
       if (!UnorderedAccessBuffer.isEmpty())
       {
-        assert(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID())->GetType() == BufferType::eUnorderedAccessBuffer);
-        pShaderResourceView = static_cast<CUnordererdAccessBuffer*>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()))->pShaderResourceView.Get();
+        pShaderResourceView = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()))->pShaderResourceView.Get();
       }
     }
   }
@@ -1067,8 +1053,7 @@ ID3D11Buffer* CDeviceContext::GetConstantBuffer(const vdl::Detail::ConstantBuffe
   {
     if (!_ConstantBuffer.isEmpty())
     {
-      assert(pBufferManager_->GetBuffer(_ConstantBuffer.GetID())->GetType() == BufferType::eCopyConstantBuffer);
-      pConstantBuffer = static_cast<CCopyConstantBuffer*>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()))->pBuffer.Get();
+      pConstantBuffer = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()))->pBuffer.Get();
     }
   }
 
@@ -1086,8 +1071,7 @@ ID3D11UnorderedAccessView* CDeviceContext::GetUnorderedAccessView(const vdl::Uno
 
       if (!UnorderedAccessTexture.isEmpty())
       {
-        assert(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID())->GetType() == TextureType::eUnorderedAccessTexture);
-        pUnorderedAccessView = static_cast<CUnorderedAccessTexture*>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()))->pUnorderedAccessView.Get();
+        pUnorderedAccessView = Cast<CUnorderedAccessTexture>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()))->pUnorderedAccessView.Get();
       }
     }
     //  UnorderedAccessBuffer
@@ -1097,8 +1081,7 @@ ID3D11UnorderedAccessView* CDeviceContext::GetUnorderedAccessView(const vdl::Uno
 
       if (!UnorderedAccessBuffer.isEmpty())
       {
-        assert(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID())->GetType() == BufferType::eUnorderedAccessBuffer);
-        pUnorderedAccessView = static_cast<CUnordererdAccessBuffer*>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()))->pUnorderedAccessView.Get();
+        pUnorderedAccessView = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()))->pUnorderedAccessView.Get();
       }
     }
   }

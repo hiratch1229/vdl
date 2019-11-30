@@ -113,44 +113,44 @@ void CSwapChain::ChangeWindowMode()
 
 void CSwapChain::ScreenShot()
 {
-  HRESULT hr = S_OK;
-
-  Microsoft::WRL::ComPtr<ID3D11Texture2D> BackBuffer;
-  {
-    hr = pSwapChain_->GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf()));
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
-  }
-
-  vdl::uint2 TextureSize;
-  Microsoft::WRL::ComPtr<ID3D11Texture2D> CopyBuffer;
-  {
-    D3D11_TEXTURE2D_DESC Texture2DDesc;
-    {
-      BackBuffer->GetDesc(&Texture2DDesc);
-      Texture2DDesc.BindFlags = 0;
-      Texture2DDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-      Texture2DDesc.Usage = D3D11_USAGE_STAGING;
-    }
-
-    TextureSize = { Texture2DDesc.Width, Texture2DDesc.Height };
-
-    hr = pD3D11Device_->CreateTexture2D(&Texture2DDesc, nullptr, CopyBuffer.GetAddressOf());
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
-
-    pD3D11ImmediateContext_->CopyResource(CopyBuffer.Get(), BackBuffer.Get());
-  }
-
-  vdl::Image Image;
-  Image.Resize(TextureSize);
-  {
-    D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
-    hr = pD3D11ImmediateContext_->Map(CopyBuffer.Get(), 0, D3D11_MAP_READ, 0, &MappedSubresorce);
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-
-    ::memcpy(Image.Buffer(), MappedSubresorce.pData, Image.BufferSize());
-
-    pD3D11ImmediateContext_->Unmap(CopyBuffer.Get(), 0);
-  }
-
-  Image.SavePNG(Constants::kScreenShotFileDirectory);
+  //HRESULT hr = S_OK;
+  //
+  //Microsoft::WRL::ComPtr<ID3D11Texture2D> BackBuffer;
+  //{
+  //  hr = pSwapChain_->GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf()));
+  //  _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+  //}
+  //
+  //vdl::uint2 TextureSize;
+  //Microsoft::WRL::ComPtr<ID3D11Texture2D> CopyBuffer;
+  //{
+  //  D3D11_TEXTURE2D_DESC Texture2DDesc;
+  //  {
+  //    BackBuffer->GetDesc(&Texture2DDesc);
+  //    Texture2DDesc.BindFlags = 0;
+  //    Texture2DDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+  //    Texture2DDesc.Usage = D3D11_USAGE_STAGING;
+  //  }
+  //
+  //  TextureSize = { Texture2DDesc.Width, Texture2DDesc.Height };
+  //
+  //  hr = pD3D11Device_->CreateTexture2D(&Texture2DDesc, nullptr, CopyBuffer.GetAddressOf());
+  //  _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+  //
+  //  pD3D11ImmediateContext_->CopyResource(CopyBuffer.Get(), BackBuffer.Get());
+  //}
+  //
+  //vdl::Image Image;
+  //Image.Resize(TextureSize);
+  //{
+  //  D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
+  //  hr = pD3D11ImmediateContext_->Map(CopyBuffer.Get(), 0, D3D11_MAP_READ, 0, &MappedSubresorce);
+  //  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  //
+  //  ::memcpy(Image.Buffer(), MappedSubresorce.pData, Image.BufferSize());
+  //
+  //  pD3D11ImmediateContext_->Unmap(CopyBuffer.Get(), 0);
+  //}
+  //
+  //Image.SavePNG(Constants::kScreenShotFileDirectory);
 }

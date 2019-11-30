@@ -874,13 +874,13 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   {
   case BufferType::eVertexBuffer:
   {
-    CVertexBuffer* pVertexBuffer = static_cast<CVertexBuffer*>(_pDstBuffer);
+    CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(_pDstBuffer);
     ::memcpy(pVertexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
   }
   break;
   case BufferType::eInstanceBuffer:
   {
-    CInstanceBuffer* pInstanceBuffer = static_cast<CInstanceBuffer*>(_pDstBuffer);
+    CInstanceBuffer* pInstanceBuffer = Cast<CInstanceBuffer>(_pDstBuffer);
     if (pInstanceBuffer->Offset + _BufferSize > pInstanceBuffer->BufferSize)
     {
       pInstanceBuffer->Offset = 0;
@@ -893,7 +893,7 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   break;
   case BufferType::eIndexBuffer:
   {
-    CIndexBuffer* pIndexBuffer = static_cast<CIndexBuffer*>(_pDstBuffer);
+    CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(_pDstBuffer);
     ::memcpy(pIndexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
   }
   break;
