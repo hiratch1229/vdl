@@ -79,4 +79,9 @@ namespace Constants
   constexpr vdl::uint kBackBufferNum = 3;
 
   constexpr vdl::FormatType kTextureFormat = vdl::FormatType::eR8G8B8A8_Unorm;
+
+  constexpr vdl::uint kInstanceBufferSizeMultiple = 5;
+
+  constexpr vdl::uint kParentConstantBufferSize = 51200;
+  static_assert(kParentConstantBufferSize % 256 == 0);
 }

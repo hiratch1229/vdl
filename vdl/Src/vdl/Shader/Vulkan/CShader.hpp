@@ -10,7 +10,7 @@ struct ShaderData
 public:
   ShaderData() = default;
 
-  ShaderData(ShaderData &&_Data)noexcept
+  ShaderData(ShaderData&& _Data)noexcept
     : Module(std::move(_Data.Module)), EntryPoint(std::move(_Data.EntryPoint)) {}
 
   ShaderData& operator=(ShaderData&& _Data)noexcept

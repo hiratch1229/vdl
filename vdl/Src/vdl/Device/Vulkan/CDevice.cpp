@@ -404,7 +404,7 @@ void CDevice::Initialize()
     assert(VkDevice_);
   }
 
-  ConstantBufferAllocater_.Initialize(kParentConstantBufferSize);
+  ConstantBufferAllocater_.Initialize(Constants::kParentConstantBufferSize);
 
   //  コマンドプールの作成
   {
@@ -489,7 +489,8 @@ void CDevice::CreateInstanceBuffer(IBuffer** _ppInstanceBuffer, vdl::uint _Buffe
   assert(_ppInstanceBuffer);
 
   CInstanceBuffer* pInstanceBuffer = new CInstanceBuffer;
-  pInstanceBuffer->BufferSize = _BufferSize * kInstanceBufferSizeMultiple;
+  pInstanceBuffer->BufferSize = _BufferSize * Constants::kInstanceBufferSizeMultiple;
+  pInstanceBuffer->Offset = 0;
   CreateBuffer(&pInstanceBuffer->BufferData, pInstanceBuffer->BufferSize, vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 
   (*_ppInstanceBuffer) = std::move(pInstanceBuffer);
@@ -523,7 +524,7 @@ void CDevice::CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, 
 
 void CDevice::CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize)
 {
-  assert(_ppConstantBuffer);
+  assert(_ppConstantBuffer && _BufferSize % 256 == 0);
 
   CConstantBuffer* pConstantBuffer = new CConstantBuffer;
   pConstantBuffer->BufferSize = _BufferSize;
@@ -777,9 +778,9 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
   (*_ppRenderTexture) = std::move(pRenderTexture);
 }
 
-void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
+void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
-  assert(_ppDepthStecilTexture);
+  assert(_ppDepthStencilTexture);
 
   CDepthStencilTexture* pDepthStencilTexture = new CDepthStencilTexture;
   pDepthStencilTexture->TextureSize = _TextureSize;
@@ -836,7 +837,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     SubmitAndWait(SubmitInfo);
   }
 
-  (*_ppDepthStecilTexture) = std::move(pDepthStencilTexture);
+  (*_ppDepthStencilTexture) = std::move(pDepthStencilTexture);
 }
 
 void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
@@ -903,6 +904,7 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   case BufferType::eVertexBuffer:
   {
     CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(_pDstBuffer);
+    assert(pVertexBuffer->BufferData.pData);
     ::memcpy(pVertexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
   }
   break;
@@ -922,6 +924,7 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   case BufferType::eIndexBuffer:
   {
     CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(_pDstBuffer);
+    assert(pIndexBuffer->BufferData.pData);
     ::memcpy(pIndexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
   }
   break;

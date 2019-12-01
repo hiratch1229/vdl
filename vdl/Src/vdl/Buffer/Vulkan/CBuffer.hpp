@@ -59,7 +59,6 @@ struct CConstantBuffer : public IConstantBuffer
 {
   BufferData BufferData;
   vdl::uint BufferSize;
-  vdl::uint Offset;
 public:
   CConstantBuffer() = default;
 

@@ -1,8 +1,34 @@
 #pragma once
 #include "../IDevice.hpp"
 
+#include <vdl/ConstantBufferAllocater/ConstantBufferAllocater.hpp>
+
+#include <vdl/Buffer/DirectX12/CBuffer.hpp>
+#include <vdl/Texture/DirectX12/CTexture.hpp>
+
+#include <vdl/pch/DirectX12/pch.hpp>
+
+class IBufferManager;
+
 class CDevice : public IDevice
 {
+  Microsoft::WRL::ComPtr<ID3D12Device5> pDevice_;
+  Microsoft::WRL::ComPtr<ID3D12CommandQueue> pCommandQueue_;
+  Microsoft::WRL::ComPtr<ID3D12CommandAllocator> pCommandAllocator_;
+  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> pCommandList_;
+  Microsoft::WRL::ComPtr<ID3D12Fence> pFence_;
+  HANDLE FenceEvent_;
+  vdl::uint FenceValue_ = 0;
+private:
+  IBufferManager* pBufferManager_;
+  ConstantBufferAllocater ConstantBufferAllocater_;
+public:
+  void ExecuteAndWait(ID3D12CommandList* _pCommandList);
+private:
+  void CreateResource(ID3D12Resource** _ppResource, const D3D12_RESOURCE_DESC& _ResourceDesc, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState)const;
+  void CreateBuffer(BufferData* _pBuffer, vdl::uint _BufferSize, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState)const;
+  void CreateStagingBuffer(BufferData* _pBuffer, const void* _Buffer, vdl::uint _BufferSize)const;
+  void CopyBuffer(BufferData* _pSrcBuffer, BufferData* _pDstBuffer, vdl::uint _BufferSize, D3D12_RESOURCE_STATES _AfterState);
 public:
   CDevice() = default;
 
@@ -32,7 +58,7 @@ public:
 
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
-  void CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
+  void CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
   void CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
@@ -46,5 +72,5 @@ public:
 
   void LoadShader(IVertexShader** _ppVertexShader, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayoutType _InputLayout)override;
 
-  void WaitIdle()override;
+  void WaitIdle()override {}
 };

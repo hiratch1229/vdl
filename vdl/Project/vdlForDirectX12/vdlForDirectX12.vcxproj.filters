@@ -51,6 +51,9 @@
     <ClCompile Include="..\..\Src\vdl\pch\DirectX12\pch.cpp">
       <Filter>Src\pch</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Texture\DirectX12\CTexture.cpp">
+      <Filter>Src\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\Device\DirectX12\CDevice.hpp">

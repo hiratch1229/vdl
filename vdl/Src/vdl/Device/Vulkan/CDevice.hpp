@@ -12,10 +12,6 @@ class IBufferManager;
 
 class CDevice : public IDevice
 {
-  static constexpr vdl::uint kInstanceBufferSizeMultiple = 5;
-  static constexpr vdl::uint kParentConstantBufferSize = 51200;
-  static_assert(kParentConstantBufferSize % 256 == 0);
-private:
   vk::UniqueInstance Instance_;
   vk::UniqueDevice VkDevice_;
   vk::PhysicalDevice PhysicalDevice_;
@@ -84,7 +80,7 @@ public:
 
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
-  void CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
+  void CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
   void CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 

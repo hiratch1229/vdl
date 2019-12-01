@@ -26,6 +26,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\SwapChain\DirectX12\CSwapChain.cpp" />
+    <ClCompile Include="..\..\Src\vdl\Texture\DirectX12\CTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\vdl\Buffer\DirectX12\CBuffer.hpp" />

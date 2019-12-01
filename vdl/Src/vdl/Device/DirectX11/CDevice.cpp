@@ -549,9 +549,9 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
   (*_ppRenderTexture) = std::move(pRenderTexture);
 }
 
-void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
+void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
-  assert(_ppDepthStecilTexture);
+  assert(_ppDepthStencilTexture);
 
   CDepthStencilTexture* pDepthStencilTexture = new CDepthStencilTexture;
   pDepthStencilTexture->Format = _Format;
@@ -628,7 +628,7 @@ void CDevice::CreateDepthStecilTexture(ITexture** _ppDepthStecilTexture, const v
     pTextureManager_->SetTexture(pDepthStencilTexture->StencilTexture.GetID(), pStencilTexture);
   }
 
-  (*_ppDepthStecilTexture) = std::move(pDepthStencilTexture);
+  (*_ppDepthStencilTexture) = std::move(pDepthStencilTexture);
 }
 
 void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
