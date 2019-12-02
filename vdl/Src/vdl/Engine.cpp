@@ -23,6 +23,9 @@
 #include <vdl/DetectMemoryLeak.hpp>
 
 #include <assert.h>
+#include <thread>
+
+#define USING_MULTI_THREAD
 
 Engine::Engine()
 {
@@ -32,8 +35,46 @@ Engine::Engine()
   //  作成時にデータを取り出せるようにする
   pEngine = this;
 
+#if defined USING_MULTI_THREAD
+  std::thread DeviceThread = std::thread([&]()->void
+  {
+    pSystem_->Initialize();
+    pDevice_->Initialize();
+    pDeviceContext_->Initialize();
+    pTextureManager_->Initialize();
+    pBufferManager_->Initialize();
+    pSoundManager_->Initialize();
+  });
+
+  pWindow_->Initialize();
+
+  DeviceThread.join();
+
+  std::thread SwapChainThread = std::thread([&]()->void
+  {
+    pSwapChain_->Initialize();
+    pModelManager_->Initialize();
+    pShaderManager_->Initialize();
+    pCPUProfiler_->Initialize();
+    pMemoryProfiler_->Initialize();
+  });
+
+  std::thread ProfilerThread = std::thread([&]()->void
+  {
+    pKeyboard_->Initialize();
+    pMouse_->Initialize();
+    pXInput_->Initialize();
+    pGamepad_->Initialize();
+    pRenderer_->Initialize();
+    pComputer_->Initialize();
+    pGUI_->Initialize();
+  });
+
+  SwapChainThread.join();
+  ProfilerThread.join();
+#else
   pSystem_->Initialize();
-  
+
   pWindow_->Initialize();
   pDevice_->Initialize();
 
@@ -57,6 +98,7 @@ Engine::Engine()
   pRenderer_->Initialize();
   pComputer_->Initialize();
   pGUI_->Initialize();
+#endif
 }
 
 Engine::~Engine()
