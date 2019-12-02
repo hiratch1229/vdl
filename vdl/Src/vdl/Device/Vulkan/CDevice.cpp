@@ -404,7 +404,7 @@ void CDevice::Initialize()
     assert(VkDevice_);
   }
 
-  ConstantBufferAllocater_.Initialize(Constants::kParentConstantBufferSize);
+  ConstantBufferAllocater_.Initialize();
 
   //  コマンドプールの作成
   {
@@ -524,7 +524,7 @@ void CDevice::CreateIndexBuffer(IBuffer** _ppIndexBuffer, const void* _Indices, 
 
 void CDevice::CreateConstantBuffer(IBuffer** _ppConstantBuffer, vdl::uint _BufferSize)
 {
-  assert(_ppConstantBuffer && _BufferSize % 256 == 0);
+  assert(_ppConstantBuffer);
 
   CConstantBuffer* pConstantBuffer = new CConstantBuffer;
   pConstantBuffer->BufferSize = _BufferSize;

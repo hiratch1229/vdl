@@ -37,6 +37,9 @@
     <Filter Include="Src\pch">
       <UniqueIdentifier>{8dc518eb-96ed-40e9-8d73-dc994c27e8aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\DeviceContext\DescriptorHeap">
+      <UniqueIdentifier>{2f19ab90-6c93-4f1c-ba24-62f340e2f28c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\vdl\Device\DirectX12\CDevice.cpp">
@@ -53,6 +56,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\vdl\Texture\DirectX12\CTexture.cpp">
       <Filter>Src\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\DeviceContext\DirectX12\DescriptorHeap\DescriptorHeap.cpp">
+      <Filter>Src\DeviceContext\DescriptorHeap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\vdl\Buffer\DirectX12\CBuffer.cpp">
+      <Filter>Src\Buffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\pch\DirectX12\pch.hpp">
       <Filter>Src\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\DeviceContext\DirectX12\DescriptorHeap\DescriptorHeap.hpp">
+      <Filter>Src\DeviceContext\DescriptorHeap</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -5,13 +5,13 @@
 
 #include <assert.h>
 
-void ConstantBufferAllocater::Initialize(vdl::uint _BufferSize)
+void ConstantBufferAllocater::Initialize()
 {
   IBuffer* pConstantBuffer;
-  Engine::Get<IDevice>()->CreateConstantBuffer(&pConstantBuffer, _BufferSize);
+  Engine::Get<IDevice>()->CreateConstantBuffer(&pConstantBuffer, kParentConstantBufferSize);
   pConstantBuffer_.reset(std::move(static_cast<IConstantBuffer*>(pConstantBuffer)));
 
-  MemorySpaces_.emplace_back(0, _BufferSize);
+  MemorySpaces_.emplace_back(0, kParentConstantBufferSize);
 }
 
 vdl::uint ConstantBufferAllocater::Secure(vdl::uint _BufferSize)

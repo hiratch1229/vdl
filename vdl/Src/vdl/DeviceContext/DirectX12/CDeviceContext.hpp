@@ -1,8 +1,213 @@
 #pragma once
 #include "../IDeviceContext.hpp"
 
+#include "DescriptorHeap/DescriptorHeap.hpp"
+
+#include <vdl/InputLayout.hpp>
+#include <vdl/Scissor.hpp>
+#include <vdl/Viewport.hpp>
+#include <vdl/GraphicsStates.hpp>
+#include <vdl/Shader.hpp>
+#include <vdl/Texture.hpp>
+#include <vdl/Sampler.hpp>
+#include <vdl/ConstantBuffer.hpp>
+#include <vdl/UnorderedAccessBuffer.hpp>
+#include <vdl/Hash.hpp>
+
+#include <vdl/StateChangeFlags/StateChangeFlags.hpp>
+#include <vdl/Constants/Constants.hpp>
+
+#include <vdl/pch/DirectX12/pch.hpp>
+
+#include <vdl/Texture/DirectX12/CTexture.hpp>
+
+#include <array>
+#include <unordered_map>
+
+class CDevice;
+class CSwapChain;
+class ITextureManager;
+class IBufferManager;
+class IShaderManager;
+
 class CDeviceContext : public IDeviceContext
 {
+  using Texture = std::variant<vdl::Texture, vdl::DepthStencilTexture>;
+  using ShaderResources = std::vector<vdl::ShaderResource>;
+  using Samplers = std::vector<vdl::Sampler>;
+  using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
+  using UnorderedAccessObjects = std::vector<vdl::UnorderedAccessObject>;
+private:
+  enum class CommandListState
+  {
+    eIdle,
+    eBegin,
+  };
+  struct SyncState
+  {
+    //Microsoft::WRL::ComPtr<ID3D12Fence> pFence;
+    vdl::uint64_t Value = 0;
+  };
+private:
+  enum class GraphicsCommandType
+  {
+    eSetVertexBuffer,
+    eSetInstanceBuffer,
+    eSetIndexBuffer,
+    eSetInputLayout,
+    eSetTopology,
+    eSetScissor,
+    eSetViewport,
+    eSetRenderTextures,
+    eSetBlendState,
+    eSetDepthStencilState,
+    eSetRasterizerState,
+    eSetVertexShader,
+    eSetHullShader,
+    eSetDomainShader,
+    eSetGeometryShader,
+    eSetPixelShader,
+    eSetVertexStageShaderResource,
+    eSetHullStageShaderResource,
+    eSetDomainStageShaderResource,
+    eSetGeometryStageShaderResource,
+    eSetPixelStageShaderResource,
+    eSetVertexStageSampler,
+    eSetHullStageSampler,
+    eSetDomainStageSampler,
+    eSetGeometryStageSampler,
+    eSetPixelStageSampler,
+    eSetVertexStageConstantBuffer,
+    eSetHullStageConstantBuffer,
+    eSetDomainStageConstantBuffer,
+    eSetGeometryStageConstantBuffer,
+    eSetPixelStageConstantBuffer,
+
+    eNum
+  };
+  static_assert(static_cast<vdl::uint>(GraphicsCommandType::eNum) <= sizeof(vdl::uint32_t) * 8);
+  static constexpr GraphicsCommandType kGraphicsPipelineStateCommands[] = {
+    GraphicsCommandType::eSetInputLayout, GraphicsCommandType::eSetTopology, GraphicsCommandType::eSetRenderTextures, GraphicsCommandType::eSetBlendState, GraphicsCommandType::eSetDepthStencilState, GraphicsCommandType::eSetRasterizerState,
+    GraphicsCommandType::eSetVertexShader, GraphicsCommandType::eSetHullShader, GraphicsCommandType::eSetDomainShader, GraphicsCommandType::eSetGeometryShader, GraphicsCommandType::eSetPixelShader };
+  struct GraphicsState
+  {
+    VertexBuffer VertexBuffer;
+    InstanceBuffer InstanceBuffer;
+    IndexBuffer IndexBuffer;
+    vdl::InputLayoutType InputLayout;
+    vdl::TopologyType Topology;
+    vdl::Scissor Scissor;
+    vdl::Viewport Viewport;
+    vdl::BlendState BlendState;
+    vdl::DepthStencilState DepthStencilState;
+    vdl::RasterizerState RasterizerState;
+    vdl::VertexShader VertexShader;
+    vdl::HullShader HullShader;
+    vdl::DomainShader DomainShader;
+    vdl::GeometryShader GeometryShader;
+    vdl::PixelShader PixelShader;
+    std::array<ShaderResources, kGraphicsShaderStageNum> ShaderResources;
+    std::array<Samplers, kGraphicsShaderStageNum> Samplers;
+    std::array<ConstantBuffers, kGraphicsShaderStageNum> ConstantBuffers;
+  };
+  struct GraphicsReserveData
+  {
+    std::vector<VertexBuffer> VertexBuffers;
+    std::vector<InstanceBuffer> InstanceBuffers;
+    std::vector<IndexBuffer> IndexBuffers;
+    std::vector<vdl::OutputManager> OutputManagers;
+    std::vector<vdl::VertexShader> VertexShaders;
+    std::vector<vdl::HullShader> HullShaders;
+    std::vector<vdl::DomainShader> DomainShaders;
+    std::vector<vdl::GeometryShader> GeometryShaders;
+    std::vector<vdl::PixelShader> PixelShaders;
+    std::vector<ShaderResources> ShaderResources;
+    std::vector<ConstantBuffers> ConstantBuffers;
+
+    std::unordered_map<vdl::ID, Texture> ClearTextures;
+
+    std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> PipelineStates_;
+  public:
+    GraphicsReserveData() = default;
+
+    void Clear()
+    {
+      VertexBuffers.clear();
+      InstanceBuffers.clear();
+      IndexBuffers.clear();
+      OutputManagers.clear();
+      VertexShaders.clear();
+      HullShaders.clear();
+      DomainShaders.clear();
+      GeometryShaders.clear();
+      PixelShaders.clear();
+      ShaderResources.clear();
+      ConstantBuffers.clear();
+
+      ClearTextures.clear();
+
+      PipelineStates_.clear();
+    }
+  };
+private:
+  enum class ComputeCommandType : vdl::uint8_t
+  {
+    eSetComputeShader,
+    eSetShaderResource,
+    eSetSampler,
+    eSetConstantBuffer,
+    eSetUnorderedAccessObject,
+
+    eNum
+  };
+  static_assert(static_cast<vdl::uint>(ComputeCommandType::eNum) <= sizeof(vdl::uint8_t) * 8);
+private:
+  ID3D12Device* pD3D12Device_;
+private:
+  CDevice* pDevice_;
+  CSwapChain* pSwapChain_;
+  ITextureManager* pTextureManager_;
+  IBufferManager* pBufferManager_;
+  IShaderManager* pShaderManager_;
+private:
+  std::unordered_map<vdl::InputLayoutType, std::vector<D3D12_INPUT_ELEMENT_DESC>> InputLayouts_;
+  std::unordered_map<vdl::BlendState, D3D12_BLEND_DESC> BlendStates_;
+  std::unordered_map<vdl::RasterizerState, D3D12_RASTERIZER_DESC> RasterizerStates_;
+  std::unordered_map<vdl::DepthStencilState, D3D12_DEPTH_STENCIL_DESC> DepthStencilStates_;
+  std::unordered_map<vdl::Sampler, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>> Samplers_;
+  std::array<DescriptorHeap, kDescriptorHeapTypeNum> DescriptorHeaps_;
+  Microsoft::WRL::ComPtr<ID3D12Fence> pFence_;
+  HANDLE FenceEvent_;
+  vdl::uint64_t FenceValue_ = 0;
+private:
+  Microsoft::WRL::ComPtr<ID3D12RootSignature> pGraphicsRootSignature_;
+  Microsoft::WRL::ComPtr<ID3D12CommandQueue> pGraphicsCommandQueue_;
+  Microsoft::WRL::ComPtr<ID3D12CommandAllocator> pGraphicsCommandAllocators_[Constants::kGraphicsCommandBufferNum];
+  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> pGraphicsCommandLists_[Constants::kGraphicsCommandBufferNum];
+  vdl::uint GraphicsCommandBufferIndex_ = 0;
+  CommandListState GraphicsCommandListState_ = CommandListState::eIdle;
+  StateChangeFlags<GraphicsCommandType, vdl::uint32_t> GraphicsStateChangeFlags_;
+  vdl::uint GraphicsRenderTargetCount_;
+  GraphicsState CurrentGraphicsState_;
+  std::array<GraphicsReserveData, Constants::kGraphicsCommandBufferNum> GraphicsReserveDatas_;
+  std::array<SyncState, Constants::kGraphicsCommandBufferNum> GraphicsSyncStates_;
+private:
+  ID3D12GraphicsCommandList* GetCurrentGraphicsCommandList()const { return pGraphicsCommandLists_[GraphicsCommandBufferIndex_].Get(); }
+  ID3D12CommandAllocator* GetCurrentGraphicsCommandAllocator()const { return pGraphicsCommandAllocators_[GraphicsCommandBufferIndex_].Get(); }
+private:
+  void PreprocessingDraw();
+  void WaitFence(ID3D12CommandQueue* _pQueue, SyncState* _pSyncState);
+  CRenderTexture* GetD3D12RenderTexture(const vdl::RenderTexture& _RenderTexture);
+  const D3D12_BLEND_DESC& GetBlendDesc(const vdl::BlendState& _BlendState);
+  const D3D12_DEPTH_STENCIL_DESC& GetDepthStecilDesc(const vdl::DepthStencilState& _DepthStencilState);
+  const D3D12_RASTERIZER_DESC& GetRasterizerDesc(const vdl::RasterizerState& _RasterizerState);
+  ID3D12DescriptorHeap* GetSamplerDescriptorHeap(const vdl::Sampler& _Sampler);
+  vdl::uint GetVertexBufferStride()const;
+  vdl::uint GetInstanceBufferStride()const;
+public:
+  ID3D12CommandQueue* GetGraphicsCommandQueue()const { return pGraphicsCommandQueue_.Get(); }
+public:
+  void Present();
 public:
   CDeviceContext() = default;
 

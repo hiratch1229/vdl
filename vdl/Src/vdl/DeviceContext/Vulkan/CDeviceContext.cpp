@@ -1,7 +1,6 @@
 #include "CDeviceContext.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/Vulkan/CDevice.hpp>
 #include <vdl/SwapChain/Vulkan/CSwapChain.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
@@ -422,7 +421,6 @@ namespace
 
 void CDeviceContext::Initialize()
 {
-  pWindow_ = Engine::Get<IWindow>();
   pSwapChain_ = static_cast<CSwapChain*>(Engine::Get<ISwapChain>());
 
   pTextureManager_ = Engine::Get<ITextureManager>();
@@ -701,13 +699,13 @@ void CDeviceContext::Initialize()
       {
         CommandBufferInfo.commandPool = GraphicsCommandPool_.get();
         CommandBufferInfo.level = vk::CommandBufferLevel::ePrimary;
-        CommandBufferInfo.commandBufferCount = kGraphicsCommandBufferNum;
+        CommandBufferInfo.commandBufferCount = Constants::kGraphicsCommandBufferNum;
       }
 
       std::vector<vk::UniqueCommandBuffer> GraphicsCommandBuffers = VkDevice_.allocateCommandBuffersUnique(CommandBufferInfo);
       assert(!GraphicsCommandBuffers.empty());
 
-      for (vdl::uint i = 0; i < kGraphicsCommandBufferNum; ++i)
+      for (vdl::uint i = 0; i < Constants::kGraphicsCommandBufferNum; ++i)
       {
         GraphicsCommandBuffers_[i] = std::move(GraphicsCommandBuffers[i]);
       }
@@ -822,13 +820,13 @@ void CDeviceContext::Initialize()
       {
         CommandBufferInfo.commandPool = ComputeCommandPool_.get();
         CommandBufferInfo.level = vk::CommandBufferLevel::ePrimary;
-        CommandBufferInfo.commandBufferCount = kComputeCommandBufferNum;
+        CommandBufferInfo.commandBufferCount = Constants::kComputeCommandBufferNum;
       }
 
       std::vector<vk::UniqueCommandBuffer> ComputeCommandBuffers = VkDevice_.allocateCommandBuffersUnique(CommandBufferInfo);
       assert(!ComputeCommandBuffers.empty());
 
-      for (vdl::uint i = 0; i < kComputeCommandBufferNum; ++i)
+      for (vdl::uint i = 0; i < Constants::kComputeCommandBufferNum; ++i)
       {
         ComputeCommandBuffers_[i] = std::move(ComputeCommandBuffers[i]);
       }
@@ -1207,14 +1205,14 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
 
 void CDeviceContext::Draw(vdl::uint _VertexCount, vdl::uint _InstanceCount, vdl::uint _FirstVertex, vdl::uint _FirstInstance)
 {
-  PreprocessingGraphicsCommandBufferDraw();
+  PreprocessingDraw();
 
   GetCurrentGraphicsCommandBuffer().draw(_VertexCount, _InstanceCount, _FirstVertex, _FirstInstance);
 }
 
 void CDeviceContext::DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount, vdl::uint _FirstIndex, vdl::uint _VertexOffset, vdl::uint _FirstInstance)
 {
-  PreprocessingGraphicsCommandBufferDraw();
+  PreprocessingDraw();
 
   GetCurrentGraphicsCommandBuffer().drawIndexed(_IndexCount, _InstanceCount, _FirstIndex, _VertexOffset, _FirstInstance);
 }
@@ -1748,7 +1746,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
   const vdl::uint CurrentComputeCommandBufferIndex = ComputeCommandBufferIndex_;
 
-  ++ComputeCommandBufferIndex_ %= kComputeCommandBufferNum;
+  ++ComputeCommandBufferIndex_ %= Constants::kComputeCommandBufferNum;
   WaitFence(GetCurrentComputeFence());
 
   ComputeReserveDatas_[ComputeCommandBufferIndex_].Clear();
@@ -1804,7 +1802,7 @@ void CDeviceContext::Flush()
 
   const vdl::uint CurrentGraphicsCommandBufferIndex = GraphicsCommandBufferIndex_;
 
-  ++GraphicsCommandBufferIndex_ %= kGraphicsCommandBufferNum;
+  ++GraphicsCommandBufferIndex_ %= Constants::kGraphicsCommandBufferNum;
   WaitFence(GetCurrentGraphicsFence());
   GetCurrentGraphicsCommandBuffer().reset(vk::CommandBufferResetFlags());
 
@@ -2025,7 +2023,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
   GraphicsCommandBufferState_ = CommandBufferState::eBeginRenderPass;
 }
 
-void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
+void CDeviceContext::PreprocessingDraw()
 {
   //  画像レイアウトの変更
   {
@@ -2146,199 +2144,201 @@ void CDeviceContext::PreprocessingGraphicsCommandBufferDraw()
   //  SetPipeline
   for (auto& GraphicsPipelineStateCommand : kGraphicsPipelineStateCommands)
   {
-    if (GraphicsStateChangeFlags_.Has(GraphicsPipelineStateCommand))
+    if (!GraphicsStateChangeFlags_.Has(GraphicsPipelineStateCommand))
     {
-      std::vector<vk::PipelineShaderStageCreateInfo> PipelineShaderStageInfos;
-      {
-        if (!CurrentGraphicsState_.VertexShader.isEmpty())
-        {
-          const CVertexShader* pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID()));
-
-          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-          {
-            PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
-            PipelineShaderStageInfo.module = pVertexShader->ShaderData.Module.get();
-            PipelineShaderStageInfo.pName = pVertexShader->ShaderData.EntryPoint;
-          }
-
-          CurrentGraphicsReserveData.VertexShaders.push_back(CurrentGraphicsState_.VertexShader);
-        }
-
-        if (!CurrentGraphicsState_.HullShader.isEmpty())
-        {
-          const CHullShader* pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID()));
-
-          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-          {
-            PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eTessellationControl;
-            PipelineShaderStageInfo.module = pHullShader->ShaderData.Module.get();
-            PipelineShaderStageInfo.pName = pHullShader->ShaderData.EntryPoint;
-          }
-
-          CurrentGraphicsReserveData.HullShaders.push_back(CurrentGraphicsState_.HullShader);
-        }
-
-        if (!CurrentGraphicsState_.DomainShader.isEmpty())
-        {
-          const CDomainShader* pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID()));
-
-          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-          {
-            PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eTessellationEvaluation;
-            PipelineShaderStageInfo.module = pDomainShader->ShaderData.Module.get();
-            PipelineShaderStageInfo.pName = pDomainShader->ShaderData.EntryPoint;
-          }
-
-          CurrentGraphicsReserveData.DomainShaders.push_back(CurrentGraphicsState_.DomainShader);
-        }
-
-        if (!CurrentGraphicsState_.GeometryShader.isEmpty())
-        {
-          const CGeometryShader* pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID()));
-
-          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-          {
-            PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eGeometry;
-            PipelineShaderStageInfo.module = pGeometryShader->ShaderData.Module.get();
-            PipelineShaderStageInfo.pName = pGeometryShader->ShaderData.EntryPoint;
-          }
-
-          CurrentGraphicsReserveData.GeometryShaders.push_back(CurrentGraphicsState_.GeometryShader);
-        }
-
-        if (!CurrentGraphicsState_.PixelShader.isEmpty())
-        {
-          const CPixelShader* pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID()));
-
-          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-          {
-            PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eFragment;
-            PipelineShaderStageInfo.module = pPixelShader->ShaderData.Module.get();
-            PipelineShaderStageInfo.pName = pPixelShader->ShaderData.EntryPoint;
-          }
-
-          CurrentGraphicsReserveData.PixelShaders.push_back(CurrentGraphicsState_.PixelShader);
-        }
-      }
-
-      vk::PipelineVertexInputStateCreateInfo PipelineVertexInputStateInfo;
-      {
-        const InputLayout& InputLayout = InputLayouts_[CurrentGraphicsState_.InputLayout];
-
-        PipelineVertexInputStateInfo.vertexBindingDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputBindingDescriptions.size());
-        PipelineVertexInputStateInfo.pVertexBindingDescriptions = InputLayout.VertexInputBindingDescriptions.data();
-        PipelineVertexInputStateInfo.vertexAttributeDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputAttributeDescriptions.size());
-        PipelineVertexInputStateInfo.pVertexAttributeDescriptions = InputLayout.VertexInputAttributeDescriptions.data();
-      }
-
-      vk::PipelineInputAssemblyStateCreateInfo PipelineInputAssemblyStateInfo;
-      {
-        PipelineInputAssemblyStateInfo.topology = Cast(CurrentGraphicsState_.Topology);
-        PipelineInputAssemblyStateInfo.primitiveRestartEnable = false;
-      }
-
-      vk::PipelineTessellationStateCreateInfo PipelineTessellationStateInfo;
-      {
-        PipelineTessellationStateInfo.patchControlPoints = GetPatchControlPoints(CurrentGraphicsState_.Topology);
-      }
-
-      vk::PipelineViewportStateCreateInfo PipelineViewportStateInfo;
-      {
-        PipelineViewportStateInfo.viewportCount = 1;
-        PipelineViewportStateInfo.pViewports = nullptr;
-        PipelineViewportStateInfo.scissorCount = 1;
-        PipelineViewportStateInfo.pScissors = nullptr;
-      }
-
-      const vk::PipelineRasterizationStateCreateInfo& PipelineRasterizationStateInfo = GetPipelineRasterizationStateInfo(CurrentGraphicsState_.RasterizerState);
-
-      const vk::PipelineDepthStencilStateCreateInfo& PipelineDepthStencilStateInfo = GetPipelineDepthStencilStateInfo(CurrentGraphicsState_.DepthStencilState);
-
-      std::vector<vk::PipelineColorBlendAttachmentState> PipelineColorBlendAttachmentStates;
-      if (GraphicsColorAttachmentCount_)
-      {
-        assert(GraphicsColorAttachmentCount_ <= Constants::kMaxRenderTextureNum);
-
-        PipelineColorBlendAttachmentStates.resize(GraphicsColorAttachmentCount_);
-        if (CurrentGraphicsState_.BlendState.IndependentBlendEnable)
-        {
-          for (vdl::uint i = 0; i < GraphicsColorAttachmentCount_; ++i)
-          {
-            PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
-          }
-        }
-        else
-        {
-          PipelineColorBlendAttachmentStates[0] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[0]);
-          for (vdl::uint i = 1; i < GraphicsColorAttachmentCount_; ++i)
-          {
-            PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
-          }
-        }
-      }
-
-      const vk::PipelineMultisampleStateCreateInfo& PipelineMultisampleStateInfo = GetMultisampleStateInfo(CurrentGraphicsState_.BlendState.AlphaToCoverageEnable);
-
-      vk::PipelineColorBlendStateCreateInfo PipelineColorBlendStateInfo;
-      {
-        PipelineColorBlendStateInfo.logicOpEnable = false;
-        PipelineColorBlendStateInfo.logicOp = vk::LogicOp::eNoOp;
-        PipelineColorBlendStateInfo.attachmentCount = GraphicsColorAttachmentCount_;
-        PipelineColorBlendStateInfo.pAttachments = PipelineColorBlendAttachmentStates.data();
-        PipelineColorBlendStateInfo.blendConstants[0] = 1.0f;
-        PipelineColorBlendStateInfo.blendConstants[1] = 1.0f;
-        PipelineColorBlendStateInfo.blendConstants[2] = 1.0f;
-        PipelineColorBlendStateInfo.blendConstants[3] = 1.0f;
-      }
-
-      std::array<vk::DynamicState, 2> DynamicStates;
-      {
-        DynamicStates[0] = vk::DynamicState::eViewport;
-        DynamicStates[1] = vk::DynamicState::eScissor;
-      }
-
-      vk::PipelineDynamicStateCreateInfo PipelineDynamicStateInfo;
-      {
-        PipelineDynamicStateInfo.dynamicStateCount = static_cast<vdl::uint>(DynamicStates.size());
-        PipelineDynamicStateInfo.pDynamicStates = DynamicStates.data();
-      }
-
-      //  パイプラインの作成
-      {
-        std::vector<vk::UniquePipeline>& CurrentGraphicsPipelines = CurrentGraphicsReserveData.Pipelines;
-        const vk::Pipeline& PreviousPipeline = CurrentGraphicsPipelines.back().get();
-
-        vk::GraphicsPipelineCreateInfo GraphicsPipelineInfo;
-        {
-          GraphicsPipelineInfo.flags = (PreviousPipeline == VK_NULL_HANDLE ? vk::PipelineCreateFlagBits::eAllowDerivatives : vk::PipelineCreateFlagBits::eAllowDerivatives | vk::PipelineCreateFlagBits::eDerivative);
-          GraphicsPipelineInfo.stageCount = static_cast<vdl::uint>(PipelineShaderStageInfos.size());
-          GraphicsPipelineInfo.pStages = PipelineShaderStageInfos.data();
-          GraphicsPipelineInfo.pVertexInputState = &PipelineVertexInputStateInfo;
-          GraphicsPipelineInfo.pInputAssemblyState = &PipelineInputAssemblyStateInfo;
-          GraphicsPipelineInfo.pTessellationState = &PipelineTessellationStateInfo;
-          GraphicsPipelineInfo.pViewportState = &PipelineViewportStateInfo;
-          GraphicsPipelineInfo.pRasterizationState = &PipelineRasterizationStateInfo;
-          GraphicsPipelineInfo.pMultisampleState = &PipelineMultisampleStateInfo;
-          GraphicsPipelineInfo.pDepthStencilState = &PipelineDepthStencilStateInfo;
-          GraphicsPipelineInfo.pColorBlendState = &PipelineColorBlendStateInfo;
-          GraphicsPipelineInfo.pDynamicState = &PipelineDynamicStateInfo;
-          GraphicsPipelineInfo.layout = PipelineLayout_.get();
-          GraphicsPipelineInfo.renderPass = CurrentGraphicsReserveData.RenderPassDatas.back().RenderPass.get();
-          GraphicsPipelineInfo.subpass = 0;
-          GraphicsPipelineInfo.basePipelineHandle = PreviousPipeline;
-          GraphicsPipelineInfo.basePipelineIndex = (PreviousPipeline == VK_NULL_HANDLE ? 0 : -1);
-        }
-
-        vk::UniquePipeline Pipeline = VkDevice_.createGraphicsPipelineUnique(GraphicsPipelineCache_.get(), GraphicsPipelineInfo);
-        assert(Pipeline);
-
-        CurrentGraphicsCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, Pipeline.get());
-
-        CurrentGraphicsPipelines.emplace_back(std::move(Pipeline));
-      }
-
-      break;
+      continue;
     }
+
+    std::vector<vk::PipelineShaderStageCreateInfo> PipelineShaderStageInfos;
+    {
+      if (!CurrentGraphicsState_.VertexShader.isEmpty())
+      {
+        const CVertexShader* pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID()));
+
+        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+        {
+          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
+          PipelineShaderStageInfo.module = pVertexShader->ShaderData.Module.get();
+          PipelineShaderStageInfo.pName = pVertexShader->ShaderData.EntryPoint;
+        }
+
+        CurrentGraphicsReserveData.VertexShaders.push_back(CurrentGraphicsState_.VertexShader);
+      }
+
+      if (!CurrentGraphicsState_.HullShader.isEmpty())
+      {
+        const CHullShader* pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID()));
+
+        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+        {
+          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eTessellationControl;
+          PipelineShaderStageInfo.module = pHullShader->ShaderData.Module.get();
+          PipelineShaderStageInfo.pName = pHullShader->ShaderData.EntryPoint;
+        }
+
+        CurrentGraphicsReserveData.HullShaders.push_back(CurrentGraphicsState_.HullShader);
+      }
+
+      if (!CurrentGraphicsState_.DomainShader.isEmpty())
+      {
+        const CDomainShader* pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID()));
+
+        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+        {
+          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eTessellationEvaluation;
+          PipelineShaderStageInfo.module = pDomainShader->ShaderData.Module.get();
+          PipelineShaderStageInfo.pName = pDomainShader->ShaderData.EntryPoint;
+        }
+
+        CurrentGraphicsReserveData.DomainShaders.push_back(CurrentGraphicsState_.DomainShader);
+      }
+
+      if (!CurrentGraphicsState_.GeometryShader.isEmpty())
+      {
+        const CGeometryShader* pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID()));
+
+        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+        {
+          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eGeometry;
+          PipelineShaderStageInfo.module = pGeometryShader->ShaderData.Module.get();
+          PipelineShaderStageInfo.pName = pGeometryShader->ShaderData.EntryPoint;
+        }
+
+        CurrentGraphicsReserveData.GeometryShaders.push_back(CurrentGraphicsState_.GeometryShader);
+      }
+
+      if (!CurrentGraphicsState_.PixelShader.isEmpty())
+      {
+        const CPixelShader* pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID()));
+
+        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+        {
+          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eFragment;
+          PipelineShaderStageInfo.module = pPixelShader->ShaderData.Module.get();
+          PipelineShaderStageInfo.pName = pPixelShader->ShaderData.EntryPoint;
+        }
+
+        CurrentGraphicsReserveData.PixelShaders.push_back(CurrentGraphicsState_.PixelShader);
+      }
+    }
+
+    vk::PipelineVertexInputStateCreateInfo PipelineVertexInputStateInfo;
+    {
+      const InputLayout& InputLayout = InputLayouts_[CurrentGraphicsState_.InputLayout];
+
+      PipelineVertexInputStateInfo.vertexBindingDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputBindingDescriptions.size());
+      PipelineVertexInputStateInfo.pVertexBindingDescriptions = InputLayout.VertexInputBindingDescriptions.data();
+      PipelineVertexInputStateInfo.vertexAttributeDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputAttributeDescriptions.size());
+      PipelineVertexInputStateInfo.pVertexAttributeDescriptions = InputLayout.VertexInputAttributeDescriptions.data();
+    }
+
+    vk::PipelineInputAssemblyStateCreateInfo PipelineInputAssemblyStateInfo;
+    {
+      PipelineInputAssemblyStateInfo.topology = Cast(CurrentGraphicsState_.Topology);
+      PipelineInputAssemblyStateInfo.primitiveRestartEnable = false;
+    }
+
+    vk::PipelineTessellationStateCreateInfo PipelineTessellationStateInfo;
+    {
+      PipelineTessellationStateInfo.patchControlPoints = GetPatchControlPoints(CurrentGraphicsState_.Topology);
+    }
+
+    vk::PipelineViewportStateCreateInfo PipelineViewportStateInfo;
+    {
+      PipelineViewportStateInfo.viewportCount = 1;
+      PipelineViewportStateInfo.pViewports = nullptr;
+      PipelineViewportStateInfo.scissorCount = 1;
+      PipelineViewportStateInfo.pScissors = nullptr;
+    }
+
+    const vk::PipelineRasterizationStateCreateInfo& PipelineRasterizationStateInfo = GetPipelineRasterizationStateInfo(CurrentGraphicsState_.RasterizerState);
+
+    const vk::PipelineDepthStencilStateCreateInfo& PipelineDepthStencilStateInfo = GetPipelineDepthStencilStateInfo(CurrentGraphicsState_.DepthStencilState);
+
+    std::vector<vk::PipelineColorBlendAttachmentState> PipelineColorBlendAttachmentStates;
+    if (GraphicsColorAttachmentCount_)
+    {
+      assert(GraphicsColorAttachmentCount_ <= Constants::kMaxRenderTextureNum);
+
+      PipelineColorBlendAttachmentStates.resize(GraphicsColorAttachmentCount_);
+      if (CurrentGraphicsState_.BlendState.IndependentBlendEnable)
+      {
+        for (vdl::uint i = 0; i < GraphicsColorAttachmentCount_; ++i)
+        {
+          PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
+        }
+      }
+      else
+      {
+        PipelineColorBlendAttachmentStates[0] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[0]);
+        for (vdl::uint i = 1; i < GraphicsColorAttachmentCount_; ++i)
+        {
+          PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
+        }
+      }
+    }
+
+    const vk::PipelineMultisampleStateCreateInfo& PipelineMultisampleStateInfo = GetMultisampleStateInfo(CurrentGraphicsState_.BlendState.AlphaToCoverageEnable);
+
+    vk::PipelineColorBlendStateCreateInfo PipelineColorBlendStateInfo;
+    {
+      PipelineColorBlendStateInfo.logicOpEnable = false;
+      PipelineColorBlendStateInfo.logicOp = vk::LogicOp::eNoOp;
+      PipelineColorBlendStateInfo.attachmentCount = GraphicsColorAttachmentCount_;
+      PipelineColorBlendStateInfo.pAttachments = PipelineColorBlendAttachmentStates.data();
+      PipelineColorBlendStateInfo.blendConstants[0] = 1.0f;
+      PipelineColorBlendStateInfo.blendConstants[1] = 1.0f;
+      PipelineColorBlendStateInfo.blendConstants[2] = 1.0f;
+      PipelineColorBlendStateInfo.blendConstants[3] = 1.0f;
+    }
+
+    std::array<vk::DynamicState, 2> DynamicStates;
+    {
+      DynamicStates[0] = vk::DynamicState::eViewport;
+      DynamicStates[1] = vk::DynamicState::eScissor;
+    }
+
+    vk::PipelineDynamicStateCreateInfo PipelineDynamicStateInfo;
+    {
+      PipelineDynamicStateInfo.dynamicStateCount = static_cast<vdl::uint>(DynamicStates.size());
+      PipelineDynamicStateInfo.pDynamicStates = DynamicStates.data();
+    }
+
+    //  パイプラインの作成
+    {
+      std::vector<vk::UniquePipeline>& CurrentGraphicsPipelines = CurrentGraphicsReserveData.Pipelines;
+      const vk::Pipeline& PreviousPipeline = CurrentGraphicsPipelines.back().get();
+
+      vk::GraphicsPipelineCreateInfo GraphicsPipelineInfo;
+      {
+        GraphicsPipelineInfo.flags = (PreviousPipeline == VK_NULL_HANDLE ? vk::PipelineCreateFlagBits::eAllowDerivatives : vk::PipelineCreateFlagBits::eAllowDerivatives | vk::PipelineCreateFlagBits::eDerivative);
+        GraphicsPipelineInfo.stageCount = static_cast<vdl::uint>(PipelineShaderStageInfos.size());
+        GraphicsPipelineInfo.pStages = PipelineShaderStageInfos.data();
+        GraphicsPipelineInfo.pVertexInputState = &PipelineVertexInputStateInfo;
+        GraphicsPipelineInfo.pInputAssemblyState = &PipelineInputAssemblyStateInfo;
+        GraphicsPipelineInfo.pTessellationState = &PipelineTessellationStateInfo;
+        GraphicsPipelineInfo.pViewportState = &PipelineViewportStateInfo;
+        GraphicsPipelineInfo.pRasterizationState = &PipelineRasterizationStateInfo;
+        GraphicsPipelineInfo.pMultisampleState = &PipelineMultisampleStateInfo;
+        GraphicsPipelineInfo.pDepthStencilState = &PipelineDepthStencilStateInfo;
+        GraphicsPipelineInfo.pColorBlendState = &PipelineColorBlendStateInfo;
+        GraphicsPipelineInfo.pDynamicState = &PipelineDynamicStateInfo;
+        GraphicsPipelineInfo.layout = PipelineLayout_.get();
+        GraphicsPipelineInfo.renderPass = CurrentGraphicsReserveData.RenderPassDatas.back().RenderPass.get();
+        GraphicsPipelineInfo.subpass = 0;
+        GraphicsPipelineInfo.basePipelineHandle = PreviousPipeline;
+        GraphicsPipelineInfo.basePipelineIndex = (PreviousPipeline == VK_NULL_HANDLE ? 0 : -1);
+      }
+
+      vk::UniquePipeline Pipeline = VkDevice_.createGraphicsPipelineUnique(GraphicsPipelineCache_.get(), GraphicsPipelineInfo);
+      assert(Pipeline);
+
+      CurrentGraphicsCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, Pipeline.get());
+
+      CurrentGraphicsPipelines.emplace_back(std::move(Pipeline));
+    }
+
+    break;
   }
 
   //  SetDescriptor
@@ -2803,7 +2803,6 @@ CRenderTexture* CDeviceContext::GetVkRenderTexture(const vdl::RenderTexture& _Re
   assert(!_RenderTexture.isEmpty());
 
   ITexture* pTexture = pTextureManager_->GetTexture(_RenderTexture.GetID());
-
   return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? pSwapChain_->GetVkRenderTexture() : Cast<CRenderTexture>(pTexture));
 }
 

@@ -6,6 +6,9 @@
 
 class ConstantBufferAllocater
 {
+  static constexpr vdl::uint kParentConstantBufferSize = 51200;
+  static_assert(kParentConstantBufferSize % 256 == 0);
+private:
   struct MemorySpace
   {
     vdl::uint Offset;
@@ -24,7 +27,7 @@ private:
 public:
   ConstantBufferAllocater() = default;
 
-  void Initialize(vdl::uint _BufferSize);
+  void Initialize();
 
   [[nodiscard]] void* GetBuffer(vdl::uint _Offset)const { return static_cast<vdl::uint8_t*>(pConstantBuffer_->GetBuffer()) + _Offset; }
 

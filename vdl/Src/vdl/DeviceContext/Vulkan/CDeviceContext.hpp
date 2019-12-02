@@ -14,6 +14,7 @@
 
 #include <vdl/Buffer/Buffer.hpp>
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
+#include <vdl/Constants/Constants.hpp>
 
 #include <vdl/Texture/Vulkan/CTexture.hpp>
 #include <vdl/Shader/Vulkan/CShader.hpp>
@@ -22,7 +23,6 @@
 
 #include <unordered_map>
 
-class IWindow;
 class CSwapChain;
 class ITextureManager;
 class IBufferManager;
@@ -31,10 +31,8 @@ class IShaderManager;
 class CDeviceContext : public IDeviceContext
 {
   static constexpr vdl::uint kDescriptorMultipleNum = 100;
-  static constexpr vdl::uint kGraphicsCommandBufferNum = 5;
-  static constexpr vdl::uint kGraphicsDescriptorPoolMaxSet = kGraphicsDescriptorLayoutNum * kGraphicsCommandBufferNum * kDescriptorMultipleNum;
-  static constexpr vdl::uint kComputeCommandBufferNum = 3;
-  static constexpr vdl::uint kComputeDescriptorPoolMaxSet = kComputeDescriptorTypeNum * kComputeCommandBufferNum * kDescriptorMultipleNum;
+  static constexpr vdl::uint kGraphicsDescriptorPoolMaxSet = kGraphicsDescriptorLayoutNum * Constants::kGraphicsCommandBufferNum * kDescriptorMultipleNum;
+  static constexpr vdl::uint kComputeDescriptorPoolMaxSet = kComputeDescriptorTypeNum * Constants::kComputeCommandBufferNum * kDescriptorMultipleNum;
 private:
   using Texture = std::variant<vdl::Texture, vdl::DepthStencilTexture>;
   using ShaderResources = std::vector<vdl::ShaderResource>;
@@ -213,7 +211,6 @@ private:
   vk::Queue GraphicsQueue_;
   vk::Queue ComputeQueue_;
 private:
-  IWindow* pWindow_;
   CSwapChain* pSwapChain_;
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
@@ -235,24 +232,24 @@ private:
   vk::UniqueDescriptorPool GraphicsDescriptorPool_;
   vdl::uint GraphicsCommandBufferIndex_ = 0;
   CommandBufferState GraphicsCommandBufferState_ = CommandBufferState::eIdle;
-  std::array<vk::UniqueCommandBuffer, kGraphicsCommandBufferNum> GraphicsCommandBuffers_;
-  std::array<SyncState, kGraphicsCommandBufferNum> GraphicsSyncStates_;
+  std::array<vk::UniqueCommandBuffer, Constants::kGraphicsCommandBufferNum> GraphicsCommandBuffers_;
+  std::array<SyncState, Constants::kGraphicsCommandBufferNum> GraphicsSyncStates_;
   vdl::uint GraphicsColorAttachmentCount_ = 0;
   StateChangeFlags<GraphicsCommandType, vdl::uint32_t> GraphicsStateChangeFlags_;
   GraphicsState CurrentGraphicsState_;
-  std::array<GraphicsReserveData, kGraphicsCommandBufferNum> GraphicsReserveDatas_;
+  std::array<GraphicsReserveData, Constants::kGraphicsCommandBufferNum> GraphicsReserveDatas_;
 private:
   vk::UniquePipelineCache ComputePipelineCache_;
   std::array<vk::UniqueDescriptorSetLayout, kComputeDescriptorTypeNum> ComputeDescriptorLayouts_;
   vk::UniqueCommandPool ComputeCommandPool_;
   vk::UniqueDescriptorPool ComputeDescriptorPool_;
   vdl::uint ComputeCommandBufferIndex_ = 0;
-  std::array<vk::UniqueCommandBuffer, kComputeCommandBufferNum> ComputeCommandBuffers_;
-  std::array<SyncState, kComputeCommandBufferNum> ComputeSyncStates_;
+  std::array<vk::UniqueCommandBuffer, Constants::kComputeCommandBufferNum> ComputeCommandBuffers_;
+  std::array<SyncState, Constants::kComputeCommandBufferNum> ComputeSyncStates_;
   StateChangeFlags<ComputeCommandType, vdl::uint8_t> ComputeStateChangeFlags_;
   ComputeState CurrentComputeState_;
   vk::Pipeline LastComputePipeline_;
-  std::array<ComputeReserveData, kComputeCommandBufferNum> ComputeReserveDatas_;
+  std::array<ComputeReserveData, Constants::kComputeCommandBufferNum> ComputeReserveDatas_;
 private:
   const vk::CommandBuffer& GetCurrentGraphicsCommandBuffer()const { return GraphicsCommandBuffers_[GraphicsCommandBufferIndex_].get(); }
   const vk::Semaphore& GetCurrentGraphicsSemaphore()const { return GraphicsSyncStates_[GraphicsCommandBufferIndex_].Semaphore.get(); }
@@ -263,7 +260,7 @@ private:
 private:
   void BeginGraphicsCommandBuffer();
   void BeginRenderPassGraphicsCommandBuffer();
-  void PreprocessingGraphicsCommandBufferDraw();
+  void PreprocessingDraw();
   void WaitFence(const vk::Fence& _Fence);
   CRenderTexture* GetVkRenderTexture(const vdl::RenderTexture& _RenderTexture);
   const vk::PipelineRasterizationStateCreateInfo& GetPipelineRasterizationStateInfo(const vdl::RasterizerState& _RasterizerState);

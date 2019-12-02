@@ -4,6 +4,7 @@
 #include <vdl/pch/DirectX12/pch.hpp>
 
 #include <assert.h>
+#include <utility>
 
 struct BufferData
 {
@@ -72,9 +73,9 @@ public:
 
 struct CCopyConstantBuffer : public IConstantBuffer
 {
-  ID3D12Resource* pParentResource_;
-  D3D12_CONSTANT_BUFFER_VIEW_DESC View;
+  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pConstantBufferViewHeap;
   vdl::uint Offset;
+  vdl::uint BufferSize;
 public:
   CCopyConstantBuffer() = default;
 
@@ -82,7 +83,7 @@ public:
 
   void* GetBuffer()const final;
 
-  vdl::uint GetBufferSize()const final { return View.SizeInBytes; }
+  vdl::uint GetBufferSize()const final { return BufferSize; }
 
   BufferType GetType()const final { return BufferType::eCopyConstantBuffer; }
 };
@@ -90,8 +91,9 @@ public:
 struct CUnordererdAccessBuffer : public IBuffer
 {
   BufferData BufferData;
-  D3D12_UNORDERED_ACCESS_VIEW_DESC View;
   vdl::uint BufferSize;
+  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pShaderResourceViewHeap;
+  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pUnordererdAccessViewHeap;
 public:
   CUnordererdAccessBuffer() = default;
 

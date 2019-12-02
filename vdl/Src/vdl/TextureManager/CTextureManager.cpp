@@ -78,7 +78,7 @@ vdl::ID CTextureManager::CreateRenderTexture(const vdl::uint2& _TextureSize, vdl
 vdl::ID CTextureManager::CreateDepthStencilTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format)
 {
   ITexture* pDepthStencilTexture;
-  pDevice_->CreateDepthStecilTexture(&pDepthStencilTexture, _TextureSize, _Format);
+  pDevice_->CreateDepthStencilTexture(&pDepthStencilTexture, _TextureSize, _Format);
 
   return Textures_.Add(pDepthStencilTexture);
 }

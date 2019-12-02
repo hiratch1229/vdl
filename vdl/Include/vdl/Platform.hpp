@@ -20,9 +20,9 @@
 #endif // _DEBUG
 #elif defined VDL_EXECUTE_DIRECTX12
 #ifdef _DEBUG
-
+#pragma comment(lib, "vdlForDirectX12OnWindows_d.lib")
 #else
-
+#pragma comment(lib, "vdlForDirectX12OnWindows.lib")
 #endif // _DEBUG
 #elif defined VDL_EXECUTE_VULKAN
 #ifdef _DEBUG

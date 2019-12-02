@@ -33,6 +33,8 @@ Global
 		Debug|x64 = Debug|x64
 		DirectX11OnWindows_Debug|x64 = DirectX11OnWindows_Debug|x64
 		DirectX11OnWindows_Release|x64 = DirectX11OnWindows_Release|x64
+		DirectX12OnWindows_Debug|x64 = DirectX12OnWindows_Debug|x64
+		DirectX12OnWindows_Release|x64 = DirectX12OnWindows_Release|x64
 		Release|x64 = Release|x64
 		VulkanOnWindows_Debug|x64 = VulkanOnWindows_Debug|x64
 		VulkanOnWindows_Release|x64 = VulkanOnWindows_Release|x64
@@ -44,6 +46,10 @@ Global
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Debug|x64.Build.0 = Debug|x64
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Release|x64.ActiveCfg = Release|x64
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX11OnWindows_Release|x64.Build.0 = Release|x64
+		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX12OnWindows_Debug|x64.ActiveCfg = Debug|x64
+		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX12OnWindows_Debug|x64.Build.0 = Debug|x64
+		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX12OnWindows_Release|x64.ActiveCfg = Release|x64
+		{4674F1B4-C552-4A2B-8741-4E3207D85740}.DirectX12OnWindows_Release|x64.Build.0 = Release|x64
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.Release|x64.ActiveCfg = Release|x64
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.Release|x64.Build.0 = Release|x64
 		{4674F1B4-C552-4A2B-8741-4E3207D85740}.VulkanOnWindows_Debug|x64.ActiveCfg = Debug|x64
@@ -54,6 +60,10 @@ Global
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.Debug|x64.Build.0 = Debug|x64
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX11OnWindows_Debug|x64.ActiveCfg = Debug|x64
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX11OnWindows_Release|x64.ActiveCfg = Release|x64
+		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX12OnWindows_Debug|x64.ActiveCfg = Debug|x64
+		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX12OnWindows_Debug|x64.Build.0 = Debug|x64
+		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX12OnWindows_Release|x64.ActiveCfg = Release|x64
+		{3B070C61-8FE8-497D-8D72-5568849B2437}.DirectX12OnWindows_Release|x64.Build.0 = Release|x64
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.Release|x64.ActiveCfg = Release|x64
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.Release|x64.Build.0 = Release|x64
 		{3B070C61-8FE8-497D-8D72-5568849B2437}.VulkanOnWindows_Debug|x64.ActiveCfg = Debug|x64
@@ -63,6 +73,10 @@ Global
 		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.DirectX11OnWindows_Debug|x64.Build.0 = DirectX11OnWindows_Debug|x64
 		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.DirectX11OnWindows_Release|x64.ActiveCfg = DirectX11OnWindows_Release|x64
 		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.DirectX11OnWindows_Release|x64.Build.0 = DirectX11OnWindows_Release|x64
+		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.DirectX12OnWindows_Debug|x64.ActiveCfg = DirectX12OnWindows_Debug|x64
+		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.DirectX12OnWindows_Debug|x64.Build.0 = DirectX12OnWindows_Debug|x64
+		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.DirectX12OnWindows_Release|x64.ActiveCfg = DirectX12OnWindows_Release|x64
+		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.DirectX12OnWindows_Release|x64.Build.0 = DirectX12OnWindows_Release|x64
 		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.Release|x64.ActiveCfg = Release|x64
 		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.Release|x64.Build.0 = Release|x64
 		{1E5C018D-53C0-4937-A2C7-6C50D7454B33}.VulkanOnWindows_Debug|x64.ActiveCfg = VulkanOnWindows_Debug|x64
@@ -75,6 +89,8 @@ Global
 		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Debug|x64.Build.0 = Debug|x64
 		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Release|x64.ActiveCfg = Release|x64
 		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX11OnWindows_Release|x64.Build.0 = Release|x64
+		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX12OnWindows_Debug|x64.ActiveCfg = Debug|x64
+		{C6943C66-0016-4141-9F66-D358272F27BF}.DirectX12OnWindows_Release|x64.ActiveCfg = Release|x64
 		{C6943C66-0016-4141-9F66-D358272F27BF}.Release|x64.ActiveCfg = Release|x64
 		{C6943C66-0016-4141-9F66-D358272F27BF}.Release|x64.Build.0 = Release|x64
 		{C6943C66-0016-4141-9F66-D358272F27BF}.VulkanOnWindows_Debug|x64.ActiveCfg = Debug|x64
@@ -83,6 +99,8 @@ Global
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.Debug|x64.Build.0 = Debug|x64
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX11OnWindows_Debug|x64.ActiveCfg = Debug|x64
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX11OnWindows_Release|x64.ActiveCfg = Release|x64
+		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX12OnWindows_Debug|x64.ActiveCfg = Debug|x64
+		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.DirectX12OnWindows_Release|x64.ActiveCfg = Release|x64
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.Release|x64.ActiveCfg = Release|x64
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.Release|x64.Build.0 = Release|x64
 		{EC72BB92-53EC-4EB9-905E-78FD5B99F8FE}.VulkanOnWindows_Debug|x64.ActiveCfg = Debug|x64
@@ -95,6 +113,10 @@ Global
 		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.DirectX11OnWindows_Debug|x64.Build.0 = DirectX11OnWindows_Debug|x64
 		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.DirectX11OnWindows_Release|x64.ActiveCfg = DirectX11OnWindows_Release|x64
 		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.DirectX11OnWindows_Release|x64.Build.0 = DirectX11OnWindows_Release|x64
+		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.DirectX12OnWindows_Debug|x64.ActiveCfg = DirectX12OnWindows_Debug|x64
+		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.DirectX12OnWindows_Debug|x64.Build.0 = DirectX12OnWindows_Debug|x64
+		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.DirectX12OnWindows_Release|x64.ActiveCfg = DirectX12OnWindows_Release|x64
+		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.DirectX12OnWindows_Release|x64.Build.0 = DirectX12OnWindows_Release|x64
 		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.Release|x64.ActiveCfg = Release|x64
 		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.Release|x64.Build.0 = Release|x64
 		{AE1B2E42-9899-4CF8-9130-7508C3AD97C5}.VulkanOnWindows_Debug|x64.ActiveCfg = VulkanOnWindows_Debug|x64

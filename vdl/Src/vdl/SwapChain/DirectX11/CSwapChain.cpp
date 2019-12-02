@@ -30,46 +30,48 @@ void CSwapChain::Initialize()
   //  エラーチェック用
   HRESULT hr = S_OK;
 
-  DXGI_SWAP_CHAIN_DESC SwapChainDesc;
+  //  スワップチェーンの作成
   {
-    SwapChainDesc.BufferDesc.Width = Constants::kDefaultWindowSize.x;
-    SwapChainDesc.BufferDesc.Height = Constants::kDefaultWindowSize.y;
-    SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
-    SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-    SwapChainDesc.BufferDesc.Format = Cast(vdl::FormatType::eSwapChain);
-    SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-    SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-    SwapChainDesc.SampleDesc.Count = 1;
-    SwapChainDesc.SampleDesc.Quality = 0;
-    SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    SwapChainDesc.BufferCount = Constants::kBackBufferNum;
-    SwapChainDesc.OutputWindow = hWnd;
-    SwapChainDesc.Windowed = true;
-    SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-    SwapChainDesc.Flags = 0;
-  }
+    DXGI_SWAP_CHAIN_DESC SwapChainDesc;
+    {
+      SwapChainDesc.BufferDesc.Width = Constants::kDefaultWindowSize.x;
+      SwapChainDesc.BufferDesc.Height = Constants::kDefaultWindowSize.y;
+      SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
+      SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+      SwapChainDesc.BufferDesc.Format = Cast(vdl::FormatType::eSwapChain);
+      SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+      SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+      SwapChainDesc.SampleDesc.Count = 1;
+      SwapChainDesc.SampleDesc.Quality = 0;
+      SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+      SwapChainDesc.BufferCount = Constants::kBackBufferNum;
+      SwapChainDesc.OutputWindow = hWnd;
+      SwapChainDesc.Windowed = true;
+      SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+      SwapChainDesc.Flags = 0;
+    }
 
-  //  ALT+ENTER無効にしてスワップチェーンを作成
-  {
-    Microsoft::WRL::ComPtr<IDXGIDevice> pDXGIDevice;
-    hr = pD3D11Device_->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(pDXGIDevice.GetAddressOf()));
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
-    Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
-    hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(pAdapter.GetAddressOf()));
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
     Microsoft::WRL::ComPtr<IDXGIFactory> pFactory;
-    hr = pAdapter->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void**>(pFactory.GetAddressOf()));
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    {
+      Microsoft::WRL::ComPtr<IDXGIDevice> pDXGIDevice;
+      hr = pD3D11Device_->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(pDXGIDevice.GetAddressOf()));
+      _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+      Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
+      hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(pAdapter.GetAddressOf()));
+      _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+      hr = pAdapter->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void**>(pFactory.GetAddressOf()));
+      _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    }
 
     hr = pFactory->CreateSwapChain(pD3D11Device_, &SwapChainDesc, pSwapChain_.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
 
+    //  ALT+Enterの無効化
     hr = pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
   }
 
-  D3D11_TEXTURE2D_DESC BackBufferDesc;
-  //  レンダーターゲットビューの作成
+  //  バックバッファの作成
   {
     Microsoft::WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
     hr = pSwapChain_->GetBuffer(0, IID_PPV_ARGS(pBackBuffer.GetAddressOf()));
@@ -77,8 +79,6 @@ void CSwapChain::Initialize()
 
     hr = pD3D11Device_->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pRenderTargetView_.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
-
-    pBackBuffer->GetDesc(&BackBufferDesc);
   }
 
   //  レンダーテクスチャの作成

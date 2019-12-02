@@ -3,6 +3,8 @@
 
 #include <vdl/pch/Vulkan/pch.hpp>
 
+#include <assert.h>
+
 struct BufferData
 {
   vk::UniqueBuffer Buffer;

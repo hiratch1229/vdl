@@ -49,7 +49,7 @@ void Main()
     "Ocean"
   };
   static constexpr uint kSceneTypeNum = static_cast<uint>(Macro::ArraySize(kSceneTypes));
-  static constexpr uint kInitSceneType = 3;
+  static constexpr uint kInitSceneType = 0;
   static_assert(kInitSceneType < kSceneTypeNum);
 
   const VertexShader DefaultVertexShader2D = VertexShader("Shader/Texture/TextureVS.hlsl", InputLayoutType::eTexture);

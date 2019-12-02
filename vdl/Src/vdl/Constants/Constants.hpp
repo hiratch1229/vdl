@@ -82,6 +82,7 @@ namespace Constants
 
   constexpr vdl::uint kInstanceBufferSizeMultiple = 5;
 
-  constexpr vdl::uint kParentConstantBufferSize = 51200;
-  static_assert(kParentConstantBufferSize % 256 == 0);
+  constexpr vdl::uint kGraphicsCommandBufferNum = 5;
+
+  constexpr vdl::uint kComputeCommandBufferNum = 3;
 }

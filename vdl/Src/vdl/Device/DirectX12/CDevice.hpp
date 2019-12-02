@@ -17,11 +17,18 @@ class CDevice : public IDevice
   Microsoft::WRL::ComPtr<ID3D12CommandAllocator> pCommandAllocator_;
   Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> pCommandList_;
   Microsoft::WRL::ComPtr<ID3D12Fence> pFence_;
+  Microsoft::WRL::ComPtr<IDXGIFactory6> pFactory_;
   HANDLE FenceEvent_;
   vdl::uint FenceValue_ = 0;
 private:
   IBufferManager* pBufferManager_;
   ConstantBufferAllocater ConstantBufferAllocater_;
+public:
+  [[nodiscard]] ID3D12Device5* GetDevice() { return pDevice_.Get(); }
+  [[nodiscard]] IDXGIFactory6* GetFactory() { return pFactory_.Get(); }
+  [[nodiscard]] ConstantBufferAllocater* GetConstantBufferAllocater() { return &ConstantBufferAllocater_; }
+public:
+  void CreateDescriptorHeap(ID3D12DescriptorHeap** _ppDescriptorHeap, D3D12_DESCRIPTOR_HEAP_TYPE _Type);
 public:
   void ExecuteAndWait(ID3D12CommandList* _pCommandList);
 private:
@@ -30,8 +37,6 @@ private:
   void CreateStagingBuffer(BufferData* _pBuffer, const void* _Buffer, vdl::uint _BufferSize)const;
   void CopyBuffer(BufferData* _pSrcBuffer, BufferData* _pDstBuffer, vdl::uint _BufferSize, D3D12_RESOURCE_STATES _AfterState);
 public:
-  CDevice() = default;
-
   CDevice() = default;
 
   void Initialize()override;

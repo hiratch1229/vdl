@@ -113,3 +113,33 @@ inline Shader* Cast(IShader* _pShader)
 
   return static_cast<Shader*>(_pShader);
 }
+
+enum class DescriptorType : vdl::uint8_t
+{
+  eShaderResource,
+  eSampler,
+  eConstantBuffer,
+  eUnorderedAccessObject,
+
+  eNum,
+  eGraphicsNum = eConstantBuffer + 1,
+  eComputeNum = eUnorderedAccessObject + 1,
+};
+static constexpr vdl::uint kGraphicsDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eGraphicsNum);
+static constexpr vdl::uint kComputeDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eComputeNum);
+static constexpr vdl::uint kDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eNum);
+
+static constexpr vdl::uint kGraphicsDescriptorNum = kGraphicsDescriptorTypeNum * kGraphicsShaderStageNum;
+
+inline vdl::uint GetDescriptorOffset(ShaderType _Stage, DescriptorType _Type)
+{
+  if (_Stage == ShaderType::eComputeShader)
+  {
+    return kGraphicsDescriptorNum + static_cast<vdl::uint>(_Type);
+  }
+  else
+  {
+    assert(_Type != DescriptorType::eUnorderedAccessObject );
+    return static_cast<vdl::uint>(_Stage) * kGraphicsDescriptorTypeNum + static_cast<vdl::uint>(_Type);
+  }
+}

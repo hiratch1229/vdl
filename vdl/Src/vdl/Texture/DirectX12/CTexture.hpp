@@ -7,6 +7,8 @@
 
 #include <vdl/Constants/Constants.hpp>
 
+#include <utility>
+
 struct TextureData
 {
   Microsoft::WRL::ComPtr<ID3D12Resource> pResource;
@@ -138,7 +140,7 @@ public:
 
 struct CUnorderedAccessTexture : public CTexture
 {
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pUnorededAccessViewHeap;
+  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pUnorderedAccessViewHeap;
   vdl::FormatType Format;
 public:
   CUnorderedAccessTexture() = default;
