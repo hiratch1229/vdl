@@ -126,7 +126,6 @@ enum class DescriptorType : vdl::uint8_t
 };
 static constexpr vdl::uint kGraphicsDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eGraphicsNum);
 static constexpr vdl::uint kComputeDescriptorTypeNum = static_cast<vdl::uint>(DescriptorType::eNum);
-
 static constexpr vdl::uint kGraphicsDescriptorLayoutNum = kGraphicsDescriptorTypeNum * kGraphicsShaderStageNum;
 
 inline vdl::uint GetDescriptorLayoutOffset(ShaderType _Stage, DescriptorType _Type)

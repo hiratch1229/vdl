@@ -18,8 +18,7 @@ private:
   Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pDescriptorHeap_;
   vdl::uint DescriptorSize_;
   vdl::uint DescriptorIncrementSize_;
-  vdl::uint CPUOffset_ = 0;
-  vdl::uint GPUOffset_ = 0;
+  vdl::uint Offset_ = 0;
 public:
   [[nodiscard]] ID3D12DescriptorHeap* GetDescriptorHeap() { return pDescriptorHeap_.Get(); }
   [[nodiscard]] vdl::uint GetDescriptorIncrementSize()const { return DescriptorIncrementSize_; }
@@ -28,9 +27,11 @@ public:
 
   void Initialize(ID3D12Device* _pDevice, DescriptorHeapType _Type);
 
-  D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(vdl::uint _DescriptorSize);
+  vdl::uint Secure(vdl::uint _DescriptorSize);
 
-  D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(vdl::uint _DescriptorSize);
+  D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(vdl::uint _Offset);
+
+  D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(vdl::uint _Offset);
 };
 
 inline constexpr D3D12_DESCRIPTOR_HEAP_TYPE Cast(DescriptorHeapType _Type)

@@ -1683,6 +1683,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
   //  パイプラインのバインド
   {
+    assert(!CurrentComputeState_.ComputeShader.isEmpty());
     const CComputeShader* pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(CurrentComputeState_.ComputeShader.GetID()));
 
     vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
@@ -1743,8 +1744,6 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
   ComputeQueue_.submit(SubmitInfo, GetCurrentComputeFence());
 
   LastSemaphore_ = CurrentSemaphore;
-
-  const vdl::uint CurrentComputeCommandBufferIndex = ComputeCommandBufferIndex_;
 
   ++ComputeCommandBufferIndex_ %= Constants::kComputeCommandBufferNum;
   WaitFence(GetCurrentComputeFence());

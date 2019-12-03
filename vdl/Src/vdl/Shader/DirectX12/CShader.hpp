@@ -135,7 +135,7 @@ inline vdl::uint GetDescriptorOffset(ShaderType _Stage, DescriptorType _Type)
 {
   if (_Stage == ShaderType::eComputeShader)
   {
-    return kGraphicsDescriptorNum + static_cast<vdl::uint>(_Type);
+    return static_cast<vdl::uint>(_Type);
   }
   else
   {

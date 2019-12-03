@@ -306,7 +306,7 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
   pUnorderedAccessBuffer->BufferSize = _BufferSize;
   if (_Buffer)
   {
-    CreateBuffer(&pUnorderedAccessBuffer->BufferData, pUnorderedAccessBuffer->BufferSize, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_COPY_DEST);
+    CreateBuffer(&pUnorderedAccessBuffer->BufferData, pUnorderedAccessBuffer->BufferSize, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
     BufferData StagingBuffer;
     CreateStagingBuffer(&StagingBuffer, _Buffer, pUnorderedAccessBuffer->BufferSize);
@@ -314,25 +314,26 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
   }
   else
   {
-    CreateBuffer(&pUnorderedAccessBuffer->BufferData, pUnorderedAccessBuffer->BufferSize, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    CreateBuffer(&pUnorderedAccessBuffer->BufferData, pUnorderedAccessBuffer->BufferSize, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   }
 
   HRESULT hr = S_OK;
 
   //  ディスクリプタヒープの作成
   CreateDescriptorHeap(pUnorderedAccessBuffer->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+  CreateDescriptorHeap(pUnorderedAccessBuffer->pUnordererdAccessViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
   //  ビューの作成
   {
     D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
     {
       ShaderResourceViewDesc.Format = DXGI_FORMAT_UNKNOWN;
-      ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+      ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
       ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-      ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-      ShaderResourceViewDesc.Texture2D.MipLevels = 1;
-      ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
-      ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+      ShaderResourceViewDesc.Buffer.FirstElement = 0;
+      ShaderResourceViewDesc.Buffer.NumElements = pUnorderedAccessBuffer->BufferSize / _Stride;
+      ShaderResourceViewDesc.Buffer.StructureByteStride = _Stride;
+      ShaderResourceViewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
     }
     pDevice_->CreateShaderResourceView(pUnorderedAccessBuffer->BufferData.pResource.Get(), &ShaderResourceViewDesc, pUnorderedAccessBuffer->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
 
@@ -476,7 +477,103 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
 
 void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images)
 {
+  assert(_ppTexture);
 
+  constexpr DXGI_FORMAT kTextureFormat = Cast(Constants::kTextureFormat);
+
+  CCubeTexture* pCubeTexture = new CCubeTexture;
+  pCubeTexture->TextureSize = _Images[0].GetTextureSize();
+
+  HRESULT hr = S_OK;
+
+  //  ディスクリプタヒープの作成
+  CreateDescriptorHeap(pCubeTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+  //  シェーダーリソースの作成
+  {
+    D3D12_RESOURCE_DESC TextureDesc;
+    {
+      TextureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+      TextureDesc.Alignment = 0;
+      TextureDesc.Width = pCubeTexture->TextureSize.x;
+      TextureDesc.Height = pCubeTexture->TextureSize.y;
+      TextureDesc.DepthOrArraySize = 6;
+      TextureDesc.MipLevels = 1;
+      TextureDesc.Format = kTextureFormat;
+      TextureDesc.SampleDesc.Count = 1;
+      TextureDesc.SampleDesc.Quality = 0;
+      TextureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+      TextureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+    }
+
+    CreateResource(pCubeTexture->TextureData.pResource.GetAddressOf(), TextureDesc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_COPY_DEST);
+    pCubeTexture->TextureData.ResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
+
+    UINT64 UploadSize;
+    D3D12_PLACED_SUBRESOURCE_FOOTPRINT PlacedFootprints[6];
+    pDevice_->GetCopyableFootprints(&TextureDesc, 0, 6, 0, PlacedFootprints, nullptr, nullptr, &UploadSize);
+
+    BufferData StagingBuffer;
+    CreateStagingBuffer(&StagingBuffer, nullptr, static_cast<vdl::uint>(UploadSize));
+
+    //  メモリの書き込み
+    {
+      const vdl::uint Stride = _Images[0].Stride();
+      for (vdl::uint i = 0; i < 6; ++i)
+      {
+        const vdl::uint8_t* Buffer = &_Images[i].Buffer()->Red;
+        D3D12_PLACED_SUBRESOURCE_FOOTPRINT& PlacedFootprint = PlacedFootprints[i];
+        for (vdl::uint y = 0; y < pCubeTexture->TextureSize.y; ++y)
+        {
+          ::memcpy(static_cast<vdl::uint8_t*>(StagingBuffer.pData) + PlacedFootprint.Offset + PlacedFootprint.Footprint.RowPitch * y, Buffer + Stride * y, Stride);
+        }
+      }
+    }
+
+    //  リソースのコピー
+    {
+      pCommandList_->Reset(pCommandAllocator_.Get(), nullptr);
+      D3D12_TEXTURE_COPY_LOCATION DstCopyLocation;
+      {
+        DstCopyLocation.pResource = pCubeTexture->TextureData.pResource.Get();
+        DstCopyLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+      }
+      D3D12_TEXTURE_COPY_LOCATION SrcCopyLocation;
+      {
+        SrcCopyLocation.pResource = StagingBuffer.pResource.Get();
+        SrcCopyLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+      }
+      for (vdl::uint i = 0; i < 6; ++i)
+      {
+        DstCopyLocation.SubresourceIndex = i;
+        SrcCopyLocation.PlacedFootprint = PlacedFootprints[i];
+        pCommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
+      }
+
+      pCubeTexture->TextureData.TransitionResourceBarrier(pCommandList_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+      pCommandList_->Close();
+
+      ExecuteAndWait(pCommandList_.Get());
+    }
+
+    //  ビューの作成
+    {
+      D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+      {
+        ShaderResourceViewDesc.Format = TextureDesc.Format;
+        ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+        ShaderResourceViewDesc.Texture2D.MipLevels = 1;
+        ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
+        ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+      }
+
+      pDevice_->CreateShaderResourceView(pCubeTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pCubeTexture->TextureData.pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
+    }
+  }
+
+  (*_ppTexture) = std::move(pCubeTexture);
 }
 
 void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
@@ -623,8 +720,8 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
       TextureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
     }
 
-    CreateResource(pUnorderedAccessTexture->TextureData.pResource.GetAddressOf(), TextureDesc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-    pUnorderedAccessTexture->TextureData.ResourceState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+    CreateResource(pUnorderedAccessTexture->TextureData.pResource.GetAddressOf(), TextureDesc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    pUnorderedAccessTexture->TextureData.ResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
     //  ビューの作成
     {
@@ -645,8 +742,8 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
       {
         UnorderedAccessDesc.Format = DXFormat;
         UnorderedAccessDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-        UnorderedAccessDesc.Texture2D.MipSlice = 1;
-        UnorderedAccessDesc.Texture2D.PlaneSlice = 1;
+        UnorderedAccessDesc.Texture2D.MipSlice = 0;
+        UnorderedAccessDesc.Texture2D.PlaneSlice = 0;
       }
 
       pDevice_->CreateUnorderedAccessView(pUnorderedAccessTexture->TextureData.pResource.Get(), nullptr, &UnorderedAccessDesc, pUnorderedAccessTexture->pUnorderedAccessViewHeap->GetCPUDescriptorHandleForHeapStart());
@@ -888,7 +985,7 @@ void CDevice::CreateResource(ID3D12Resource** _ppResource, const D3D12_RESOURCE_
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 }
 
-void CDevice::CreateBuffer(BufferData* _pBuffer, vdl::uint _BufferSize, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState)const
+void CDevice::CreateBuffer(BufferData* _pBuffer, vdl::uint _BufferSize, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState, D3D12_RESOURCE_FLAGS _RosourceFlags)const
 {
   assert(_pBuffer);
 
@@ -904,7 +1001,7 @@ void CDevice::CreateBuffer(BufferData* _pBuffer, vdl::uint _BufferSize, D3D12_HE
     ResourceDesc.SampleDesc.Count = 1;
     ResourceDesc.SampleDesc.Quality = 0;
     ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+    ResourceDesc.Flags = _RosourceFlags;
   }
 
   CreateResource(_pBuffer->pResource.GetAddressOf(), ResourceDesc, _HeapType, _InitialResourceState);

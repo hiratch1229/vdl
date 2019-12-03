@@ -41,38 +41,30 @@ void DescriptorHeap::Initialize(ID3D12Device* _pDevice, DescriptorHeapType _Type
   DescriptorIncrementSize_ = _pDevice->GetDescriptorHandleIncrementSize(DescriptorHeapDesc.Type);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::GetCPUDescriptorHandle(vdl::uint _DescriptorSize)
+vdl::uint DescriptorHeap::Secure(vdl::uint _DescriptorSize)
+{
+  if (DescriptorSize_ < Offset_ + _DescriptorSize)
+  {
+    Offset_ = 0;
+  }
+
+  const vdl::uint Offset = Offset_;
+  Offset_ += _DescriptorSize;
+  return Offset;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::GetCPUDescriptorHandle(vdl::uint _Offset)
 {
   D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle = pDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-  {
-    if (DescriptorSize_ < CPUOffset_ + _DescriptorSize)
-    {
-      CPUOffset_ = 0;
-    }
-    else
-    {
-      DescriptorHandle.ptr += CPUOffset_ * DescriptorIncrementSize_;
-      CPUOffset_ += _DescriptorSize;
-    }
-  }
+  DescriptorHandle.ptr += _Offset * DescriptorIncrementSize_;
 
   return DescriptorHandle;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetGPUDescriptorHandle(vdl::uint _DescriptorSize)
+D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetGPUDescriptorHandle(vdl::uint _Offset)
 {
   D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHandle = pDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-  {
-    if (DescriptorSize_ < GPUOffset_ + _DescriptorSize)
-    {
-      GPUOffset_ = 0;
-    }
-    else
-    {
-      DescriptorHandle.ptr += GPUOffset_ * DescriptorIncrementSize_;
-      GPUOffset_ += _DescriptorSize;
-    }
-  }
+  DescriptorHandle.ptr += _Offset * DescriptorIncrementSize_;
 
   return DescriptorHandle;
 }
