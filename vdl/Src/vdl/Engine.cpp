@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <thread>
 
-#define USING_MULTI_THREAD
+//#define USING_MULTI_THREAD
 
 Engine::Engine()
 {

@@ -45,7 +45,7 @@ private:
   };
   struct SyncState
   {
-    //Microsoft::WRL::ComPtr<ID3D12Fence> pFence;
+    Microsoft::WRL::ComPtr<ID3D12Fence> pFence;
     vdl::uint64_t Value = 0;
   };
 private:
@@ -176,9 +176,9 @@ private:
   std::unordered_map<vdl::DepthStencilState, D3D12_DEPTH_STENCIL_DESC> DepthStencilStates_;
   std::unordered_map<vdl::Sampler, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>> Samplers_;
   std::array<DescriptorHeap, kDescriptorHeapTypeNum> DescriptorHeaps_;
-  Microsoft::WRL::ComPtr<ID3D12Fence> pFence_;
+  //Microsoft::WRL::ComPtr<ID3D12Fence> pFence_;
   HANDLE FenceEvent_;
-  vdl::uint64_t FenceValue_ = 0;
+  //vdl::uint64_t FenceValue_ = 0;
 private:
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pGraphicsRootSignature_;
   Microsoft::WRL::ComPtr<ID3D12CommandQueue> pGraphicsCommandQueue_;
@@ -196,6 +196,7 @@ private:
   ID3D12CommandAllocator* GetCurrentGraphicsCommandAllocator()const { return pGraphicsCommandAllocators_[GraphicsCommandBufferIndex_].Get(); }
 private:
   void PreprocessingDraw();
+  void SingnalFence(ID3D12CommandQueue* _pQueue, SyncState* _pSyncState);
   void WaitFence(ID3D12CommandQueue* _pQueue, SyncState* _pSyncState);
   CRenderTexture* GetD3D12RenderTexture(const vdl::RenderTexture& _RenderTexture);
   const D3D12_BLEND_DESC& GetBlendDesc(const vdl::BlendState& _BlendState);

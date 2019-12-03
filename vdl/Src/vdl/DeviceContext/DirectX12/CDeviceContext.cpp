@@ -546,8 +546,13 @@ void CDeviceContext::Initialize()
     }
 
     //  ƒtƒFƒ“ƒX‚Ìì¬
-    hr = pD3D12Device_->CreateFence(FenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(pFence_.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    {
+      for (auto& GraphicsSyncState : GraphicsSyncStates_)
+      {
+        hr = pD3D12Device_->CreateFence(GraphicsSyncState.Value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(GraphicsSyncState.pFence.GetAddressOf()));
+        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+      }
+    }
   }
 }
 
@@ -900,6 +905,7 @@ void CDeviceContext::Flush()
   ID3D12CommandList* pCurrentCommandList = pCurrentGraphicsCommandList;
   pGraphicsCommandQueue_->ExecuteCommandLists(1, &pCurrentCommandList);
 
+  SingnalFence(pGraphicsCommandQueue_.Get(), &GraphicsSyncStates_[GraphicsCommandBufferIndex_]);
   ++GraphicsCommandBufferIndex_ %= Constants::kGraphicsCommandBufferNum;
   WaitFence(pGraphicsCommandQueue_.Get(), &GraphicsSyncStates_[GraphicsCommandBufferIndex_]);
   hr = GetCurrentGraphicsCommandList()->Reset(GetCurrentGraphicsCommandAllocator(), nullptr);
@@ -1414,17 +1420,18 @@ void CDeviceContext::PreprocessingDraw()
   GraphicsStateChangeFlags_.Clear();
 }
 
+void CDeviceContext::SingnalFence(ID3D12CommandQueue* _pQueue, SyncState* _pSyncState)
+{
+  _pQueue->Signal(_pSyncState->pFence.Get(), ++_pSyncState->Value);
+}
+
 void CDeviceContext::WaitFence(ID3D12CommandQueue* _pQueue, SyncState* _pSyncState)
 {
-  _pQueue->Signal(pFence_.Get(), FenceValue_);
-
-  if (pFence_->GetCompletedValue() < FenceValue_)
+  if (_pSyncState->pFence->GetCompletedValue() < _pSyncState->Value)
   {
-    pFence_->SetEventOnCompletion(FenceValue_, FenceEvent_);
-    ::WaitForSingleObject(FenceEvent_, INFINITE);
+    _pSyncState->pFence->SetEventOnCompletion(_pSyncState->Value, FenceEvent_);
+    ::WaitForSingleObjectEx(FenceEvent_, INFINITE, false);
   }
-  ++FenceValue_;
-  _pSyncState->Value = FenceValue_;
 }
 
 CRenderTexture* CDeviceContext::GetD3D12RenderTexture(const vdl::RenderTexture& _RenderTexture)

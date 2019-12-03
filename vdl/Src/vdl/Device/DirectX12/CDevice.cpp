@@ -320,18 +320,7 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
   HRESULT hr = S_OK;
 
   //  ディスクリプタヒープの作成
-  {
-    D3D12_DESCRIPTOR_HEAP_DESC ShaderResourceViewHeapDesc;
-    {
-      ShaderResourceViewHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-      ShaderResourceViewHeapDesc.NumDescriptors = 1;
-      ShaderResourceViewHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-      ShaderResourceViewHeapDesc.NodeMask = 0;
-    }
-
-    hr = pDevice_->CreateDescriptorHeap(&ShaderResourceViewHeapDesc, IID_PPV_ARGS(pUnorderedAccessBuffer->pShaderResourceViewHeap.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-  }
+  CreateDescriptorHeap(pUnorderedAccessBuffer->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
   //  ビューの作成
   {
@@ -500,10 +489,8 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
   pRenderTexture->DXFormat = Cast(_Format);
 
   //  ディスクリプタヒープの作成
-  {
-    CreateDescriptorHeap(pRenderTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    CreateDescriptorHeap(pRenderTexture->pRenderTargetViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-  }
+  CreateDescriptorHeap(pRenderTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+  CreateDescriptorHeap(pRenderTexture->pRenderTargetViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
   //  シェーダーリソースの作成
   {
@@ -565,10 +552,8 @@ void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const
   pDepthStencilTexture->DXFormat = Cast(_Format);
 
   //  ディスクリプタヒープの作成
-  {
-    CreateDescriptorHeap(pDepthStencilTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    CreateDescriptorHeap(pDepthStencilTexture->pDepthStencilViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-  }
+  CreateDescriptorHeap(pDepthStencilTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+  CreateDescriptorHeap(pDepthStencilTexture->pDepthStencilViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
   //  シェーダーリソースの作成
   {
@@ -618,10 +603,8 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
   const DXGI_FORMAT DXFormat = Cast(_Format);
 
   //  ディスクリプタヒープの作成
-  {
-    CreateDescriptorHeap(pUnorderedAccessTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    CreateDescriptorHeap(pUnorderedAccessTexture->pUnorderedAccessViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-  }
+  CreateDescriptorHeap(pUnorderedAccessTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+  CreateDescriptorHeap(pUnorderedAccessTexture->pUnorderedAccessViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
   //  シェーダーリソースの作成
   {
