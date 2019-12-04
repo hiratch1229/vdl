@@ -207,8 +207,6 @@ ModelData glTFLoader::Load(const char* _FilePath)const
         return;
       }
 
-      constexpr vdl::Matrix kRotate = vdl::Matrix(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-
       tinygltf::Mesh& Mesh = Model.meshes[_Node.mesh];
 
       //  マテリアルのインデックスでソート
@@ -326,6 +324,7 @@ ModelData glTFLoader::Load(const char* _FilePath)const
           default: assert(false);
           }
 
+          constexpr vdl::Matrix kRotate = vdl::Matrix(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
           const size_t PolygonNum = IndexNum / 3;
           for (size_t PolygonCount = 0; PolygonCount < PolygonNum; ++PolygonCount)
           {
@@ -340,6 +339,7 @@ ModelData glTFLoader::Load(const char* _FilePath)const
               MeshData.IndexCount = 0;
               MeshData.MaterialIndex = Primitive.material;
               MeshData.GlobalTransform = GlobalTransform * kRotate;
+              //MeshData.GlobalTransform = GlobalTransform;
             }
             MaterialIndex = Primitive.material;
           }

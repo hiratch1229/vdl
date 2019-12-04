@@ -69,6 +69,9 @@
     <Filter Include="シェーダーファイル\Ocean\PostProcess">
       <UniqueIdentifier>{120a88f2-2eab-4ddb-b734-01735d747f04}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\PBR">
+      <UniqueIdentifier>{8ea38718-afb2-48dd-bc4c-bee0bd46370d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -101,6 +104,9 @@
     <ClCompile Include="Scene\SceneOcean.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\ScenePBR.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Scene.hpp">
@@ -131,6 +137,9 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\SceneOcean.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\ScenePBR.hpp">
       <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
@@ -282,6 +291,12 @@
     <FxCompile Include="Shader\Ocean\PostProcess\DepthOfFieldPS.hlsl">
       <Filter>シェーダーファイル\Ocean\PostProcess</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\PBR\PBRPS.hlsl">
+      <Filter>シェーダーファイル\PBR</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PBR\PBRVS.hlsl">
+      <Filter>シェーダーファイル\PBR</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Tessellation\Tessellation.hlsli">
@@ -343,6 +358,9 @@
     </None>
     <None Include="Shader\Ocean\PostProcess\ScreenSpaceRayMarch.hlsli">
       <Filter>シェーダーファイル\Ocean\PostProcess</Filter>
+    </None>
+    <None Include="Shader\PBR\PBR.hlsli">
+      <Filter>シェーダーファイル\PBR</Filter>
     </None>
   </ItemGroup>
 </Project>

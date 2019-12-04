@@ -484,7 +484,7 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
 
   vdl::InstanceStaticMesh Instance;
   {
-    Instance.World = _World * _StaticMesh.GetGlobalTransform();
+    Instance.World = _StaticMesh.GetGlobalTransform() * _World;
     Instance.Color = _Color;
   }
   StaticMeshRendererCommandList_.PushDrawData(_StaticMesh, std::move(Instance));
