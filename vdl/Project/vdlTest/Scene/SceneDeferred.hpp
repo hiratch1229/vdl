@@ -22,6 +22,7 @@ class SceneDeferred : public IScene
 private:
   static constexpr vdl::uint2 kWindowSize = vdl::Constants::kDefaultWindowSize;
   static constexpr vdl::uint2 kShadowMapSize = vdl::uint2(4096, 4096);
+  static constexpr vdl::float3 kSkyboxScale = 500.0f;
   static constexpr float kRectangleScale = 15.0f;
   static constexpr float kRectangleHalfScale = kRectangleScale * 0.5f;
   static constexpr float kSphereScale = 0.5f;

@@ -53,7 +53,7 @@ void Main()
     "PBR"
   };
   static constexpr uint kSceneTypeNum = static_cast<uint>(Macro::ArraySize(kSceneTypes));
-  static constexpr uint kInitSceneType = 4;
+  static constexpr uint kInitSceneType = 3;
   static_assert(kInitSceneType < kSceneTypeNum);
 
   const VertexShader DefaultVertexShader2D = VertexShader("Shader/Texture/TextureVS.hlsl", InputLayoutType::eTexture);

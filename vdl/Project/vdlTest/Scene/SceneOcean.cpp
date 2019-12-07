@@ -83,7 +83,7 @@ void SceneOcean::Initialize()
 
   //  ‹ó‚Ì‰Šú‰»
   {
-    SkyboxTexture_ = CubeTexture("Data/skybox.png");
+    SkyboxTexture_ = CubeTexture("Data/Skybox/hw_glacier.png");
     SkyboxVertexShader_ = VertexShader("Shader/Skybox/SkyboxVS.hlsl", InputLayoutType::eStaticMesh);
     SkyboxPixelShader_ = PixelShader("Shader/Skybox/SkyboxPS.hlsl");
   }

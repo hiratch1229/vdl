@@ -189,6 +189,7 @@ void CDevice::Initialize()
   pDevice_.As(&pInfoQueue_);
 
   pInfoQueue_->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+  //pInfoQueue_->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
   pInfoQueue_->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
 
   D3D12_MESSAGE_SEVERITY Serveritys[] =

@@ -3,18 +3,20 @@
 
 class ScenePBR : public IScene
 {
-  static constexpr vdl::float3 kAnimationCubePosition = vdl::float3(-10.0f, 5.0f, 0.0f);
-  static constexpr vdl::float3 kBoomBoxPosition = vdl::float3(-5.0f, 5.0f, 0.0f);
-  static constexpr vdl::float3 kDamagedHelmetPosition = vdl::float3(0.0f, 5.0f, 0.0f);
-  static constexpr vdl::float3 kSciFiHelmetPosition = vdl::float3(5.0f, 5.0f, 0.0f);
-  static constexpr vdl::float3 kSuzannePosition = vdl::float3(10.0f, 5.0f, 0.0f);
+  static constexpr vdl::float3 kSkyboxScale = 500.0f;
+  //static constexpr vdl::float3 kAnimationCubePosition = vdl::float3(-10.0f, 5.0f, 0.0f);
+  static constexpr vdl::float3 kBoomBoxPosition = vdl::float3(-10.5f, 5.0f, 0.0f);
+  static constexpr vdl::float3 kDamagedHelmetPosition = vdl::float3(-3.5f, 5.0f, 0.0f);
+  static constexpr vdl::float3 kSciFiHelmetPosition = vdl::float3(3.5f, 5.0f, 0.0f);
+  static constexpr vdl::float3 kSuzannePosition = vdl::float3(10.5f, 5.0f, 0.0f);
   static constexpr vdl::float3 kTwoSidedPlanePosition = vdl::float3(0.0f, 0.0f, 0.0f);
-  static constexpr vdl::float3 kAnimationCubeScale = vdl::float3(1.5f, 1.5f, 1.5f);
+  //static constexpr vdl::float3 kAnimationCubeScale = vdl::float3(1.5f, 1.5f, 1.5f);
   static constexpr vdl::float3 kBoomBoxScale = vdl::float3(150.0f, 150.0f, 150.0f);
   static constexpr vdl::float3 kDamagedHelmetScale = vdl::float3(1.5f, 1.5f, 1.5f);
   static constexpr vdl::float3 kSciFiHelmetScale = vdl::float3(1.5f, 1.5f, 1.5f);
   static constexpr vdl::float3 kSuzanneScale = vdl::float3(1.5f, 1.5f, 1.5f);
   static constexpr vdl::float3 kTwoSidedPlaneScale = vdl::float3(15.0f, 15.0f, 15.0f);
+  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(300, ImGuiHelper::kSceneWindowSize.y);
 private:
   struct Materials
   {
@@ -35,9 +37,14 @@ private:
   vdl::ConstantBuffer<vdl::DirectinalLight> LightConstantData_;
   vdl::ConstantBuffer< MaterialData> MaterialDataConstantData_;
 private:
-  vdl::Model AnimatedCube_;
-  Materials AnimatedMaterials_;
-  vdl::Matrix AnimatedCubeWorld_;
+  vdl::StaticMesh Sphere_;
+  vdl::CubeTexture SkyboxTexture_;
+  vdl::VertexShader SkyboxVertexShader_;
+  vdl::PixelShader SkyboxPixelShader_;
+private:
+  //vdl::Model AnimatedCube_;
+  //Materials AnimatedMaterials_;
+  //vdl::Matrix AnimatedCubeWorld_;
   vdl::Model BoomBox_;
   Materials BoomBoxMaterials_;
   vdl::Matrix BoomBoxWorld_;

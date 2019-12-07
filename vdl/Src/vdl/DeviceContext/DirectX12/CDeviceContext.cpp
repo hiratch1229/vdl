@@ -969,8 +969,12 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
   ComputeReserveData* pCurrentComputeReserveData = GetCurrentComputeReserveData();
 
+  ID3D12CommandAllocator* pCommandAllocator = GetCurrentComputeCommandAllocator();
+  hr = pCommandAllocator->Reset();
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
   ID3D12GraphicsCommandList* pCurrentComputeCommandList = GetCurrentComputeCommandList();
-  pCurrentComputeCommandList->Reset(GetCurrentComputeCommandAllocator(), nullptr);
+  hr = pCurrentComputeCommandList->Reset(pCommandAllocator, nullptr);
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   pCurrentComputeCommandList->SetComputeRootSignature(pComputeRootSignature_.Get());
@@ -1265,6 +1269,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
     }
   }
 
+  const vdl::uint LastGraphicsCommandBufferIndex = GraphicsCommandBufferIndex_;
   Flush();
 
   //  SetPipeline
@@ -1294,6 +1299,8 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
   pCurrentComputeCommandList->Close();
 
+  WaitFence(pGraphicsCommandQueue_.Get(), &GraphicsSyncStates_[LastGraphicsCommandBufferIndex]);
+
   ID3D12CommandList* pCurrentCommandList = pCurrentComputeCommandList;
   pComputeCommandQueue_->ExecuteCommandLists(1, &pCurrentCommandList);
 
@@ -1311,7 +1318,8 @@ void CDeviceContext::Flush()
   HRESULT hr = S_OK;
 
   ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
-  pCurrentGraphicsCommandList->Close();
+  hr = pCurrentGraphicsCommandList->Close();
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
 
   //  コンピュートパイプラインの待機
   if (pLastComputeSyncState_)
@@ -1333,7 +1341,11 @@ void CDeviceContext::Flush()
   pCurrentGraphicsReseveData->PipelineStates.resize(1);
   pCurrentGraphicsReseveData->PipelineStates[0] = std::move(pCurrentGraphicsReseveData->PipelineStates.back());
 
-  hr = GetCurrentGraphicsCommandList()->Reset(GetCurrentGraphicsCommandAllocator(), pCurrentGraphicsReseveData->PipelineStates[0].Get());
+  ID3D12CommandAllocator* pCommandAllocator = GetCurrentGraphicsCommandAllocator();
+  hr = pCommandAllocator->Reset();
+  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+
+  hr = GetCurrentGraphicsCommandList()->Reset(pCommandAllocator, pCurrentGraphicsReseveData->PipelineStates[0].Get());
   _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
   GraphicsCommandListState_ = CommandListState::eIdle;
 }

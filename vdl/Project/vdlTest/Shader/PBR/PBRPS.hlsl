@@ -27,6 +27,7 @@ float4 main(PS_IN In) : SV_TARGET
 {
   float3 BaseColor = BaseColorMap.Sample(Sampler, In.Texcoord).rgb;
   float2 MetallicRoughness = MetallicRoughnessMap.Sample(Sampler, In.Texcoord).bg;
+  MetallicRoughness.y = max(MetallicRoughness.y, 0.0001f);
   float3 Emissive = EmissiveMap.Sample(Sampler, In.Texcoord).rgb;
   float AmbientOcclusion = AmbientOcclusionMap.Sample(Sampler, In.Texcoord).r;
   
