@@ -84,11 +84,12 @@ void CDevice::Initialize()
 
 #if defined( DEBUG ) || defined( _DEBUG )
   constexpr vdl::uint kDxgiCreateFactoryFlag = DXGI_CREATE_FACTORY_DEBUG;
+
   //  デバッグレイヤーを有効にする
   {
     Microsoft::WRL::ComPtr<ID3D12Debug3> pDebug;
 
-    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(pDebug.GetAddressOf()))))
+    if (SUCCEEDED(::D3D12GetDebugInterface(IID_PPV_ARGS(pDebug.GetAddressOf()))))
     {
       //pDebug->SetEnableGPUBasedValidation(true);
       pDebug->EnableDebugLayer();
@@ -189,7 +190,6 @@ void CDevice::Initialize()
   pDevice_.As(&pInfoQueue_);
 
   pInfoQueue_->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
-  //pInfoQueue_->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
   pInfoQueue_->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
 
   D3D12_MESSAGE_SEVERITY Serveritys[] =
@@ -199,8 +199,9 @@ void CDevice::Initialize()
 
   D3D12_MESSAGE_ID DenyIDs[] =
   {
-    D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
-    D3D12_MESSAGE_ID_CLEARDEPTHSTENCILVIEW_MISMATCHINGCLEARVALUE,
+    D3D12_MESSAGE_ID_CREATEGRAPHICSPIPELINESTATE_DEPTHSTENCILVIEW_NOT_SET,  //  DirectX11,Vulkanでは出ない為無効
+    D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,           //  ClearColorの最適値を指定出来るようにしていない為無効
+    D3D12_MESSAGE_ID_CLEARDEPTHSTENCILVIEW_MISMATCHINGCLEARVALUE,           //  ClearDepth,Stencilの最適値を指定出来るようにしていない為無効
   };
 
   D3D12_INFO_QUEUE_FILTER FileterDesc = {};
@@ -562,7 +563,7 @@ void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Ima
       D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
       {
         ShaderResourceViewDesc.Format = TextureDesc.Format;
-        ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
         ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
         ShaderResourceViewDesc.Texture2D.MipLevels = 1;
