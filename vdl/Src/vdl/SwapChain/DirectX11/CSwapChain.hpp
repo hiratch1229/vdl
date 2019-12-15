@@ -1,9 +1,9 @@
 #pragma once
 #include "../ISwapChain.hpp"
 
-#include <vdl/Texture.hpp>
-
 #include <vdl/pch/DirectX11/pch.hpp>
+
+#include <vdl/Texture.hpp>
 
 class IWindow;
 class IDeviceContext;
@@ -25,6 +25,8 @@ public:
   ID3D11RenderTargetView* GetRenderTargetView()const { return pRenderTargetView_.Get(); }
 public:
   CSwapChain() = default;
+
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
 
   void Initialize()override;
 

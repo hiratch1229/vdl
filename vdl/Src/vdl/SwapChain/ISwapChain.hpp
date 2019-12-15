@@ -1,4 +1,6 @@
 #pragma once
+#include <vdl/Platform/Platform.hpp>
+
 #include <vdl/Texture.hpp>
 
 class ISwapChain
@@ -10,6 +12,8 @@ public:
 
   virtual ~ISwapChain() = default;
   
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
+
   virtual void Initialize() = 0;
 
   virtual void ScreenClear() = 0;

@@ -3,6 +3,7 @@
 #include <vdl/Types.hpp>
 #include <vdl/Matrix.hpp>
 
+#include <vdl/Platform/Platform.hpp>
 #include <vdl/Buffer/Buffer.hpp>
 
 class IDeviceContext
@@ -13,6 +14,8 @@ public:
   IDeviceContext() = default;
 
   virtual ~IDeviceContext() = default;
+  
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

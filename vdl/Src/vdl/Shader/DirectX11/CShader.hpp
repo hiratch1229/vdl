@@ -10,6 +10,8 @@ struct CVertexShader : public IVertexShader
 public:
   CVertexShader() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+
   ShaderType GetType()const final { return ShaderType::eVertexShader; }
 
   vdl::InputLayoutType GetInputLayout()const final { return InputLayout; }
@@ -21,6 +23,8 @@ struct CHullShader : public IShader
 public:
   CHullShader() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+
   ShaderType GetType()const final { return ShaderType::eHullShader; }
 };
 
@@ -29,6 +33,8 @@ struct CDomainShader : public IShader
   Microsoft::WRL::ComPtr<ID3D11DomainShader> pDomainShader;
 public:
   CDomainShader() = default;
+
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
 
   ShaderType GetType()const final { return ShaderType::eDomainShader; }
 };
@@ -39,6 +45,8 @@ struct CGeometryShader : public IShader
 public:
   CGeometryShader() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+
   ShaderType GetType()const final { return ShaderType::eGeometryShader; }
 };
 
@@ -47,6 +55,8 @@ struct CPixelShader : public IShader
   Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
 public:
   CPixelShader() = default;
+
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
 
   ShaderType GetType()const final { return ShaderType::ePixelShader; }
 };
@@ -57,6 +67,8 @@ struct CComputeShader : public IShader
 public:
   CComputeShader() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+
   ShaderType GetType()const final { return ShaderType::eComputeShader; }
 };
 
@@ -65,30 +77,32 @@ inline Shader* Cast(IShader* _pShader)
 {
   static_assert(std::is_base_of<IShader, Shader>::value);
 
+  const ShaderType Type = _pShader->GetType();
+
   if constexpr (std::is_same<CVertexShader, Shader>::value)
   {
-    assert(_pShader->GetType() == ShaderType::eVertexShader);
+    assert(Type == ShaderType::eVertexShader);
   }
   if constexpr (std::is_same<CHullShader, Shader>::value)
   {
-    assert(_pShader->GetType() == ShaderType::eHullShader);
+    assert(Type == ShaderType::eHullShader);
   }
   if constexpr (std::is_same<CDomainShader, Shader>::value)
   {
-    assert(_pShader->GetType() == ShaderType::eDomainShader);
+    assert(Type == ShaderType::eDomainShader);
   }
   if constexpr (std::is_same<CGeometryShader, Shader>::value)
   {
-    assert(_pShader->GetType() == ShaderType::eGeometryShader);
+    assert(Type == ShaderType::eGeometryShader);
   }
   if constexpr (std::is_same<CPixelShader, Shader>::value)
   {
-    assert(_pShader->GetType() == ShaderType::ePixelShader);
+    assert(Type == ShaderType::ePixelShader);
   }
   if constexpr (std::is_same<CComputeShader, Shader>::value)
   {
-    assert(_pShader->GetType() == ShaderType::eComputeShader);
+    assert(Type == ShaderType::eComputeShader);
   }
 
-  return static_cast<Shader*>(_pShader);
+  return Cast<Shader, IShader>(_pShader);
 }

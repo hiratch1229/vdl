@@ -16,6 +16,8 @@ class CWindow : public IWindow
 public:
   CWindow() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eWindows; }
+
   void Initialize()override;
 
   void Show(bool _isShow)override;

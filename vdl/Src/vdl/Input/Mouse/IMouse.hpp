@@ -2,6 +2,8 @@
 #include <vdl/Fwd.hpp>
 #include <vdl/Type2.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 class IMouse
 {
 public:
@@ -10,6 +12,8 @@ public:
   IMouse() = default;
 
   virtual ~IMouse() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

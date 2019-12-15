@@ -193,6 +193,7 @@
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\FBXLoader.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\glTFLoader.hpp" />
     <ClInclude Include="..\..\Src\vdl\ModelManager\ModelLoader\ModelData.hpp" />
+    <ClInclude Include="..\..\Src\vdl\Platform\Platform.hpp" />
     <ClInclude Include="..\..\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
     <ClInclude Include="..\..\Src\vdl\Renderer\CRenderer.hpp" />
     <ClInclude Include="..\..\Src\vdl\Renderer\IRenderer.hpp" />
@@ -700,7 +701,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;VDL_USING_WINDOWS;VDL_EXECUTE_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -891,7 +892,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_EXECUTE_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\..\Include;..\..\Include\ThirdParty;..\..\Src;..\..\Src\ThirdParty;..\..\Src\ThirdParty\FBXSDK\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

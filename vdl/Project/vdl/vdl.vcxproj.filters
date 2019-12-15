@@ -181,6 +181,9 @@
     <Filter Include="Src\ConstantBufferAllocater">
       <UniqueIdentifier>{323b6ed6-2f6e-4fc2-aab1-4be19efd467d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Platform">
+      <UniqueIdentifier>{39b1f1c3-a355-4121-8867-a5d52ba7723e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\vdl\Angle.hpp">
@@ -611,6 +614,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\vdl\ConstantBufferAllocater\ConstantBufferAllocater.hpp">
       <Filter>Src\ConstantBufferAllocater</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\vdl\Platform\Platform.hpp">
+      <Filter>Src\Platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

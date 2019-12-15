@@ -58,6 +58,8 @@ private:
 public:
   CComputer() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
+
   void Initialize()override;
 
   void SetShader(const vdl::ComputeShader& _ComputeShader)override;

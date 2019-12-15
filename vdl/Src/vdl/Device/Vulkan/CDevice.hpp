@@ -39,7 +39,6 @@ public:
   [[nodiscard]] const vk::CommandBuffer& GetCommandBuffer()const { return CommandBuffer_.get(); }
   [[nodiscard]] vdl::uint GetGraphicsQueueIndex()const { return GraphicsQueueIndex_; }
   [[nodiscard]] vdl::uint GetComputeQueueIndex()const { return ComputeQueueIndex_; }
-  [[nodiscard]] ConstantBufferAllocater* GetConstantBufferAllocater() { return &ConstantBufferAllocater_; }
 public:
   [[nodiscard]] vdl::uint FindQueue(vk::QueueFlags _QueueFlag, const vk::SurfaceKHR& _Surface = vk::SurfaceKHR())const { return FindQueue(_QueueFlag, vk::QueueFlags(), _Surface); }
   [[nodiscard]] vdl::uint GetMemoryTypeIndex(vdl::uint _MemoryTypeBits, const vk::MemoryPropertyFlags& _MemoryPropertys)const;
@@ -55,6 +54,8 @@ public:
   CDevice() = default;
 
   ~CDevice();
+
+  PlatformType GetPlatform()const final { return PlatformType::eVulkan; }
 
   void Initialize()override;
 
@@ -76,11 +77,15 @@ public:
 
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 
-  void CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images)override;
+  void CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl::Image, 6>& _Images)override;
 
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
   void CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
+
+  void CreateDepthTexture(ITexture** _ppDepthTexture, IDepthStencilTexture* _pDepthStencilTexture)override;
+
+  void CreateStencilTexture(ITexture** _ppStencilTexture, IDepthStencilTexture* _pDepthStencilTexture)override;
 
   void CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 

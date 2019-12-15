@@ -471,7 +471,7 @@ void CDeviceContext::Initialize()
     { D3D12_DESCRIPTOR_RANGE_TYPE_UAV, Constants::kMaxUnorderedAccessObjectNum, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
   };
 
-  auto GetDescriptorRange = [kDescriptorRanges](DescriptorType _Type)->const D3D12_DESCRIPTOR_RANGE *
+  auto GetDescriptorRange = [&kDescriptorRanges](DescriptorType _Type)->const D3D12_DESCRIPTOR_RANGE*
   {
     return &kDescriptorRanges[static_cast<vdl::uint>(_Type)];
   };
@@ -508,7 +508,7 @@ void CDeviceContext::Initialize()
       _ASSERT_EXPR_A(SUCCEEDED(hr), pError->GetBufferPointer());
 
       hr = pD3D12Device_->CreateRootSignature(0, pSignature->GetBufferPointer(), pSignature->GetBufferSize(), IID_PPV_ARGS(pGraphicsRootSignature_.GetAddressOf()));
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+      ERROR_CHECK(hr);
     }
 
     //  コマンドキューの作成
@@ -522,7 +522,7 @@ void CDeviceContext::Initialize()
       }
 
       hr = pD3D12Device_->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(pGraphicsCommandQueue_.GetAddressOf()));
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+      ERROR_CHECK(hr);
     }
 
     //  コマンドリストの作成
@@ -531,18 +531,18 @@ void CDeviceContext::Initialize()
       {
         //  コマンドアロケータの作成
         hr = pD3D12Device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(pGraphicsCommandAllocators_[i].GetAddressOf()));
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
 
         //  コマンドリストの作成
         hr = pD3D12Device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, pGraphicsCommandAllocators_[i].Get(), nullptr, IID_PPV_ARGS(pGraphicsCommandLists_[i].GetAddressOf()));
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
 
         hr = pGraphicsCommandLists_[i]->Close();
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
       }
 
       hr = GetCurrentGraphicsCommandList()->Reset(GetCurrentGraphicsCommandAllocator(), nullptr);
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+      ERROR_CHECK(hr);
     }
 
     //  フェンスの作成
@@ -550,7 +550,7 @@ void CDeviceContext::Initialize()
       for (auto& GraphicsSyncState : GraphicsSyncStates_)
       {
         hr = pD3D12Device_->CreateFence(GraphicsSyncState.Value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(GraphicsSyncState.pFence.GetAddressOf()));
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
       }
     }
   }
@@ -584,7 +584,7 @@ void CDeviceContext::Initialize()
       _ASSERT_EXPR_A(SUCCEEDED(hr), pError->GetBufferPointer());
 
       hr = pD3D12Device_->CreateRootSignature(0, pSignature->GetBufferPointer(), pSignature->GetBufferSize(), IID_PPV_ARGS(pComputeRootSignature_.GetAddressOf()));
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+      ERROR_CHECK(hr);
     }
 
     //  コマンドキューの作成
@@ -598,7 +598,7 @@ void CDeviceContext::Initialize()
       }
 
       hr = pD3D12Device_->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(pComputeCommandQueue_.GetAddressOf()));
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+      ERROR_CHECK(hr);
     }
 
     //  コマンドリストの作成
@@ -607,14 +607,14 @@ void CDeviceContext::Initialize()
       {
         //  コマンドアロケータの作成
         hr = pD3D12Device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_COMPUTE, IID_PPV_ARGS(pComputeCommandAllocators_[i].GetAddressOf()));
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
 
         //  コマンドリストの作成
         hr = pD3D12Device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_COMPUTE, pComputeCommandAllocators_[i].Get(), nullptr, IID_PPV_ARGS(pComputeCommandLists_[i].GetAddressOf()));
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
 
         hr = pComputeCommandLists_[i]->Close();
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
       }
     }
 
@@ -623,7 +623,7 @@ void CDeviceContext::Initialize()
       for (auto& ComputeSyncState : ComputeSyncStates_)
       {
         hr = pD3D12Device_->CreateFence(ComputeSyncState.Value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(ComputeSyncState.pFence.GetAddressOf()));
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
       }
     }
   }
@@ -971,11 +971,11 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
   ID3D12CommandAllocator* pCommandAllocator = GetCurrentComputeCommandAllocator();
   hr = pCommandAllocator->Reset();
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   ID3D12GraphicsCommandList* pCurrentComputeCommandList = GetCurrentComputeCommandList();
   hr = pCurrentComputeCommandList->Reset(pCommandAllocator, nullptr);
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   pCurrentComputeCommandList->SetComputeRootSignature(pComputeRootSignature_.Get());
   ID3D12DescriptorHeap* ppDescriptorHeaps[] = { DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eCBV_SRV_UAV)].GetDescriptorHeap(), DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eSampler)].GetDescriptorHeap() };
@@ -1057,7 +1057,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
               {
                 pColorTexture->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
               }
-              ShaderResouceData.CPUDescriptorHandle = pColorTexture->TextureData.pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
+              ShaderResouceData.CPUDescriptorHandle = pColorTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
             }
             break;
             }
@@ -1223,7 +1223,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
               {
                 pTexture->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
               }
-              UnorderedAccessObjectData.CPUDescriptorHandle = pTexture->TextureData.pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
+              UnorderedAccessObjectData.CPUDescriptorHandle = pTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
             }
           }
           //  UnorderedAccessBuffer
@@ -1288,7 +1288,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pPipelineState;
     hr = pD3D12Device_->CreateComputePipelineState(&PipelineStateDesc, IID_PPV_ARGS(pPipelineState.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
 
     pCurrentComputeCommandList->SetPipelineState(pPipelineState.Get());
 
@@ -1319,7 +1319,7 @@ void CDeviceContext::Flush()
 
   ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
   hr = pCurrentGraphicsCommandList->Close();
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   //  コンピュートパイプラインの待機
   if (pLastComputeSyncState_)
@@ -1343,10 +1343,10 @@ void CDeviceContext::Flush()
 
   ID3D12CommandAllocator* pCommandAllocator = GetCurrentGraphicsCommandAllocator();
   hr = pCommandAllocator->Reset();
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   hr = GetCurrentGraphicsCommandList()->Reset(pCommandAllocator, pCurrentGraphicsReseveData->PipelineStates[0].Get());
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
   GraphicsCommandListState_ = CommandListState::eIdle;
 }
 
@@ -1361,7 +1361,7 @@ void CDeviceContext::Present()
   HRESULT hr = S_OK;
 
   hr = pSwapChain_->GetSwapChain()->Present(0, 0);
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 }
 
 //--------------------------------------------------
@@ -1453,7 +1453,7 @@ void CDeviceContext::PreprocessingDraw()
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pPipelineState;
     hr = pD3D12Device_->CreateGraphicsPipelineState(&PipelineStateDesc, IID_PPV_ARGS(pPipelineState.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
 
     pCurrentGraphicsCommandList->SetPipelineState(pPipelineState.Get());
 
@@ -1539,7 +1539,7 @@ void CDeviceContext::PreprocessingDraw()
                 {
                   pColorTexture->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
                 }
-                ShaderResouceData.CPUDescriptorHandle = pColorTexture->TextureData.pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
+                ShaderResouceData.CPUDescriptorHandle = pColorTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
               }
               break;
               }

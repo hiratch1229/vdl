@@ -3,6 +3,8 @@
 #include <vdl/Type2.hpp>
 #include <vdl/Button.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 class IGamepad
 {
 public:
@@ -11,6 +13,8 @@ public:
   IGamepad() = default;
 
   virtual ~IGamepad() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

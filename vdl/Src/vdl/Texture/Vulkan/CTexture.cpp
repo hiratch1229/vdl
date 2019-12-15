@@ -1,7 +1,7 @@
 #include "CTexture.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Device/Vulkan/CDevice.hpp>
+#include <vdl/Device/IDevice.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 
 #include <vdl/Format/Format.hpp>
@@ -107,23 +107,8 @@ const vdl::Texture& CDepthStencilTexture::GetDepthTexture()
   {
     DepthTexture = vdl::Palette::White;
 
-    CDepthTexture* pDepthTexture = new CDepthTexture;
-    pDepthTexture->pParent = this;
-
-    vk::ImageViewCreateInfo ImageViewInfo;
-    {
-      ImageViewInfo.image = TextureData.Image.get();
-      ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = VkFormat;
-      ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
-      ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
-      ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
-      ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
-      ImageViewInfo.subresourceRange = { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 };
-    }
-
-    pDepthTexture->View = static_cast<CDevice*>(Engine::Get<IDevice>())->GetDevice().createImageViewUnique(ImageViewInfo);
-    assert(pDepthTexture->View);
+    ITexture* pDepthTexture;
+    Engine::Get<IDevice>()->CreateDepthTexture(&pDepthTexture, this);
 
     ITextureManager* pTextureManager = Engine::Get<ITextureManager>();
     pTextureManager->SetTexture(DepthTexture.GetID(), pDepthTexture);
@@ -131,7 +116,7 @@ const vdl::Texture& CDepthStencilTexture::GetDepthTexture()
     //  TODO:親のオブジェクトを渡して参照カウントを増やす
     for (vdl::uint i = 0;; ++i)
     {
-      if (pDepthTexture->pParent == pTextureManager->GetTexture(i))
+      if (this == pTextureManager->GetTexture(i))
       {
         pTextureManager->AddRef(i);
         break;
@@ -148,31 +133,16 @@ const vdl::Texture& CDepthStencilTexture::GetStencilTexture()
   {
     StencilTexture = vdl::Palette::White;
 
-    CStencilTexture* pStencilTexture = new CStencilTexture;
-    pStencilTexture->pParent = this;
-
-    vk::ImageViewCreateInfo ImageViewInfo;
-    {
-      ImageViewInfo.image = TextureData.Image.get();
-      ImageViewInfo.viewType = vk::ImageViewType::e2D;
-      ImageViewInfo.format = VkFormat;
-      ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
-      ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
-      ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
-      ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
-      ImageViewInfo.subresourceRange = { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 };
-    }
-
-    pStencilTexture->View = static_cast<CDevice*>(Engine::Get<IDevice>())->GetDevice().createImageViewUnique(ImageViewInfo);
-    assert(pStencilTexture->View);
+    ITexture* pStencilTexture;
+    Engine::Get<IDevice>()->CreateStencilTexture(&pStencilTexture, this);
 
     ITextureManager* pTextureManager = Engine::Get<ITextureManager>();
-    pTextureManager->SetTexture(StencilTexture.GetID(), pStencilTexture);
+    pTextureManager->SetTexture(DepthTexture.GetID(), pStencilTexture);
 
     //  TODO:親のオブジェクトを渡して参照カウントを増やす
     for (vdl::uint i = 0;; ++i)
     {
-      if (pStencilTexture->pParent == pTextureManager->GetTexture(i))
+      if (this == pTextureManager->GetTexture(i))
       {
         pTextureManager->AddRef(i);
         break;

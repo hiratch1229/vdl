@@ -49,6 +49,8 @@ public:
 
   ~CSwapChain();
 
+  PlatformType GetPlatform()const final { return PlatformType::eVulkan; }
+
   void Initialize()override;
 
   void ScreenClear()override;

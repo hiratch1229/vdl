@@ -2,6 +2,8 @@
 #include <vdl/Fwd.hpp>
 #include <vdl/Types.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 #include <vdl/Shader/IShader.hpp>
 
 class IRenderer
@@ -12,6 +14,8 @@ public:
   IRenderer() = default;
 
   virtual ~IRenderer() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

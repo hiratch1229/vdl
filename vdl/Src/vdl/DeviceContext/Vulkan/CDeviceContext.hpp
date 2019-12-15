@@ -273,6 +273,8 @@ public:
 public:
   CDeviceContext() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eVulkan; }
+
   void Initialize()override;
 
   void SetVertexBuffer(const VertexBuffer& _VertexBuffer)override;

@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <utility>
 
+class ConstantBufferAllocater;
+
 struct BufferData
 {
   Microsoft::WRL::ComPtr<ID3D12Resource> pResource;
@@ -32,6 +34,8 @@ struct CVertexBuffer : public IBuffer
 public:
   CVertexBuffer() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+
   BufferType GetType()const final { return BufferType::eVertexBuffer; }
 };
 
@@ -44,6 +48,8 @@ struct CInstanceBuffer : public IBuffer
 public:
   CInstanceBuffer() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+
   BufferType GetType()const final { return BufferType::eInstanceBuffer; }
 };
 
@@ -53,6 +59,8 @@ struct CIndexBuffer : public IBuffer
   D3D12_INDEX_BUFFER_VIEW View;
 public:
   CIndexBuffer() = default;
+
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
 
   BufferType GetType()const final { return BufferType::eIndexBuffer; }
 };
@@ -64,6 +72,8 @@ struct CConstantBuffer : public IConstantBuffer
 public:
   CConstantBuffer() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+
   void* GetBuffer()const final { return BufferData.pData; }
 
   vdl::uint GetBufferSize()const final { return BufferSize; }
@@ -73,6 +83,7 @@ public:
 
 struct CCopyConstantBuffer : public IConstantBuffer
 {
+  ConstantBufferAllocater* pConstantBufferAllocater;
   Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pConstantBufferViewHeap;
   vdl::uint Offset;
   vdl::uint BufferSize;
@@ -80,6 +91,8 @@ public:
   CCopyConstantBuffer() = default;
 
   ~CCopyConstantBuffer();
+
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
 
   void* GetBuffer()const final;
 
@@ -97,6 +110,8 @@ struct CUnordererdAccessBuffer : public IBuffer
 public:
   CUnordererdAccessBuffer() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+
   BufferType GetType()const final { return BufferType::eUnorderedAccessBuffer; }
 };
 
@@ -105,34 +120,40 @@ inline Buffer* Cast(IBuffer* _pBuffer)
 {
   static_assert(std::is_base_of<IBuffer, Buffer>::value);
 
+  const BufferType Type = _pBuffer->GetType();
+
   if constexpr (std::is_same<IConstantBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eConstantBuffer || _pBuffer->GetType() == BufferType::eCopyConstantBuffer);
+    assert(Type == BufferType::eConstantBuffer || Type == BufferType::eCopyConstantBuffer);
   }
-  if constexpr (std::is_same<CVertexBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CVertexBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eVertexBuffer);
+    assert(Type == BufferType::eVertexBuffer);
   }
-  if constexpr (std::is_same<CInstanceBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CInstanceBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eInstanceBuffer);
+    assert(Type == BufferType::eInstanceBuffer);
   }
-  if constexpr (std::is_same<CIndexBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CIndexBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eIndexBuffer);
+    assert(Type == BufferType::eIndexBuffer);
   }
-  if constexpr (std::is_same<CConstantBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CConstantBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eConstantBuffer);
+    assert(Type == BufferType::eConstantBuffer);
   }
-  if constexpr (std::is_same<CCopyConstantBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CCopyConstantBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eCopyConstantBuffer);
+    assert(Type == BufferType::eCopyConstantBuffer);
   }
-  if constexpr (std::is_same<CUnordererdAccessBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CUnordererdAccessBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eUnorderedAccessBuffer);
+    assert(Type == BufferType::eUnorderedAccessBuffer);
+  }
+  else
+  {
+    static_assert(false);
   }
 
-  return static_cast<Buffer*>(_pBuffer);
+  return Cast<Buffer, IBuffer>(_pBuffer);
 }

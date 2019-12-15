@@ -1,13 +1,13 @@
 #pragma once
 #include "../IDeviceContext.hpp"
 
+#include <vdl/pch/DirectX11/pch.hpp>
+
 #include <vdl/InputLayout.hpp>
 #include <vdl/GraphicsStates.hpp>
 #include <vdl/Texture.hpp>
 #include <vdl/Sampler.hpp>
 #include <vdl/Hash.hpp>
-
-#include <vdl/pch/DirectX11/pch.hpp>
 
 #include <unordered_map>
 
@@ -37,6 +37,9 @@ public:
   [[nodiscard]] bool isFoundInputLayout(vdl::InputLayoutType _InputLayout) { return InputLayouts_.find(_InputLayout) != InputLayouts_.end(); }
   void RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _pCode);
 private:
+  ID3D11BlendState* GetBlendState(const vdl::BlendState& _BlendState);
+  ID3D11DepthStencilState* GetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState);
+  ID3D11RasterizerState* GetRasterizerState(const vdl::RasterizerState& _RasterizerState);
   ID3D11RenderTargetView* GetRenderTargetView(const vdl::RenderTexture& _RenderTexture);
   ID3D11ShaderResourceView* GetShaderResourceView(const vdl::ShaderResource& _ShaderResource);
   ID3D11SamplerState* GetSamplerState(const vdl::Sampler& _Sampler);
@@ -46,6 +49,8 @@ private:
   vdl::uint GetInstanceBufferStride()const;
 public:
   CDeviceContext() = default;
+
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
 
   void Initialize()override;
 

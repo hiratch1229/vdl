@@ -1,7 +1,9 @@
 #pragma once
 #include "../IDeviceContext.hpp"
 
-#include "DescriptorHeap/DescriptorHeap.hpp"
+#include <vdl/pch/DirectX12/pch.hpp>
+
+#include <vdl/Texture/DirectX12/CTexture.hpp>
 
 #include <vdl/InputLayout.hpp>
 #include <vdl/Scissor.hpp>
@@ -17,9 +19,8 @@
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
 #include <vdl/Constants/Constants.hpp>
 
-#include <vdl/pch/DirectX12/pch.hpp>
-
-#include <vdl/Texture/DirectX12/CTexture.hpp>
+#include "DescriptorHeap/DescriptorHeap.hpp"
+#include <vdl/CommandList/DirectX12/CommandList.hpp>
 
 #include <array>
 #include <unordered_map>
@@ -253,6 +254,8 @@ public:
   void Present();
 public:
   CDeviceContext() = default;
+
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
 
   void Initialize()override;
 

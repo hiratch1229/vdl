@@ -15,6 +15,8 @@ public:
 
   ~CCPUProfiler();
 
+  PlatformType GetPlatform()const final { return PlatformType::eWindows; }
+
   void Initialize()override;
 
   double GetUseRate()const override;

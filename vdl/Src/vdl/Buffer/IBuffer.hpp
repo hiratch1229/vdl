@@ -1,6 +1,8 @@
 #pragma once
 #include <vdl/Types.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 enum class BufferType : vdl::uint8_t
 {
   eVertexBuffer,
@@ -16,6 +18,8 @@ struct IBuffer
   IBuffer() = default;
 
   virtual ~IBuffer() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   [[nodiscard]] virtual BufferType GetType()const = 0;
 };

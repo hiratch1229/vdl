@@ -21,6 +21,8 @@ public:
 public:
   CDevice() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+
   void Initialize()override;
 
   void CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _BufferSize)override;
@@ -41,11 +43,15 @@ public:
 
   void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)override;
 
-  void CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images)override;
+  void CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl::Image, 6>& _Images)override;
 
   void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
   void CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
+
+  void CreateDepthTexture(ITexture** _ppDepthTexture, IDepthStencilTexture* _pDepthStencilTexture)override;
+
+  void CreateStencilTexture(ITexture** _ppStencilTexture, IDepthStencilTexture* _pDepthStencilTexture)override;
 
   void CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 

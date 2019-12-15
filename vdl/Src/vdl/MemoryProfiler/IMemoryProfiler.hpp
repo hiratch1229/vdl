@@ -1,4 +1,5 @@
 #pragma once
+#include <vdl/Platform/Platform.hpp>
 
 class IMemoryProfiler
 {
@@ -8,6 +9,8 @@ public:
   IMemoryProfiler() = default;
 
   virtual ~IMemoryProfiler() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

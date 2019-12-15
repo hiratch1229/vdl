@@ -1,6 +1,8 @@
 #pragma once
 #include <vdl/Fwd.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 class ISoundManager
 {
 public:
@@ -9,6 +11,8 @@ public:
   ISoundManager() = default;
 
   virtual ~ISoundManager() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

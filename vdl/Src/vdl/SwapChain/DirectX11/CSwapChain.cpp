@@ -21,7 +21,7 @@ void CSwapChain::Initialize()
   pWindow_ = Engine::Get<IWindow>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
 
-  CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
+  CDevice* pDevice = Cast<CDevice>(Engine::Get<IDevice>());
   pD3D11Device_ = pDevice->GetDevice();
   pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
 
@@ -54,31 +54,31 @@ void CSwapChain::Initialize()
     Microsoft::WRL::ComPtr<IDXGIFactory> pFactory;
     {
       Microsoft::WRL::ComPtr<IDXGIDevice> pDXGIDevice;
-      hr = pD3D11Device_->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(pDXGIDevice.GetAddressOf()));
-      _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+      hr = pD3D11Device_->QueryInterface(IID_PPV_ARGS(pDXGIDevice.GetAddressOf()));
+      ERROR_CHECK(hr);
       Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
-      hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(pAdapter.GetAddressOf()));
-      _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
-      hr = pAdapter->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void**>(pFactory.GetAddressOf()));
-      _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+      hr = pDXGIDevice->GetParent(IID_PPV_ARGS(pAdapter.GetAddressOf()));
+      ERROR_CHECK(hr);
+      hr = pAdapter->GetParent(IID_PPV_ARGS(pFactory.GetAddressOf()));
+      ERROR_CHECK(hr);
     }
-
+    
     hr = pFactory->CreateSwapChain(pD3D11Device_, &SwapChainDesc, pSwapChain_.GetAddressOf());
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
 
     //  ALT+Enterの無効化
     hr = pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
   }
 
   //  バックバッファの作成
   {
     Microsoft::WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
     hr = pSwapChain_->GetBuffer(0, IID_PPV_ARGS(pBackBuffer.GetAddressOf()));
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
 
     hr = pD3D11Device_->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pRenderTargetView_.GetAddressOf());
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
   }
 
   //  レンダーテクスチャの作成
@@ -118,7 +118,7 @@ void CSwapChain::ScreenShot()
   //Microsoft::WRL::ComPtr<ID3D11Texture2D> BackBuffer;
   //{
   //  hr = pSwapChain_->GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf()));
-  //  _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+  //  ERROR_CHECK(hr);
   //}
   //
   //vdl::uint2 TextureSize;
@@ -135,7 +135,7 @@ void CSwapChain::ScreenShot()
   //  TextureSize = { Texture2DDesc.Width, Texture2DDesc.Height };
   //
   //  hr = pD3D11Device_->CreateTexture2D(&Texture2DDesc, nullptr, CopyBuffer.GetAddressOf());
-  //  _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+  //  ERROR_CHECK(hr);
   //
   //  pD3D11ImmediateContext_->CopyResource(CopyBuffer.Get(), BackBuffer.Get());
   //}
@@ -145,7 +145,7 @@ void CSwapChain::ScreenShot()
   //{
   //  D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
   //  hr = pD3D11ImmediateContext_->Map(CopyBuffer.Get(), 0, D3D11_MAP_READ, 0, &MappedSubresorce);
-  //  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  //  ERROR_CHECK(hr);
   //
   //  ::memcpy(Image.Buffer(), MappedSubresorce.pData, Image.BufferSize());
   //

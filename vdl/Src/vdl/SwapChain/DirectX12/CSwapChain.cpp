@@ -47,14 +47,14 @@ void CSwapChain::Initialize()
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
     hr = pFactory->CreateSwapChain(pDeviceContext_->GetGraphicsCommandQueue(), &SwapChainDesc, pSwapChain.GetAddressOf());
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
 
     hr = pSwapChain->QueryInterface(IID_PPV_ARGS(pSwapChain_.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
 
     //  ALT+Enterの無効化
     hr = pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
   }
 
   //  バックバッファの作成
@@ -85,13 +85,13 @@ void CSwapChain::Initialize()
       //  レンダーターゲットのデスクリプタヒープ作成
       {
         hr = pD3D12Device->CreateDescriptorHeap(&RenderTargetDescriptorHeapDesc, IID_PPV_ARGS(D3D12RenderTexture.pRenderTargetViewHeap.GetAddressOf()));
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
       }
 
       //  レンダーターゲットビューの作成
       {
         hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(D3D12RenderTexture.TextureData.pResource.GetAddressOf()));
-        _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+        ERROR_CHECK(hr);
 
         pD3D12Device->CreateRenderTargetView(D3D12RenderTexture.TextureData.pResource.Get(), nullptr, D3D12RenderTexture.pRenderTargetViewHeap->GetCPUDescriptorHandleForHeapStart());
       }

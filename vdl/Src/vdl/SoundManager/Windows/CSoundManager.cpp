@@ -24,7 +24,7 @@ vdl::ID CSoundManager::Load(const char* _FilePath)
   Data* pData = new Data;
   {
     hr = ::MFPCreateMediaPlayer(wFilePath, false, MFP_OPTION_NONE, nullptr, hWnd_, pData->pMediaPlayer.GetAddressOf());
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
   }
 
   return Datas_.Add(pData);

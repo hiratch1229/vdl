@@ -54,6 +54,8 @@ private:
 public:
   CRenderer() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
+
   void Initialize()override;
 
   vdl::Matrix GetView()const override;

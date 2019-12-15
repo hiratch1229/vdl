@@ -9,13 +9,15 @@
 #include <vdl/Math.hpp>
 #include <vdl/DetectMemoryLeak.hpp>
 
+#include <joystickapi.h>
+
 namespace
 {
   inline BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, void*)
   {
     //  DirectInputを作成
     //  TODO
-    static_cast<CGamepad*>(Engine::Get<IGamepad>())->CreateDirectInputDevice(pdidInstance->guidProduct);
+    Cast<CGamepad>(Engine::Get<IGamepad>())->CreateDirectInputDevice(pdidInstance->guidProduct);
 
     //  次へ
     return DIENUM_CONTINUE;
@@ -56,11 +58,11 @@ void CGamepad::Initialize()
 
   //  DirectInputを作成
   hr = ::DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(pDirectInput_.GetAddressOf()), NULL);
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   //  Joystickを作成
   hr = pDirectInput_->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, nullptr, DIEDFL_ATTACHEDONLY);
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   //  ボタンの数を保存
   {
@@ -335,11 +337,11 @@ void CGamepad::CreateDirectInputDevice(const GUID& GuidProductFromDirectInput)
 
   //  ジョイスティックを作成
   hr = pDirectInput_->CreateDevice(GuidProductFromDirectInput, &pDirectInputData.pJoyStick, nullptr);
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
   hr = pDirectInputData.pJoyStick->SetDataFormat(&c_dfDIJoystick);
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
   hr = pDirectInputData.pJoyStick->SetCooperativeLevel(hWnd_, DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   // 軸の値の範囲を設定
   DIPROPRANGE DirectInputPropatyRange;

@@ -14,6 +14,8 @@ private:
 public:
   CTextureManager() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
+
   void Initialize()override;
 
   vdl::ID LoadTexture(const char* _FilePath, bool _isSerialize)override;

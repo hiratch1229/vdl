@@ -1,9 +1,9 @@
 #pragma once
 #include "../IBuffer.hpp"
 
-#include <vdl/Macro.hpp>
-
 #include <vdl/pch/DirectX11/pch.hpp>
+
+#include <vdl/Macro.hpp>
 
 #include <assert.h>
 
@@ -12,6 +12,8 @@ struct CVertexBuffer : public IBuffer
   Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
 public:
   CVertexBuffer() = default;
+
+  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
 
   BufferType GetType()const override final { return BufferType::eVertexBuffer; }
 };
@@ -22,6 +24,8 @@ struct CInstanceBuffer : public IBuffer
 public:
   CInstanceBuffer() = default;
 
+  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+
   BufferType GetType()const override final { return BufferType::eInstanceBuffer; }
 };
 
@@ -31,6 +35,8 @@ struct CIndexBuffer : public IBuffer
   DXGI_FORMAT IndexFormat;
 public:
   CIndexBuffer() = default;
+
+  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
 
   BufferType GetType()const override final { return BufferType::eIndexBuffer; }
 };
@@ -46,6 +52,8 @@ public:
     : Buffer(new char[_BufferSize]), BufferSize(_BufferSize) {}
 
   ~CConstantBuffer() { vdl::Macro::SafeDelete(Buffer); }
+
+  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
 
   BufferType GetType()const override final { return BufferType::eConstantBuffer; }
 
@@ -67,6 +75,8 @@ public:
 
   ~CCopyConstantBuffer() { vdl::Macro::SafeDelete(Buffer); }
 
+  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+
   void* GetBuffer()const final { return Buffer; }
 
   vdl::uint GetBufferSize()const final { return BufferSize; }
@@ -85,6 +95,8 @@ public:
   CUnordererdAccessBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
     : Stride(_Stride), BufferSize(_BufferSize) {}
 
+  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+
   BufferType GetType()const override final { return BufferType::eUnorderedAccessBuffer; }
 };
 
@@ -93,30 +105,36 @@ inline Buffer* Cast(IBuffer* _pBuffer)
 {
   static_assert(std::is_base_of<IBuffer, Buffer>::value);
 
+  const BufferType Type = _pBuffer->GetType();
+
   if constexpr (std::is_same<CVertexBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eVertexBuffer);
+    assert(Type == BufferType::eVertexBuffer);
   }
-  if constexpr (std::is_same<CInstanceBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CInstanceBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eInstanceBuffer);
+    assert(Type == BufferType::eInstanceBuffer);
   }
-  if constexpr (std::is_same<CIndexBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CIndexBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eIndexBuffer);
+    assert(Type == BufferType::eIndexBuffer);
   }
-  if constexpr (std::is_same<CConstantBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CConstantBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eConstantBuffer);
+    assert(Type == BufferType::eConstantBuffer);
   }
-  if constexpr (std::is_same<CCopyConstantBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CCopyConstantBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eCopyConstantBuffer);
+    assert(Type == BufferType::eCopyConstantBuffer);
   }
-  if constexpr (std::is_same<CUnordererdAccessBuffer, Buffer>::value)
+  else if constexpr (std::is_same<CUnordererdAccessBuffer, Buffer>::value)
   {
-    assert(_pBuffer->GetType() == BufferType::eUnorderedAccessBuffer);
+    assert(Type == BufferType::eUnorderedAccessBuffer);
+  }
+  else
+  {
+    static_assert(false);
   }
 
-  return static_cast<Buffer*>(_pBuffer);
+  return Cast<Buffer, IBuffer>(_pBuffer);
 }

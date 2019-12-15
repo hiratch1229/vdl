@@ -12,6 +12,8 @@ class CBufferManager : public IBufferManager
 public:
   CBufferManager() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
+
   void Initialize()override;
 
   vdl::ID CreateVertexBuffer(vdl::uint _BufferSize)override;

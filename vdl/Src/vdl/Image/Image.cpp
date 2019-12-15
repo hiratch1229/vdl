@@ -1,11 +1,11 @@
 #include <vdl/Image.hpp>
 
-#include <zstd/zstd.h>
-#include <zstd/common/zstd_errors.h>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb/stb_image_write.h>
-
 #include <vdl/Misc/Misc.hpp>
+
+#include <ThirdParty/zstd/zstd.h>
+#include <ThirdParty/zstd/common/zstd_errors.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <ThirdParty/stb/stb_image_write.h>
 
 #include <string>
 #include <filesystem>

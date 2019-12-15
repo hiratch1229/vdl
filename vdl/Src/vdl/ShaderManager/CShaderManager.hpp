@@ -12,6 +12,8 @@ class CShaderManager : public IShaderManager
 public:
   CShaderManager() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
+
   void Initialize()override;
 
   vdl::ID LoadFromFile(const char* _FilePath, const char* _EntryPoint, ShaderType _Type)override;

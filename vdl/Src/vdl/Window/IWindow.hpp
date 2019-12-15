@@ -1,6 +1,8 @@
 #pragma once
 #include <vdl/Fwd.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 class IWindow
 {
 public:
@@ -9,6 +11,8 @@ public:
   IWindow() = default;
 
   virtual ~IWindow() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

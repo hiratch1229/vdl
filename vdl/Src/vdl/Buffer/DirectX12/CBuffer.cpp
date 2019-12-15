@@ -1,14 +1,17 @@
 #include "CBuffer.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Device/DirectX12/CDevice.hpp>
+#include <vdl/ConstantBufferAllocater/ConstantBufferAllocater.hpp>
 
 CCopyConstantBuffer::~CCopyConstantBuffer()
 {
-  static_cast<CDevice*>(Engine::Get<IDevice>())->GetConstantBufferAllocater()->Release(Offset, BufferSize);
+  if (Engine::isActive())
+  {
+    pConstantBufferAllocater->Release(Offset, BufferSize);
+  }
 }
 
 void* CCopyConstantBuffer::GetBuffer()const
 {
-  return static_cast<CDevice*>(Engine::Get<IDevice>())->GetConstantBufferAllocater()->GetBuffer(Offset);
+  return pConstantBufferAllocater->GetBuffer(Offset);
 }

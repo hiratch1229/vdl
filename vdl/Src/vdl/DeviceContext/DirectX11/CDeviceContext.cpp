@@ -289,12 +289,12 @@ namespace
 
 void CDeviceContext::Initialize()
 {
-  pSwapChain_ = static_cast<CSwapChain*>(Engine::Get<ISwapChain>());
+  pSwapChain_ = Cast<CSwapChain>(Engine::Get<ISwapChain>());
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
 
-  CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
+  CDevice* pDevice = Cast<CDevice>(Engine::Get<IDevice>());
   pD3D11Device_ = pDevice->GetDevice();
   pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
 }
@@ -396,111 +396,17 @@ void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures
 
 void CDeviceContext::SetBlendState(const vdl::BlendState& _BlendState)
 {
-  if (BlendStates_.find(_BlendState) == BlendStates_.end())
-  {
-    HRESULT hr = S_OK;
-
-    Microsoft::WRL::ComPtr<ID3D11BlendState> pBlendState;
-    {
-      D3D11_BLEND_DESC BlendDesc;
-      {
-        BlendDesc.AlphaToCoverageEnable = _BlendState.AlphaToCoverageEnable;
-        BlendDesc.IndependentBlendEnable = _BlendState.IndependentBlendEnable;
-
-        const vdl::uint EnableRenderTextureNum = (_BlendState.IndependentBlendEnable ? Constants::kMaxRenderTextureNum : 1);
-
-        for (vdl::uint RenderTextureCount = 0; RenderTextureCount < EnableRenderTextureNum; ++RenderTextureCount)
-        {
-          D3D11_RENDER_TARGET_BLEND_DESC& RenderTargetBlendDesc = BlendDesc.RenderTarget[RenderTextureCount];
-          const vdl::RenderTextureBlendState& RenderTextureBlendState = _BlendState.RenderTexture[RenderTextureCount];
-
-          RenderTargetBlendDesc.BlendEnable = RenderTextureBlendState.BlendEnable;
-          RenderTargetBlendDesc.SrcBlend = Cast(RenderTextureBlendState.SrcBlend);
-          RenderTargetBlendDesc.DestBlend = Cast(RenderTextureBlendState.DestBlend);
-          RenderTargetBlendDesc.BlendOp = Cast(RenderTextureBlendState.BlendOp);
-          RenderTargetBlendDesc.SrcBlendAlpha = Cast(RenderTextureBlendState.SrcBlendAlpha);
-          RenderTargetBlendDesc.DestBlendAlpha = Cast(RenderTextureBlendState.DestBlendAlpha);
-          RenderTargetBlendDesc.BlendOpAlpha = Cast(RenderTextureBlendState.BlendOpAlpha);
-          RenderTargetBlendDesc.RenderTargetWriteMask = Cast(RenderTextureBlendState.RenderTargetWriteMask);
-        }
-      }
-
-      hr = pD3D11Device_->CreateBlendState(&BlendDesc, pBlendState.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-    }
-
-    BlendStates_.insert(std::make_pair(_BlendState, pBlendState));
-  }
-
-  pD3D11ImmediateContext_->OMSetBlendState(BlendStates_.at(_BlendState).Get(), nullptr, 0xFFFFFFFF);
+  pD3D11ImmediateContext_->OMSetBlendState(GetBlendState(_BlendState), nullptr, 0xFFFFFFFF);
 }
 
 void CDeviceContext::SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState)
 {
-  if (DepthStencilStates_.find(_DepthStencilState) == DepthStencilStates_.end())
-  {
-    HRESULT hr = S_OK;
-
-    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDepthStencilState;
-    {
-      D3D11_DEPTH_STENCIL_DESC DepthStencilDesc;
-      {
-        DepthStencilDesc.DepthEnable = _DepthStencilState.DepthEnable;
-        DepthStencilDesc.DepthWriteMask = Cast(_DepthStencilState.DepthWriteMask);
-        DepthStencilDesc.DepthFunc = Cast(_DepthStencilState.DepthFunc);
-        DepthStencilDesc.StencilEnable = _DepthStencilState.StencilEnable;
-        DepthStencilDesc.StencilReadMask = 0xFF;
-        DepthStencilDesc.StencilWriteMask = _DepthStencilState.StencilWriteMask;
-        DepthStencilDesc.FrontFace.StencilFailOp = Cast(_DepthStencilState.FrontFace.StencilFailOp);
-        DepthStencilDesc.FrontFace.StencilDepthFailOp = Cast(_DepthStencilState.FrontFace.StencilDepthFailOp);
-        DepthStencilDesc.FrontFace.StencilPassOp = Cast(_DepthStencilState.FrontFace.StencilPassOp);
-        DepthStencilDesc.FrontFace.StencilFunc = Cast(_DepthStencilState.FrontFace.StencilFunc);
-        DepthStencilDesc.BackFace.StencilFailOp = Cast(_DepthStencilState.BackFace.StencilFailOp);
-        DepthStencilDesc.BackFace.StencilDepthFailOp = Cast(_DepthStencilState.BackFace.StencilDepthFailOp);
-        DepthStencilDesc.BackFace.StencilPassOp = Cast(_DepthStencilState.BackFace.StencilPassOp);
-        DepthStencilDesc.BackFace.StencilFunc = Cast(_DepthStencilState.BackFace.StencilFunc);
-      }
-
-      hr = pD3D11Device_->CreateDepthStencilState(&DepthStencilDesc, pDepthStencilState.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-    }
-
-    DepthStencilStates_.insert(std::make_pair(_DepthStencilState, pDepthStencilState));
-  }
-
-  pD3D11ImmediateContext_->OMSetDepthStencilState(DepthStencilStates_.at(_DepthStencilState).Get(), _DepthStencilState.StencilReference);
+  pD3D11ImmediateContext_->OMSetDepthStencilState(GetDepthStencilState(_DepthStencilState), _DepthStencilState.StencilReference);
 }
 
 void CDeviceContext::SetRasterizerState(const vdl::RasterizerState& _RasterizerState)
 {
-  if (RasterizerStates_.find(_RasterizerState) == RasterizerStates_.end())
-  {
-    HRESULT hr = S_OK;
-
-    Microsoft::WRL::ComPtr<ID3D11RasterizerState> pRasterizerState;
-    {
-      D3D11_RASTERIZER_DESC RasterizerDesc;
-      {
-        RasterizerDesc.FillMode = Cast(_RasterizerState.FillMode);
-        RasterizerDesc.CullMode = Cast(_RasterizerState.CullMode);
-        RasterizerDesc.FrontCounterClockwise = _RasterizerState.FrontCounterClockwise;
-        RasterizerDesc.DepthBias = _RasterizerState.DepthBias;
-        RasterizerDesc.DepthBiasClamp = 0.0f;
-        RasterizerDesc.SlopeScaledDepthBias = 0.0f;
-        RasterizerDesc.DepthClipEnable = _RasterizerState.DepthClipEnable;
-        RasterizerDesc.ScissorEnable = _RasterizerState.ScissorEnable;
-        RasterizerDesc.MultisampleEnable = false;
-        RasterizerDesc.AntialiasedLineEnable = _RasterizerState.AntialiasedLineEnable;
-      }
-
-      hr = pD3D11Device_->CreateRasterizerState(&RasterizerDesc, pRasterizerState.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-    }
-
-    RasterizerStates_.insert(std::make_pair(_RasterizerState, pRasterizerState));
-  }
-
-  pD3D11ImmediateContext_->RSSetState(RasterizerStates_.at(_RasterizerState).Get());
+  pD3D11ImmediateContext_->RSSetState(GetRasterizerState(_RasterizerState));
 }
 
 void CDeviceContext::VSSetShader(const vdl::VertexShader& _VertexShader)
@@ -957,11 +863,120 @@ void CDeviceContext::RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _p
     if (!InputElementDesc.empty())
     {
       hr = pD3D11Device_->CreateInputLayout(InputElementDesc.data(), static_cast<vdl::uint>(InputElementDesc.size()), _pCode->GetBufferPointer(), _pCode->GetBufferSize(), pInputLayout.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+      ERROR_CHECK(hr);
     }
   }
 
   InputLayouts_.insert(std::make_pair(_Key, pInputLayout));
+}
+
+ID3D11BlendState* CDeviceContext::GetBlendState(const vdl::BlendState& _BlendState)
+{
+  if (BlendStates_.find(_BlendState) == BlendStates_.end())
+  {
+    HRESULT hr = S_OK;
+
+    Microsoft::WRL::ComPtr<ID3D11BlendState> pBlendState;
+    {
+      D3D11_BLEND_DESC BlendDesc;
+      {
+        BlendDesc.AlphaToCoverageEnable = _BlendState.AlphaToCoverageEnable;
+        BlendDesc.IndependentBlendEnable = _BlendState.IndependentBlendEnable;
+
+        const vdl::uint EnableRenderTextureNum = (_BlendState.IndependentBlendEnable ? Constants::kMaxRenderTextureNum : 1);
+
+        for (vdl::uint RenderTextureCount = 0; RenderTextureCount < EnableRenderTextureNum; ++RenderTextureCount)
+        {
+          D3D11_RENDER_TARGET_BLEND_DESC& RenderTargetBlendDesc = BlendDesc.RenderTarget[RenderTextureCount];
+          const vdl::RenderTextureBlendState& RenderTextureBlendState = _BlendState.RenderTexture[RenderTextureCount];
+
+          RenderTargetBlendDesc.BlendEnable = RenderTextureBlendState.BlendEnable;
+          RenderTargetBlendDesc.SrcBlend = Cast(RenderTextureBlendState.SrcBlend);
+          RenderTargetBlendDesc.DestBlend = Cast(RenderTextureBlendState.DestBlend);
+          RenderTargetBlendDesc.BlendOp = Cast(RenderTextureBlendState.BlendOp);
+          RenderTargetBlendDesc.SrcBlendAlpha = Cast(RenderTextureBlendState.SrcBlendAlpha);
+          RenderTargetBlendDesc.DestBlendAlpha = Cast(RenderTextureBlendState.DestBlendAlpha);
+          RenderTargetBlendDesc.BlendOpAlpha = Cast(RenderTextureBlendState.BlendOpAlpha);
+          RenderTargetBlendDesc.RenderTargetWriteMask = Cast(RenderTextureBlendState.RenderTargetWriteMask);
+        }
+      }
+
+      hr = pD3D11Device_->CreateBlendState(&BlendDesc, pBlendState.GetAddressOf());
+      ERROR_CHECK(hr);
+    }
+
+    BlendStates_.insert(std::make_pair(_BlendState, pBlendState));
+  }
+
+  return BlendStates_.at(_BlendState).Get();
+}
+
+ID3D11DepthStencilState* CDeviceContext::GetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState)
+{
+  if (DepthStencilStates_.find(_DepthStencilState) == DepthStencilStates_.end())
+  {
+    HRESULT hr = S_OK;
+
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDepthStencilState;
+    {
+      D3D11_DEPTH_STENCIL_DESC DepthStencilDesc;
+      {
+        DepthStencilDesc.DepthEnable = _DepthStencilState.DepthEnable;
+        DepthStencilDesc.DepthWriteMask = Cast(_DepthStencilState.DepthWriteMask);
+        DepthStencilDesc.DepthFunc = Cast(_DepthStencilState.DepthFunc);
+        DepthStencilDesc.StencilEnable = _DepthStencilState.StencilEnable;
+        DepthStencilDesc.StencilReadMask = 0xFF;
+        DepthStencilDesc.StencilWriteMask = _DepthStencilState.StencilWriteMask;
+        DepthStencilDesc.FrontFace.StencilFailOp = Cast(_DepthStencilState.FrontFace.StencilFailOp);
+        DepthStencilDesc.FrontFace.StencilDepthFailOp = Cast(_DepthStencilState.FrontFace.StencilDepthFailOp);
+        DepthStencilDesc.FrontFace.StencilPassOp = Cast(_DepthStencilState.FrontFace.StencilPassOp);
+        DepthStencilDesc.FrontFace.StencilFunc = Cast(_DepthStencilState.FrontFace.StencilFunc);
+        DepthStencilDesc.BackFace.StencilFailOp = Cast(_DepthStencilState.BackFace.StencilFailOp);
+        DepthStencilDesc.BackFace.StencilDepthFailOp = Cast(_DepthStencilState.BackFace.StencilDepthFailOp);
+        DepthStencilDesc.BackFace.StencilPassOp = Cast(_DepthStencilState.BackFace.StencilPassOp);
+        DepthStencilDesc.BackFace.StencilFunc = Cast(_DepthStencilState.BackFace.StencilFunc);
+      }
+
+      hr = pD3D11Device_->CreateDepthStencilState(&DepthStencilDesc, pDepthStencilState.GetAddressOf());
+      ERROR_CHECK(hr);
+    }
+
+    DepthStencilStates_.insert(std::make_pair(_DepthStencilState, pDepthStencilState));
+  }
+
+  return DepthStencilStates_.at(_DepthStencilState).Get();
+}
+
+ID3D11RasterizerState* CDeviceContext::GetRasterizerState(const vdl::RasterizerState& _RasterizerState)
+{
+  if (RasterizerStates_.find(_RasterizerState) == RasterizerStates_.end())
+  {
+    HRESULT hr = S_OK;
+
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> pRasterizerState;
+    {
+      D3D11_RASTERIZER_DESC RasterizerDesc;
+      {
+        RasterizerDesc.FillMode = Cast(_RasterizerState.FillMode);
+        RasterizerDesc.CullMode = Cast(_RasterizerState.CullMode);
+        RasterizerDesc.FrontCounterClockwise = _RasterizerState.FrontCounterClockwise;
+        RasterizerDesc.DepthBias = _RasterizerState.DepthBias;
+        RasterizerDesc.DepthBiasClamp = 0.0f;
+        RasterizerDesc.SlopeScaledDepthBias = 0.0f;
+        RasterizerDesc.DepthClipEnable = _RasterizerState.DepthClipEnable;
+        RasterizerDesc.ScissorEnable = _RasterizerState.ScissorEnable;
+        RasterizerDesc.MultisampleEnable = false;
+        RasterizerDesc.AntialiasedLineEnable = _RasterizerState.AntialiasedLineEnable;
+      }
+
+      hr = pD3D11Device_->CreateRasterizerState(&RasterizerDesc, pRasterizerState.GetAddressOf());
+      ERROR_CHECK(hr);
+    }
+
+    RasterizerStates_.insert(std::make_pair(_RasterizerState, pRasterizerState));
+  }
+
+  return RasterizerStates_.at(_RasterizerState).Get();
 }
 
 ID3D11RenderTargetView* CDeviceContext::GetRenderTargetView(const vdl::RenderTexture& _RenderTexture)
@@ -989,7 +1004,32 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
       const vdl::Texture& Texture = std::get<vdl::Texture>(_ShaderResource);
       if (!Texture.isEmpty())
       {
-        pShaderResourceView = Cast<CTexture>(pTextureManager_->GetTexture(Texture.GetID()))->pShaderResourceView.Get();
+        ITexture* pTexture = pTextureManager_->GetTexture(Texture.GetID());
+
+        switch (pTexture->GetType())
+        {
+        case TextureType::eDepthStencilTexture:
+        case TextureType::eSwapChainRenderTexture:
+          assert(false);
+        case TextureType::eDepthTexture:
+        {
+          CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
+          pShaderResourceView = pDepthTexture->pShaderResourceView.Get();
+        }
+        break;
+        case TextureType::eStencilTexture:
+        {
+          CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
+          pShaderResourceView = pStencilTexture->pShaderResourceView.Get();
+        }
+        break;
+        default:
+        {
+          CTexture* pColorTexture = Cast<CTexture>(pTexture);
+          pShaderResourceView = pColorTexture->pShaderResourceView.Get();
+        }
+        break;
+        }
       }
     }
     if (std::get_if<vdl::CubeTexture>(&_ShaderResource))
@@ -1038,7 +1078,7 @@ ID3D11SamplerState* CDeviceContext::GetSamplerState(const vdl::Sampler& _Sampler
       }
 
       hr = pD3D11Device_->CreateSamplerState(&SamplerDesc, pSamplerState.GetAddressOf());
-      _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+      ERROR_CHECK(hr);
     }
 
     Samplers_.insert(std::make_pair(_Sampler, pSamplerState));

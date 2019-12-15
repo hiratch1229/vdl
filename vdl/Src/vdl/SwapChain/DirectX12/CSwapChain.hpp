@@ -1,11 +1,11 @@
 #pragma once
 #include "../ISwapChain.hpp"
 
-#include <vdl/Texture.hpp>
-
 #include <vdl/Texture/DirectX12/CTexture.hpp>
 
 #include <vdl/pch/DirectX12/pch.hpp>
+
+#include <vdl/Texture.hpp>
 
 #include <vector>
 
@@ -28,6 +28,8 @@ public:
     [[nodiscard]] CRenderTexture* GetD3D12RenderTexture() { return &D3D12RenderTextures_[CurrentBufferIndex_]; }
 public:
   CSwapChain() = default;
+
+  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
 
   void Initialize()override;
 

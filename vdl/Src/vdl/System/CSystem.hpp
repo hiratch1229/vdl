@@ -49,6 +49,8 @@ private:
 public:
   CSystem() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
+
   void Initialize()override;
 
   bool Update()override;

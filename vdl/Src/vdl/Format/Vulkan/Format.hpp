@@ -168,13 +168,12 @@ inline constexpr vk::Format EmulateFormat(vdl::FormatType _Format)
 //  switch (_Format)
 //  {
 //  case vdl::FormatType::eD32_Float_S8X24_Uint:
-//    return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+//    return vk::Format::eD32SfloatS8Uint;
 //  case vdl::FormatType::eD32_Float:
-//    return DXGI_FORMAT_R32_FLOAT;
+//    return vk::Format::eD32Sfloat;
 //  case vdl::FormatType::eD24_Unorm_S8_Uint:
-//    return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+//    return vk::Format::eD24UnormS8Uint;
 //  case vdl::FormatType::eD16_Unorm:
-//    return DXGI_FORMAT_R16_UNORM;
 //    return vk::Format::eD16Unorm;
 //  default: assert(false);
 //  }

@@ -89,6 +89,8 @@ public:
 
   ~CGamepad();
 
+  PlatformType GetPlatform()const final { return PlatformType::eWindows; }
+
   void Initialize()override;
 
   void Update()override;

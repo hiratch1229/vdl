@@ -3,7 +3,9 @@
 #include <vdl/Type2.hpp>
 #include <vdl/Texture.hpp>
 
-enum class TextureType
+#include <vdl/Platform/Platform.hpp>
+
+enum class TextureType : vdl::uint8_t
 {
   eTexture,
   eCubeTexture,
@@ -20,6 +22,8 @@ struct ITexture
   ITexture() = default;
 
   virtual ~ITexture() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   [[nodiscard]] virtual TextureType GetType()const = 0;
 

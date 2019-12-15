@@ -1,6 +1,8 @@
 #pragma once
 #include <vdl/Types.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 class IKeyboard
 {
 public:
@@ -9,6 +11,8 @@ public:
   IKeyboard() = default;
 
   virtual ~IKeyboard() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

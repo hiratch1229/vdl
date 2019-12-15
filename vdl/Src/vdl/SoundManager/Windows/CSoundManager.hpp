@@ -21,6 +21,8 @@ private:
 public:
   CSoundManager() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eWindows; }
+
   void Initialize()override;
 
   vdl::ID Load(const char* _FilePath)override;

@@ -2,6 +2,8 @@
 #include <vdl/Fwd.hpp>
 #include <vdl/InputLayout.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 #include <vdl/Shader/IShader.hpp>
 
 class IShaderManager
@@ -12,6 +14,8 @@ public:
   IShaderManager() = default;
 
   virtual ~IShaderManager() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

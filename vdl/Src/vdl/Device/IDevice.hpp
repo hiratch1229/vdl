@@ -3,6 +3,7 @@
 #include <vdl/Types.hpp>
 #include <vdl/ConstantBuffer.hpp>
 
+#include <vdl/Platform/Platform.hpp>
 #include <vdl/Buffer/Buffer.hpp>
 
 #include <vdl/Shader/IShader.hpp>
@@ -19,6 +20,8 @@ public:
   IDevice() = default;
 
   virtual ~IDevice() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 
@@ -40,11 +43,15 @@ public:
 
   virtual void CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image) = 0;
 
-  virtual void CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images) = 0;
+  virtual void CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl::Image, 6>& _Images) = 0;
 
   virtual void CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
 
   virtual void CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
+
+  virtual void CreateDepthTexture(ITexture** _ppDepthTexture, IDepthStencilTexture* _pDepthStencilTexture) = 0;
+
+  virtual void CreateStencilTexture(ITexture** _ppStencilTexture, IDepthStencilTexture* _pDepthStencilTexture) = 0;
 
   virtual void CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
 

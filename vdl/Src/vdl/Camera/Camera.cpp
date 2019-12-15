@@ -6,7 +6,6 @@
 
 #include <vdl/Keyboard.hpp>
 #include <vdl/Mouse.hpp>
-
 #include <vdl/Quaternion.hpp>
 #include <vdl/Matrix.hpp>
 

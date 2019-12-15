@@ -36,7 +36,7 @@ void DescriptorHeap::Initialize(ID3D12Device* _pDevice, DescriptorHeapType _Type
   }
 
   hr = _pDevice->CreateDescriptorHeap(&DescriptorHeapDesc, IID_PPV_ARGS(pDescriptorHeap_.GetAddressOf()));
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   DescriptorIncrementSize_ = _pDevice->GetDescriptorHandleIncrementSize(DescriptorHeapDesc.Type);
 }

@@ -9,7 +9,7 @@ class CMemoryProfiler : public IMemoryProfiler
 public:
   CMemoryProfiler() = default;
 
-  virtual ~CMemoryProfiler() = default;
+  PlatformType GetPlatform()const final { return PlatformType::eWindows; }
 
   void Initialize()override;
 

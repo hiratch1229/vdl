@@ -22,6 +22,7 @@
 
 #include <ImGui/imgui.h>
 
+#include <Windows.h>
 #include <ctype.h>
 
 namespace
@@ -610,7 +611,6 @@ void CGUI::Initialize()
   pKeyboard_ = Engine::Get<IKeyboard>();
   pMouse_ = Engine::Get<IMouse>();
   pBufferManager_ = Engine::Get<IBufferManager>();
-  hWnd_ = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());
 
   pConstantBuffer_ = std::make_unique<vdl::ConstantBuffer<ConstantBufferData>>();
 
@@ -652,7 +652,7 @@ void CGUI::Initialize()
     io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
     io.BackendRendererName = "vdl";
     io.BackendPlatformName = "vdl";
-    io.ImeWindowHandle = hWnd_;
+    io.ImeWindowHandle = Engine::Get<IWindow>()->GetHandle();
 
     // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array that we will update during the application lifetime.
     io.KeyMap[ImGuiKey_Tab] = VK_TAB;

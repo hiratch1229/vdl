@@ -106,7 +106,7 @@ void CDevice::Initialize()
     Microsoft::WRL::ComPtr<IDXGIFactory2> pFactory2;
 
     hr = ::CreateDXGIFactory2(kDxgiCreateFactoryFlag, IID_PPV_ARGS(pFactory2.GetAddressOf()));
-    _ASSERT_EXPR_A(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
 
     pFactory2.As(&pFactory_);
   }
@@ -139,11 +139,11 @@ void CDevice::Initialize()
   if (useWrapAdapter)
   {
     hr = pFactory_->EnumWarpAdapter(IID_PPV_ARGS(pAdapter.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
   }
 
   hr = ::D3D12CreateDevice(pAdapter.Get(), kMininumFeatureLevel, IID_PPV_ARGS(pDevice_.GetAddressOf()));
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 
   ConstantBufferAllocater_.Initialize();
 
@@ -152,34 +152,22 @@ void CDevice::Initialize()
     D3D12_COMMAND_QUEUE_DESC CommandQueueDesc;
     {
       CommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-      CommandQueueDesc.Priority = 0;
+      CommandQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
       CommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
       CommandQueueDesc.NodeMask = 0;
     }
 
     hr = pDevice_->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(pCommandQueue_.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-  }
-
-  //  コマンドアロケータの作成
-  {
-    hr = pDevice_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(pCommandAllocator_.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
   }
 
   //  コマンドリストの作成
-  {
-    hr = pDevice_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, pCommandAllocator_.Get(), nullptr, IID_PPV_ARGS(pCommandList_.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-
-    hr = pCommandList_->Close();
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-  }
+  CommandList_ = CommandList(pDevice_.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
 
   //  フェンスの作成
   {
     hr = pDevice_->CreateFence(FenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(pFence_.GetAddressOf()));
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    ERROR_CHECK(hr);
 
     FenceEvent_ = CreateEvent(nullptr, false, false, nullptr);
     assert(FenceEvent_ != nullptr);
@@ -319,37 +307,43 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
     CreateBuffer(&pUnorderedAccessBuffer->BufferData, pUnorderedAccessBuffer->BufferSize, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   }
 
-  HRESULT hr = S_OK;
-
-  //  ディスクリプタヒープの作成
-  CreateDescriptorHeap(pUnorderedAccessBuffer->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-  CreateDescriptorHeap(pUnorderedAccessBuffer->pUnordererdAccessViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
   //  ビューの作成
   {
-    D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+    //  ShaderResourceViewの作成
     {
-      ShaderResourceViewDesc.Format = DXGI_FORMAT_UNKNOWN;
-      ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-      ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-      ShaderResourceViewDesc.Buffer.FirstElement = 0;
-      ShaderResourceViewDesc.Buffer.NumElements = pUnorderedAccessBuffer->BufferSize / _Stride;
-      ShaderResourceViewDesc.Buffer.StructureByteStride = _Stride;
-      ShaderResourceViewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    }
-    pDevice_->CreateShaderResourceView(pUnorderedAccessBuffer->BufferData.pResource.Get(), &ShaderResourceViewDesc, pUnorderedAccessBuffer->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
+      //  ディスクリプタヒープの作成
+      CreateDescriptorHeap(pUnorderedAccessBuffer->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-    D3D12_UNORDERED_ACCESS_VIEW_DESC UnorderedAccessView;
-    {
-      UnorderedAccessView.Format = DXGI_FORMAT_UNKNOWN;
-      UnorderedAccessView.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-      UnorderedAccessView.Buffer.FirstElement = 0;
-      UnorderedAccessView.Buffer.NumElements = pUnorderedAccessBuffer->BufferSize / _Stride;
-      UnorderedAccessView.Buffer.StructureByteStride = _Stride;
-      UnorderedAccessView.Buffer.CounterOffsetInBytes = 0;
-      UnorderedAccessView.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+      D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+      {
+        ShaderResourceViewDesc.Format = DXGI_FORMAT_UNKNOWN;
+        ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+        ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        ShaderResourceViewDesc.Buffer.FirstElement = 0;
+        ShaderResourceViewDesc.Buffer.NumElements = pUnorderedAccessBuffer->BufferSize / _Stride;
+        ShaderResourceViewDesc.Buffer.StructureByteStride = _Stride;
+        ShaderResourceViewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+      }
+      pDevice_->CreateShaderResourceView(pUnorderedAccessBuffer->BufferData.pResource.Get(), &ShaderResourceViewDesc, pUnorderedAccessBuffer->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
     }
-    pDevice_->CreateUnorderedAccessView(pUnorderedAccessBuffer->BufferData.pResource.Get(), nullptr, &UnorderedAccessView, pUnorderedAccessBuffer->pUnordererdAccessViewHeap->GetCPUDescriptorHandleForHeapStart());
+
+    //  UnorderedAccessViewの作成
+    {
+      //  ディスクリプタヒープの作成
+      CreateDescriptorHeap(pUnorderedAccessBuffer->pUnordererdAccessViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+      D3D12_UNORDERED_ACCESS_VIEW_DESC UnorderedAccessView;
+      {
+        UnorderedAccessView.Format = DXGI_FORMAT_UNKNOWN;
+        UnorderedAccessView.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+        UnorderedAccessView.Buffer.FirstElement = 0;
+        UnorderedAccessView.Buffer.NumElements = pUnorderedAccessBuffer->BufferSize / _Stride;
+        UnorderedAccessView.Buffer.StructureByteStride = _Stride;
+        UnorderedAccessView.Buffer.CounterOffsetInBytes = 0;
+        UnorderedAccessView.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+      }
+      pDevice_->CreateUnorderedAccessView(pUnorderedAccessBuffer->BufferData.pResource.Get(), nullptr, &UnorderedAccessView, pUnorderedAccessBuffer->pUnordererdAccessViewHeap->GetCPUDescriptorHandleForHeapStart());
+    }
   }
 
   (*_ppUnorderedAccessBuffer) = std::move(pUnorderedAccessBuffer);
@@ -363,6 +357,7 @@ vdl::Detail::ConstantBufferData CDevice::CloneConstantBuffer(const vdl::Detail::
   {
     CCopyConstantBuffer* pCopyConstantBuffer = new CCopyConstantBuffer;
     {
+      pCopyConstantBuffer->pConstantBufferAllocater = &ConstantBufferAllocater_;
       pCopyConstantBuffer->BufferSize = pSrcConstantBuffer->BufferSize;
       pCopyConstantBuffer->Offset = ConstantBufferAllocater_.Secure(pCopyConstantBuffer->BufferSize);
       CreateDescriptorHeap(pCopyConstantBuffer->pConstantBufferViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -392,11 +387,6 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
   CTexture* pTexture = new CTexture;
   pTexture->TextureSize = _Image.GetTextureSize();
 
-  HRESULT hr = S_OK;
-
-  //  ディスクリプタヒープの作成
-  CreateDescriptorHeap(pTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
   //  シェーダーリソースの作成
   {
     D3D12_RESOURCE_DESC TextureDesc;
@@ -413,9 +403,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
       TextureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
       TextureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
     }
-
-    CreateResource(pTexture->TextureData.pResource.GetAddressOf(), TextureDesc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_COPY_DEST);
-    pTexture->TextureData.ResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
+    CreateTexture(&pTexture->TextureData, TextureDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
     UINT64 UploadSize;
     D3D12_PLACED_SUBRESOURCE_FOOTPRINT PlacedFootprint;
@@ -449,47 +437,48 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
         SrcCopyLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
         SrcCopyLocation.PlacedFootprint = PlacedFootprint;
       }
-      pCommandList_->Reset(pCommandAllocator_.Get(), nullptr);
-      pCommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
-      pTexture->TextureData.TransitionResourceBarrier(pCommandList_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-      pCommandList_->Close();
+      CommandList_.Reset();
 
-      ExecuteAndWait(pCommandList_.Get());
+      CommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
+      pTexture->TextureData.TransitionResourceBarrier(CommandList_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+      CommandList_.Close();
+
+      ExecuteAndWait(CommandList_.Get());
     }
 
     //  ビューの作成
     {
-      D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+      //  ShaderResourceViewの作成
       {
-        ShaderResourceViewDesc.Format = TextureDesc.Format;
-        ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-        ShaderResourceViewDesc.Texture2D.MipLevels = 1;
-        ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
-        ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-      }
+        //  ディスクリプタヒープの作成
+        CreateDescriptorHeap(pTexture->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-      pDevice_->CreateShaderResourceView(pTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pTexture->TextureData.pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
+        D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+        {
+          ShaderResourceViewDesc.Format = kTextureFormat;
+          ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+          ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+          ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+          ShaderResourceViewDesc.Texture2D.MipLevels = 1;
+          ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
+          ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+        }
+        pDevice_->CreateShaderResourceView(pTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
+      }
     }
   }
 
   (*_ppTexture) = std::move(pTexture);
 }
 
-void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images)
+void CDevice::CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl::Image, 6>& _Images)
 {
-  assert(_ppTexture);
+  assert(_ppCubeTexture);
 
   constexpr DXGI_FORMAT kTextureFormat = Cast(Constants::kTextureFormat);
 
   CCubeTexture* pCubeTexture = new CCubeTexture;
   pCubeTexture->TextureSize = _Images[0].GetTextureSize();
-
-  HRESULT hr = S_OK;
-
-  //  ディスクリプタヒープの作成
-  CreateDescriptorHeap(pCubeTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
   //  シェーダーリソースの作成
   {
@@ -507,9 +496,7 @@ void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Ima
       TextureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
       TextureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
     }
-
-    CreateResource(pCubeTexture->TextureData.pResource.GetAddressOf(), TextureDesc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_COPY_DEST);
-    pCubeTexture->TextureData.ResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
+    CreateTexture(&pCubeTexture->TextureData, TextureDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
     UINT64 UploadSize;
     D3D12_PLACED_SUBRESOURCE_FOOTPRINT PlacedFootprints[6];
@@ -534,7 +521,8 @@ void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Ima
 
     //  リソースのコピー
     {
-      pCommandList_->Reset(pCommandAllocator_.Get(), nullptr);
+      CommandList_.Reset();
+
       D3D12_TEXTURE_COPY_LOCATION DstCopyLocation;
       {
         DstCopyLocation.pResource = pCubeTexture->TextureData.pResource.Get();
@@ -549,36 +537,40 @@ void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Ima
       {
         DstCopyLocation.SubresourceIndex = i;
         SrcCopyLocation.PlacedFootprint = PlacedFootprints[i];
-        pCommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
+        CommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
       }
 
-      pCubeTexture->TextureData.TransitionResourceBarrier(pCommandList_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-      pCommandList_->Close();
+      pCubeTexture->TextureData.TransitionResourceBarrier(CommandList_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+      CommandList_.Close();
 
-      ExecuteAndWait(pCommandList_.Get());
+      ExecuteAndWait(CommandList_.Get());
     }
 
     //  ビューの作成
     {
-      D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+      //  ShaderResourceViewの作成
       {
-        ShaderResourceViewDesc.Format = TextureDesc.Format;
-        ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-        ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-        ShaderResourceViewDesc.Texture2D.MipLevels = 1;
-        ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
-        ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+        //  ディスクリプタヒープの作成
+        CreateDescriptorHeap(pCubeTexture->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+        {
+          ShaderResourceViewDesc.Format = kTextureFormat;
+          ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+          ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+          ShaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+          ShaderResourceViewDesc.TextureCube.MipLevels = 1;
+          ShaderResourceViewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+        }
+        pDevice_->CreateShaderResourceView(pCubeTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pCubeTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
       }
-
-      pDevice_->CreateShaderResourceView(pCubeTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pCubeTexture->TextureData.pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
     }
-  }
 
-  (*_ppTexture) = std::move(pCubeTexture);
+    (*_ppCubeTexture) = std::move(pCubeTexture);
+  }
 }
 
-void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
+void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2 & _TextureSize, vdl::FormatType _Format)
 {
   assert(*_ppRenderTexture);
 
@@ -586,10 +578,6 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
   pRenderTexture->TextureSize = _TextureSize;
   pRenderTexture->Format = _Format;
   pRenderTexture->DXFormat = Cast(_Format);
-
-  //  ディスクリプタヒープの作成
-  CreateDescriptorHeap(pRenderTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-  CreateDescriptorHeap(pRenderTexture->pRenderTargetViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
   //  シェーダーリソースの作成
   {
@@ -607,41 +595,48 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
       TextureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
       TextureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
     }
-
-    CreateResource(pRenderTexture->TextureData.pResource.GetAddressOf(), TextureDesc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    pRenderTexture->TextureData.ResourceState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    CreateTexture(&pRenderTexture->TextureData, TextureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
     //  ビューの作成
     {
-      D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+      //  ShaderResourceViewの作成
       {
-        ShaderResourceViewDesc.Format = pRenderTexture->DXFormat;
-        ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-        ShaderResourceViewDesc.Texture2D.MipLevels = 1;
-        ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
-        ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+        //  ディスクリプタヒープの作成
+        CreateDescriptorHeap(pRenderTexture->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+        {
+          ShaderResourceViewDesc.Format = pRenderTexture->DXFormat;
+          ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+          ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+          ShaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+          ShaderResourceViewDesc.TextureCube.MipLevels = 1;
+          ShaderResourceViewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+        }
+        pDevice_->CreateShaderResourceView(pRenderTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pRenderTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
       }
 
-      pDevice_->CreateShaderResourceView(pRenderTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pRenderTexture->TextureData.pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
-
-      D3D12_RENDER_TARGET_VIEW_DESC RenderTargetViewDesc;
+      //  RenderTargetViewの作成
       {
-        RenderTargetViewDesc.Format = pRenderTexture->DXFormat;
-        RenderTargetViewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-        RenderTargetViewDesc.Texture2D.MipSlice = 0;
-        RenderTargetViewDesc.Texture2D.PlaneSlice = 0;
-      }
+        //  ディスクリプタヒープの作成
+        CreateDescriptorHeap(pRenderTexture->pRenderTargetViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-      pDevice_->CreateRenderTargetView(pRenderTexture->TextureData.pResource.Get(), &RenderTargetViewDesc, pRenderTexture->pRenderTargetViewHeap->GetCPUDescriptorHandleForHeapStart());
+        D3D12_RENDER_TARGET_VIEW_DESC RenderTargetViewDesc;
+        {
+          RenderTargetViewDesc.Format = pRenderTexture->DXFormat;
+          RenderTargetViewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+          RenderTargetViewDesc.Texture2D.MipSlice = 0;
+          RenderTargetViewDesc.Texture2D.PlaneSlice = 0;
+        }
+        pDevice_->CreateRenderTargetView(pRenderTexture->TextureData.pResource.Get(), &RenderTargetViewDesc, pRenderTexture->pRenderTargetViewHeap->GetCPUDescriptorHandleForHeapStart());
+      }
     }
   }
 
   (*_ppRenderTexture) = std::move(pRenderTexture);
 }
 
-void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
+void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const vdl::uint2 & _TextureSize, vdl::FormatType _Format)
 {
   assert(_ppDepthStencilTexture);
 
@@ -649,10 +644,6 @@ void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const
   pDepthStencilTexture->TextureSize = _TextureSize;
   pDepthStencilTexture->Format = _Format;
   pDepthStencilTexture->DXFormat = Cast(_Format);
-
-  //  ディスクリプタヒープの作成
-  CreateDescriptorHeap(pDepthStencilTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-  CreateDescriptorHeap(pDepthStencilTexture->pDepthStencilViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
   //  シェーダーリソースの作成
   {
@@ -670,12 +661,13 @@ void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const
       TextureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
       TextureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     }
-
-    CreateResource(pDepthStencilTexture->TextureData.pResource.GetAddressOf(), TextureDesc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-    pDepthStencilTexture->TextureData.ResourceState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+    CreateTexture(&pDepthStencilTexture->TextureData, TextureDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
     //  ビューの作成
     {
+      //  ディスクリプタヒープの作成
+      CreateDescriptorHeap(pDepthStencilTexture->pDepthStencilViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
       D3D12_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
       {
         DepthStencilViewDesc.Format = Cast(_Format);
@@ -683,7 +675,6 @@ void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const
         DepthStencilViewDesc.Flags = D3D12_DSV_FLAG_NONE;
         DepthStencilViewDesc.Texture2D.MipSlice = 0;
       }
-
       pDevice_->CreateDepthStencilView(pDepthStencilTexture->TextureData.pResource.Get(), &DepthStencilViewDesc, pDepthStencilTexture->pDepthStencilViewHeap->GetCPUDescriptorHandleForHeapStart());
     }
   }
@@ -691,7 +682,68 @@ void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const
   (*_ppDepthStencilTexture) = std::move(pDepthStencilTexture);
 }
 
-void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
+void CDevice::CreateDepthTexture(ITexture** _ppDepthTexture, IDepthStencilTexture* _pDepthStencilTexture)
+{
+  assert(_ppDepthTexture);
+
+  CDepthStencilTexture* pDepthStencilTexture = Cast<CDepthStencilTexture>(_pDepthStencilTexture);
+
+  CDepthTexture* pDepthTexture = new CDepthTexture;
+  pDepthTexture->pParent = pDepthStencilTexture;
+
+  //  ビューの作成
+  {
+    //  ディスクリプタヒープの作成
+    CreateDescriptorHeap(pDepthTexture->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+    {
+      ShaderResourceViewDesc.Format = DepthFormatFromDepthStencilFormat(pDepthStencilTexture->Format);
+      ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+      ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+      ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+      ShaderResourceViewDesc.Texture2D.MipLevels = 1;
+      ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
+      ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+    }
+
+    pDevice_->CreateShaderResourceView(pDepthStencilTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pDepthTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
+  }
+
+  (*_ppDepthTexture) = std::move(pDepthTexture);
+}
+
+void CDevice::CreateStencilTexture(ITexture** _ppStencilTexture, IDepthStencilTexture* _pDepthStencilTexture)
+{
+  assert(_ppStencilTexture);
+
+  CDepthStencilTexture* pDepthStencilTexture = Cast<CDepthStencilTexture>(_pDepthStencilTexture);
+
+  CStencilTexture* pStencilTexture = new CStencilTexture;
+  pStencilTexture->pParent = pDepthStencilTexture;
+
+  //  ビューの作成
+  {
+    //  ディスクリプタヒープの作成
+    CreateDescriptorHeap(pStencilTexture->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+    {
+      ShaderResourceViewDesc.Format = StencilFormatFromDepthStencilFormat(pDepthStencilTexture->Format);
+      ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+      ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+      ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+      ShaderResourceViewDesc.Texture2D.MipLevels = 1;
+      ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
+      ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+    }
+    pDevice_->CreateShaderResourceView(pDepthStencilTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pStencilTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
+  }
+
+  (*_ppStencilTexture) = std::move(pStencilTexture);
+}
+
+void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2 & _TextureSize, vdl::FormatType _Format)
 {
   assert(_ppUnorderedAccessTexture);
 
@@ -700,10 +752,6 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
   pUnorderedAccessTexture->Format = _Format;
 
   const DXGI_FORMAT DXFormat = Cast(_Format);
-
-  //  ディスクリプタヒープの作成
-  CreateDescriptorHeap(pUnorderedAccessTexture->TextureData.pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-  CreateDescriptorHeap(pUnorderedAccessTexture->pUnorderedAccessViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
   //  シェーダーリソースの作成
   {
@@ -721,34 +769,41 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
       TextureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
       TextureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
     }
-
-    CreateResource(pUnorderedAccessTexture->TextureData.pResource.GetAddressOf(), TextureDesc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-    pUnorderedAccessTexture->TextureData.ResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    CreateTexture(&pUnorderedAccessTexture->TextureData, TextureDesc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
     //  ビューの作成
     {
-      D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+      //  ShaderResourceViewの作成
       {
-        ShaderResourceViewDesc.Format = DXFormat;
-        ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        ShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-        ShaderResourceViewDesc.Texture2D.MipLevels = 1;
-        ShaderResourceViewDesc.Texture2D.PlaneSlice = 0;
-        ShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+        //  ディスクリプタヒープの作成
+        CreateDescriptorHeap(pUnorderedAccessTexture->pShaderResourceViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC ShaderResourceViewDesc;
+        {
+          ShaderResourceViewDesc.Format = DXFormat;
+          ShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+          ShaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+          ShaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+          ShaderResourceViewDesc.TextureCube.MipLevels = 1;
+          ShaderResourceViewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+        }
+        pDevice_->CreateShaderResourceView(pUnorderedAccessTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pUnorderedAccessTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
       }
 
-      pDevice_->CreateShaderResourceView(pUnorderedAccessTexture->TextureData.pResource.Get(), &ShaderResourceViewDesc, pUnorderedAccessTexture->TextureData.pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
-
-      D3D12_UNORDERED_ACCESS_VIEW_DESC UnorderedAccessDesc;
+      //  UnorderedAccessViewの作成
       {
-        UnorderedAccessDesc.Format = DXFormat;
-        UnorderedAccessDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-        UnorderedAccessDesc.Texture2D.MipSlice = 0;
-        UnorderedAccessDesc.Texture2D.PlaneSlice = 0;
-      }
+        //  ディスクリプタヒープの作成
+        CreateDescriptorHeap(pUnorderedAccessTexture->pUnorderedAccessViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-      pDevice_->CreateUnorderedAccessView(pUnorderedAccessTexture->TextureData.pResource.Get(), nullptr, &UnorderedAccessDesc, pUnorderedAccessTexture->pUnorderedAccessViewHeap->GetCPUDescriptorHandleForHeapStart());
+        D3D12_UNORDERED_ACCESS_VIEW_DESC UnorderedAccessDesc;
+        {
+          UnorderedAccessDesc.Format = DXFormat;
+          UnorderedAccessDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+          UnorderedAccessDesc.Texture2D.MipSlice = 0;
+          UnorderedAccessDesc.Texture2D.PlaneSlice = 0;
+        }
+        pDevice_->CreateUnorderedAccessView(pUnorderedAccessTexture->TextureData.pResource.Get(), nullptr, &UnorderedAccessDesc, pUnorderedAccessTexture->pUnorderedAccessViewHeap->GetCPUDescriptorHandleForHeapStart());
+      }
     }
   }
 
@@ -935,7 +990,7 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, v
 
 //--------------------------------------------------
 
-void CDevice::CreateDescriptorHeap(ID3D12DescriptorHeap** _ppDescriptorHeap, D3D12_DESCRIPTOR_HEAP_TYPE _Type)
+void CDevice::CreateDescriptorHeap(ID3D12DescriptorHeap** _ppDescriptorHeap, D3D12_DESCRIPTOR_HEAP_TYPE _Type)const
 {
   HRESULT hr = S_OK;
 
@@ -948,7 +1003,7 @@ void CDevice::CreateDescriptorHeap(ID3D12DescriptorHeap** _ppDescriptorHeap, D3D
   }
 
   hr = pDevice_->CreateDescriptorHeap(&DescriptorHeapDesc, IID_PPV_ARGS(_ppDescriptorHeap));
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 }
 
 void CDevice::ExecuteAndWait(ID3D12CommandList* _pCommandList)
@@ -984,41 +1039,40 @@ void CDevice::CreateResource(ID3D12Resource** _ppResource, const D3D12_RESOURCE_
   }
 
   hr = pDevice_->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &_ResourceDesc, _InitialResourceState, nullptr, IID_PPV_ARGS(_ppResource));
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+  ERROR_CHECK(hr);
 }
 
-void CDevice::CreateBuffer(BufferData* _pBuffer, vdl::uint _BufferSize, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState, D3D12_RESOURCE_FLAGS _RosourceFlags)const
+void CDevice::CreateBuffer(BufferData * _pBufferData, vdl::uint _BufferSize, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState, D3D12_RESOURCE_FLAGS _ResourceFlags)const
 {
-  assert(_pBuffer);
+  assert(_pBufferData);
 
-  D3D12_RESOURCE_DESC ResourceDesc;
+  D3D12_RESOURCE_DESC BufferDesc;
   {
-    ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    ResourceDesc.Alignment = 0;
-    ResourceDesc.Width = _BufferSize;
-    ResourceDesc.Height = 1;
-    ResourceDesc.DepthOrArraySize = 1;
-    ResourceDesc.MipLevels = 1;
-    ResourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-    ResourceDesc.SampleDesc.Count = 1;
-    ResourceDesc.SampleDesc.Quality = 0;
-    ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    ResourceDesc.Flags = _RosourceFlags;
+    BufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    BufferDesc.Alignment = 0;
+    BufferDesc.Width = _BufferSize;
+    BufferDesc.Height = 1;
+    BufferDesc.DepthOrArraySize = 1;
+    BufferDesc.MipLevels = 1;
+    BufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+    BufferDesc.SampleDesc.Count = 1;
+    BufferDesc.SampleDesc.Quality = 0;
+    BufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    BufferDesc.Flags = _ResourceFlags;
   }
-
-  CreateResource(_pBuffer->pResource.GetAddressOf(), ResourceDesc, _HeapType, _InitialResourceState);
+  CreateResource(_pBufferData->pResource.GetAddressOf(), BufferDesc, _HeapType, _InitialResourceState);
 
   //  ステージングしない時ポインタを取得する
   if (_HeapType == D3D12_HEAP_TYPE_UPLOAD)
   {
     HRESULT hr = S_OK;
 
-    hr = _pBuffer->pResource->Map(0, nullptr, &_pBuffer->pData);
-    _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
+    hr = _pBufferData->pResource->Map(0, nullptr, &_pBufferData->pData);
+    ERROR_CHECK(hr);
   }
 }
 
-void CDevice::CreateStagingBuffer(BufferData* _pBuffer, const void* _Buffer, vdl::uint _BufferSize)const
+void CDevice::CreateStagingBuffer(BufferData * _pBuffer, const void* _Buffer, vdl::uint _BufferSize)const
 {
   assert(_pBuffer);
 
@@ -1031,16 +1085,13 @@ void CDevice::CreateStagingBuffer(BufferData* _pBuffer, const void* _Buffer, vdl
   }
 }
 
-void CDevice::CopyBuffer(BufferData* _pSrcBuffer, BufferData* _pDstBuffer, vdl::uint _BufferSize, D3D12_RESOURCE_STATES _AfterState)
+void CDevice::CopyBuffer(BufferData * _pSrcBuffer, BufferData * _pDstBuffer, vdl::uint _BufferSize, D3D12_RESOURCE_STATES _AfterState)
 {
   assert(_pSrcBuffer && _pDstBuffer);
 
-  HRESULT hr = S_OK;
+  CommandList_.Reset();
 
-  hr = pCommandList_->Reset(pCommandAllocator_.Get(), nullptr);
-  _ASSERT_EXPR(SUCCEEDED(hr), hResultTrace(hr));
-
-  pCommandList_->CopyResource(_pDstBuffer->pResource.Get(), _pSrcBuffer->pResource.Get());
+  CommandList_->CopyResource(_pDstBuffer->pResource.Get(), _pSrcBuffer->pResource.Get());
 
   D3D12_RESOURCE_BARRIER ResourceBarrier;
   {
@@ -1051,8 +1102,17 @@ void CDevice::CopyBuffer(BufferData* _pSrcBuffer, BufferData* _pDstBuffer, vdl::
     ResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
     ResourceBarrier.Transition.StateAfter = _AfterState;
   }
-  pCommandList_->ResourceBarrier(1, &ResourceBarrier);
-  pCommandList_->Close();
+  CommandList_->ResourceBarrier(1, &ResourceBarrier);
+  CommandList_.Close();
 
-  ExecuteAndWait(pCommandList_.Get());
+  ExecuteAndWait(CommandList_.Get());
+}
+
+void CDevice::CreateTexture(TextureData * _pTextureData, const D3D12_RESOURCE_DESC& _TextureDesc, D3D12_RESOURCE_STATES _InitialResourceState)const
+{
+  assert(_pTextureData);
+
+  CreateResource(_pTextureData->pResource.GetAddressOf(), _TextureDesc, D3D12_HEAP_TYPE_DEFAULT, _InitialResourceState);
+
+  _pTextureData->ResourceState = _InitialResourceState;
 }

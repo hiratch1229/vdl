@@ -1,10 +1,10 @@
 #include <vdl/MotionData.hpp>
 
-#include <vdl/Model.hpp>
-#include <vdl/Math.hpp>
-
 #include <vdl/Engine.hpp>
 #include <vdl/ModelManager/IModelManager.hpp>
+
+#include <vdl/Model.hpp>
+#include <vdl/Math.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 

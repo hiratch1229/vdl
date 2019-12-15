@@ -1,6 +1,8 @@
 #pragma once
 #include <vdl/Types.hpp>
 
+#include <vdl/Platform/Platform.hpp>
+
 class ISystem
 {
 public:
@@ -9,6 +11,8 @@ public:
   ISystem() = default;
 
   virtual ~ISystem() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

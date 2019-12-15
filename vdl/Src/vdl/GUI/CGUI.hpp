@@ -12,8 +12,6 @@
 
 #include <vdl/Buffer/Buffer.hpp>
 
-#include <vdl/pch/Windows/pch.hpp>
-
 #include <memory>
 
 class ISystem;
@@ -39,7 +37,6 @@ private:
   IKeyboard* pKeyboard_;
   IMouse* pMouse_;
   IBufferManager* pBufferManager_;
-  HWND hWnd_;
 private:
   vdl::VertexShader VertexShader_;
   vdl::HullShader HullShader_;
@@ -64,6 +61,8 @@ public:
   CGUI() = default;
 
   ~CGUI();
+
+  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
 
   void Initialize()override;
   

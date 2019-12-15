@@ -24,6 +24,8 @@ private:
 public:
   CModelManager() = default;
 
+  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
+
   void Initialize()override {}
 
   vdl::ID Load(const vdl::VertexStaticMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::StaticMeshData& _StaticMeshData)override;

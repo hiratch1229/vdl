@@ -559,6 +559,7 @@ vdl::Detail::ConstantBufferData CDevice::CloneConstantBuffer(const vdl::Detail::
   {
     CCopyConstantBuffer* pCopyConstantBuffer = new CCopyConstantBuffer;
     {
+      pCopyConstantBuffer->pConstantBufferAllocater = &ConstantBufferAllocater_;
       pCopyConstantBuffer->ParentBuffer = Cast<CConstantBuffer>(ConstantBufferAllocater_.GetConstantBuffer())->BufferData.Buffer.get();
       pCopyConstantBuffer->BufferSize = pSrcConstantBuffer->BufferSize;
       pCopyConstantBuffer->Offset = ConstantBufferAllocater_.Secure(pCopyConstantBuffer->BufferSize);
@@ -643,9 +644,9 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
   (*_ppTexture) = std::move(pTexture);
 }
 
-void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Image, 6>& _Images)
+void CDevice::CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl::Image, 6>& _Images)
 {
-  assert(_ppTexture);
+  assert(_ppCubeTexture);
 
   constexpr vk::Format kTextureFormat = Cast(Constants::kTextureFormat);
 
@@ -718,7 +719,7 @@ void CDevice::CreateCubeTexture(ITexture** _ppTexture, const std::array<vdl::Ima
 
   CreateImageView(&pCubeTexture->TextureData, kTextureFormat, SubresourceRange, vk::ImageViewType::eCube);
 
-  (*_ppTexture) = std::move(pCubeTexture);
+  (*_ppCubeTexture) = std::move(pCubeTexture);
 }
 
 void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)
@@ -838,6 +839,66 @@ void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const
   }
 
   (*_ppDepthStencilTexture) = std::move(pDepthStencilTexture);
+}
+
+void CDevice::CreateDepthTexture(ITexture** _ppDepthTexture, IDepthStencilTexture* _pDepthStencilTexture)
+{
+  assert(_ppDepthTexture);
+
+  CDepthStencilTexture* pDepthStencilTexture = Cast<CDepthStencilTexture>(_pDepthStencilTexture);
+
+  CDepthTexture* pDepthTexture = new CDepthTexture;
+  pDepthTexture->pParent = pDepthStencilTexture;
+
+  //  ビューの作成
+  {
+    vk::ImageViewCreateInfo ImageViewInfo;
+    {
+      ImageViewInfo.image = pDepthStencilTexture->TextureData.Image.get();
+      ImageViewInfo.viewType = vk::ImageViewType::e2D;
+      ImageViewInfo.format = pDepthStencilTexture->VkFormat;
+      ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
+      ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
+      ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
+      ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
+      ImageViewInfo.subresourceRange = { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 };
+    }
+
+    pDepthTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
+    assert(pDepthTexture->View);
+  }
+
+  (*_ppDepthTexture) = std::move(pDepthTexture);
+}
+
+void CDevice::CreateStencilTexture(ITexture** _ppStencilTexture, IDepthStencilTexture* _pDepthStencilTexture)
+{
+  assert(_ppStencilTexture);
+
+  CDepthStencilTexture* pDepthStencilTexture = Cast<CDepthStencilTexture>(_pDepthStencilTexture);
+
+  CStencilTexture* pStencilTexture = new CStencilTexture;
+  pStencilTexture->pParent = pDepthStencilTexture;
+
+  //  ビューの作成
+  {
+    vk::ImageViewCreateInfo ImageViewInfo;
+    {
+      ImageViewInfo.image = pDepthStencilTexture->TextureData.Image.get();
+      ImageViewInfo.viewType = vk::ImageViewType::e2D;
+      ImageViewInfo.format = pDepthStencilTexture->VkFormat;
+      ImageViewInfo.components.r = vk::ComponentSwizzle::eR;
+      ImageViewInfo.components.g = vk::ComponentSwizzle::eG;
+      ImageViewInfo.components.b = vk::ComponentSwizzle::eB;
+      ImageViewInfo.components.a = vk::ComponentSwizzle::eA;
+      ImageViewInfo.subresourceRange = { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 };
+    }
+
+    pStencilTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
+    assert(pStencilTexture->View);
+  }
+
+  (*_ppStencilTexture) = std::move(pStencilTexture);
 }
 
 void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture, const vdl::uint2& _TextureSize, vdl::FormatType _Format)

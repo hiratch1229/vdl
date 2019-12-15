@@ -1,8 +1,8 @@
 #pragma once
-#include <vdl/InputLayout.hpp>
 #include <vdl/Types.hpp>
+#include <vdl/InputLayout.hpp>
 
-#include <vector>
+#include <vdl/Platform/Platform.hpp>
 
 enum class ShaderType : vdl::uint8_t
 {
@@ -24,6 +24,8 @@ struct IShader
   IShader() = default;
 
   virtual ~IShader() = default;
+
+  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
 
   [[nodiscard]] virtual ShaderType GetType()const = 0;
 
