@@ -107,6 +107,7 @@ struct CUnordererdAccessBuffer : public IBuffer
   vdl::uint BufferSize;
   Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pShaderResourceViewHeap;
   Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pUnordererdAccessViewHeap;
+  D3D12_RESOURCE_STATES ResourceState;
 public:
   CUnordererdAccessBuffer() = default;
 

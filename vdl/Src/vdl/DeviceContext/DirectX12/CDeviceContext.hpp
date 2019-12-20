@@ -39,11 +39,11 @@ class CDeviceContext : public IDeviceContext
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
   using UnorderedAccessObjects = std::vector<vdl::UnorderedAccessObject>;
 private:
-  enum class CommandListState
-  {
-    eIdle,
-    eBegin,
-  };
+  //enum class CommandListState
+  //{
+  //  eIdle,
+  //  eBegin,
+  //};
   struct SyncState
   {
     Microsoft::WRL::ComPtr<ID3D12Fence> pFence;
@@ -192,7 +192,7 @@ private:
     }
   };
 private:
-  ID3D12Device* pD3D12Device_;
+  ID3D12Device5* pD3D12Device_;
 private:
   CDevice* pDevice_;
   CSwapChain* pSwapChain_;
@@ -208,12 +208,15 @@ private:
   std::array<DescriptorHeap, kDescriptorHeapTypeNum> DescriptorHeaps_;
   HANDLE FenceEvent_;
 private:
+  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pDefaultViewDescriptorHeap_;
+
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pGraphicsRootSignature_;
   Microsoft::WRL::ComPtr<ID3D12CommandQueue> pGraphicsCommandQueue_;
-  std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, Constants::kGraphicsCommandBufferNum> pGraphicsCommandAllocators_;
-  std::array<Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>, Constants::kGraphicsCommandBufferNum> pGraphicsCommandLists_;
+  //std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, Constants::kGraphicsCommandBufferNum> pGraphicsCommandAllocators_;
+  //std::array<Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>, Constants::kGraphicsCommandBufferNum> pGraphicsCommandLists_;
+  std::array<CommandList, Constants::kGraphicsCommandBufferNum> GraphicsCommandLists_;
   vdl::uint GraphicsCommandBufferIndex_ = 0;
-  CommandListState GraphicsCommandListState_ = CommandListState::eIdle;
+  //CommandListState GraphicsCommandListState_ = CommandListState::eIdle;
   StateChangeFlags<GraphicsCommandType, vdl::uint32_t> GraphicsStateChangeFlags_;
   vdl::uint GraphicsRenderTargetCount_;
   GraphicsState CurrentGraphicsState_;
@@ -232,8 +235,7 @@ private:
   SyncState* pLastComputeSyncState_ = nullptr;
 private:
   GraphicsReserveData* GetCurrentGraphicsReserveData() { return &GraphicsReserveDatas_[GraphicsCommandBufferIndex_]; }
-  ID3D12CommandAllocator* GetCurrentGraphicsCommandAllocator()const { return pGraphicsCommandAllocators_[GraphicsCommandBufferIndex_].Get(); }
-  ID3D12GraphicsCommandList* GetCurrentGraphicsCommandList()const { return pGraphicsCommandLists_[GraphicsCommandBufferIndex_].Get(); }
+  CommandList* GetCurrentGraphicsCommandList() { return &GraphicsCommandLists_[GraphicsCommandBufferIndex_]; }
   ComputeReserveData* GetCurrentComputeReserveData() { return &ComputeReserveDatas_[ComputeCommandBufferIndex_]; }
   ID3D12CommandAllocator* GetCurrentComputeCommandAllocator()const { return pComputeCommandAllocators_[ComputeCommandBufferIndex_].Get(); }
   ID3D12GraphicsCommandList* GetCurrentComputeCommandList()const { return pComputeCommandLists_[ComputeCommandBufferIndex_].Get(); }
@@ -245,7 +247,10 @@ private:
   const D3D12_BLEND_DESC& GetBlendDesc(const vdl::BlendState& _BlendState);
   const D3D12_DEPTH_STENCIL_DESC& GetDepthStecilDesc(const vdl::DepthStencilState& _DepthStencilState);
   const D3D12_RASTERIZER_DESC& GetRasterizerDesc(const vdl::RasterizerState& _RasterizerState);
+  ID3D12DescriptorHeap* GetShaderResourceDescriptorHeap(const vdl::ShaderResource& _ShaderResource, ID3D12GraphicsCommandList* _pCommandList);
   ID3D12DescriptorHeap* GetSamplerDescriptorHeap(const vdl::Sampler& _Sampler);
+  ID3D12DescriptorHeap* GetConstantBufferDescriptorHeap(const vdl::Detail::ConstantBufferData& _ConstantBuffer);
+  ID3D12DescriptorHeap* GetUnorderedAccessObjectDescriptorHeap(const vdl::UnorderedAccessObject& _UnorderedAccessObject, ID3D12GraphicsCommandList* _pCommandList);
   vdl::uint GetVertexBufferStride()const;
   vdl::uint GetInstanceBufferStride()const;
 public:

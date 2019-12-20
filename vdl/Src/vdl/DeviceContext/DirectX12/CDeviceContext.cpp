@@ -350,18 +350,12 @@ namespace
 
     return D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED;
   }
-
-  struct DescriptorData
-  {
-    D3D12_CPU_DESCRIPTOR_HANDLE CPUDescriptorHandle;
-    vdl::uint Bind;
-  };
 }
 
 void CDeviceContext::Initialize()
 {
-  pDevice_ = static_cast<CDevice*>(Engine::Get<IDevice>());
-  pSwapChain_ = static_cast<CSwapChain*>(Engine::Get<ISwapChain>());
+  pDevice_ = Cast<CDevice>(Engine::Get<IDevice>());
+  pSwapChain_ = Cast<CSwapChain>(Engine::Get<ISwapChain>());
 
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
@@ -529,29 +523,21 @@ void CDeviceContext::Initialize()
     {
       for (vdl::uint i = 0; i < Constants::kGraphicsCommandBufferNum; ++i)
       {
-        //  コマンドアロケータの作成
-        hr = pD3D12Device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(pGraphicsCommandAllocators_[i].GetAddressOf()));
-        ERROR_CHECK(hr);
-
-        //  コマンドリストの作成
-        hr = pD3D12Device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, pGraphicsCommandAllocators_[i].Get(), nullptr, IID_PPV_ARGS(pGraphicsCommandLists_[i].GetAddressOf()));
-        ERROR_CHECK(hr);
-
-        hr = pGraphicsCommandLists_[i]->Close();
-        ERROR_CHECK(hr);
+        GraphicsCommandLists_[i] = CommandList(pD3D12Device_, D3D12_COMMAND_LIST_TYPE_DIRECT);
       }
 
-      hr = GetCurrentGraphicsCommandList()->Reset(GetCurrentGraphicsCommandAllocator(), nullptr);
-      ERROR_CHECK(hr);
+      CommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
+      pCurrentGraphicsCommandList->Reset();
+      (*pCurrentGraphicsCommandList)->SetGraphicsRootSignature(pGraphicsRootSignature_.Get());
+      ID3D12DescriptorHeap* ppDescriptorHeaps[] = { DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eCBV_SRV_UAV)].GetDescriptorHeap(), DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eSampler)].GetDescriptorHeap() };
+      (*pCurrentGraphicsCommandList)->SetDescriptorHeaps(static_cast<vdl::uint>(vdl::Macro::ArraySize(ppDescriptorHeaps)), ppDescriptorHeaps);
     }
 
     //  フェンスの作成
+    for (auto& GraphicsSyncState : GraphicsSyncStates_)
     {
-      for (auto& GraphicsSyncState : GraphicsSyncStates_)
-      {
-        hr = pD3D12Device_->CreateFence(GraphicsSyncState.Value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(GraphicsSyncState.pFence.GetAddressOf()));
-        ERROR_CHECK(hr);
-      }
+      hr = pD3D12Device_->CreateFence(GraphicsSyncState.Value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(GraphicsSyncState.pFence.GetAddressOf()));
+      ERROR_CHECK(hr);
     }
   }
 
@@ -627,6 +613,8 @@ void CDeviceContext::Initialize()
       }
     }
   }
+
+  pDevice_->CreateDescriptorHeap(pDefaultViewDescriptorHeap_.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 #pragma region GraphicsPipeline
@@ -873,7 +861,7 @@ void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture
 
   constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
-  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
+  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList()->Get();
 
   CRenderTexture* pRenderTexture = GetD3D12RenderTexture(_RenderTexture);
   if (pRenderTexture->TextureData.ResourceState != kResourceState)
@@ -900,7 +888,7 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
 
   constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
-  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
+  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList()->Get();
 
   const vdl::ID TextureID = _DepthStencilTexture.GetID();
   CDepthStencilTexture* pDepthStencilTexture = Cast<CDepthStencilTexture>(pTextureManager_->GetTexture(TextureID));
@@ -927,7 +915,7 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
 
   constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
-  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
+  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList()->Get();
 
   const vdl::ID TextureID = _UnorderedAccessTexture.GetID();
   CUnorderedAccessTexture* pUnorderedAccessTexture = Cast<CUnorderedAccessTexture>(pTextureManager_->GetTexture(TextureID));
@@ -953,14 +941,14 @@ void CDeviceContext::Draw(vdl::uint _VertexCount, vdl::uint _InstanceCount, vdl:
 {
   PreprocessingDraw();
 
-  GetCurrentGraphicsCommandList()->DrawInstanced(_VertexCount, _InstanceCount, _FirstVertex, _FirstInstance);
+  (*GetCurrentGraphicsCommandList())->DrawInstanced(_VertexCount, _InstanceCount, _FirstVertex, _FirstInstance);
 }
 
 void CDeviceContext::DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount, vdl::uint _FirstIndex, vdl::uint _VertexOffset, vdl::uint _FirstInstance)
 {
   PreprocessingDraw();
 
-  GetCurrentGraphicsCommandList()->DrawIndexedInstanced(_IndexCount, _InstanceCount, _FirstIndex, _VertexOffset, _FirstInstance);
+  (*GetCurrentGraphicsCommandList())->DrawIndexedInstanced(_IndexCount, _InstanceCount, _FirstIndex, _VertexOffset, _FirstInstance);
 }
 
 void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ)
@@ -981,7 +969,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
   ID3D12DescriptorHeap* ppDescriptorHeaps[] = { DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eCBV_SRV_UAV)].GetDescriptorHeap(), DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eSampler)].GetDescriptorHeap() };
   pCurrentComputeCommandList->SetDescriptorHeaps(static_cast<vdl::uint>(vdl::Macro::ArraySize(ppDescriptorHeaps)), ppDescriptorHeaps);
 
-  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
+  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList()->Get();
 
   //  SetDescriptor
   {
@@ -990,155 +978,56 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
       const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(CurrentComputeState_.ShaderResources.size());
 
       //  データの読み込み
-      std::vector<DescriptorData> ShaderResouceDatas;
+      std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> ShaderResourceDatas(ShaderResourceNum);
       {
         for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
         {
-          const vdl::ShaderResource& ShaderResource = CurrentComputeState_.ShaderResources[ShaderResourceCount];
-
-          ITexture* pTexture = nullptr;
+          ID3D12DescriptorHeap* pShaderResourceDescriptorHeap = GetShaderResourceDescriptorHeap(CurrentComputeState_.ShaderResources[ShaderResourceCount], pCurrentGraphicsCommandList);
           {
-            if (std::get_if<vdl::Texture>(&ShaderResource))
+            //  取得できなかった場合デフォルトを使用
+            if (!pShaderResourceDescriptorHeap)
             {
-              const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
-              if (!Texture.isEmpty())
-              {
-                pTexture = pTextureManager_->GetTexture(Texture.GetID());
-              }
-            }
-            else if (std::get_if<vdl::CubeTexture>(&ShaderResource))
-            {
-              const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(ShaderResource);
-              if (!CubeTexture.isEmpty())
-              {
-                pTexture = pTextureManager_->GetTexture(CubeTexture.GetID());
-              }
+              pShaderResourceDescriptorHeap = pDefaultViewDescriptorHeap_.Get();
             }
           }
 
-          //  Texture
-          if (pTexture)
-          {
-            DescriptorData& ShaderResouceData = ShaderResouceDatas.emplace_back();
-            {
-              ShaderResouceData.Bind = ShaderResourceCount;
-            }
-
-            constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-
-            switch (pTexture->GetType())
-            {
-            case TextureType::eDepthStencilTexture:
-              assert(false);
-            case TextureType::eDepthTexture:
-            {
-              CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
-              if (pDepthTexture->pParent->TextureData.ResourceState != kResourceState)
-              {
-                pDepthTexture->pParent->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
-              }
-              ShaderResouceData.CPUDescriptorHandle = pDepthTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-            }
-            break;
-            case TextureType::eStencilTexture:
-            {
-              CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
-              if (pStencilTexture->pParent->TextureData.ResourceState != kResourceState)
-              {
-                pStencilTexture->pParent->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
-              }
-              ShaderResouceData.CPUDescriptorHandle = pStencilTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-            }
-            break;
-            default:
-            {
-              CTexture* pColorTexture = Cast<CTexture>(pTexture);
-              if (pColorTexture->TextureData.ResourceState != kResourceState)
-              {
-                pColorTexture->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
-              }
-              ShaderResouceData.CPUDescriptorHandle = pColorTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-            }
-            break;
-            }
-          }
-          //  UnorderedAccessBuffer
-          else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
-          {
-            const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(ShaderResource);
-
-            if (!UnorderedAccessBuffer.isEmpty())
-            {
-              CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
-
-              DescriptorData& ShaderResouceData = ShaderResouceDatas.emplace_back();
-              {
-                ShaderResouceData.Bind = ShaderResourceCount;
-                ShaderResouceData.CPUDescriptorHandle = pUnorderedAccessBuffer->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-              }
-            }
-          }
+          ShaderResourceDatas[ShaderResourceCount] = pShaderResourceDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
         }
       }
 
-      if (!ShaderResouceDatas.empty())
-      {
-        constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
-        DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
+      constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
+      DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
+      const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(ShaderResourceNum);
 
-        const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(ShaderResourceNum);
+      pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset), &ShaderResourceNum,
+        ShaderResourceNum, ShaderResourceDatas.data(), nullptr, Cast(kDescriptorHeapType));
 
-        const D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle = DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset);
-        const vdl::uint DescriptorIncrementSize = DescriptorHeap.GetDescriptorIncrementSize();
+      constexpr DescriptorType kDescriptorType = DescriptorType::eShaderResource;
+      pCurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
 
-        for (auto& ShaderResouceData : ShaderResouceDatas)
-        {
-          D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptorHandle = DescriptorHandle;
-          DestDescriptorHandle.ptr += DescriptorIncrementSize * ShaderResouceData.Bind;
-
-          pD3D12Device_->CopyDescriptorsSimple(1, DestDescriptorHandle, ShaderResouceData.CPUDescriptorHandle, Cast(kDescriptorHeapType));
-        }
-
-        constexpr DescriptorType kDescriptorType = DescriptorType::eShaderResource;
-        pCurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
-
-        pCurrentComputeReserveData->ShaderResources = CurrentComputeState_.ShaderResources;
-      }
+      pCurrentComputeReserveData->ShaderResources = CurrentComputeState_.ShaderResources;
     }
 
     //  SetSampler
     {
       const vdl::uint SamplerNum = static_cast<vdl::uint>(CurrentComputeState_.Samplers.size());
-
-      //  データの読み込み
-      std::vector<DescriptorData> SamplerDatas;
+      if (SamplerNum)
       {
-        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+        //  データの読み込み
+        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> SamplerDatas(SamplerNum);
         {
-          DescriptorData& SamplerData = SamplerDatas.emplace_back();
+          for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
           {
-            SamplerData.CPUDescriptorHandle = GetSamplerDescriptorHeap(CurrentComputeState_.Samplers[SamplerCount])->GetCPUDescriptorHandleForHeapStart();
-            SamplerData.Bind = SamplerCount;
+            SamplerDatas[SamplerCount] = GetSamplerDescriptorHeap(CurrentComputeState_.Samplers[SamplerCount])->GetCPUDescriptorHandleForHeapStart();
           }
         }
-      }
 
-      if (!SamplerDatas.empty())
-      {
         constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eSampler;
         DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
         const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(SamplerNum);
 
-        const D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle = DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset);
-        const vdl::uint DescriptorIncrementSize = DescriptorHeap.GetDescriptorIncrementSize();
-
-        for (auto& SamplerData : SamplerDatas)
-        {
-          D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptorHandle = DescriptorHandle;
-          DestDescriptorHandle.ptr += DescriptorIncrementSize * SamplerData.Bind;
-
-          pD3D12Device_->CopyDescriptorsSimple(1, DestDescriptorHandle, SamplerData.CPUDescriptorHandle, Cast(kDescriptorHeapType));
-        }
+        pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset), &SamplerNum,
+          SamplerNum, SamplerDatas.data(), nullptr, Cast(kDescriptorHeapType));
 
         constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
         pCurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
@@ -1150,48 +1039,34 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(CurrentComputeState_.ConstantBuffers.size());
 
       //  データの読み込み
-      std::vector<DescriptorData> ConstantBufferDatas;
+      std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> ConstantBufferDatas(ConstantBufferNum);
       {
         for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
         {
-          const vdl::Detail::ConstantBufferData& ConstantBuffer = CurrentComputeState_.ConstantBuffers[ConstantBufferCount];
-          if (ConstantBuffer.isEmpty())
+          ID3D12DescriptorHeap* pDescriptorHeap = GetConstantBufferDescriptorHeap(CurrentComputeState_.ConstantBuffers[ConstantBufferCount]);
           {
-            continue;
+            //  取得できなかった場合デフォルトを使用
+            if (!pDescriptorHeap)
+            {
+              pDescriptorHeap = pDefaultViewDescriptorHeap_.Get();
+            }
           }
 
-          CCopyConstantBuffer* pConstantBuffer = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(ConstantBuffer.GetID()));
-
-          DescriptorData& BufferData = ConstantBufferDatas.emplace_back();
-          {
-            BufferData.CPUDescriptorHandle = pConstantBuffer->pConstantBufferViewHeap->GetCPUDescriptorHandleForHeapStart();
-            BufferData.Bind = ConstantBufferCount;
-          }
+          ConstantBufferDatas[ConstantBufferCount] = pDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
         }
       }
 
-      if (!ConstantBufferDatas.empty())
-      {
-        constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
-        DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
-        const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(ConstantBufferNum);
+      constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
+      DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
+      const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(ConstantBufferNum);
 
-        const D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle = DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset);
-        const vdl::uint DescriptorIncrementSize = DescriptorHeap.GetDescriptorIncrementSize();
+      pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset), &ConstantBufferNum,
+        ConstantBufferNum, ConstantBufferDatas.data(), nullptr, Cast(kDescriptorHeapType));
 
-        for (auto& ConstantBufferData : ConstantBufferDatas)
-        {
-          D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptorHandle = DescriptorHandle;
-          DestDescriptorHandle.ptr += DescriptorIncrementSize * ConstantBufferData.Bind;
+      constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
+      pCurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
 
-          pD3D12Device_->CopyDescriptorsSimple(1, DestDescriptorHandle, ConstantBufferData.CPUDescriptorHandle, Cast(kDescriptorHeapType));
-        }
-
-        constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
-        pCurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
-
-        pCurrentComputeReserveData->ConstantBuffers = CurrentComputeState_.ConstantBuffers;
-      }
+      pCurrentComputeReserveData->ConstantBuffers = CurrentComputeState_.ConstantBuffers;
     }
 
     //  SetUnorderedAccessObject
@@ -1199,73 +1074,34 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
       const vdl::uint UnorderedAccessObjectNum = static_cast<vdl::uint>(CurrentComputeState_.UnorderedAccessObjects.size());
 
       //  データの読み込み
-      std::vector<DescriptorData> UnorderedAccessObjectDatas;
+      std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> UnorderedAccessObjectDatas(UnorderedAccessObjectNum);
       {
         for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
         {
-          const vdl::UnorderedAccessObject& UnorderedAccessObject = CurrentComputeState_.UnorderedAccessObjects[UnorderedAccessObjectCount];
-
-          //  UnorderedAccessTexture
-          if (std::get_if<vdl::UnorderedAccessTexture>(&UnorderedAccessObject))
+          ID3D12DescriptorHeap* pUnorderedAccessObjectDescriptorHeap = GetUnorderedAccessObjectDescriptorHeap(CurrentComputeState_.UnorderedAccessObjects[UnorderedAccessObjectCount], pCurrentGraphicsCommandList);
           {
-            const vdl::UnorderedAccessTexture& UnorderedAccessTexture = std::get<vdl::UnorderedAccessTexture>(UnorderedAccessObject);
-            if (!UnorderedAccessTexture.isEmpty())
+            //  取得できなかった場合デフォルトを使用
+            if (!pUnorderedAccessObjectDescriptorHeap)
             {
-              DescriptorData& UnorderedAccessObjectData = UnorderedAccessObjectDatas.emplace_back();
-              {
-                UnorderedAccessObjectData.Bind = UnorderedAccessObjectCount;
-              }
-
-              constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-
-              CTexture* pTexture = Cast<CTexture>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()));
-              if (pTexture->TextureData.ResourceState != kResourceState)
-              {
-                pTexture->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
-              }
-              UnorderedAccessObjectData.CPUDescriptorHandle = pTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
+              pUnorderedAccessObjectDescriptorHeap = pDefaultViewDescriptorHeap_.Get();
             }
           }
-          //  UnorderedAccessBuffer
-          else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&UnorderedAccessObject))
-          {
-            const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(UnorderedAccessObject);
-            if (!UnorderedAccessBuffer.isEmpty())
-            {
-              CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
 
-              DescriptorData& UnorderedAccessObjectData = UnorderedAccessObjectDatas.emplace_back();
-              {
-                UnorderedAccessObjectData.Bind = UnorderedAccessObjectCount;
-                UnorderedAccessObjectData.CPUDescriptorHandle = pUnorderedAccessBuffer->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-              }
-            }
-          }
+          UnorderedAccessObjectDatas[UnorderedAccessObjectCount] = pUnorderedAccessObjectDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
         }
       }
 
-      if (!UnorderedAccessObjectDatas.empty())
-      {
-        constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
-        DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
-        const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(UnorderedAccessObjectNum);
+      constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
+      DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
+      const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(UnorderedAccessObjectNum);
 
-        const D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle = DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset);
-        const vdl::uint DescriptorIncrementSize = DescriptorHeap.GetDescriptorIncrementSize();
+      pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset), &UnorderedAccessObjectNum,
+        UnorderedAccessObjectNum, UnorderedAccessObjectDatas.data(), nullptr, Cast(kDescriptorHeapType));
 
-        for (auto& UnorderedAccessObjectData : UnorderedAccessObjectDatas)
-        {
-          D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptorHandle = DescriptorHandle;
-          DestDescriptorHandle.ptr += DescriptorIncrementSize * UnorderedAccessObjectData.Bind;
+      constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessObject;
+      pCurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
 
-          pD3D12Device_->CopyDescriptorsSimple(1, DestDescriptorHandle, UnorderedAccessObjectData.CPUDescriptorHandle, Cast(kDescriptorHeapType));
-        }
-
-        constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessObject;
-        pCurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
-
-        pCurrentComputeReserveData->UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
-      }
+      pCurrentComputeReserveData->UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
     }
   }
 
@@ -1315,11 +1151,8 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
 void CDeviceContext::Flush()
 {
-  HRESULT hr = S_OK;
-
-  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
-  hr = pCurrentGraphicsCommandList->Close();
-  ERROR_CHECK(hr);
+  CommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
+  pCurrentGraphicsCommandList->Close();
 
   //  コンピュートパイプラインの待機
   if (pLastComputeSyncState_)
@@ -1328,7 +1161,7 @@ void CDeviceContext::Flush()
     pLastComputeSyncState_ = nullptr;
   }
 
-  ID3D12CommandList* pCurrentCommandList = pCurrentGraphicsCommandList;
+  ID3D12CommandList* pCurrentCommandList = pCurrentGraphicsCommandList->Get();
   pGraphicsCommandQueue_->ExecuteCommandLists(1, &pCurrentCommandList);
 
   SingnalFence(pGraphicsCommandQueue_.Get(), &GraphicsSyncStates_[GraphicsCommandBufferIndex_]);
@@ -1341,20 +1174,17 @@ void CDeviceContext::Flush()
   pCurrentGraphicsReseveData->PipelineStates.resize(1);
   pCurrentGraphicsReseveData->PipelineStates[0] = std::move(pCurrentGraphicsReseveData->PipelineStates.back());
 
-  ID3D12CommandAllocator* pCommandAllocator = GetCurrentGraphicsCommandAllocator();
-  hr = pCommandAllocator->Reset();
-  ERROR_CHECK(hr);
-
-  hr = GetCurrentGraphicsCommandList()->Reset(pCommandAllocator, pCurrentGraphicsReseveData->PipelineStates[0].Get());
-  ERROR_CHECK(hr);
-  GraphicsCommandListState_ = CommandListState::eIdle;
+  GetCurrentGraphicsCommandList()->Reset(pCurrentGraphicsReseveData->PipelineStates[0].Get());
+  (*GetCurrentGraphicsCommandList())->SetGraphicsRootSignature(pGraphicsRootSignature_.Get());
+  ID3D12DescriptorHeap* ppDescriptorHeaps[] = { DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eCBV_SRV_UAV)].GetDescriptorHeap(), DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eSampler)].GetDescriptorHeap() };
+  (*GetCurrentGraphicsCommandList())->SetDescriptorHeaps(static_cast<vdl::uint>(vdl::Macro::ArraySize(ppDescriptorHeaps)), ppDescriptorHeaps);
 }
 
 //--------------------------------------------------
 
 void CDeviceContext::Present()
 {
-  pSwapChain_->GetD3D12RenderTexture()->TextureData.TransitionResourceBarrier(GetCurrentGraphicsCommandList(), D3D12_RESOURCE_STATE_PRESENT);
+  pSwapChain_->GetD3D12RenderTexture()->TextureData.TransitionResourceBarrier(GetCurrentGraphicsCommandList()->Get(), D3D12_RESOURCE_STATE_PRESENT);
 
   Flush();
 
@@ -1370,15 +1200,7 @@ void CDeviceContext::PreprocessingDraw()
 {
   HRESULT hr = S_OK;
 
-  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
-
-  if (GraphicsCommandListState_ == CommandListState::eIdle)
-  {
-    pCurrentGraphicsCommandList->SetGraphicsRootSignature(pGraphicsRootSignature_.Get());
-    ID3D12DescriptorHeap* ppDescriptorHeaps[] = { DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eCBV_SRV_UAV)].GetDescriptorHeap(), DescriptorHeaps_[static_cast<vdl::uint>(DescriptorHeapType::eSampler)].GetDescriptorHeap() };
-    pCurrentGraphicsCommandList->SetDescriptorHeaps(static_cast<vdl::uint>(vdl::Macro::ArraySize(ppDescriptorHeaps)), ppDescriptorHeaps);
-    GraphicsCommandListState_ = CommandListState::eBegin;
-  }
+  ID3D12GraphicsCommandList* pCurrentGraphicsCommandList = GetCurrentGraphicsCommandList()->Get();
 
   //  シザーが無効の時に強制的に設定する
   if (!CurrentGraphicsState_.RasterizerState.ScissorEnable)
@@ -1472,117 +1294,29 @@ void CDeviceContext::PreprocessingDraw()
         const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(ShaderResources.size());
 
         //  データの読み込み
-        std::vector<DescriptorData> ShaderResouceDatas;
+        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> ShaderResourceDatas(ShaderResourceNum);
         {
           for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
           {
-            const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
-
-            ITexture* pTexture = nullptr;
+            ID3D12DescriptorHeap* pShaderResourceDescriptorHeap = GetShaderResourceDescriptorHeap(ShaderResources[ShaderResourceCount], pCurrentGraphicsCommandList);
             {
-              if (std::get_if<vdl::Texture>(&ShaderResource))
+              //  取得できなかった場合デフォルトを使用
+              if (!pShaderResourceDescriptorHeap)
               {
-                const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
-                if (!Texture.isEmpty())
-                {
-                  pTexture = pTextureManager_->GetTexture(Texture.GetID());
-                }
-              }
-              else if (std::get_if<vdl::CubeTexture>(&ShaderResource))
-              {
-                const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(ShaderResource);
-                if (!CubeTexture.isEmpty())
-                {
-                  pTexture = pTextureManager_->GetTexture(CubeTexture.GetID());
-                }
+                pShaderResourceDescriptorHeap = pDefaultViewDescriptorHeap_.Get();
               }
             }
 
-            //  Texture
-            if (pTexture)
-            {
-              DescriptorData& ShaderResouceData = ShaderResouceDatas.emplace_back();
-              {
-                ShaderResouceData.Bind = ShaderResourceCount;
-              }
-
-              constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-
-              switch (pTexture->GetType())
-              {
-              case TextureType::eDepthStencilTexture:
-                assert(false);
-              case TextureType::eDepthTexture:
-              {
-                CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
-                if (pDepthTexture->pParent->TextureData.ResourceState != kResourceState)
-                {
-                  pDepthTexture->pParent->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
-                }
-                ShaderResouceData.CPUDescriptorHandle = pDepthTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-              }
-              break;
-              case TextureType::eStencilTexture:
-              {
-                CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
-                if (pStencilTexture->pParent->TextureData.ResourceState != kResourceState)
-                {
-                  pStencilTexture->pParent->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
-                }
-                ShaderResouceData.CPUDescriptorHandle = pStencilTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-              }
-              break;
-              default:
-              {
-                CTexture* pColorTexture = Cast<CTexture>(pTexture);
-                if (pColorTexture->TextureData.ResourceState != kResourceState)
-                {
-                  pColorTexture->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
-                }
-                ShaderResouceData.CPUDescriptorHandle = pColorTexture->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-              }
-              break;
-              }
-            }
-            //  UnorderedAccessBuffer
-            else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
-            {
-              const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(ShaderResource);
-
-              if (!UnorderedAccessBuffer.isEmpty())
-              {
-                CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
-
-                DescriptorData& ShaderResouceData = ShaderResouceDatas.emplace_back();
-                {
-                  ShaderResouceData.Bind = ShaderResourceCount;
-                  ShaderResouceData.CPUDescriptorHandle = pUnorderedAccessBuffer->pShaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart();
-                }
-              }
-            }
+            ShaderResourceDatas[ShaderResourceCount] = pShaderResourceDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
           }
-        }
-
-        if (ShaderResouceDatas.empty())
-        {
-          return;
         }
 
         constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
         DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
-
         const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(ShaderResourceNum);
 
-        const D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle = DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset);
-        const vdl::uint DescriptorIncrementSize = DescriptorHeap.GetDescriptorIncrementSize();
-
-        for (auto& ShaderResouceData : ShaderResouceDatas)
-        {
-          D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptorHandle = DescriptorHandle;
-          DestDescriptorHandle.ptr += DescriptorIncrementSize * ShaderResouceData.Bind;
-
-          pD3D12Device_->CopyDescriptorsSimple(1, DestDescriptorHandle, ShaderResouceData.CPUDescriptorHandle, Cast(kDescriptorHeapType));
-        }
+        pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset), &ShaderResourceNum,
+          ShaderResourceNum, ShaderResourceDatas.data(), nullptr, Cast(kDescriptorHeapType));
 
         constexpr DescriptorType kDescriptorType = DescriptorType::eShaderResource;
         pCurrentGraphicsCommandList->SetGraphicsRootDescriptorTable(GetDescriptorOffset(_Type, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
@@ -1624,37 +1358,20 @@ void CDeviceContext::PreprocessingDraw()
         const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
 
         //  データの読み込み
-        std::vector<DescriptorData> SamplerDatas;
+        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> SamplerDatas(SamplerNum);
         {
           for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
           {
-            DescriptorData& SamplerData = SamplerDatas.emplace_back();
-            {
-              SamplerData.CPUDescriptorHandle = GetSamplerDescriptorHeap(Samplers[SamplerCount])->GetCPUDescriptorHandleForHeapStart();
-              SamplerData.Bind = SamplerCount;
-            }
+            SamplerDatas[SamplerCount] = GetSamplerDescriptorHeap(Samplers[SamplerCount])->GetCPUDescriptorHandleForHeapStart();
           }
-        }
-
-        if (SamplerDatas.empty())
-        {
-          return;
         }
 
         constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eSampler;
         DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
         const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(SamplerNum);
 
-        const D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle = DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset);
-        const vdl::uint DescriptorIncrementSize = DescriptorHeap.GetDescriptorIncrementSize();
-
-        for (auto& SamplerData : SamplerDatas)
-        {
-          D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptorHandle = DescriptorHandle;
-          DestDescriptorHandle.ptr += DescriptorIncrementSize * SamplerData.Bind;
-
-          pD3D12Device_->CopyDescriptorsSimple(1, DestDescriptorHandle, SamplerData.CPUDescriptorHandle, Cast(kDescriptorHeapType));
-        }
+        pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset), &SamplerNum,
+          SamplerNum, SamplerDatas.data(), nullptr, Cast(kDescriptorHeapType));
 
         constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
         pCurrentGraphicsCommandList->SetGraphicsRootDescriptorTable(GetDescriptorOffset(_Type, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
@@ -1694,44 +1411,29 @@ void CDeviceContext::PreprocessingDraw()
         const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
 
         //  データの読み込み
-        std::vector<DescriptorData> ConstantBufferDatas;
+        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> ConstantBufferDatas(ConstantBufferNum);
         {
           for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
           {
-            if (ConstantBuffers[ConstantBufferCount].isEmpty())
+            ID3D12DescriptorHeap* pDescriptorHeap = GetConstantBufferDescriptorHeap(ConstantBuffers[ConstantBufferCount]);
             {
-              continue;
+              //  取得できなかった場合デフォルトを使用
+              if (!pDescriptorHeap)
+              {
+                pDescriptorHeap = pDefaultViewDescriptorHeap_.Get();
+              }
             }
 
-            CCopyConstantBuffer* pConstantBuffer = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
-
-            DescriptorData& BufferData = ConstantBufferDatas.emplace_back();
-            {
-              BufferData.CPUDescriptorHandle = pConstantBuffer->pConstantBufferViewHeap->GetCPUDescriptorHandleForHeapStart();
-              BufferData.Bind = ConstantBufferCount;
-            }
+            ConstantBufferDatas[ConstantBufferCount] = pDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
           }
-        }
-
-        if (ConstantBufferDatas.empty())
-        {
-          return;
         }
 
         constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
         DescriptorHeap& DescriptorHeap = DescriptorHeaps_[static_cast<vdl::uint>(kDescriptorHeapType)];
         const vdl::uint DescriptorHeapOffset = DescriptorHeap.Secure(ConstantBufferNum);
 
-        const D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle = DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset);
-        const vdl::uint DescriptorIncrementSize = DescriptorHeap.GetDescriptorIncrementSize();
-
-        for (auto& ConstantBufferData : ConstantBufferDatas)
-        {
-          D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptorHandle = DescriptorHandle;
-          DestDescriptorHandle.ptr += DescriptorIncrementSize * ConstantBufferData.Bind;
-
-          pD3D12Device_->CopyDescriptorsSimple(1, DestDescriptorHandle, ConstantBufferData.CPUDescriptorHandle, Cast(kDescriptorHeapType));
-        }
+        pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.GetCPUDescriptorHandle(DescriptorHeapOffset), &ConstantBufferNum,
+          ConstantBufferNum, ConstantBufferDatas.data(), nullptr, Cast(kDescriptorHeapType));
 
         constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
         pCurrentGraphicsCommandList->SetGraphicsRootDescriptorTable(GetDescriptorOffset(_Type, kDescriptorType), DescriptorHeap.GetGPUDescriptorHandle(DescriptorHeapOffset));
@@ -1832,7 +1534,6 @@ void CDeviceContext::PreprocessingDraw()
         {
           pRenderTexture->TextureData.TransitionResourceBarrier(pCurrentGraphicsCommandList, kResourceState);
         }
-
         RenderTargetDescriptors[RenderTextureCount] = pRenderTexture->pRenderTargetViewHeap->GetCPUDescriptorHandleForHeapStart();
       }
     }
@@ -1968,6 +1669,89 @@ const D3D12_RASTERIZER_DESC& CDeviceContext::GetRasterizerDesc(const vdl::Raster
   return RasterizerStates_.at(_RasterizerState);
 }
 
+ID3D12DescriptorHeap* CDeviceContext::GetShaderResourceDescriptorHeap(const vdl::ShaderResource& _ShaderResource, ID3D12GraphicsCommandList* _pCommandList)
+{
+  ID3D12DescriptorHeap* pDescriptorHeap = nullptr;
+  {
+    constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+    //  Texture
+    if (const vdl::Texture* pShaderResource = std::get_if<vdl::Texture>(&_ShaderResource))
+    {
+      if (!pShaderResource->isEmpty())
+      {
+        ITexture* pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+
+        switch (pTexture->GetType())
+        {
+        case TextureType::eDepthStencilTexture:
+        case TextureType::eSwapChainRenderTexture:
+          assert(false);
+        case TextureType::eDepthTexture:
+        {
+          CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
+          if (pDepthTexture->pParent->TextureData.ResourceState != kResourceState)
+          {
+            pDepthTexture->pParent->TextureData.TransitionResourceBarrier(_pCommandList, kResourceState);
+          }
+          pDescriptorHeap = pDepthTexture->pShaderResourceViewHeap.Get();
+        }
+        break;
+        case TextureType::eStencilTexture:
+        {
+          CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
+          if (pStencilTexture->pParent->TextureData.ResourceState != kResourceState)
+          {
+            pStencilTexture->pParent->TextureData.TransitionResourceBarrier(_pCommandList, kResourceState);
+          }
+          pDescriptorHeap = pStencilTexture->pShaderResourceViewHeap.Get();
+        }
+        break;
+        default:
+        {
+          CTexture* pColorTexture = Cast<CTexture>(pTexture);
+          if (pColorTexture->TextureData.ResourceState != kResourceState)
+          {
+            pColorTexture->TextureData.TransitionResourceBarrier(_pCommandList, kResourceState);
+          }
+          pDescriptorHeap = pColorTexture->pShaderResourceViewHeap.Get();
+        }
+        break;
+        }
+      }
+    }
+    //  CubeTexture
+    if (const vdl::CubeTexture* pShaderResource = std::get_if<vdl::CubeTexture>(&_ShaderResource))
+    {
+      if (!pShaderResource->isEmpty())
+      {
+        CCubeTexture* pCubeTexture = Cast<CCubeTexture>(pTextureManager_->GetTexture(pShaderResource->GetID()));
+        if (pCubeTexture->TextureData.ResourceState != kResourceState)
+        {
+          pCubeTexture->TextureData.TransitionResourceBarrier(_pCommandList, kResourceState);
+        }
+        pDescriptorHeap = pCubeTexture->pShaderResourceViewHeap.Get();
+      }
+    }
+    //  UnorderedAccessBuffer
+    else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_ShaderResource))
+    {
+      if (!pShaderResource->isEmpty())
+      {
+        CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(pShaderResource->GetID()));
+        if (pUnorderedAccessBuffer->ResourceState != kResourceState)
+        {
+          CTexture::TransitionResourceBarrier(_pCommandList, pUnorderedAccessBuffer->BufferData.pResource.Get(), pUnorderedAccessBuffer->ResourceState, kResourceState);
+          pUnorderedAccessBuffer->ResourceState = kResourceState;
+        }
+        pDescriptorHeap = pUnorderedAccessBuffer->pShaderResourceViewHeap.Get();
+      }
+    }
+  }
+
+  return pDescriptorHeap;
+}
+
 ID3D12DescriptorHeap* CDeviceContext::GetSamplerDescriptorHeap(const vdl::Sampler& _Sampler)
 {
   if (Samplers_.find(_Sampler) == Samplers_.end())
@@ -1995,6 +1779,57 @@ ID3D12DescriptorHeap* CDeviceContext::GetSamplerDescriptorHeap(const vdl::Sample
   }
 
   return Samplers_.at(_Sampler).Get();
+}
+
+ID3D12DescriptorHeap* CDeviceContext::GetConstantBufferDescriptorHeap(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
+{
+  ID3D12DescriptorHeap* pDescriptorHeap = nullptr;
+  {
+    if (!_ConstantBuffer.isEmpty())
+    {
+      pDescriptorHeap = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()))->pConstantBufferViewHeap.Get();
+    }
+  }
+
+  return pDescriptorHeap;
+}
+
+ID3D12DescriptorHeap* CDeviceContext::GetUnorderedAccessObjectDescriptorHeap(const vdl::UnorderedAccessObject& _UnorderedAccessObject, ID3D12GraphicsCommandList* _pCommandList)
+{
+  ID3D12DescriptorHeap* pDescriptorHeap = nullptr;
+  {
+    constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+
+    //  UnorderedAccessTexture
+    if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = std::get_if<vdl::UnorderedAccessTexture>(&_UnorderedAccessObject))
+    {
+      if (!pUnorderedAccessObject->isEmpty())
+      {
+        CUnorderedAccessTexture* pCUnorderedAccessTexture = Cast<CUnorderedAccessTexture>(pTextureManager_->GetTexture(pUnorderedAccessObject->GetID()));
+        if (pCUnorderedAccessTexture->TextureData.ResourceState != kResourceState)
+        {
+          pCUnorderedAccessTexture->TextureData.TransitionResourceBarrier(_pCommandList, kResourceState);
+        }
+        pDescriptorHeap = pCUnorderedAccessTexture->pUnorderedAccessViewHeap.Get();
+      }
+    }
+    //  UnorderedAccessBuffer
+    else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessObject = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_UnorderedAccessObject))
+    {
+      if (!pUnorderedAccessObject->isEmpty())
+      {
+        CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(pUnorderedAccessObject->GetID()));
+        if (pUnorderedAccessBuffer->ResourceState != kResourceState)
+        {
+          CTexture::TransitionResourceBarrier(_pCommandList, pUnorderedAccessBuffer->BufferData.pResource.Get(), pUnorderedAccessBuffer->ResourceState, kResourceState);
+          pUnorderedAccessBuffer->ResourceState = kResourceState;
+        }
+        pDescriptorHeap = pUnorderedAccessBuffer->pUnordererdAccessViewHeap.Get();
+      }
+    }
+  }
+
+  return pDescriptorHeap;
 }
 
 vdl::uint CDeviceContext::GetVertexBufferStride()const

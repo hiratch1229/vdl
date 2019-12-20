@@ -306,6 +306,7 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
   {
     CreateBuffer(&pUnorderedAccessBuffer->BufferData, pUnorderedAccessBuffer->BufferSize, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   }
+  pUnorderedAccessBuffer->ResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
   //  ƒrƒ…[‚Ìì¬
   {
@@ -440,7 +441,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
       CommandList_.Reset();
 
       CommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
-      pTexture->TextureData.TransitionResourceBarrier(CommandList_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+      pTexture->TextureData.TransitionResourceBarrier(CommandList_.Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
       CommandList_.Close();
 
       ExecuteAndWait(CommandList_.Get());
@@ -540,7 +541,7 @@ void CDevice::CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl:
         CommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
       }
 
-      pCubeTexture->TextureData.TransitionResourceBarrier(CommandList_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+      pCubeTexture->TextureData.TransitionResourceBarrier(CommandList_.Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
       CommandList_.Close();
 
       ExecuteAndWait(CommandList_.Get());
@@ -1042,7 +1043,7 @@ void CDevice::CreateResource(ID3D12Resource** _ppResource, const D3D12_RESOURCE_
   ERROR_CHECK(hr);
 }
 
-void CDevice::CreateBuffer(BufferData * _pBufferData, vdl::uint _BufferSize, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState, D3D12_RESOURCE_FLAGS _ResourceFlags)const
+void CDevice::CreateBuffer(BufferData* _pBufferData, vdl::uint _BufferSize, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState, D3D12_RESOURCE_FLAGS _ResourceFlags)const
 {
   assert(_pBufferData);
 

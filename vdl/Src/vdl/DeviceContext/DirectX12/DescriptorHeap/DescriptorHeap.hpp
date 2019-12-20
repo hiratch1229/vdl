@@ -13,7 +13,7 @@ constexpr vdl::uint kDescriptorHeapTypeNum = static_cast<vdl::uint>(DescriptorHe
 
 class DescriptorHeap
 {
-  static constexpr vdl::uint kDescriptorMultipleNum = 1;
+  static constexpr vdl::uint kDescriptorMultipleNum = 20;
 private:
   Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pDescriptorHeap_;
   vdl::uint DescriptorSize_;
