@@ -22,7 +22,7 @@ public:
 
   [[nodiscard]] virtual vdl::ID Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::SkinnedMeshData& _SkinnedMeshData) = 0;
 
-  [[nodiscard]] virtual std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize) = 0;
+  [[nodiscard]] virtual std::vector<vdl::SkinnedMesh> Load(const char* _FilePath) = 0;
 
   virtual void AddRef(const vdl::ID& _ID) = 0;
 

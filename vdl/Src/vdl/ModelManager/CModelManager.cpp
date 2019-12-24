@@ -100,7 +100,7 @@ vdl::ID CModelManager::Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl:
   return Meshes_.Add(pMesh);
 }
 
-std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _isSerialize)
+std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath)
 {
   const std::filesystem::path OriginalFilePath = _FilePath;
   const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
@@ -110,8 +110,7 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
   ModelData ModelData;
   {
     //  バイナリファイルが存在して、元ファイルの更新日時が古い場合読み込み
-    if (_isSerialize
-      && std::filesystem::exists(BinaryFilePath) && !(existOriginalFile && ::isFileUpdate(OriginalFilePath, BinaryFilePath)))
+    if (std::filesystem::exists(BinaryFilePath) && !(existOriginalFile && ::isFileUpdate(OriginalFilePath, BinaryFilePath)))
     {
       ::ImportFromBinary(BinaryFilePath.string().c_str(), ModelData);
     }
@@ -152,17 +151,14 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
         ModelData.Indices = std::move(Indices);
       }
 
-      if (_isSerialize)
+      //  フォルダが存在しない場合作成
+      if (!std::filesystem::exists(BinaryFileDirectory))
       {
-        //  フォルダが存在しない場合作成
-        if (!std::filesystem::exists(BinaryFileDirectory))
-        {
-          std::filesystem::create_directories(BinaryFileDirectory);
-        }
-
-        //  バイナリファイルに書き出し
-        ::ExportToBinary(BinaryFilePath.string().c_str(), ModelData);
+        std::filesystem::create_directories(BinaryFileDirectory);
       }
+
+      //  バイナリファイルに書き出し
+      ::ExportToBinary(BinaryFilePath.string().c_str(), ModelData);
     }
   }
 

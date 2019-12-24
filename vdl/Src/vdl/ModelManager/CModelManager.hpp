@@ -32,7 +32,7 @@ public:
 
   vdl::ID Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl::Indices& _Indices, const vdl::SkinnedMeshData& _SkinnedMeshData)override;
 
-  std::vector<vdl::SkinnedMesh> Load(const char* _FilePath, bool _isSerialize)override;
+  std::vector<vdl::SkinnedMesh> Load(const char* _FilePath)override;
 
   void AddRef(const vdl::ID& _ID)override
   {

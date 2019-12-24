@@ -23,9 +23,9 @@ namespace
 
 namespace vdl
 {
-  Texture::Texture(const char* _FilePath, bool _isSerialize)
+  Texture::Texture(const char* _FilePath)
   {
-    ID_ = Engine::Get<ITextureManager>()->LoadTexture(_FilePath, _isSerialize);
+    ID_ = Engine::Get<ITextureManager>()->LoadTexture(_FilePath);
   }
 
   Texture::Texture(const Image& _Image)
@@ -111,9 +111,9 @@ namespace vdl
 
   //--------------------------------------------------
 
-  CubeTexture::CubeTexture(const char* _FilePath, bool _isSerialize)
+  CubeTexture::CubeTexture(const char* _FilePath)
   {
-    ID_ = Engine::Get<ITextureManager>()->LoadCubeTexture(_FilePath, _isSerialize);
+    ID_ = Engine::Get<ITextureManager>()->LoadCubeTexture(_FilePath);
   }
 
   CubeTexture::CubeTexture(const Image& _Image)

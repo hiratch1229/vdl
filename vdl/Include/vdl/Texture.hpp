@@ -13,7 +13,7 @@ namespace vdl
     Texture() = default;
 
     //  ファイルから作成
-    Texture(const char* _FilePath, bool _isSerialize = true);
+    Texture(const char* _FilePath);
 
     //  データから作成
     Texture(const Image& _Image);
@@ -107,7 +107,7 @@ namespace vdl
     CubeTexture() = default;
 
     //  ファイルから作成
-    CubeTexture(const char* _FilePath, bool _isSerialize = true);
+    CubeTexture(const char* _FilePath);
 
     //  データから作成
     CubeTexture(const Image& _Image);

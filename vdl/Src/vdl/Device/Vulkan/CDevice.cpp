@@ -119,6 +119,85 @@ namespace
     return EShLanguage();
   }
 
+  inline void ComplineShader(std::vector<vdl::uint>* _pCode, ShaderType _Type, const char* _FilePath, const char* _EntryPoint)
+  {
+    const std::filesystem::path OriginalFilePath = _FilePath;
+    const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
+    const std::filesystem::path BinaryFilePath = std::filesystem::path((BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).string() + "_" + std::string(_EntryPoint)).concat(Constants::kShaderBinaryFileFormat);
+    const bool existOriginalFile = std::filesystem::exists(OriginalFilePath);
+
+    //  バイナリファイルが存在して、元ファイルの更新日時が古い場合読み込み
+    if (std::filesystem::exists(BinaryFilePath) && !(existOriginalFile && ::isFileUpdate(OriginalFilePath, BinaryFilePath)))
+    {
+      ::ImportFromBinary(BinaryFilePath.string().c_str(), *_pCode);
+    }
+    else
+    {
+      const EShLanguage Stage = Cast(_Type);
+
+      bool Result = true;
+
+      //  シェーダーファイルのロード
+      std::string Data;
+      {
+        std::ifstream IStream(_FilePath);
+        _ASSERT_EXPR_A(IStream, (std::string(_FilePath) + "が存在しません。").c_str());
+
+        IStream.seekg(0, std::ios::end);
+        Data.reserve(static_cast<std::string::size_type>(IStream.tellg()));
+        IStream.seekg(0, std::ios::beg);
+        Data.assign(std::istreambuf_iterator<char>(IStream), std::istreambuf_iterator<char>());
+      }
+
+      glslang::InitializeProcess();
+
+      const char* pData = Data.data();
+      const int DataSize = static_cast<int>(Data.size());
+
+      //  シェーダーファイルのコンパイル
+      glslang::TShader Shader(Stage);
+      {
+        Shader.setStringsWithLengthsAndNames(&pData, &DataSize, &_FilePath, 1);
+        Shader.setEntryPoint(_EntryPoint);
+        Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, VK_HEADER_VERSION);
+        Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_1);
+        Shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
+
+        DirStackFileIncluder Includer;
+        Result = Shader.parse(&glslang::DefaultTBuiltInResource, VK_HEADER_VERSION, false, kControls, Includer);
+        _ASSERT_EXPR_A(Result, "コンパイル失敗");
+      }
+
+      //  シェーダーファイルのリンク
+      glslang::TProgram Program;
+      {
+        Program.addShader(&Shader);
+
+        Result = Program.link(kControls);
+        _ASSERT_EXPR_A(Result, "シェーダーファイルのリンクに失敗");
+      }
+
+      IntermTraverser IntermTraverser(_Type);
+      Program.buildReflection();
+
+      glslang::TIntermediate* pIntermediate = Program.getIntermediate(Stage);
+      pIntermediate->getTreeRoot()->traverse(&IntermTraverser);
+
+      glslang::GlslangToSpv(*pIntermediate, *_pCode);
+
+      glslang::FinalizeProcess();
+
+      //  フォルダが存在しない場合作成
+      if (!std::filesystem::exists(BinaryFileDirectory))
+      {
+        std::filesystem::create_directories(BinaryFileDirectory);
+      }
+
+      //  バイナリファイルに書き出し
+      ::ExportToBinary(BinaryFilePath.string().c_str(), *_pCode);
+    }
+  }
+
   inline void ComplineShader(std::vector<vdl::uint>* _pCode, ShaderType _Type, const char* _Source, vdl::uint /*_DataSize*/, const char* _EntryPoint)
   {
     const EShLanguage Stage = Cast(_Type);
@@ -137,63 +216,6 @@ namespace
       Shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
 
       Result = Shader.parse(&glslang::DefaultTBuiltInResource, VK_HEADER_VERSION, false, kControls);
-      _ASSERT_EXPR_A(Result, "コンパイル失敗");
-    }
-
-    //  シェーダーファイルのリンク
-    glslang::TProgram Program;
-    {
-      Program.addShader(&Shader);
-
-      Result = Program.link(kControls);
-      _ASSERT_EXPR_A(Result, "シェーダーファイルのリンクに失敗");
-    }
-
-    IntermTraverser IntermTraverser(_Type);
-    Program.buildReflection();
-
-    glslang::TIntermediate* pIntermediate = Program.getIntermediate(Stage);
-    pIntermediate->getTreeRoot()->traverse(&IntermTraverser);
-
-    glslang::GlslangToSpv(*pIntermediate, *_pCode);
-
-    glslang::FinalizeProcess();
-  }
-
-  inline void ComplineShader(std::vector<vdl::uint>* _pCode, ShaderType _Type, const char* _FilePath, const char* _EntryPoint)
-  {
-    const EShLanguage Stage = Cast(_Type);
-
-    bool Result = true;
-
-    //  シェーダーファイルのロード
-    std::string Data;
-    {
-      std::ifstream IStream(_FilePath);
-      _ASSERT_EXPR_A(IStream, (std::string(_FilePath) + "が存在しません。").c_str());
-
-      IStream.seekg(0, std::ios::end);
-      Data.reserve(static_cast<std::string::size_type>(IStream.tellg()));
-      IStream.seekg(0, std::ios::beg);
-      Data.assign(std::istreambuf_iterator<char>(IStream), std::istreambuf_iterator<char>());
-    }
-
-    glslang::InitializeProcess();
-
-    const char* pData = Data.data();
-    const int DataSize = static_cast<int>(Data.size());
-
-    //  シェーダーファイルのコンパイル
-    glslang::TShader Shader(Stage);
-    {
-      Shader.setStringsWithLengthsAndNames(&pData, &DataSize, &_FilePath, 1);
-      Shader.setEntryPoint(_EntryPoint);
-      Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, VK_HEADER_VERSION);
-      Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_1);
-      Shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
-
-      DirStackFileIncluder Includer;
-      Result = Shader.parse(&glslang::DefaultTBuiltInResource, VK_HEADER_VERSION, false, kControls, Includer);
       _ASSERT_EXPR_A(Result, "コンパイル失敗");
     }
 

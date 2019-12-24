@@ -56,7 +56,7 @@ namespace vdl
     Model() = default;
 
     //  ƒtƒ@ƒCƒ‹‚©‚çì¬
-    Model(const char* _FilePath, bool _isSerialize = true);
+    Model(const char* _FilePath);
 
     Model(const StaticModelData& _StaticModelData);
 

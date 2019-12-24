@@ -93,9 +93,9 @@ namespace vdl
 
   //--------------------------------------------------
 
-  Model::Model(const char* _FilePath, bool _isSerialize)
+  Model::Model(const char* _FilePath)
   {
-    Meshes_ = Engine::Get<IModelManager>()->Load(_FilePath, _isSerialize);
+    Meshes_ = Engine::Get<IModelManager>()->Load(_FilePath);
   }
 
   Model::Model(const StaticModelData& _StaticModelData)

@@ -10,7 +10,7 @@ class CTextureManager : public ITextureManager
   IDevice* pDevice_;
   ReferenceCounts<ITexture> Textures_;
 private:
-  vdl::Image GetImageFromFilePath(const char* _FilePath, bool _isSerialize)const;
+  vdl::Image GetImageFromFilePath(const char* _FilePath)const;
 public:
   CTextureManager() = default;
 
@@ -18,11 +18,11 @@ public:
 
   void Initialize()override;
 
-  vdl::ID LoadTexture(const char* _FilePath, bool _isSerialize)override;
+  vdl::ID LoadTexture(const char* _FilePath)override;
 
   vdl::ID LoadTexture(const vdl::Image& _Image)override;
 
-  vdl::ID LoadCubeTexture(const char* _FilePath, bool _isSerialize)override;
+  vdl::ID LoadCubeTexture(const char* _FilePath)override;
 
   vdl::ID LoadCubeTexture(const vdl::Image& _Image)override;
 

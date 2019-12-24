@@ -20,23 +20,53 @@
 namespace
 {
   constexpr const char* kShaderTargets[static_cast<vdl::uint>(ShaderType::eNum)] = { "vs_5_0", "hs_5_0", "ds_5_0", "gs_5_0", "ps_5_0", "cs_5_0" };
+  constexpr vdl::uint kCompileFlag = D3DCOMPILE_ENABLE_STRICTNESS;
 
   inline void ComplieShader(ShaderData* _pShaderData, const char* _Target, const char* _FilePath, const char* _EntryPoint)
   {
-    vdl::uint CompileFlag = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined _DEBUG | DEBUG
-    CompileFlag |= D3DCOMPILE_DEBUG;
-#endif
-
-    wchar_t wFilePath[Constants::kMaxCharacterNum]{};
-    ::mbstowcs_s(nullptr, wFilePath, _FilePath, Constants::kMaxCharacterNum);
+    const std::filesystem::path OriginalFilePath = _FilePath;
+    const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
+    const std::filesystem::path BinaryFilePath = std::filesystem::path((BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).string() + "_" + std::string(_EntryPoint)).concat(Constants::kShaderBinaryFileFormat);
+    const bool existOriginalFile = std::filesystem::exists(OriginalFilePath);
 
     HRESULT hr = S_OK;
 
-    Microsoft::WRL::ComPtr<ID3DBlob> pError;
-    hr = ::D3DCompileFromFile(wFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-      _EntryPoint, _Target, CompileFlag, 0, _pShaderData->pCode.GetAddressOf(), pError.GetAddressOf());
-    _ASSERT_EXPR_A(SUCCEEDED(hr), static_cast<const char*>(pError->GetBufferPointer()));
+    //  バイナリファイルが存在して、元ファイルの更新日時が古い場合読み込み
+    if (std::filesystem::exists(BinaryFilePath) && !(existOriginalFile && ::isFileUpdate(OriginalFilePath, BinaryFilePath)))
+    {
+      std::vector<vdl::uint8_t> Code;
+      ::ImportFromBinary(BinaryFilePath.string().c_str(), Code);
+
+      const size_t CodeSize = Code.size();
+      hr = ::D3DCreateBlob(CodeSize, _pShaderData->pCode.GetAddressOf());
+      ERROR_CHECK(hr);
+      ::memcpy(_pShaderData->pCode->GetBufferPointer(), Code.data(), CodeSize);
+    }
+    else
+    {
+      wchar_t wFilePath[Constants::kMaxCharacterNum]{};
+      ::mbstowcs_s(nullptr, wFilePath, _FilePath, Constants::kMaxCharacterNum);
+
+      Microsoft::WRL::ComPtr<ID3DBlob> pError;
+      hr = ::D3DCompileFromFile(wFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+        _EntryPoint, _Target, kCompileFlag, 0, _pShaderData->pCode.GetAddressOf(), pError.GetAddressOf());
+      _ASSERT_EXPR_A(SUCCEEDED(hr), static_cast<const char*>(pError->GetBufferPointer()));
+
+      //  フォルダが存在しない場合作成
+      if (!std::filesystem::exists(BinaryFileDirectory))
+      {
+        std::filesystem::create_directories(BinaryFileDirectory);
+      }
+
+      //  バイナリファイルに書き出し
+      {
+        std::vector<vdl::uint8_t> Code;
+        const size_t CodeSize = _pShaderData->pCode->GetBufferSize();
+        Code.resize(CodeSize);
+        ::memcpy(Code.data(), _pShaderData->pCode->GetBufferPointer(), CodeSize);
+        ::ExportToBinary(BinaryFilePath.string().c_str(), Code);
+      }
+    }
 
     _pShaderData->ByteCode.pShaderBytecode = _pShaderData->pCode->GetBufferPointer();
     _pShaderData->ByteCode.BytecodeLength = _pShaderData->pCode->GetBufferSize();
@@ -44,16 +74,11 @@ namespace
 
   inline void ComplieShader(ShaderData* _pShaderData, const char* _Target, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint)
   {
-    vdl::uint CompileFlag = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined _DEBUG | DEBUG
-    CompileFlag |= D3DCOMPILE_DEBUG;
-#endif
-
     HRESULT hr = S_OK;
 
     Microsoft::WRL::ComPtr<ID3DBlob> pError;
     hr = ::D3DCompile(_Source, _DataSize, nullptr, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-      _EntryPoint, _Target, CompileFlag, 0, _pShaderData->pCode.GetAddressOf(), pError.GetAddressOf());
+      _EntryPoint, _Target, kCompileFlag, 0, _pShaderData->pCode.GetAddressOf(), pError.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), static_cast<const char*>(pError->GetBufferPointer()));
 
     _pShaderData->ByteCode.pShaderBytecode = _pShaderData->pCode->GetBufferPointer();
