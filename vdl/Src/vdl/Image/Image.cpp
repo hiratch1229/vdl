@@ -31,7 +31,7 @@ namespace vdl
     std::vector<uint8_t> EncodeData;
     {
       int Lenght;
-      uint8_t* PNG = ::stbi_write_png_to_mem(&Buffer()->Red, static_cast<int>(Size_.x * 4), static_cast<int>(Size_.x), static_cast<int>(Size_.y), sizeof(Color), &Lenght);
+      uint8_t* PNG = ::stbi_write_png_to_mem(&Buffer()->Red, static_cast<int>(Size_.x * 4), static_cast<int>(Size_.x), static_cast<int>(Size_.y), sizeof(Color4), &Lenght);
 
       EncodeData.resize(static_cast<size_t>(Lenght));
       ::memcpy(EncodeData.data(), PNG, Lenght);

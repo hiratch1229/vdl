@@ -12,7 +12,7 @@ class SceneSprite : public IScene
     vdl::float2 SrcPos;
     vdl::float2 SrcSize;
     vdl::Degree Angle;
-    vdl::ColorF Color = vdl::Palette::White;
+    vdl::Color4F Color = vdl::Palette::White;
   };
   using Datas = std::vector<Data>;
 private:

@@ -57,17 +57,17 @@ public:
 
   virtual void Draw(vdl::uint _VertexCount) = 0;
 
-  virtual void Draw(const vdl::Texture& _Texture, const vdl::float2& _DstLeftTop, const vdl::float2& _DstSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::ColorF& _Color) = 0;
+  virtual void Draw(const vdl::Texture& _Texture, const vdl::float2& _DstLeftTop, const vdl::float2& _DstSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::Color4F& _Color) = 0;
 
-  virtual void Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _World, const vdl::ColorF& _Color) = 0;
+  virtual void Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _World, const vdl::Color4F& _Color) = 0;
 
-  virtual void Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const vdl::MotionBlendDatas& _MotionBlendDatas, const vdl::ColorF& _Color) = 0;
+  virtual void Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const vdl::MotionBlendDatas& _MotionBlendDatas, const vdl::Color4F& _Color) = 0;
 
-  virtual void Clear(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor) = 0;
+  virtual void Clear(const vdl::RenderTexture& _RenderTexture, const vdl::Color4F& _ClearColor) = 0;
 
   virtual void Clear(const vdl::DepthStencilTexture& _DepthStencilTexture, float _ClearDepth, vdl::uint _ClearStencil) = 0;
 
-  virtual void Clear(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor) = 0;
+  virtual void Clear(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::Color4F& _ClearColor) = 0;
 
   virtual void Flush() = 0;
 };

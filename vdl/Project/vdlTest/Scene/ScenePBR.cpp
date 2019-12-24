@@ -76,29 +76,30 @@ void ScenePBR::Update()
   MaterialData& MaterialData = MaterialDataConstantData_.GetData();
   MaterialData.CameraPosition = Camera_.Position;
 
-  ImGui::Begin("ScenePBR", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  constexpr GUI::WindowFlags kSceneWindowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+  GUI::Begin("ScenePBR", nullptr, kSceneWindowBeginFlags);
   {
-    ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
-    ImGui::SetWindowSize(kSceneWindowSize);
+    GUI::SetWindowPos(GUIHelper::kSceneWindowPos);
+    GUI::SetWindowSize(kSceneWindowSize);
 
-    if (ImGui::TreeNode("DirectinalLight"))
+    if (GUI::TreeNode("DirectinalLight"))
     {
       DirectinalLight& DirectionalLight = LightConstantData_.GetData();
-      ImGui::SliderFloat3("Direction", &DirectionalLight.Direction, -1.0f, 1.0f);
-      ImGui::DragFloat("Itensity", &DirectionalLight.Itensity, 0.01f);
-      ImGui::ColorEdit3("Color", &DirectionalLight.Color);
+      GUI::Slider("Direction", &DirectionalLight.Direction, -1.0f, 1.0f);
+      GUI::Drag("Itensity", &DirectionalLight.Itensity, 0.01f);
+      GUI::ColorEdit("Color", &DirectionalLight.Color);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("MaterialData"))
+    if (GUI::TreeNode("MaterialData"))
     {
-      ImGui::SliderFloat("Reflectance", &MaterialData.Reflectance, 0.0f, 1.0f);
-      ImGui::ColorEdit3("Ambient", &MaterialData.Ambient);
+      GUI::Slider("Reflectance", &MaterialData.Reflectance, 0.0f, 1.0f);
+      GUI::ColorEdit("Ambient", &MaterialData.Ambient);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
   }
-  ImGui::End();
+  GUI::End();
 
   //  PBR‚Ì•`‰æ
   {

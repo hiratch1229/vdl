@@ -394,46 +394,46 @@ namespace vdl::Renderer2D
     SetPixelStageConstantBuffers(_Slot, _BufferNum, ConstantBuffers.data());
   }
 
-  void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color = Palette::White);
+  void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const Color4F& _Color = Palette::White);
 
-  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Color4F& _Color = Palette::White)
   {
     Draw(_Texture, _DestLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, 0.0f, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const Color4F& _Color = Palette::White)
   {
     Draw(_Texture, _DestLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, _Angle, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _SrcLeftPos, const float2& _SrcSize, const Color4F& _Color = Palette::White)
   {
     Draw(_Texture, _DestLeftTop, _SrcSize, _SrcLeftPos, _SrcSize, 0.0f, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const Degree& _Angle, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const Degree& _Angle, const Color4F& _Color = Palette::White)
   {
     Draw(_Texture, _DestLeftTop, _DestSize, float2(0.0f), _Texture.GetSize(), _Angle, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const Color4F& _Color = Palette::White)
   {
     Draw(_Texture, _DestLeftTop, _DestSize, float2(0.0f), _Texture.GetSize(), 0.0f, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const Degree& _Angle, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const Degree& _Angle, const Color4F& _Color = Palette::White)
   {
     const uint2 Size = _Texture.GetSize();
     Draw(_Texture, _DestLeftTop, Size, float2(0.0f), Size, _Angle, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const float2& _DestLeftTop, const Color4F& _Color = Palette::White)
   {
     const uint2 Size = _Texture.GetSize();
     Draw(_Texture, _DestLeftTop, Size, float2(0.0f), Size, 0.0f, _Color);
   }
 
-  inline void Draw(const Texture& _Texture, const ColorF& _Color = Palette::White)
+  inline void Draw(const Texture& _Texture, const Color4F& _Color = Palette::White)
   {
     const uint2 Size = _Texture.GetSize();
     Draw(_Texture, float2(0.0f), Size, float2(0.0f), Size, 0.0f, _Color);

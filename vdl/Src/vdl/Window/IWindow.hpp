@@ -22,5 +22,5 @@ public:
 
   [[nodiscard]] virtual const vdl::uint2& GetWindowSize()const = 0;
 
-  [[nodiscard]] virtual const vdl::ColorF& GetScreenClearColor()const = 0;
+  [[nodiscard]] virtual const vdl::Color4F& GetScreenClearColor()const = 0;
 };

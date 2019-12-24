@@ -42,13 +42,13 @@ void SceneTessellation::Initialize()
 
 void SceneTessellation::Update()
 {
-  ImGui::Begin("SceneTessellation");
+  GUI::Begin("SceneTessellation");
   {
     ConstantBufferData& Data = ConstantBuffer_.GetData();
-    ImGui::SliderFloat3("TessFactor", &Data.TessFactor, kTessellationMinValue, kTessellationMaxValue);
-    ImGui::SliderFloat("InsideFactor", &Data.InsideFactor, kTessellationMinValue, kTessellationMaxValue);
+    GUI::Slider("TessFactor", &Data.TessFactor, kTessellationMinValue, kTessellationMaxValue);
+    GUI::Slider("InsideFactor", &Data.InsideFactor, kTessellationMinValue, kTessellationMaxValue);
   }
-  ImGui::End();
+  GUI::End();
 
   FreeCamera(&Camera_);
   Renderer3D::SetCamera(Camera_);

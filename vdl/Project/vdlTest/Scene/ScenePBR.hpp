@@ -16,7 +16,7 @@ class ScenePBR : public IScene
   static constexpr vdl::float3 kSciFiHelmetScale = vdl::float3(1.5f, 1.5f, 1.5f);
   static constexpr vdl::float3 kSuzanneScale = vdl::float3(1.5f, 1.5f, 1.5f);
   static constexpr vdl::float3 kTwoSidedPlaneScale = vdl::float3(15.0f, 15.0f, 15.0f);
-  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(300, ImGuiHelper::kSceneWindowSize.y);
+  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(300, GUIHelper::kSceneWindowSize.y);
 private:
   struct Materials
   {
@@ -28,7 +28,7 @@ private:
   {
     vdl::float3 CameraPosition;
     float Reflectance;
-    vdl::ColorF Ambient;
+    vdl::Color4F Ambient;
   };
 private:
   vdl::Camera Camera_;

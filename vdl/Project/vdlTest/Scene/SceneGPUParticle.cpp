@@ -40,13 +40,13 @@ void SceneGPUParticle::Update()
     CSData.DeltaTime = System::GetDeltaTime();
   }
 
-  ImGui::Begin("SceneGPUParticle");
+  GUI::Begin("SceneGPUParticle");
   {
-    ImGui::Text("ParticleNum:%d", kBufferNum);
-    ImGui::Text((std::string("Target:") + std::to_string(CSData.MousePosition)).c_str());
-    ImGui::InputFloat2("PointHalfSize", &GSConstantBuffer_.GetData().PointHalfSize);
+    GUI::Text("ParticleNum:%d", kBufferNum);
+    GUI::Text((std::string("Target:") + std::to_string(CSData.MousePosition)).c_str());
+    GUI::Input("PointHalfSize", &GSConstantBuffer_.GetData().PointHalfSize);
   }
-  ImGui::End();
+  GUI::End();
 
   Computer::Dispatch(kThreadGroupNum, 1, 1);
 

@@ -19,7 +19,6 @@
 #include <vdl/DetectMemoryLeak.hpp>
 
 #include <thread>
-#include <Windows.h>
 
 void CSystem::Initialize()
 {
@@ -77,15 +76,15 @@ bool CSystem::Update()
 
   //  デフォルトの機能の処理
   {
-    if (DefaultActionFlags_ & vdl::System::DefalutAction::eExit)
+    if (DefaultActionFlags_ & vdl::System::DefaultActionFlag::eExit)
     {
       return false;
     }
-    if (DefaultActionFlags_ & vdl::System::DefalutAction::eChangeWindowMode)
+    if (DefaultActionFlags_ & vdl::System::DefaultActionFlag::eChangeWindowMode)
     {
       pSwapChain_->ChangeWindowMode();
     }
-    if (DefaultActionFlags_ & vdl::System::DefalutAction::eScreenShot)
+    if (DefaultActionFlags_ & vdl::System::DefaultActionFlag::eScreenShot)
     {
       pSwapChain_->ScreenShot();
     }

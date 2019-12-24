@@ -4,12 +4,12 @@
 #include <vdl/Input/Mouse/IMouse.hpp>
 
 #include <vdl/Resource/Windows/Resource.hpp>
+#include <vdl/pch/Windows/pch.hpp>
 
 #include <ThirdParty/ImGui/imgui.h>
 
 #include <vdl/System.hpp>
 
-#include <Windows.h>
 #include <crtdbg.h>
 #include <locale>
 #include <future>
@@ -27,22 +27,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     ::ValidateRect(hwnd, NULL);
     break;
   case WM_CLOSE:
-    Engine::Get<ISystem>()->EnableDefaultActions(vdl::System::DefalutAction::eExit);
-    Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefalutAction::eExit);
-    Engine::Get<ISystem>()->DisableDefaultActions(vdl::System::DefalutAction::eExit);
+    Engine::Get<ISystem>()->EnableDefaultActions(vdl::System::DefaultActionFlag::eExit);
+    Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefaultActionFlag::eExit);
+    Engine::Get<ISystem>()->DisableDefaultActions(vdl::System::DefaultActionFlag::eExit);
     break;
     //  ÉLÅ[ÇâüÇµÇΩéû
   case WM_KEYDOWN:
     switch (wParam)
     {
     case VK_ESCAPE:
-      Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefalutAction::eExit);
+      Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefaultActionFlag::eExit);
       break;
     case VK_F2:
-      Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefalutAction::eScreenShot);
+      Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefaultActionFlag::eScreenShot);
       break;
     case VK_F11:
-      Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefalutAction::eChangeWindowMode);
+      Engine::Get<ISystem>()->ReportDefaultActions(vdl::System::DefaultActionFlag::eChangeWindowMode);
       break;
     }
     break;

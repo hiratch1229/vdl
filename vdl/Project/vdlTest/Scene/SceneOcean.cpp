@@ -51,7 +51,8 @@ void SceneOcean::Initialize()
 
     ShadowData& ShadowData = ShadowDataConstantBuffer_.GetData();
     {
-      ShadowData.Shadow = ColorF(Palette::DimGray, 0.0001f);
+      ShadowData.Shadow = Palette::DimGray;
+      ShadowData.Bias = 0.0001f;
     }
   }
 
@@ -239,118 +240,119 @@ void SceneOcean::Update()
     WaterSurfaceData& WaterSurfaceData = WaterSurfaceDataConstantBuffer_.GetData();
     CameraData& CameraData = CameraDataConstantBuffer_.GetData();
 
-    ImGui::Begin("SceneOcean", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    constexpr GUI::WindowFlags kSceneWindowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+    GUI::Begin("SceneOcean", nullptr, kSceneWindowBeginFlags);
     {
-      ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
-      ImGui::SetWindowSize(kSceneWindowSize);
-      if (ImGui::Checkbox("Wireframe", &isWireframe_))
+      GUI::SetWindowPos(GUIHelper::kSceneWindowPos);
+      GUI::SetWindowSize(kSceneWindowSize);
+      if (GUI::Checkbox("Wireframe", &isWireframe_))
       {
         RasterizerState_ = (isWireframe_ ? RasterizerState::kWireframeCullNone : RasterizerState::kSolidCullNone);
       }
-      if (ImGui::TreeNode("Camera"))
+      if (GUI::TreeNode("Camera"))
       {
         float FocalLength = CameraData.FocalLength;
-        if (ImGui::SliderFloat("FocalLength", &FocalLength, 0.0f, 1.0f) && 0.0f <= FocalLength && FocalLength <= 1.0f)
+        if (GUI::Slider("FocalLength", &FocalLength, 0.0f, 1.0f) && 0.0f <= FocalLength && FocalLength <= 1.0f)
         {
           CameraData.FocalLength = FocalLength;
         }
-        ImGui::TreePop();
+        GUI::TreePop();
       }
-      if (ImGui::TreeNode("DirectinalLight"))
+      if (GUI::TreeNode("DirectinalLight"))
       {
         LightData& LightData = LightDataConstantBuffer_.GetData();
-        if (ImGui::DragFloat3("Position", &DirectionalLightPosition_))
+        if (GUI::Drag("Position", &DirectionalLightPosition_))
         {
           UpdateLightViewProjecion();
         }
-        ImGui::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
-        ImGui::DragFloat("Itensity", &LightData.DirectionalLight.Itensity, 0.01f);
-        ImGui::ColorEdit3("Color", &LightData.DirectionalLight.Color);
-        ImGui::TreePop();
+        GUI::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
+        GUI::Drag("Itensity", &LightData.DirectionalLight.Itensity, 0.01f);
+        GUI::ColorEdit("Color", &LightData.DirectionalLight.Color);
+        GUI::TreePop();
       }
-      if (ImGui::TreeNode("Shadow"))
+      if (GUI::TreeNode("Shadow"))
       {
         ShadowData& ShadowData = ShadowDataConstantBuffer_.GetData();
-        ImGui::ColorEdit3("Color", &ShadowData.Shadow);
-        ImGui::DragFloat("Bias", &ShadowData.Shadow.Alpha, 1.0f, 0.0f, 0.0f, "%.6f");
-        ImGui::TreePop();
+        GUI::ColorEdit("Color", &ShadowData.Shadow);
+        GUI::Drag("Bias", &ShadowData.Bias, 1.0f, 0.0f, 0.0f, "%.6f");
+        GUI::TreePop();
       }
-      if (ImGui::TreeNode("Terrain"))
+      if (GUI::TreeNode("Terrain"))
       {
 #if DEBUG| _DEBUG
-        if (ImGui::Button("Reload HeightMapUpdateCS"))
+        if (GUI::Button("Reload HeightMapUpdateCS"))
         {
           TerrainHeightMapUpdateComputeShader_ = ComputeShader(kTerrainHeightMapUpdateComputeShaderFilePath);
         }
-        if (ImGui::Button("Reload TerrainPS"))
+        if (GUI::Button("Reload TerrainPS"))
         {
           TerrainPixelShader_ = PixelShader(kTerrainPixelShaderFilePath, kTerrainPixelShaderEntryPoint);
         }
 #endif
-        if (ImGui::Button("Clear HeightMap"))
+        if (GUI::Button("Clear HeightMap"))
         {
           Renderer::Clear(TerrainHeightMap_);
           Renderer::Clear(TerrainNormalMap_, Palette::NormalMap);
         }
-        ImGui::SliderFloat("BlushSize", &TerrainUpdateData.BlushSize, 0.1f, 150.0f);
-        ImGui::SliderFloat("BlushHardness", &TerrainUpdateData.BlushHardness, -1.0f, 1.0f);
+        GUI::Slider("BlushSize", &TerrainUpdateData.BlushSize, 0.1f, 150.0f);
+        GUI::Slider("BlushHardness", &TerrainUpdateData.BlushHardness, -1.0f, 1.0f);
         TerrainData& TerrainData = TerrainDataConstantBuffer_.GetData();
-        int TextureLoopNum = static_cast<int>(TerrainData.TextureLoopNum);
-        if (ImGui::InputInt("TextureLoopNum", &TextureLoopNum) && TextureLoopNum > 0)
+        uint TextureLoopNum = TerrainData.TextureLoopNum;
+        if (GUI::Input("TextureLoopNum", &TextureLoopNum) && TextureLoopNum > 0)
         {
           TerrainData.TextureLoopNum = TextureLoopNum;
         }
-        ImGui::DragFloat("SandThreshold", &TerrainData.SandThreshold, 0.01f);
-        ImGui::DragFloat("RockThreshold", &TerrainData.RockThreshold, 0.01f);
-        ImGui::DragFloat("SlopeThreshold", &TerrainData.SlopeThreshold, 0.01f);
-        ImGui::TreePop();
+        GUI::Drag("SandThreshold", &TerrainData.SandThreshold, 0.01f);
+        GUI::Drag("RockThreshold", &TerrainData.RockThreshold, 0.01f);
+        GUI::Drag("SlopeThreshold", &TerrainData.SlopeThreshold, 0.01f);
+        GUI::TreePop();
       }
-      if (ImGui::TreeNode("WaterSurface"))
+      if (GUI::TreeNode("WaterSurface"))
       {
 #if defined _DEBUG | DEBUG
-        if (ImGui::Button("Reload WaterSurfaceDS"))
+        if (GUI::Button("Reload WaterSurfaceDS"))
         {
           WaterSurfaceDomainShader_ = DomainShader(kWaterSurfaceDomainShaderFilePath);
         }
-        if (ImGui::Button("Reload WaterSurfacePS"))
+        if (GUI::Button("Reload WaterSurfacePS"))
         {
           WaterSurfacePixelShader_ = PixelShader(kWaterSurfacePixelShaderFilePath);
         }
-        if (ImGui::Button("Reload WaterSurfaceRefractionPS"))
+        if (GUI::Button("Reload WaterSurfaceRefractionPS"))
         {
           WaterSurfaceRefractionPixelShader_ = PixelShader(kWaterSurfaceRefractionPixelShaderFilePath);
         }
-        if (ImGui::Button("Reload WaterSurfaceReflectionPS"))
+        if (GUI::Button("Reload WaterSurfaceReflectionPS"))
         {
           WaterSurfaceReflectionPixelShader_ = PixelShader(kWaterSurfaceReflectionPixelShaderFilePath);
         }
 #endif
-        ImGui::Checkbox("isUpdate", &isWaterSurfaceUpdate_);
-        int WaveNum = static_cast<int>(WaterSurfaceData.WaveNum);
-        if (ImGui::SliderInt("WaveNum", &WaveNum, 1, kMaxWaveNum) && (WaveNum > 0 && WaveNum <= kMaxWaveNum))
+        GUI::Checkbox("isUpdate", &isWaterSurfaceUpdate_);
+        uint WaveNum = WaterSurfaceData.WaveNum;
+        if (GUI::Slider("WaveNum", &WaveNum, 1u, kMaxWaveNum) && (WaveNum > 0 && WaveNum <= kMaxWaveNum))
         {
           WaterSurfaceData.WaveNum = WaveNum;
         }
-        ImGui::TreePop();
+        GUI::TreePop();
       }
-      if (ImGui::TreeNode("RayMarch"))
+      if (GUI::TreeNode("RayMarch"))
       {
         RayMarchData& RayMarchData = RayMarchConstantBuffer_.GetData();
 
-        ImGui::SliderFloat("MaxStep", &RayMarchData.MaxStep, 0.0f, 1.0f);
+        GUI::Slider("MaxStep", &RayMarchData.MaxStep, 0.0f, 1.0f);
 
-        int SampleNum = static_cast<int>(RayMarchData.SampleNum);
-        if (ImGui::SliderInt("SampleNum", &SampleNum, 1, kMaxRayMarchNum) && (SampleNum > 0 && SampleNum <= kMaxRayMarchNum))
+        uint SampleNum = RayMarchData.SampleNum;
+        if (GUI::Slider("SampleNum", &SampleNum, 1u, kMaxRayMarchNum) && (SampleNum > 0 && SampleNum <= kMaxRayMarchNum))
         {
           RayMarchData.SampleNum = SampleNum;
-      }
+        }
 
         RayMarchData.Step = RayMarchData.MaxStep / RayMarchData.SampleNum;
 
-        ImGui::TreePop();
+        GUI::TreePop();
       }
     }
-    ImGui::End();
+    GUI::End();
 
     if (isWaterSurfaceUpdate_)
     {
@@ -363,7 +365,7 @@ void SceneOcean::Update()
       Renderer::Clear(TerrainNormalMap_, Palette::NormalMap);
     }
 
-    if (!ImGui::IsAnyItemActive())
+    if (!GUI::IsAnyItemActive())
     {
       if (Input::isPressed(Input::Mouse::ButtonLeft))
       {
@@ -490,7 +492,7 @@ void SceneOcean::Update()
     {
       for (uint x = 0; x < kRetangleNum.x; ++x)
       {
-        Renderer3D::Draw(Rectangle_, Matrix::Translate({ (x - kRetangleHalfNum.x) * kRetangleSize.x, kWaterSurfaceHeight, (y - kRetangleHalfNum.y) * kRetangleSize.y }), ColorF(Palette::LightSkyBlue, 0.25f));
+        Renderer3D::Draw(Rectangle_, Matrix::Translate({ (x - kRetangleHalfNum.x) * kRetangleSize.x, kWaterSurfaceHeight, (y - kRetangleHalfNum.y) * kRetangleSize.y }), Color4F(Palette::LightSkyBlue, 0.25f));
       }
     }
   }
@@ -551,60 +553,61 @@ void SceneOcean::Update()
     Renderer2D::SetPixelStageShaderResources(1, 1, &EmptyShaderResource);
   }
 
-  ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  constexpr GUI::WindowFlags kRenderingFlowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+  GUI::Begin("RenderingFlow", nullptr, kRenderingFlowBeginFlags);
   {
-    ImGui::SetWindowPos(ImGuiHelper::kRenderingFlowWindowPos);
-    ImGui::SetWindowSize(ImGuiHelper::kRenderingFlowWindowSize);
-    if (ImGui::TreeNode("HeightMapUpdatePass"))
+    GUI::SetWindowPos(GUIHelper::kRenderingFlowWindowPos);
+    GUI::SetWindowSize(GUIHelper::kRenderingFlowWindowSize);
+    if (GUI::TreeNode("HeightMapUpdatePass"))
     {
-      ImGuiHelper::DrawRenderTexture("TexcoordMap", TerrainTexcoordMap_, kHeightMapDisplaySize);
-      ImGuiHelper::DrawUnorderedAccessTexture("HeightMap", TerrainHeightMap_, kHeightMapDisplaySize);
-      ImGuiHelper::DrawUnorderedAccessTexture("NormalMap", TerrainNormalMap_, kHeightMapDisplaySize);
+      GUIHelper::DrawRenderTexture("TexcoordMap", TerrainTexcoordMap_, kHeightMapDisplaySize);
+      GUIHelper::DrawUnorderedAccessTexture("HeightMap", TerrainHeightMap_, kHeightMapDisplaySize);
+      GUIHelper::DrawUnorderedAccessTexture("NormalMap", TerrainNormalMap_, kHeightMapDisplaySize);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("GBufferPass"))
+    if (GUI::TreeNode("GBufferPass"))
     {
       for (uint i = 0; i < kGBufferNum; ++i)
       {
-        ImGuiHelper::DrawRenderTexture(kGBufferNames[i], GBufferTextures_[i], ImGuiHelper::kGBufferDisplaySize);
+        GUIHelper::DrawRenderTexture(kGBufferNames[i], GBufferTextures_[i], GUIHelper::kGBufferDisplaySize);
       }
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("WaterSurface"))
+    if (GUI::TreeNode("WaterSurface"))
     {
       for (uint i = 0; i < kGBufferNum; ++i)
       {
-        ImGuiHelper::DrawRenderTexture(kGBufferNames[i], WaterSurfaceGBufferTextures_[i], ImGuiHelper::kGBufferDisplaySize);
+        GUIHelper::DrawRenderTexture(kGBufferNames[i], WaterSurfaceGBufferTextures_[i], GUIHelper::kGBufferDisplaySize);
       }
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("ShadowPass"))
+    if (GUI::TreeNode("ShadowPass"))
     {
-      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kHeightMapDisplaySize);
+      GUIHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kHeightMapDisplaySize);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("LightPass"))
+    if (GUI::TreeNode("LightPass"))
     {
       for (uint i = 0; i < kLightPassOutNum; ++i)
       {
-        ImGuiHelper::DrawRenderTexture(kLightPassOutNames[i], LightPassRenderTextures_[i], ImGuiHelper::kGBufferDisplaySize);
+        GUIHelper::DrawRenderTexture(kLightPassOutNames[i], LightPassRenderTextures_[i], GUIHelper::kGBufferDisplaySize);
       }
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("BlurPass"))
+    if (GUI::TreeNode("BlurPass"))
     {
       for (uint i = 0; i < kShrinkBuffeNum; ++i)
       {
-        ImGuiHelper::DrawRenderTexture(std::string("ShirnkBuffer" + std::to_string(i)).c_str(), ShrinkBuffers_[i], ImGuiHelper::kGBufferDisplaySize);
+        GUIHelper::DrawRenderTexture(std::string("ShirnkBuffer" + std::to_string(i)).c_str(), ShrinkBuffers_[i], GUIHelper::kGBufferDisplaySize);
       }
-      ImGui::TreePop();
+      GUI::TreePop();
     }
   }
-  ImGui::End();
+  GUI::End();
 }
 
 //--------------------------------------------------

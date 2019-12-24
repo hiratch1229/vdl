@@ -11,10 +11,10 @@ void SceneSprite::Update()
 {
   int Size = static_cast<int>(Datas_.size());
 
-  ImGui::Begin("Sprite");
+  GUI::Begin("Sprite");
   {
     //  数値が変更された時
-    if (ImGui::InputInt("Size", &Size))
+    if (GUI::Input("Size", &Size))
     {
       if (Size < 0)
       {
@@ -27,24 +27,23 @@ void SceneSprite::Update()
     }
 
     //  ツリー構造で全ての情報を出力
-    ImGui::SetNextTreeNodeOpen(false, ImGuiCond_Once);
     for (int i = 0; i < Size; ++i)
     {
       Data& Data = Datas_[i];
 
-      if (ImGui::TreeNode((std::string("Data[") + std::to_string(i) + "]").c_str()))
+      if (GUI::TreeNode((std::string("Data[") + std::to_string(i) + "]").c_str()))
       {
-        ImGui::InputFloat2("Pos", &Data.Pos);
-        ImGui::InputFloat2("Size", &Data.Size);
-        ImGui::InputFloat2("SrcPos", &Data.SrcPos);
-        ImGui::InputFloat2("SrcSize", &Data.SrcSize);
-        ImGui::InputFloat("Angle", reinterpret_cast<float*>(&Data.Angle));
-        ImGui::ColorEdit4("Color", &Data.Color);
-        ImGui::TreePop();
+        GUI::Input("Pos", &Data.Pos);
+        GUI::Input("Size", &Data.Size);
+        GUI::Input("SrcPos", &Data.SrcPos);
+        GUI::Input("SrcSize", &Data.SrcSize);
+        GUI::Input("Angle", &Data.Angle);
+        GUI::ColorEdit("Color", &Data.Color);
+        GUI::TreePop();
       }
     }
   }
-  ImGui::End();
+  GUI::End();
 
   //  描画
   for (auto& Data : Datas_)

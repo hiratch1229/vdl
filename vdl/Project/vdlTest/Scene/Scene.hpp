@@ -1,7 +1,7 @@
 #pragma once
 #include <vdl.hpp>
 
-namespace ImGuiHelper
+namespace GUIHelper
 {
   constexpr vdl::uint2 kInformationWindowPos = vdl::uint2(0, 0);
   constexpr vdl::uint2 kInformationWindowSize = vdl::uint2(225, 130);
@@ -13,60 +13,60 @@ namespace ImGuiHelper
 
   inline void DrawRenderTexture(const char* _Label, const vdl::RenderTexture& _Texture, const vdl::float2& _DisplaySize)
   {
-    if (ImGui::CollapsingHeader(_Label))
+    if (vdl::GUI::CollapsingHeader(_Label))
     {
-      ImGui::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
-      ImGui::Text(std::string("TextureSize:" + std::to_string(_Texture.GetSize())).c_str());
-      ImGui::Image(_Texture, _DisplaySize);
+      vdl::GUI::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
+      vdl::GUI::Text(std::string("TextureSize:" + std::to_string(_Texture.GetSize())).c_str());
+      vdl::GUI::Image(_Texture, _DisplaySize);
     }
   }
 
   inline void DrawDepthTexture(const char* _Label, const vdl::DepthStencilTexture& _Texture, const vdl::float2& _DisplaySize)
   {
-    if (ImGui::CollapsingHeader(_Label))
+    if (vdl::GUI::CollapsingHeader(_Label))
     {
-      ImGui::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
+      vdl::GUI::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
       const vdl::Texture& DepthTexture = _Texture.GetDepthTexture();
-      ImGui::Text(std::string("TextureSize:" + std::to_string(DepthTexture.GetSize())).c_str());
-      ImGui::Image(DepthTexture, _DisplaySize);
+      vdl::GUI::Text(std::string("TextureSize:" + std::to_string(DepthTexture.GetSize())).c_str());
+      vdl::GUI::Image(DepthTexture, _DisplaySize);
     }
   }
 
   inline void DrawStencilTexture(const char* _Label, const vdl::DepthStencilTexture& _Texture, const vdl::float2& _DisplaySize)
   {
-    if (ImGui::CollapsingHeader(_Label))
+    if (vdl::GUI::CollapsingHeader(_Label))
     {
-      ImGui::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
+      vdl::GUI::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
       const vdl::Texture& StencilTexture = _Texture.GetStencilTexture();
-      ImGui::Text(std::string("TextureSize:" + std::to_string(StencilTexture.GetSize())).c_str());
-      ImGui::Image(StencilTexture, _DisplaySize);
+      vdl::GUI::Text(std::string("TextureSize:" + std::to_string(StencilTexture.GetSize())).c_str());
+      vdl::GUI::Image(StencilTexture, _DisplaySize);
     }
   }
 
   inline void DrawDepthStencilTexture(const char* _Label, const vdl::DepthStencilTexture& _Texture, const vdl::float2& _DisplaySize)
   {
-    if (ImGui::CollapsingHeader(_Label))
+    if (vdl::GUI::CollapsingHeader(_Label))
     {
-      ImGui::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
+      vdl::GUI::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
       const vdl::Texture& DepthTexture = _Texture.GetDepthTexture();
-      ImGui::Text(std::string("TextureSize:" + std::to_string(DepthTexture.GetSize())).c_str());
-      ImGui::Image(DepthTexture, _DisplaySize);
+      vdl::GUI::Text(std::string("TextureSize:" + std::to_string(DepthTexture.GetSize())).c_str());
+      vdl::GUI::Image(DepthTexture, _DisplaySize);
 
       const vdl::Texture& StencilTexture = _Texture.GetStencilTexture();
       if (!StencilTexture.isEmpty())
       {
-        ImGui::Image(StencilTexture, _DisplaySize);
+        vdl::GUI::Image(StencilTexture, _DisplaySize);
       }
     }
   }
 
   inline void DrawUnorderedAccessTexture(const char* _Label, const vdl::UnorderedAccessTexture& _Texture, const vdl::float2& _DisplaySize)
   {
-    if (ImGui::CollapsingHeader(_Label))
+    if (vdl::GUI::CollapsingHeader(_Label))
     {
-      ImGui::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
-      ImGui::Text(std::string("TextureSize:" + std::to_string(_Texture.GetSize())).c_str());
-      ImGui::Image(_Texture, _DisplaySize);
+      vdl::GUI::Text(std::string("Format:" + std::to_string(_Texture.GetFormat())).c_str());
+      vdl::GUI::Text(std::string("TextureSize:" + std::to_string(_Texture.GetSize())).c_str());
+      vdl::GUI::Image(_Texture, _DisplaySize);
     }
   }
 }

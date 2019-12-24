@@ -11,7 +11,7 @@ namespace vdl
   class Image
   {
     uint2 Size_ = 0;
-    std::vector<Color> Buffer_;
+    std::vector<Color4> Buffer_;
   public:
     Image() = default;
 
@@ -25,11 +25,11 @@ namespace vdl
 
     [[nodiscard]] bool isEmpty()const noexcept { return Buffer_.empty(); }
 
-    [[nodiscard]] Color* Buffer() { return Buffer_.data(); }
+    [[nodiscard]] Color4* Buffer() { return Buffer_.data(); }
 
-    [[nodiscard]] const Color* Buffer()const { return Buffer_.data(); }
+    [[nodiscard]] const Color4* Buffer()const { return Buffer_.data(); }
 
-    [[nodiscard]] const Color GetColor(const uint2& _Pos)const { return Buffer_[_Pos.x + _Pos.y * Size_.x]; }
+    [[nodiscard]] const Color4 GetColor(const uint2& _Pos)const { return Buffer_[_Pos.x + _Pos.y * Size_.x]; }
 
     void Resize(const uint2& _Size) { Size_ = _Size; Buffer_.resize(static_cast<size_t>(Size_.x) * Size_.y); }
   public:

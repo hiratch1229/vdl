@@ -13,7 +13,7 @@ class SceneDeferred : public IScene
   struct Data
   {
     vdl::float3 Position;
-    vdl::ColorF Color;
+    vdl::Color4F Color;
     Range MinRange;
     Range MaxRange;
     float Timer;
@@ -30,8 +30,8 @@ private:
   static constexpr vdl::uint kGBufferNum = 3; /* Diffuse + NormalMap + Specular */
   static constexpr vdl::uint kShaderResourceNum = kGBufferNum + 2;  /* GBuffer + Depth + ShadowMap */
   static constexpr const char* kLigthPassPSFilePath = "Shader/Deferred/LightPassPS.hlsl";
-  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(300, ImGuiHelper::kSceneWindowSize.y);
-  static constexpr vdl::uint2 kShadowMapDisplaySize = vdl::uint2(ImGuiHelper::kGBufferDisplaySize.x);
+  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(300, GUIHelper::kSceneWindowSize.y);
+  static constexpr vdl::uint2 kShadowMapDisplaySize = vdl::uint2(GUIHelper::kGBufferDisplaySize.x);
 private:
   struct LightData
   {
@@ -42,8 +42,9 @@ private:
   {
     vdl::float3 EyePosition;
     float SpecularPower;
-    vdl::ColorF Ambient;
-    vdl::ColorF Shadow;
+    vdl::Color4F Ambient;
+    vdl::Color3F Shadow;
+    float ShadowBias;
     vdl::Matrix InverseViewProjection;
   };
 private:

@@ -48,13 +48,13 @@ namespace vdl
     Matrix NDCTransform;
     float2 TexcoordScale;
     float2 TexcoordTranslate;
-    ColorF Color;
+    Color4F Color;
   };
 
   struct InstanceStaticMesh
   {
     Matrix World;
-    ColorF Color;
+    Color4F Color;
   };
 
   struct InstanceSkinnedMesh : public InstanceStaticMesh

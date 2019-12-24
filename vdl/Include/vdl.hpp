@@ -94,5 +94,6 @@
 #include <vdl/Macro.hpp>
 #include <vdl/Hash.hpp>
 #include <vdl/Serialize.hpp>
+#include <vdl/Flag.hpp>
 #include <vdl/Random.hpp>
 #include <vdl/DetectMemoryLeak.hpp>

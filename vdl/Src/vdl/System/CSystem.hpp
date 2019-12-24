@@ -1,6 +1,8 @@
 #pragma once
 #include "ISystem.hpp"
 
+#include <vdl/System.hpp>
+
 #include <chrono>
 
 class ISwapChain;
@@ -34,8 +36,8 @@ private:
 private:
 private:
   SystemState SystemState_;
-  vdl::uint DefaultActionFlags_ = 0;
-  vdl::uint ValidDefaultActions_ = ~0;
+  vdl::System::DefaultActionFlags DefaultActionFlags_ = 0;
+  vdl::System::DefaultActionFlags ValidDefaultActions_ = ~0;
   using Duration = std::chrono::duration<double>;
   std::chrono::high_resolution_clock::time_point LastTime_;
   Duration DeltaTime_;
@@ -55,11 +57,11 @@ public:
 
   bool Update()override;
 
-  void EnableDefaultActions(vdl::uint _DefaultActionFlags)override { ValidDefaultActions_ |= _DefaultActionFlags; }
+  void EnableDefaultActions(const vdl::System::DefaultActionFlags& _Flags)override { ValidDefaultActions_ |= _Flags; }
 
-  void DisableDefaultActions(vdl::uint _DefaultActionFlags)override { ValidDefaultActions_ &= ~_DefaultActionFlags; }
+  void DisableDefaultActions(const vdl::System::DefaultActionFlags& _Flags)override { ValidDefaultActions_ &= ~_Flags; }
 
-  void ReportDefaultActions(vdl::uint _DefaultActionFlags)override { DefaultActionFlags_ |= (ValidDefaultActions_ & _DefaultActionFlags); }
+  void ReportDefaultActions(const vdl::System::DefaultActionFlags& _Flags)override { DefaultActionFlags_ |= (ValidDefaultActions_ & _Flags); }
 
   void SetMaxFPS(vdl::uint _MaxFPS)override { FrameInterval_ = Duration(_MaxFPS == 0 ? 0.0 : 1.0 / _MaxFPS); }
 

@@ -512,9 +512,9 @@ namespace vdl::Renderer3D
     SetPixelStageConstantBuffers(_Slot, _BufferNum, ConstantBuffers.data());
   }
 
-  void Draw(const StaticMesh& _StaticMesh, const Matrix& _World = Matrix::Identity(), const ColorF& _Color = Palette::White);
+  void Draw(const StaticMesh& _StaticMesh, const Matrix& _World = Matrix::Identity(), const Color4F& _Color = Palette::White);
 
-  inline void Draw(const Model& _Model, const Matrix& _World = Matrix::Identity(), const ColorF& _Color = Palette::White)
+  inline void Draw(const Model& _Model, const Matrix& _World = Matrix::Identity(), const Color4F& _Color = Palette::White)
   {
     assert(!_Model.isEmpty());
 

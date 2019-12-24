@@ -8,7 +8,7 @@
 
 struct Material
 {
-  vdl::ColorF MaterialColor = vdl::Palette::White;
+  vdl::Color4F MaterialColor = vdl::Palette::White;
   vdl::CompressionImage Diffuse;
   vdl::CompressionImage Specular;
   vdl::CompressionImage NormalMap;

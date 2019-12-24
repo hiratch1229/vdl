@@ -19,7 +19,7 @@ class SceneOcean : public IScene
   static constexpr const char* kTerrainNormalMapUpdateComputeShaderFilePath = "Shader/Ocean/Terrain/TerrainNormalMapUpdateCS.hlsl";
   static constexpr const char* kTerrainPixelShaderFilePath = "Shader/Ocean/Terrain/TerrainPS.hlsl";
   static constexpr const char* kTerrainPixelShaderEntryPoint = "GBufferPass";
-  static constexpr vdl::ColorF kTerrainTexcoordMapClearColor = vdl::ColorF(-1.0f, -1.0f, -1.0f, 0.0f);
+  static constexpr vdl::Color4F kTerrainTexcoordMapClearColor = vdl::Color4F(-1.0f, -1.0f, -1.0f, 0.0f);
   static constexpr vdl::uint2 kThreadGroupNum = vdl::uint2(32, 32);
   static constexpr vdl::uint3 kTerrainNormalMapDispatchNum = vdl::uint3(kHeightMapSize.x / kThreadGroupNum.x + (kHeightMapSize.x % kThreadGroupNum.x == 0 ? 0 : 1), kHeightMapSize.y / kThreadGroupNum.y + (kHeightMapSize.y % kThreadGroupNum.y == 0 ? 0 : 1), 1);
   static constexpr vdl::uint kMaxWaveNum = 25;
@@ -34,8 +34,8 @@ class SceneOcean : public IScene
   static constexpr const char* kWaterSurfaceRefractionPixelShaderFilePath = "Shader/Ocean/PostProcess/ScreenSpaceRefractionPS.hlsl";
   static constexpr vdl::uint kShrinkBuffeNum = 4;
   static constexpr vdl::uint kMaxRayMarchNum = 100;
-  static constexpr vdl::uint2 kHeightMapDisplaySize = vdl::uint2(ImGuiHelper::kGBufferDisplaySize.x);
-  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(400, ImGuiHelper::kSceneWindowSize.y);
+  static constexpr vdl::uint2 kHeightMapDisplaySize = vdl::uint2(GUIHelper::kGBufferDisplaySize.x);
+  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(400, GUIHelper::kSceneWindowSize.y);
 private:
   enum class GBufferType
   {
@@ -47,7 +47,7 @@ private:
   };
   static constexpr vdl::uint kGBufferNum = static_cast<vdl::uint>(GBufferType::eNum);
   static constexpr const char* kGBufferNames[kGBufferNum] = { "Diffuse", "Normal", "Depth" };
-  static constexpr vdl::ColorF kGBufferClearColors[kGBufferNum] = { vdl::ColorF(0.0f,0.0f,0.0f, 0.0f), vdl::ColorF(0.0f,0.0f,0.0f, 0.0f), vdl::ColorF(1.0f,0.0f,0.0f, 0.0f) };
+  static constexpr vdl::Color4F kGBufferClearColors[kGBufferNum] = { vdl::Color4F(0.0f,0.0f,0.0f, 0.0f), vdl::Color4F(0.0f,0.0f,0.0f, 0.0f), vdl::Color4F(1.0f,0.0f,0.0f, 0.0f) };
   enum class LightPassOutputType
   {
     eColor,
@@ -103,7 +103,8 @@ private:
   };
   struct ShadowData
   {
-    vdl::ColorF Shadow; /* Color + Bias*/
+    vdl::Color3F Shadow;
+    float Bias;
   };
   struct RayMarchData
   {

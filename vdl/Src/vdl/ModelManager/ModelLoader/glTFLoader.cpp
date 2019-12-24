@@ -23,12 +23,12 @@ namespace
       if (_Image.component == 3)
       {
         const vdl::uint8_t* glTFBuffer = _Image.image.data();
-        vdl::Color* Buffer = Image.Buffer();
+        vdl::Color4* Buffer = Image.Buffer();
 
         const vdl::uint PixelNum = _Image.width * _Image.height;
         for (vdl::uint i = 0; i < PixelNum; ++i)
         {
-          Buffer[i] = vdl::Color(glTFBuffer[i * 3 + 0], glTFBuffer[i * 3 + 1], glTFBuffer[i * 3 + 2]);
+          Buffer[i] = vdl::Color4(glTFBuffer[i * 3 + 0], glTFBuffer[i * 3 + 1], glTFBuffer[i * 3 + 2]);
         }
       }
       //  RGBAのフォーマット
@@ -42,7 +42,7 @@ namespace
     return Image;
   }
 
-  inline vdl::ColorF Cast(const tinygltf::ColorValue& _Color)
+  inline vdl::Color4F Cast(const tinygltf::ColorValue& _Color)
   {
     return { static_cast<float>(_Color[0]), static_cast<float>(_Color[1]), static_cast<float>(_Color[2]), static_cast<float>(_Color[3]) };
   }

@@ -1,5 +1,6 @@
 #pragma once
-#include <vdl/Types.hpp>
+#include <vdl/Fwd.hpp>
+#include <vdl/Flag.hpp>
 
 #include <vdl/Platform/Platform.hpp>
 
@@ -18,11 +19,11 @@ public:
 
   [[nodiscard]] virtual bool Update() = 0;
 
-  virtual void EnableDefaultActions(vdl::uint _DefaultActionFlags) = 0;
+  virtual void EnableDefaultActions(const vdl::System::DefaultActionFlags& _Flags) = 0;
 
-  virtual void DisableDefaultActions(vdl::uint _DefaultActionFlags) = 0;
+  virtual void DisableDefaultActions(const vdl::System::DefaultActionFlags& _Flags) = 0;
 
-  virtual void ReportDefaultActions(vdl::uint _DefaultActionFlags) = 0;
+  virtual void ReportDefaultActions(const vdl::System::DefaultActionFlags& _Flags) = 0;
 
   virtual void SetMaxFPS(vdl::uint _MaxFPS) = 0;
 

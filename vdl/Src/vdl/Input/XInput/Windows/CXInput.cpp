@@ -3,7 +3,7 @@
 #include <vdl/Math.hpp>
 #include <vdl/DetectMemoryLeak.hpp>
 
-#include <Windows.h>
+#include <vdl/pch/Windows/pch.hpp>
 #include <Xinput.h>
 
 void CXInput::Update()

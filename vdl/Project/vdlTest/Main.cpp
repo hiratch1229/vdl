@@ -70,22 +70,24 @@ void Main()
   const DepthStencilTexture SwapChainDepthStencilTexture = Window::GetDepthStencilTexture();
 
   uint SceneType = kInitSceneType;
-  uint MaxFPS = vdl::Constants::kDefaultMaxFPS;
+  uint MaxFPS = Constants::kDefaultMaxFPS;
 
   std::unique_ptr<IScene> pCurrentScene(GetNextScene(SceneType));
   pCurrentScene->Initialize();
 
-  while (vdl::System::Update())
+  constexpr GUI::WindowFlags kBeginFlag = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+
+  while (System::Update())
   {
-    ImGui::Begin("Information", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-    ImGui::SetWindowPos(ImGuiHelper::kInformationWindowPos);
-    ImGui::SetWindowSize(ImGuiHelper::kInformationWindowSize);
-    ImGui::Text("FPS:%d(1 / %f)", System::GetFPS(), System::GetDeltaTime());
-    ImGui::Text("CPU:%f%%", System::GetCPUUseRate());
-    ImGui::Text("Memory:%f%%", System::GetMemoryUseRate());
-    if (ImGui::InputInt("MaxFPS", reinterpret_cast<int*>(&MaxFPS)))
+    GUI::Begin("Information", nullptr, kBeginFlag);
+    GUI::SetWindowPos(GUIHelper::kInformationWindowPos);
+    GUI::SetWindowSize(GUIHelper::kInformationWindowSize);
+    GUI::Text("FPS:%d(1 / %f)", System::GetFPS(), System::GetDeltaTime());
+    GUI::Text("CPU:%f%%", System::GetCPUUseRate());
+    GUI::Text("Memory:%f%%", System::GetMemoryUseRate());
+    if (GUI::Input("MaxFPS", reinterpret_cast<int*>(&MaxFPS)))
     {
-      vdl::System::SetMaxFPS(MaxFPS);
+      System::SetMaxFPS(MaxFPS);
     }
 
     //  シーンの更新
@@ -94,7 +96,7 @@ void Main()
 
       IScene* pNextScene = nullptr;
       {
-        if (ImGui::Combo("Scene", reinterpret_cast<int*>(&SceneType), kSceneTypes, kSceneTypeNum))
+        if (GUI::Combo("Scene", reinterpret_cast<int*>(&SceneType), kSceneTypes, kSceneTypeNum))
         {
           pNextScene = GetNextScene(SceneType);
         }
@@ -117,6 +119,6 @@ void Main()
       }
     }
 
-    ImGui::End();
+    GUI::End();
   }
 }

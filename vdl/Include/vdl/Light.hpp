@@ -10,14 +10,14 @@ namespace vdl
   {
     float3 Direction;
     float Itensity;
-    ColorF Color;
+    Color4F Color;
   };
 
   struct PointLight
   {
     float3 Position;
     float Itensity;
-    ColorF Color;
+    Color4F Color;
     float3 Padding;
     float Range;
   };
@@ -37,7 +37,7 @@ namespace vdl
     float Itensity;
     float3 Direction;
     Radian Angle;
-    ColorF Color;
+    Color4F Color;
     float Range;
     float3 Padding;
   };

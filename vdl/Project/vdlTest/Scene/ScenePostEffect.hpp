@@ -12,15 +12,17 @@ class ScenePostEffect : public IScene
   static constexpr vdl::uint kShaderResourceNum = kGBufferNum + 2;  /* GBuffer + Depth + ShadowMap */
   static constexpr vdl::uint kShrinkBuffeNum = 4;
   static constexpr const char* kLigthPassPSFilePath = "Shader/PostEffect/LightPassPS.hlsl";
-  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(415, ImGuiHelper::kSceneWindowSize.y);
-  static constexpr vdl::uint2 kShadowMapDisplaySize = vdl::uint2(ImGuiHelper::kGBufferDisplaySize.x);
+  static constexpr vdl::uint2 kSceneWindowSize = vdl::uint2(415, GUIHelper::kSceneWindowSize.y);
+  static constexpr vdl::uint2 kShadowMapDisplaySize = vdl::uint2(GUIHelper::kGBufferDisplaySize.x);
 private:
   struct RenderingData
   {
     vdl::float3 EyePos;
     float LuminanceThreshold;
-    vdl::ColorF Fog;
-    vdl::ColorF Shadow;
+    vdl::Color3F Fog;
+    float Exposure;
+    vdl::Color3F Shadow;
+    float ShadowBias;
     vdl::Matrix InverseViewProjection;
   };
 private:

@@ -5,7 +5,7 @@
 
 #include <vdl/DetectMemoryLeak.hpp>
 
-#include <Windows.h>
+#include <vdl/pch/Windows/pch.hpp>
 
 void CKeyboard::Update()
 {

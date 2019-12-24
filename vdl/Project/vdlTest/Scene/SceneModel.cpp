@@ -12,27 +12,27 @@ void SceneModel::Update()
 {
   FreeCamera(&Camera_);
 
-  ImGui::Begin("Model");
+  GUI::Begin("Model");
   {
     const int DrawNum = DrawNum_;
-    if (ImGui::InputInt("DrawNum", reinterpret_cast<int*>(&DrawNum_)) && DrawNum_ < 0)
+    if (GUI::Input("DrawNum", reinterpret_cast<int*>(&DrawNum_)) && DrawNum_ < 0)
     {
       DrawNum_ = DrawNum;
     }
-    ImGui::SetNextTreeNodeOpen(false, ImGuiCond_Once);
-    if (ImGui::TreeNode("Camera"))
+
+    if (GUI::TreeNode("Camera"))
     {
-      ImGui::InputFloat3("Position", &Camera_.Position);
-      ImGui::InputFloat3("Target", &Camera_.Target);
-      ImGui::InputFloat3("Up", &Camera_.Up);
-      ImGui::InputFloat("Near", &Camera_.Near);
-      ImGui::InputFloat("Far", &Camera_.Far);
-      ImGui::InputFloat("Fov", reinterpret_cast<float*>(&Camera_.Fov));
-      ImGui::Checkbox("isPerspective", &Camera_.isPerspective);
-      ImGui::TreePop();
+      GUI::Input("Position", &Camera_.Position);
+      GUI::Input("Target", &Camera_.Target);
+      GUI::Input("Up", &Camera_.Up);
+      GUI::Input("Near", &Camera_.Near);
+      GUI::Input("Far", &Camera_.Far);
+      GUI::Input("Fov", reinterpret_cast<float*>(&Camera_.Fov));
+      GUI::Checkbox("isPerspective", &Camera_.isPerspective);
+      GUI::TreePop();
     }
   }
-  ImGui::End();
+  GUI::End();
 
   Renderer3D::SetCamera(Camera_);
 

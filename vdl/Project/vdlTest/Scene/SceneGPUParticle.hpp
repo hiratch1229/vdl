@@ -24,7 +24,7 @@ private:
   {
     vdl::float2 Position;
     vdl::float2 Velocity;
-    vdl::ColorF Color;
+    vdl::Color4F Color;
   };
   using UnorderedAccessBuffer = vdl::UnorderedAccessBuffer<Particle>;
 private:

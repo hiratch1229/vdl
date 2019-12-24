@@ -169,7 +169,7 @@ std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _i
   //  マテリアルデータの変換
   vdl::Materials Materials;
   {
-    auto CreateTexture = [](const vdl::CompressionImage& _CompressionImage, const vdl::Color& _DummyData)->vdl::Image
+    auto CreateTexture = [](const vdl::CompressionImage& _CompressionImage, const vdl::Color4& _DummyData)->vdl::Image
     {
       vdl::Image Image;
       {

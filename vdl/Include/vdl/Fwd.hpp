@@ -57,8 +57,10 @@ namespace vdl
   //-------------------------
   //  Color.hpp
   //-------------------------
-  struct Color;
-  struct ColorF;
+  struct Color3;
+  struct Color3F;
+  struct Color4;
+  struct Color4F;
 
   //-------------------------
   //  Vertex.hpp
@@ -165,13 +167,19 @@ namespace vdl
   //-------------------------
   //  ConstantBuffer.hpp
   //-------------------------
-  namespace Detail { class ConstantBufferData; }
+  namespace Detail
+  {
+    class ConstantBufferData;
+  }
   template<class T> class ConstantBuffer;
 
   //-------------------------
   //  UnorderedAccessBuffer.hpp
   //-------------------------
-  namespace Detail { class UnorderedAccessBufferData; }
+  namespace Detail
+  {
+    class UnorderedAccessBufferData;
+  }
   template<class T> class UnorderedAccessBuffer;
 
   //-------------------------
@@ -212,39 +220,101 @@ namespace vdl
   //-------------------------
   //  Cicle.hpp
   //-------------------------
-  namespace Geometry2D { struct Circle; }
+  namespace Geometry2D
+  {
+    struct Circle;
+  }
 
   //-------------------------
   //  Box.hpp
   //-------------------------
-  namespace Geometry3D { struct AABB; }
-  namespace Geometry3D { struct OBB; }
+  namespace Geometry3D
+  {
+    struct AABB;
+    struct OBB;
+  }
 
   //-------------------------
   //  Sphere.hpp
   //-------------------------
-  namespace Geometry3D { struct Sphere; }
+  namespace Geometry3D
+  {
+    struct Sphere;
+  }
 
   //-------------------------
   //  Capsule.hpp
   //-------------------------
-  namespace Geometry3D { struct Capsule; }
+  namespace Geometry3D
+  {
+    struct Capsule;
+  }
 
   //-------------------------
   //  Button.hpp
   //-------------------------
-  namespace Input { enum class InputDeviceType : uint8_t; }
-  namespace Input { class Button; }
+  namespace Input
+  {
+    enum class InputDeviceType : uint8_t;
+    class Button;
+  }
 
   //-------------------------
   //  XInput.hpp
   //-------------------------
-  namespace Input { class XInput; }
+  namespace Input
+  {
+    class XInput;
+  }
 
   //-------------------------
   //  Gamepad.hpp
   //-------------------------
-  namespace Input { class Gamepad; }
+  namespace Input
+  {
+    class Gamepad;
+  }
+
+  //-------------------------
+  //  Flag.hpp
+  //-------------------------
+  template<class FlagType, class DataType> class Flags;
+
+  //-------------------------
+  //  System.hpp
+  //-------------------------
+  namespace System
+  {
+    enum class DefaultActionFlag : uint8_t;
+    using DefaultActionFlags = Flags<DefaultActionFlag, uint8_t>;
+  }
+
+  //-------------------------
+  //  GUI.hpp
+  //-------------------------
+  namespace GUI
+  {
+    enum class WindowFlag : uint;
+    using WindowFlags = Flags<WindowFlag, uint>;
+    enum class InputTextFlag : uint;
+    using InputTextFlags = Flags<InputTextFlag, uint>;
+    enum class TreeNodeFlag : uint16_t;
+    using TreeNodeFlags = Flags<TreeNodeFlag, uint16_t>;
+    enum class SelectableFlag : uint8_t;
+    using SelectableFlags = Flags<SelectableFlag, uint8_t>;
+    enum class ComboFlag : uint8_t;
+    using ComboFlags = Flags<ComboFlag, uint8_t>;
+    enum class TabBarFlag : uint8_t;
+    using TabBarFlags = Flags<TabBarFlag, uint8_t>;
+    enum class TabItemFlag : uint8_t;
+    using TabItemFlags = Flags<TabItemFlag, uint8_t>;
+    enum class FocusedFlag : uint8_t;
+    using FocusedFlags = Flags<FocusedFlag, uint8_t>;
+    enum class HoveredFlag : uint8_t;
+    using HoveredFlags = Flags<HoveredFlag, uint8_t>;
+    enum class ColorEditFlag : uint;
+    using ColorEditFlags = Flags<ColorEditFlag, uint>;
+  }
 
   //-------------------------
   //-------------------------

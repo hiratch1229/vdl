@@ -3,6 +3,8 @@
 #include <vdl/Engine.hpp>
 #include <vdl/System/ISystem.hpp>
 
+#include <vdl/Flag.hpp>
+
 namespace vdl::System
 {
   bool Update()
@@ -12,17 +14,21 @@ namespace vdl::System
 
   void Exit()
   {
-    Engine::Get<ISystem>()->EnableDefaultActions(DefalutAction::eExit);
-    Engine::Get<ISystem>()->ReportDefaultActions(DefalutAction::eExit);
-    Engine::Get<ISystem>()->DisableDefaultActions(DefalutAction::eExit);
+    constexpr DefaultActionFlags kActionFlag = DefaultActionFlag::eExit;
+
+    ISystem* pSystem = Engine::Get<ISystem>();
+
+    pSystem->EnableDefaultActions(kActionFlag);
+    pSystem->ReportDefaultActions(kActionFlag);
+    pSystem->DisableDefaultActions(kActionFlag);
   }
 
-  void EnableDefaultActions(uint _DefaultActionFlags)
+  void EnableDefaultActions(const DefaultActionFlags& _DefaultActionFlags)
   {
     Engine::Get<ISystem>()->EnableDefaultActions(_DefaultActionFlags);
   }
 
-  void DisableDefaultActions(uint _DefaultActionFlags)
+  void DisableDefaultActions(const DefaultActionFlags& _DefaultActionFlags)
   {
     Engine::Get<ISystem>()->DisableDefaultActions(_DefaultActionFlags);
   }

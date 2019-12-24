@@ -42,7 +42,7 @@ vdl::ID CTextureManager::LoadCubeTexture(const vdl::Image& _Image)
   auto LoadTexture = [&_Image, &TextureSize](vdl::Image* _pImage, const vdl::uint2& _LeftTopPos)->void
   {
     _pImage->Resize(TextureSize);
-    vdl::Color* Buffer = _pImage->Buffer();
+    vdl::Color4* Buffer = _pImage->Buffer();
 
     for (vdl::uint y = 0; y < TextureSize.y; ++y)
     {

@@ -10,6 +10,8 @@
 #include <vdl/Input/Mouse/IMouse.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 
+#include <ThirdParty/ImGui/imgui.h>
+
 #include <vdl/Math.hpp>
 #include <vdl/Topology.hpp>
 #include <vdl/Scissor.hpp>
@@ -20,9 +22,9 @@
 #include <vdl/Macro.hpp>
 #include <vdl/DetectMemoryLeak.hpp>
 
-#include <ImGui/imgui.h>
 
-#include <Windows.h>
+#include <Vdl/pch/Windows/pch.hpp>
+
 #include <ctype.h>
 
 namespace
@@ -647,12 +649,14 @@ void CGUI::Initialize()
 
   //  ImGuiのフラグの設定
   {
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; //  ドッキング有効化
+
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;       // We can honor GetMouseCursor() values (optional)
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;        // We can honor io.WantSetMousePos requests (optional, rarely used)
     io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
     io.BackendRendererName = "vdl";
     io.BackendPlatformName = "vdl";
-    io.ImeWindowHandle = Engine::Get<IWindow>()->GetHandle();
+    //io.ImeWindowHandle = Engine::Get<IWindow>()->GetHandle();
 
     // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array that we will update during the application lifetime.
     io.KeyMap[ImGuiKey_Tab] = VK_TAB;

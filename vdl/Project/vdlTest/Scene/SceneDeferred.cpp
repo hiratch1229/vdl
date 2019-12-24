@@ -23,7 +23,7 @@ void SceneDeferred::Initialize()
 
   for (auto& Data : Datas_)
   {
-    Data.Color = ColorF(Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f));
+    Data.Color = Color4F(Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f));
     Data.MinRange.x = Random::Range(-kRectangleHalfScale, kRectangleHalfScale);
     Data.MinRange.z = Random::Range(-kRectangleHalfScale, kRectangleHalfScale);
     Data.MaxRange.x = Random::Range(-kRectangleHalfScale, kRectangleHalfScale);
@@ -51,7 +51,7 @@ void SceneDeferred::Initialize()
 
     DirectionLightPosition_ = Camera_.Position;
     const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up(), 5.0f, 500.0f, 30.0f, false);
-    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize/4.0f);
+    LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize / 4.0f);
     Renderer3D::SetVertexStageConstantBuffers(1, 1, &LightViewProjectionConstantBuffer_);
   }
 
@@ -82,7 +82,8 @@ void SceneDeferred::Initialize()
     {
       RenderingData.SpecularPower = 15.0f;
       RenderingData.Ambient = Palette::DimGray;
-      RenderingData.Shadow = ColorF(Palette::DimGray, 0.0001f);
+      RenderingData.Shadow = Palette::DimGray;
+      RenderingData.ShadowBias = 0.0001f;
     }
     Renderer::SetPixelStageConstantBuffers(1, 1, &RenderingConstantBuffer_);
     Renderer::SetPixelStageConstantBuffers(2, 1, &LightViewProjectionConstantBuffer_);
@@ -105,45 +106,46 @@ void SceneDeferred::Update()
       RenderingData.InverseViewProjection = (Renderer3D::GetView() * Renderer3D::GetProjection()).Inverse();
     }
 
-    ImGui::Begin("SceneDeferred", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    constexpr GUI::WindowFlags kSceneWindowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+    GUI::Begin("SceneDeferred", nullptr, kSceneWindowBeginFlags);
     {
-      ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
-      ImGui::SetWindowSize(kSceneWindowSize);
+      GUI::SetWindowPos(GUIHelper::kSceneWindowPos);
+      GUI::SetWindowSize(kSceneWindowSize);
 #if defined _DEBUG | DEBUG
-      if (ImGui::Button("Reload LightPassPS"))
+      if (GUI::Button("Reload LightPassPS"))
       {
         LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
         Renderer::SetPixelShader(LightPassPixelShader_);
       }
 #endif
-      ImGui::Checkbox("SphereUpdate", &isUpdate_);
-      ImGui::DragFloat("SpecularPower", &RenderingData.SpecularPower, 0.01f);
-      ImGui::ColorEdit3("Ambient", &RenderingData.Ambient);
-      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow);
-      ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha, 0.0f, 0.0f, "%.6f");
-      if (ImGui::TreeNode("DirectionalLight"))
+      GUI::Checkbox("SphereUpdate", &isUpdate_);
+      GUI::Drag("SpecularPower", &RenderingData.SpecularPower, 0.01f);
+      GUI::ColorEdit("Ambient", &RenderingData.Ambient);
+      GUI::ColorEdit("Shadow", &RenderingData.Shadow);
+      GUI::Input("ShadowBias", &RenderingData.ShadowBias, 0.0f, 0.0f, "%.6f");
+      if (GUI::TreeNode("DirectionalLight"))
       {
-        if (ImGui::DragFloat3("Position", &DirectionLightPosition_))
+        if (GUI::Drag("Position", &DirectionLightPosition_))
         {
           LightData.DirectionalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
 
           const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up(), 5.0f, 500.0f, 30.0f, false);
-          LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize/4);
+          LightViewProjectionConstantBuffer_.GetData() = Light.View() * Light.Projection(kWindowSize / 4);
         }
-        ImGui::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
-        ImGui::DragFloat("Itensity", &LightData.DirectionalLight.Itensity, 0.01f);
-        ImGui::ColorEdit3("Color", &LightData.DirectionalLight.Color);
-        ImGui::TreePop();
+        GUI::Text(std::string("Direction:" + std::to_string(LightData.DirectionalLight.Direction)).c_str());
+        GUI::Drag("Itensity", &LightData.DirectionalLight.Itensity, 0.01f);
+        GUI::ColorEdit("Color", &LightData.DirectionalLight.Color);
+        GUI::TreePop();
       }
-      if (ImGui::TreeNode("PointLight"))
+      if (GUI::TreeNode("PointLight"))
       {
-        ImGui::DragFloat("Itensity", &PointLightItensity_, 0.01f);
-        ImGui::DragFloat("Range", &PointLightRange_, 0.01f);
-        ImGui::TreePop();
+        GUI::Drag("Itensity", &PointLightItensity_, 0.01f);
+        GUI::Drag("Range", &PointLightRange_, 0.01f);
+        GUI::TreePop();
       }
     }
-    ImGui::End();
-    
+    GUI::End();
+
     if (isUpdate_)
     {
       const float DeltaTime = System::GetDeltaTime();
@@ -219,26 +221,27 @@ void SceneDeferred::Update()
     Renderer::Draw(3);
   }
 
-  ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  constexpr GUI::WindowFlags kRenderingFlowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+  GUI::Begin("RenderingFlow", nullptr, kRenderingFlowBeginFlags);
   {
-    ImGui::SetWindowPos(ImGuiHelper::kRenderingFlowWindowPos);
-    ImGui::SetWindowSize(ImGuiHelper::kRenderingFlowWindowSize);
+    GUI::SetWindowPos(GUIHelper::kRenderingFlowWindowPos);
+    GUI::SetWindowSize(GUIHelper::kRenderingFlowWindowSize);
 
-    if (ImGui::TreeNode("GBufferPass"))
+    if (GUI::TreeNode("GBufferPass"))
     {
-      ImGuiHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
-      ImGuiHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
-      ImGuiHelper::DrawRenderTexture("Specular", GBufferRenderTextures_[2], ImGuiHelper::kGBufferDisplaySize);
-      ImGuiHelper::DrawDepthTexture("Depth", GBufferDepthTexture_, ImGuiHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], GUIHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], GUIHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Specular", GBufferRenderTextures_[2], GUIHelper::kGBufferDisplaySize);
+      GUIHelper::DrawDepthTexture("Depth", GBufferDepthTexture_, GUIHelper::kGBufferDisplaySize);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("ShadowPass"))
+    if (GUI::TreeNode("ShadowPass"))
     {
-      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kShadowMapDisplaySize);
+      GUIHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kShadowMapDisplaySize);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
   }
-  ImGui::End();
+  GUI::End();
 }

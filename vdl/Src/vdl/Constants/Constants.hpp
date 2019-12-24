@@ -70,7 +70,7 @@ namespace Constants
 
   constexpr const char* kDefaultWindowName = "vdl";
 
-  constexpr vdl::ColorF kDefaultScreenClearColor = vdl::Palette::Black;
+  constexpr vdl::Color4F kDefaultScreenClearColor = vdl::Palette::Black;
 
   constexpr float kDefaultClearDepth = 1.0f;
 

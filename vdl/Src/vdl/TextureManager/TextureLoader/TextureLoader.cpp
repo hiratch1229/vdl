@@ -6,7 +6,7 @@
 #define STBI_NO_PIC
 #define STBI_NO_PSD
 #define STBI_NO_PNM
-#include <stb/stb_image.h>
+#include <ThirdParty/stb/stb_image.h>
 
 #include <vdl/Misc/Misc.hpp>
 

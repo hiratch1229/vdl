@@ -88,13 +88,25 @@ namespace vdl
   }
 
   template<class Archive>
-  inline void serialize(Archive& _Archive, Color& _Color)
+  inline void serialize(Archive& _Archive, Color3& _Color)
+  {
+    _Archive(_Color.Red, _Color.Green, _Color.Blue);
+  }
+
+  template<class Archive>
+  inline void serialize(Archive& _Archive, Color3F& _Color)
+  {
+    _Archive(_Color.Red, _Color.Green, _Color.Blue);
+  }
+
+  template<class Archive>
+  inline void serialize(Archive& _Archive, Color4& _Color)
   {
     _Archive(_Color.Red, _Color.Green, _Color.Blue, _Color.Alpha);
   }
 
   template<class Archive>
-  inline void serialize(Archive& _Archive, ColorF& _Color)
+  inline void serialize(Archive& _Archive, Color4F& _Color)
   {
     _Archive(_Color.Red, _Color.Green, _Color.Blue, _Color.Alpha);
   }

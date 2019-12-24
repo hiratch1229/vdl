@@ -60,8 +60,10 @@ void ScenePostEffect::Initialize()
     RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
     {
       RenderingData.LuminanceThreshold = 0.45f;
-      RenderingData.Shadow = ColorF(Palette::DimGray, 0.0001f);
-      RenderingData.Fog = ColorF(Palette::DimGray, 5.0f);
+      RenderingData.Fog = Palette::DimGray;
+      RenderingData.Exposure = 5.0f;
+      RenderingData.Shadow = Palette::DimGray;
+      RenderingData.ShadowBias = 0.0001f;
     }
     Renderer::SetPixelStageConstantBuffers(1, 1, &RenderingConstantBuffer_);
     Renderer::SetPixelStageConstantBuffers(2, 1, &LightViewProjectionConstantBuffer_);
@@ -104,35 +106,36 @@ void ScenePostEffect::Update()
       RenderingData.InverseViewProjection = (Camera_.View() * Camera_.Projection(kWindowSize)).Inverse();
     }
 
-    ImGui::Begin("ScenePostEffect", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    constexpr GUI::WindowFlags kSceneWindowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+    GUI::Begin("ScenePostEffect", nullptr, kSceneWindowBeginFlags);
     {
-      ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
-      ImGui::SetWindowSize(kSceneWindowSize);
+      GUI::SetWindowPos(GUIHelper::kSceneWindowPos);
+      GUI::SetWindowSize(kSceneWindowSize);
 #if defined _DEBUG | DEBUG
-      if (ImGui::Button("Reload LightPassPS"))
+      if (GUI::Button("Reload LightPassPS"))
       {
         LightPassPixelShader_ = PixelShader(kLigthPassPSFilePath);
         Renderer::SetPixelShader(LightPassPixelShader_);
       }
 #endif
-      ImGui::ColorEdit3("Shadow", &RenderingData.Shadow);
-      ImGui::InputFloat("ShadowBias", &RenderingData.Shadow.Alpha, 0.0f, 0.0f, "%.6f");
-      ImGui::ColorEdit3("Fog", &RenderingData.Fog);
-      ImGui::SliderFloat("LuminanceThreshold", &RenderingData.LuminanceThreshold, 0.0f, 1.0f);
-      ImGui::DragFloat("Exposure", &RenderingData.Fog.Alpha, 0.01f);
-      if (ImGui::TreeNode("DirectionalLight"))
+      GUI::ColorEdit("Shadow", &RenderingData.Shadow);
+      GUI::Input("ShadowBias", &RenderingData.ShadowBias, 0.0f, 0.0f, "%.6f");
+      GUI::ColorEdit("Fog", &RenderingData.Fog);
+      GUI::Slider("LuminanceThreshold", &RenderingData.LuminanceThreshold, 0.0f, 1.0f);
+      GUI::Drag("Exposure", &RenderingData.Exposure, 0.01f);
+      if (GUI::TreeNode("DirectionalLight"))
       {
-        if (ImGui::DragFloat3("Position", &DirectionLightPosition_))
+        if (GUI::Drag("Position", &DirectionLightPosition_))
         {
           DirectionalLight.Direction = float3(float3(0.0f) - DirectionLightPosition_).Normalize();
         }
-        ImGui::Text(std::string("Direction:" + std::to_string(DirectionalLight.Direction)).c_str());
-        ImGui::DragFloat("Itensity", &DirectionalLight.Itensity, 0.01f);
-        ImGui::ColorEdit3("Color", &DirectionalLight.Color);
-        ImGui::TreePop();
+        GUI::Text(std::string("Direction:" + std::to_string(DirectionalLight.Direction)).c_str());
+        GUI::Drag("Itensity", &DirectionalLight.Itensity, 0.01f);
+        GUI::ColorEdit("Color", &DirectionalLight.Color);
+        GUI::TreePop();
       }
     }
-    ImGui::End();
+    GUI::End();
   }
 
   const Camera Light = Camera(DirectionLightPosition_, float3(0.0f), float3::Up(), 5.0f, 500.0f, 30.0f, false);
@@ -228,41 +231,42 @@ void ScenePostEffect::Update()
     }
   }
 
-  ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  constexpr GUI::WindowFlags kRenderingFlowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+  GUI::Begin("RenderingFlow", nullptr, kRenderingFlowBeginFlags);
   {
-    ImGui::SetWindowPos(ImGuiHelper::kRenderingFlowWindowPos);
-    ImGui::SetWindowSize(ImGuiHelper::kRenderingFlowWindowSize);
+    GUI::SetWindowPos(GUIHelper::kRenderingFlowWindowPos);
+    GUI::SetWindowSize(GUIHelper::kRenderingFlowWindowSize);
 
-    if (ImGui::TreeNode("GBufferPass"))
+    if (GUI::TreeNode("GBufferPass"))
     {
-      ImGuiHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
-      ImGuiHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
-      ImGuiHelper::DrawDepthTexture("Depth", GBufferDepthTexture_, ImGuiHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], GUIHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], GUIHelper::kGBufferDisplaySize);
+      GUIHelper::DrawDepthTexture("Depth", GBufferDepthTexture_, GUIHelper::kGBufferDisplaySize);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("ShadowPass"))
+    if (GUI::TreeNode("ShadowPass"))
     {
-      ImGuiHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kShadowMapDisplaySize);
+      GUIHelper::DrawDepthTexture("ShadowMap", ShadowMap_, kShadowMapDisplaySize);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("LightPass"))
+    if (GUI::TreeNode("LightPass"))
     {
-      ImGuiHelper::DrawRenderTexture("Color", LightPassRenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
-      ImGuiHelper::DrawRenderTexture("Luminance", LightPassRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Color", LightPassRenderTextures_[0], GUIHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Luminance", LightPassRenderTextures_[1], GUIHelper::kGBufferDisplaySize);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
-    if (ImGui::TreeNode("PostProcess"))
+    if (GUI::TreeNode("PostProcess"))
     {
       for (vdl::uint ShrinkBufferCount = 0; ShrinkBufferCount < kShrinkBuffeNum; ++ShrinkBufferCount)
       {
-        ImGuiHelper::DrawRenderTexture(std::string("ShrinkBuffer" + std::to_string(ShrinkBufferCount)).c_str(), ShrinkBuffers_[ShrinkBufferCount], ImGuiHelper::kGBufferDisplaySize);
+        GUIHelper::DrawRenderTexture(std::string("ShrinkBuffer" + std::to_string(ShrinkBufferCount)).c_str(), ShrinkBuffers_[ShrinkBufferCount], GUIHelper::kGBufferDisplaySize);
       }
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
   }
-  ImGui::End();
+  GUI::End();
 }

@@ -86,7 +86,7 @@ namespace
     return 0;
   }
 
-  inline vk::ClearColorValue Cast(const vdl::ColorF& _Color)
+  inline vk::ClearColorValue Cast(const vdl::Color4F& _Color)
   {
     return std::array<float, 4>({ _Color.Red, _Color.Green, _Color.Blue, _Color.Alpha });
   }
@@ -1110,7 +1110,7 @@ void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint
 #undef SetComputeState
 #pragma endregion
 
-void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)
+void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::Color4F& _ClearColor)
 {
   assert(!_RenderTexture.isEmpty());
 
@@ -1172,7 +1172,7 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   }
 }
 
-void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)
+void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::Color4F& _ClearColor)
 {
   assert(!_UnorderedAccessTexture.isEmpty());
 

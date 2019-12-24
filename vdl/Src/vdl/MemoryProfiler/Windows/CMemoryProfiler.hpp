@@ -1,7 +1,7 @@
 #pragma once
 #include "../IMemoryProfiler.hpp"
 
-#include <Windows.h>
+#include <vdl/pch/Windows/pch.hpp>
 
 class CMemoryProfiler : public IMemoryProfiler
 {

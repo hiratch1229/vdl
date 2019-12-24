@@ -437,7 +437,7 @@ void CRenderer::Draw(vdl::uint _VertexCount)
   EmptyRendererCommandList_.PushDrawData(Empty(), std::move(_VertexCount));
 }
 
-void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::ColorF& _Color)
+void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::Color4F& _Color)
 {
   //  ï\é¶Ç≥ÇÍÇ»Ç¢Ç‡ÇÃÇÕèúÇ≠
   if (_Color.Alpha <= 0.0f || _DestSize.x * _DestSize.y == 0.0f)
@@ -467,7 +467,7 @@ void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftT
   TextureRendererCommandList_.PushDrawData(_Texture, std::move(Instance));
 }
 
-void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _World, const vdl::ColorF& _Color)
+void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _World, const vdl::Color4F& _Color)
 {
   //  ï\é¶Ç≥ÇÍÇ»Ç¢Ç‡ÇÃÇÕèúÇ≠
   if (_Color.Alpha <= 0.0f)
@@ -490,7 +490,7 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
   StaticMeshRendererCommandList_.PushDrawData(_StaticMesh, std::move(Instance));
 }
 
-void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const vdl::MotionBlendDatas& _MotionBlendDatas, const vdl::ColorF& _Color)
+void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const vdl::MotionBlendDatas& _MotionBlendDatas, const vdl::Color4F& _Color)
 {
   //  ï\é¶Ç≥ÇÍÇ»Ç¢Ç‡ÇÃÇÕèúÇ≠
   if (_Color.Alpha <= 0.0f)
@@ -513,7 +513,7 @@ void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _W
   SkinnedMeshRendererCommandList_.PushDrawData(_SkinnedMesh, std::move(Instance));
 }
 
-void CRenderer::Clear(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)
+void CRenderer::Clear(const vdl::RenderTexture& _RenderTexture, const vdl::Color4F& _ClearColor)
 {
   Flush();
 
@@ -527,7 +527,7 @@ void CRenderer::Clear(const vdl::DepthStencilTexture& _DepthStencilTexture, floa
   pDeviceContext_->ClearDepthStencilTexture(_DepthStencilTexture, _ClearDepth, _ClearStencil);
 }
 
-void CRenderer::Clear(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)
+void CRenderer::Clear(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::Color4F& _ClearColor)
 {
   Flush();
 

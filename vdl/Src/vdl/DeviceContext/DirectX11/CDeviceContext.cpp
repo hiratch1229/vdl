@@ -270,20 +270,20 @@ namespace
     return D3D11_TEXTURE_ADDRESS_WRAP;
   }
 
-  inline vdl::ColorF Cast(vdl::BorderColorType _Type)
+  inline vdl::Color4F Cast(vdl::BorderColorType _Type)
   {
     switch (_Type)
     {
     case vdl::BorderColorType::eTransparent:
-      return vdl::ColorF(0.0f, 0.0f, 0.0f, 0.0f);
+      return vdl::Color4F(0.0f, 0.0f, 0.0f, 0.0f);
     case vdl::BorderColorType::eBlack:
-      return vdl::ColorF(0.0f, 0.0f, 0.0f, 1.0f);
+      return vdl::Color4F(0.0f, 0.0f, 0.0f, 1.0f);
     case vdl::BorderColorType::eWhite:
-      return vdl::ColorF(1.0f, 1.0f, 1.0f, 1.0f);
+      return vdl::Color4F(1.0f, 1.0f, 1.0f, 1.0f);
     default: assert(false);
     }
 
-    return vdl::ColorF();
+    return vdl::Color4F();
   }
 }
 
@@ -745,7 +745,7 @@ void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint
   pD3D11ImmediateContext_->CSSetUnorderedAccessViews(_StartSlot, _UnorderedAccessObjectNum, pUnorderedAccessBuffers.data(), nullptr);
 }
 
-void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::ColorF& _ClearColor)
+void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::Color4F& _ClearColor)
 {
   assert(!_RenderTexture.isEmpty());
 
@@ -759,7 +759,7 @@ void CDeviceContext::ClearDepthStencilTexture(const vdl::DepthStencilTexture& _D
   pD3D11ImmediateContext_->ClearDepthStencilView(Cast<CDepthStencilTexture>(pTextureManager_->GetTexture(_DepthStencilTexture.GetID()))->pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, _ClearDepth, _ClearStencil);
 }
 
-void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::ColorF& _ClearColor)
+void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::Color4F& _ClearColor)
 {
   assert(!_UnorderedAccessTexture.isEmpty());
 

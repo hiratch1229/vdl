@@ -20,11 +20,11 @@ namespace vdl::Renderer
     SetRenderTextures(_OutputManager.RenderTextures, _OutputManager.DepthStencilTexture);
   }
 
-  void Clear(const RenderTexture& _RenderTexure, const ColorF& _ClearColor = Palette::Black);
+  void Clear(const RenderTexture& _RenderTexure, const Color4F& _ClearColor = Palette::Black);
 
   void Clear(const DepthStencilTexture& _DepthStencilTexture, float _ClearDepth = 1.0f, uint _ClearStencil = 0);
 
-  void Clear(const UnorderedAccessTexture& _UnorderedAccessTexture, const ColorF& _ClearColor = Palette::Black);
+  void Clear(const UnorderedAccessTexture& _UnorderedAccessTexture, const Color4F& _ClearColor = Palette::Black);
 
   void SetTopology(TopologyType _Topology);
 

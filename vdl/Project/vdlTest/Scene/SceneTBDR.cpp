@@ -31,7 +31,7 @@ void SceneTBDR::Initialize()
     {
       for (auto& Data : Datas)
       {
-        Data.Color = ColorF(Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f));
+        Data.Color = Color4F(Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f), Random::Range(0.0f, 1.0f));
         Data.Timer = 0.0f;
         Data.Time = Random::Range(kMinUpdateTime, kMaxUpdateTime);
 
@@ -127,7 +127,7 @@ void SceneTBDR::Initialize()
       Renderer::SetPixelStageConstantBuffers(0, 1, &DirectinalLightConstantBuffer_);
       RenderingData& RenderingData = RenderingConstantBuffer_.GetData();
       {
-        RenderingData.AmbientColor = { 0.5f,0.5f,0.5f };
+        RenderingData.AmbientColor = Palette::DimGray;
         RenderingData.PointLightNum = kMaxDataNum;
       }
       Renderer::SetPixelStageConstantBuffers(1, 1, &RenderingConstantBuffer_);
@@ -162,44 +162,45 @@ void SceneTBDR::Update()
     }
     UpdateData& UpdateData = UpdateConstantBuffer_.GetData();
 
-    ImGui::Begin("SceneTBDR", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    constexpr GUI::WindowFlags kSceneWindowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+    GUI::Begin("SceneTBDR", nullptr, kSceneWindowBeginFlags);
     {
-      ImGui::SetWindowPos(ImGuiHelper::kSceneWindowPos);
-      ImGui::SetWindowSize(kSceneWindowSize);
+      GUI::SetWindowPos(GUIHelper::kSceneWindowPos);
+      GUI::SetWindowSize(kSceneWindowSize);
 #if defined _DEBUG | DEBUG
-      if (ImGui::Button("Reload TileBaseCS"))
+      if (GUI::Button("Reload TileBaseCS"))
       {
         TileBaseComputeShader_ = ComputeShader(kTileBaseComputeShaderFilePath);
         Computer::SetShader(TileBaseComputeShader_);
       }
 #endif
-      ImGui::Checkbox("TileBased", &isTileBase);
-      int CurrentPointLightNum = static_cast<int>(RenderingData.PointLightNum);
-      if (ImGui::SliderInt("PointLightNum", &CurrentPointLightNum, 0, kMaxDataNum))
+      GUI::Checkbox("TileBased", &isTileBase);
+      uint CurrentPointLightNum = RenderingData.PointLightNum;
+      if (GUI::Slider("PointLightNum", &CurrentPointLightNum, 0u, kMaxDataNum))
       {
         if (0 <= CurrentPointLightNum && CurrentPointLightNum <= kMaxDataNum)
         {
           RenderingData.PointLightNum = CurrentPointLightNum;
         }
       }
-      ImGui::ColorEdit3("Ambient", &RenderingData.AmbientColor.x);
-      if (ImGui::TreeNode("DirectionalLight"))
+      GUI::ColorEdit("Ambient", &RenderingData.AmbientColor);
+      if (GUI::TreeNode("DirectionalLight"))
       {
         DirectinalLight& DirectinalLight = DirectinalLightConstantBuffer_.GetData();
-        ImGui::DragFloat3("Direction", &DirectinalLight.Direction);
-        ImGui::Text(std::string("Direction:" + std::to_string(DirectinalLight.Direction)).c_str());
-        ImGui::DragFloat("Itensity", &DirectinalLight.Itensity, 0.01f);
-        ImGui::ColorEdit3("Color", &DirectinalLight.Color);
-        ImGui::TreePop();
+        GUI::Drag("Direction", &DirectinalLight.Direction);
+        GUI::Text(std::string("Direction:" + std::to_string(DirectinalLight.Direction)).c_str());
+        GUI::Drag("Itensity", &DirectinalLight.Itensity, 0.01f);
+        GUI::ColorEdit("Color", &DirectinalLight.Color);
+        GUI::TreePop();
       }
-      if (ImGui::TreeNode("PointLight"))
+      if (GUI::TreeNode("PointLight"))
       {
-        ImGui::DragFloat("Itensity", &UpdateData.PointLightItensity, 0.01f);
-        ImGui::DragFloat("Range", &UpdateData.PointLightRange, 0.01f);
-        ImGui::TreePop();
+        GUI::Drag("Itensity", &UpdateData.PointLightItensity, 0.01f);
+        GUI::Drag("Range", &UpdateData.PointLightRange, 0.01f);
+        GUI::TreePop();
       }
     }
-    ImGui::End();
+    GUI::End();
 
     //  ポイントライトの更新
     {
@@ -258,18 +259,19 @@ void SceneTBDR::Update()
     }
   }
 
-  ImGui::Begin("RenderingFlow", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  constexpr GUI::WindowFlags kRenderingFlowBeginFlags = GUI::WindowFlags(GUI::WindowFlag::eNoMove) | GUI::WindowFlag::eNoResize;
+  GUI::Begin("RenderingFlow", nullptr, kRenderingFlowBeginFlags);
   {
-    ImGui::SetWindowPos(ImGuiHelper::kRenderingFlowWindowPos);
-    ImGui::SetWindowSize(ImGuiHelper::kRenderingFlowWindowSize);
+    GUI::SetWindowPos(GUIHelper::kRenderingFlowWindowPos);
+    GUI::SetWindowSize(GUIHelper::kRenderingFlowWindowSize);
 
-    if (ImGui::TreeNode("GBufferPass"))
+    if (GUI::TreeNode("GBufferPass"))
     {
-      ImGuiHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], ImGuiHelper::kGBufferDisplaySize);
-      ImGuiHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], ImGuiHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Diffuse", GBufferRenderTextures_[0], GUIHelper::kGBufferDisplaySize);
+      GUIHelper::DrawRenderTexture("Normal", GBufferRenderTextures_[1], GUIHelper::kGBufferDisplaySize);
 
-      ImGui::TreePop();
+      GUI::TreePop();
     }
   }
-  ImGui::End();
+  GUI::End();
 }

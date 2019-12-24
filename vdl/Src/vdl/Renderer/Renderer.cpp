@@ -73,7 +73,7 @@ namespace vdl
       Engine::Get<IRenderer>()->SetRenderTextures(_RenderTextures, _DepthStencilTexture);
     }
 
-    void Clear(const RenderTexture& _RenderTexure, const ColorF& _ClearColor)
+    void Clear(const RenderTexture& _RenderTexure, const Color4F& _ClearColor)
     {
       Engine::Get<IRenderer>()->Clear(_RenderTexure, _ClearColor);
     }
@@ -83,7 +83,7 @@ namespace vdl
       Engine::Get<IRenderer>()->Clear(_DepthStencilTexture, _ClearDepth, _ClearStencil);
     }
 
-    void Clear(const UnorderedAccessTexture& _UnorderedAccessTexture, const ColorF& _ClearColor)
+    void Clear(const UnorderedAccessTexture& _UnorderedAccessTexture, const Color4F& _ClearColor)
     {
       assert(!_UnorderedAccessTexture.isEmpty());
 
@@ -532,7 +532,7 @@ namespace vdl
       Engine::Get<IRenderer>()->SetConstantBuffers(_StartSlot, _BufferNum, _ConstantBuffers, ShaderType::ePixelShader, InputLayoutType::eTexture);
     }
 
-    void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const ColorF& _Color)
+    void Draw(const Texture& _Texture, const float2& _DestLeftTop, const float2& _DestSize, const float2& _SrcLeftPos, const float2& _SrcSize, const Degree& _Angle, const Color4F& _Color)
     {
       assert(!_Texture.isEmpty());
 
@@ -831,21 +831,21 @@ namespace vdl
       pRenderer->SetConstantBuffers(_StartSlot, _BufferNum, _ConstantBuffers, ShaderType::ePixelShader, InputLayoutType::eSkinnedMesh);
     }
 
-    void Draw(const StaticMesh& _StaticMesh, const Matrix& _World, const ColorF& _Color)
+    void Draw(const StaticMesh& _StaticMesh, const Matrix& _World, const Color4F& _Color)
     {
       assert(!_StaticMesh.isEmpty());
 
       Engine::Get<IRenderer>()->Draw(_StaticMesh, _World, _Color);
     }
 
-    void Draw(const SkinnedMesh& _SkinnedMesh, const Matrix& _World, const MotionData& _MotionData, const ColorF& _Color)
+    void Draw(const SkinnedMesh& _SkinnedMesh, const Matrix& _World, const MotionData& _MotionData, const Color4F& _Color)
     {
       assert(!_SkinnedMesh.isEmpty());
 
       Engine::Get<IRenderer>()->Draw(_SkinnedMesh, _World, { _MotionData }, _Color);
     }
 
-    void Draw(const SkinnedMesh& _SkinnedMesh, const Matrix& _World, const MotionBlendDatas& _MotionBlendDatas, const ColorF& _Color)
+    void Draw(const SkinnedMesh& _SkinnedMesh, const Matrix& _World, const MotionBlendDatas& _MotionBlendDatas, const Color4F& _Color)
     {
       assert(!_SkinnedMesh.isEmpty());
 
