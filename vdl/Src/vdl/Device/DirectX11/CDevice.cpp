@@ -25,14 +25,10 @@
 namespace
 {
   constexpr const char* kShaderTargets[static_cast<vdl::uint>(ShaderType::eNum)] = { "vs_5_0", "hs_5_0", "ds_5_0", "gs_5_0", "ps_5_0", "cs_5_0" };
+  constexpr vdl::uint kCompileFlag = D3DCOMPILE_ENABLE_STRICTNESS;
 
   inline void ComplieShader(ID3DBlob** _ppCode, const char* _Target, const char* _FilePath, const char* _EntryPoint)
   {
-    vdl::uint CompileFlag = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined _DEBUG | DEBUG
-    CompileFlag |= D3DCOMPILE_DEBUG;
-#endif
-
     wchar_t wFilePath[Constants::kMaxCharacterNum]{};
     ::mbstowcs_s(nullptr, wFilePath, _FilePath, Constants::kMaxCharacterNum);
 
@@ -40,22 +36,17 @@ namespace
 
     Microsoft::WRL::ComPtr<ID3DBlob> pError;
     hr = ::D3DCompileFromFile(wFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-      _EntryPoint, _Target, CompileFlag, 0, _ppCode, pError.GetAddressOf());
+      _EntryPoint, _Target, kCompileFlag, 0, _ppCode, pError.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), static_cast<const char*>(pError->GetBufferPointer()));
   }
 
   inline void ComplieShader(ID3DBlob** _ppCode, const char* _Target, const char* _Source, vdl::uint _DataSize, const char* _EntryPoint)
   {
-    vdl::uint CompileFlag = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined _DEBUG | DEBUG
-    CompileFlag |= D3DCOMPILE_DEBUG;
-#endif
-
     HRESULT hr = S_OK;
 
     Microsoft::WRL::ComPtr<ID3DBlob> pError;
     hr = ::D3DCompile(_Source, _DataSize, nullptr, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-      _EntryPoint, _Target, CompileFlag, 0, _ppCode, pError.GetAddressOf());
+      _EntryPoint, _Target, kCompileFlag, 0, _ppCode, pError.GetAddressOf());
     _ASSERT_EXPR_A(SUCCEEDED(hr), static_cast<const char*>(pError->GetBufferPointer()));
   }
 
@@ -776,9 +767,8 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
 
   HRESULT hr = S_OK;
 
-  const char* ShaderTarget = kShaderTargets[static_cast<vdl::uint>(_Type)];
-
   Microsoft::WRL::ComPtr<ID3DBlob> pCode;
+  ::ComplieShader(pCode.GetAddressOf(), kShaderTargets[static_cast<vdl::uint>(_Type)], _FilePath, _EntryPoint);
   switch (_Type)
   {
     //case ShaderType::eVertexShader:
@@ -787,7 +777,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   {
     CHullShader* pShader = new CHullShader;
 
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _FilePath, _EntryPoint);
 
     Microsoft::WRL::ComPtr<ID3D11HullShader> pHullShader;
     {
@@ -802,8 +791,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   {
     CDomainShader* pShader = new CDomainShader;
 
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _FilePath, _EntryPoint);
-
     Microsoft::WRL::ComPtr<ID3D11DomainShader> pDomainShader;
     {
       hr = pD3D11Device_->CreateDomainShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pDomainShader.GetAddressOf());
@@ -816,8 +803,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   case ShaderType::eGeometryShader:
   {
     CGeometryShader* pShader = new CGeometryShader;
-
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _FilePath, _EntryPoint);
 
     Microsoft::WRL::ComPtr<ID3D11GeometryShader> pGeometryShader;
     {
@@ -832,8 +817,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   {
     CPixelShader* pShader = new CPixelShader;
 
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _FilePath, _EntryPoint);
-
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
     {
       hr = pD3D11Device_->CreatePixelShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pPixelShader.GetAddressOf());
@@ -846,8 +829,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _FilePath, const char*
   case ShaderType::eComputeShader:
   {
     CComputeShader* pShader = new CComputeShader;
-
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _FilePath, _EntryPoint);
 
     Microsoft::WRL::ComPtr<ID3D11ComputeShader> pComputeShader;
     {
@@ -869,9 +850,8 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
 
   HRESULT hr = S_OK;
 
-  const char* ShaderTarget = kShaderTargets[static_cast<vdl::uint>(_Type)];
-
   Microsoft::WRL::ComPtr<ID3DBlob> pCode;
+  ::ComplieShader(pCode.GetAddressOf(), kShaderTargets[static_cast<vdl::uint>(_Type)], _Source, _DataSize, _EntryPoint);
   switch (_Type)
   {
     //case ShaderType::eVertexShader:
@@ -879,8 +859,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   case ShaderType::eHullShader:
   {
     CHullShader* pShader = new CHullShader;
-
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _Source, _DataSize, _EntryPoint);
 
     Microsoft::WRL::ComPtr<ID3D11HullShader> pHullShader;
     {
@@ -895,8 +873,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   {
     CDomainShader* pShader = new CDomainShader;
 
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _Source, _DataSize, _EntryPoint);
-
     Microsoft::WRL::ComPtr<ID3D11DomainShader> pDomainShader;
     {
       hr = pD3D11Device_->CreateDomainShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pDomainShader.GetAddressOf());
@@ -909,8 +885,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   case ShaderType::eGeometryShader:
   {
     CGeometryShader* pShader = new CGeometryShader;
-
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _Source, _DataSize, _EntryPoint);
 
     Microsoft::WRL::ComPtr<ID3D11GeometryShader> pGeometryShader;
     {
@@ -925,8 +899,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   {
     CPixelShader* pShader = new CPixelShader;
 
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _Source, _DataSize, _EntryPoint);
-
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
     {
       hr = pD3D11Device_->CreatePixelShader(pCode->GetBufferPointer(), pCode->GetBufferSize(), nullptr, pShader->pPixelShader.GetAddressOf());
@@ -939,8 +911,6 @@ void CDevice::LoadShader(IShader** _ppShader, const char* _Source, vdl::uint _Da
   case ShaderType::eComputeShader:
   {
     CComputeShader* pShader = new CComputeShader;
-
-    ::ComplieShader(pCode.GetAddressOf(), ShaderTarget, _Source, _DataSize, _EntryPoint);
 
     Microsoft::WRL::ComPtr<ID3D11ComputeShader> pComputeShader;
     {
@@ -962,12 +932,10 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _FilePath,
   CVertexShader* pShader = new CVertexShader;
   pShader->InputLayout = _InputLayout;
 
-  constexpr const char* kShaderTarget = kShaderTargets[static_cast<vdl::uint>(ShaderType::eVertexShader)];
-
   HRESULT hr = S_OK;
 
   Microsoft::WRL::ComPtr<ID3DBlob> pCode;
-  ::ComplieShader(pCode.GetAddressOf(), kShaderTarget, _FilePath, _EntryPoint);
+  ::ComplieShader(pCode.GetAddressOf(), kShaderTargets[static_cast<vdl::uint>(ShaderType::eVertexShader)], _FilePath, _EntryPoint);
 
   Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
   {
@@ -991,12 +959,10 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, v
   CVertexShader* pShader = new CVertexShader;
   pShader->InputLayout = _InputLayout;
 
-  constexpr const char* kShaderTarget = kShaderTargets[static_cast<vdl::uint>(ShaderType::eVertexShader)];
-
   HRESULT hr = S_OK;
 
   Microsoft::WRL::ComPtr<ID3DBlob> pCode;
-  ::ComplieShader(pCode.GetAddressOf(), kShaderTarget, _Source, _DataSize, _EntryPoint);
+  ::ComplieShader(pCode.GetAddressOf(), kShaderTargets[static_cast<vdl::uint>(ShaderType::eVertexShader)], _Source, _DataSize, _EntryPoint);
 
   Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
   {

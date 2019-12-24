@@ -5,12 +5,11 @@
 #include <vdl/Engine.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/Constants/Constants.hpp>
-#include <vdl/Misc/Windows/Misc.hpp>
+#include <vdl/Misc/Misc.hpp>
 
 #include <vdl/Image.hpp>
+#include <vdl/Serialize.hpp>
 #include <vdl/DetectMemoryLeak.hpp>
-
-#include <filesystem>
 
 void CTextureManager::Initialize()
 {
@@ -95,39 +94,39 @@ vdl::ID CTextureManager::CreateUnorderedAccessTexture(const vdl::uint2& _Texture
 
 vdl::Image CTextureManager::GetImageFromFilePath(const char* _FilePath, bool _isSerialize)const
 {
+  const std::filesystem::path OriginalFilePath = _FilePath;
   const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
   const std::filesystem::path BinaryFilePath = (BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).concat(Constants::kBinaryFileFormat);
+  const bool existOriginalFile = std::filesystem::exists(OriginalFilePath);
 
   vdl::Image Image;
-  if (_isSerialize)
   {
-    //  バイナリファイルが存在する場合ファイルから読み込む
-    if (std::filesystem::exists(BinaryFilePath))
+    //  バイナリファイルが存在して、元ファイルの更新日時が古い場合読み込み
+    if (_isSerialize
+      && std::filesystem::exists(BinaryFilePath) && !(existOriginalFile && ::isFileUpdate(OriginalFilePath, BinaryFilePath)))
     {
       vdl::CompressionImage CompressionImage;
       ::ImportFromBinary(BinaryFilePath.string().c_str(), CompressionImage);
       Image = CompressionImage;
     }
-  }
-
-  if (Image.isEmpty())
-  {
-    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
-
-    Image = TextureLoader().LoadFromFile(_FilePath);
-
-    if (_isSerialize)
+    else
     {
-      //  フォルダが存在しない場合作成
-      if (!std::filesystem::exists(BinaryFileDirectory))
-      {
-        std::filesystem::create_directories(BinaryFileDirectory);
-      }
+      _ASSERT_EXPR_A(existOriginalFile, std::string(std::string(_FilePath) + "が見つかりません。").c_str());
 
-      //  バイナリファイルに書き出し
-      vdl::CompressionImage CompressionImage = Image;
-      ::ExportToBinary(BinaryFilePath.string().c_str(), CompressionImage);
+      Image = TextureLoader().LoadFromFile(_FilePath);
+
+      if (_isSerialize)
+      {
+        //  フォルダが存在しない場合作成
+        if (!std::filesystem::exists(BinaryFileDirectory))
+        {
+          std::filesystem::create_directories(BinaryFileDirectory);
+        }
+
+        //  バイナリファイルに書き出し
+        vdl::CompressionImage CompressionImage = Image;
+        ::ExportToBinary(BinaryFilePath.string().c_str(), CompressionImage);
+      }
     }
   }
 

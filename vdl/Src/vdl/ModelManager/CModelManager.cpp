@@ -3,16 +3,14 @@
 #include "ModelLoader/FBXLoader.hpp"
 #include "ModelLoader/glTFLoader.hpp"
 
-#include <vdl/Constants/Constants.hpp>
-#include <vdl/Misc/Windows/Misc.hpp>
-
-#include <vdl/Model.hpp>
-
 #include <ThirdParty/meshoptimizer/meshoptimizer.h>
 
-#include <vdl/DetectMemoryLeak.hpp>
+#include <vdl/Constants/Constants.hpp>
+#include <vdl/Misc/Misc.hpp>
 
-#include <filesystem>
+#include <vdl/Model.hpp>
+#include <vdl/Serialize.hpp>
+#include <vdl/DetectMemoryLeak.hpp>
 
 namespace
 {
@@ -104,22 +102,24 @@ vdl::ID CModelManager::Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl:
 
 std::vector<vdl::SkinnedMesh> CModelManager::Load(const char* _FilePath, bool _isSerialize)
 {
+  const std::filesystem::path OriginalFilePath = _FilePath;
   const std::filesystem::path BinaryFileDirectory = std::filesystem::path(Constants::kBinaryFileDirectory) / std::filesystem::path(_FilePath).remove_filename();
   const std::filesystem::path BinaryFilePath = (BinaryFileDirectory / std::filesystem::path(_FilePath).filename()).concat(Constants::kBinaryFileFormat);
+  const bool existOriginalFile = std::filesystem::exists(OriginalFilePath);
 
   ModelData ModelData;
   {
-    const std::string FileFormat = GetFileFormat(_FilePath);
-
-    //  バイナリファイルが存在する場合ファイルから読み込む
-    if (_isSerialize && std::filesystem::exists(BinaryFilePath))
+    //  バイナリファイルが存在して、元ファイルの更新日時が古い場合読み込み
+    if (_isSerialize
+      && std::filesystem::exists(BinaryFilePath) && !(existOriginalFile && ::isFileUpdate(OriginalFilePath, BinaryFilePath)))
     {
       ::ImportFromBinary(BinaryFilePath.string().c_str(), ModelData);
     }
     else
     {
-      _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-        std::string(std::string(_FilePath) + "が見つかりません。").c_str());
+      _ASSERT_EXPR_A(existOriginalFile, std::string(std::string(_FilePath) + "が見つかりません。").c_str());
+
+      const std::string FileFormat = GetFileFormat(_FilePath);
 
       if (FBXLoader::CheckSupportFormat(FileFormat))
       {

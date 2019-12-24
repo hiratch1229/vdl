@@ -64,6 +64,14 @@ namespace Constants
 
   constexpr const char* kBinaryFileFormat = ".bin";
 
+#if defined VDL_USING_DIRECTX11
+  constexpr const char* kShaderBinaryFileFormat = "_d3d11.bin";
+#elif defined VDL_USING_DIRECTX12
+  constexpr const char* kShaderBinaryFileFormat = "_d3d12.bin";
+#elif defined VDL_USING_VULKAN
+  constexpr const char* kShaderBinaryFileFormat = "_vk.bin";
+#endif
+
   constexpr const char* kScreenShotFileDirectory = "ScreenShot/";
 
   constexpr const char* kClassName = "vdl";
