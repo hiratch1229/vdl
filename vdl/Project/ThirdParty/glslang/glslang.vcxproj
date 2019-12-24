@@ -65,11 +65,6 @@
     <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\GlslangToSpv.h" />
     <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\hex_float.h" />
     <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\Logger.h" />
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\instrument.hpp" />
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\libspirv.h" />
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\libspirv.hpp" />
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\linker.hpp" />
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\optimizer.hpp" />
     <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv.hpp" />
     <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\SpvBuilder.h" />
     <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spvIR.h" />
@@ -83,7 +78,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\ThirdParty\glslang\glslang\GenericCodeGen\CodeGen.cpp" />
     <ClCompile Include="..\..\..\Src\ThirdParty\glslang\glslang\GenericCodeGen\Link.cpp" />
-    <ClCompile Include="..\..\..\Src\ThirdParty\glslang\glslang\glslang.js.cpp" />
     <ClCompile Include="..\..\..\Src\ThirdParty\glslang\glslang\MachineIndependent\attribute.cpp" />
     <ClCompile Include="..\..\..\Src\ThirdParty\glslang\glslang\MachineIndependent\Constant.cpp" />
     <ClCompile Include="..\..\..\Src\ThirdParty\glslang\glslang\MachineIndependent\glslang_tab.cpp" />
@@ -184,6 +178,8 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

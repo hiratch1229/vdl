@@ -16,9 +16,6 @@
     <Filter Include="StandAlone">
       <UniqueIdentifier>{7f65a961-c57c-40bb-bad1-818fc0fdf943}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SPIRV\spirv-tools">
-      <UniqueIdentifier>{3d6719c6-c49b-4b62-b000-124c09cbd181}</UniqueIdentifier>
-    </Filter>
     <Filter Include="glslang\GenericCodeGen">
       <UniqueIdentifier>{5cb4362b-193a-47d2-9698-718de9f9751c}</UniqueIdentifier>
     </Filter>
@@ -98,21 +95,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\SpvTools.h">
       <Filter>SPIRV</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\instrument.hpp">
-      <Filter>SPIRV\spirv-tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\libspirv.h">
-      <Filter>SPIRV\spirv-tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\libspirv.hpp">
-      <Filter>SPIRV\spirv-tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\linker.hpp">
-      <Filter>SPIRV\spirv-tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Src\ThirdParty\glslang\SPIRV\spirv-tools\optimizer.hpp">
-      <Filter>SPIRV\spirv-tools</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Src\ThirdParty\glslang\hlsl\hlslAttributes.h">
       <Filter>hlsl</Filter>
@@ -304,9 +286,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Src\ThirdParty\glslang\hlsl\pch.cpp">
       <Filter>hlsl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Src\ThirdParty\glslang\glslang\glslang.js.cpp">
-      <Filter>glslang</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Src\ThirdParty\glslang\glslang\MachineIndependent\attribute.cpp">
       <Filter>glslang\MachineIndependent</Filter>

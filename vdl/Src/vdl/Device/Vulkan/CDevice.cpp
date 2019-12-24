@@ -132,11 +132,11 @@ namespace
     {
       Shader.setStrings(&_Source, 1);
       Shader.setEntryPoint(_EntryPoint);
-      Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, 110);
+      Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, VK_HEADER_VERSION);
       Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_1);
       Shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
 
-      Result = Shader.parse(&glslang::DefaultTBuiltInResource, 110, false, kControls);
+      Result = Shader.parse(&glslang::DefaultTBuiltInResource, VK_HEADER_VERSION, false, kControls);
       _ASSERT_EXPR_A(Result, "コンパイル失敗");
     }
 
@@ -188,12 +188,12 @@ namespace
     {
       Shader.setStringsWithLengthsAndNames(&pData, &DataSize, &_FilePath, 1);
       Shader.setEntryPoint(_EntryPoint);
-      Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, 110);
+      Shader.setEnvInput(glslang::EShSourceHlsl, Stage, glslang::EShClientVulkan, VK_HEADER_VERSION);
       Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_1);
       Shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
 
       DirStackFileIncluder Includer;
-      Result = Shader.parse(&glslang::DefaultTBuiltInResource, 110, false, kControls, Includer);
+      Result = Shader.parse(&glslang::DefaultTBuiltInResource, VK_HEADER_VERSION, false, kControls, Includer);
       _ASSERT_EXPR_A(Result, "コンパイル失敗");
     }
 
