@@ -644,6 +644,9 @@
     <ClCompile Include="..\..\..\Src\vdl\GUI\GUI.cpp">
       <Filter>Src\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\vdl\Collision3D\Collision3D.cpp">
+      <Filter>Src\Collision3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Shader\Mesh\Mesh.hlsli">

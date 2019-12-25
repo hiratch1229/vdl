@@ -151,6 +151,7 @@
     <ClCompile Include="..\..\..\Src\vdl\Buffer\Buffer.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Camera\Camera.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Collision2D\Collision2D.cpp" />
+    <ClCompile Include="..\..\..\Src\vdl\Collision3D\Collision3D.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Computer\CComputer.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Computer\Computer.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Computer\ComputerFactory.cpp" />
