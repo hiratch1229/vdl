@@ -201,6 +201,7 @@
     <ClCompile Include="..\..\..\Src\vdl\Window\WindowFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Include\vdl\GUI.inl" />
     <None Include="..\..\..\Shader\Mesh\Mesh.hlsli" />
     <None Include="..\..\..\Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli" />
     <None Include="..\..\..\Shader\Mesh\StaticMesh\StaticMesh.hlsli" />

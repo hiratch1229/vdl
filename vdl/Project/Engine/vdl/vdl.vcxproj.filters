@@ -670,6 +670,9 @@
     <None Include="..\..\..\Src\vdl\Renderer\RendererCommand\RendererCommand.inl">
       <Filter>Src\Renderer\RendererCommand</Filter>
     </None>
+    <None Include="..\..\..\Include\vdl\GUI.inl">
+      <Filter>Include\vdl</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\..\Shader\Mesh\MeshPS.hlsl">

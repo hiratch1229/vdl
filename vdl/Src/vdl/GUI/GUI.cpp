@@ -57,29 +57,29 @@ namespace
     return ImGuiDir_None;
   }
 
-  inline ImGuiDataType_ Cast(vdl::GUI::DataType _Type)
+  inline ImGuiDataType_ Cast(vdl::GUI::Detail::DataType _Type)
   {
     switch (_Type)
     {
-    case vdl::GUI::DataType::eS8:
+    case vdl::GUI::Detail::DataType::eS8:
       return ImGuiDataType_S8;
-    case vdl::GUI::DataType::eU8:
+    case vdl::GUI::Detail::DataType::eU8:
       return ImGuiDataType_U8;
-    case vdl::GUI::DataType::eS16:
+    case vdl::GUI::Detail::DataType::eS16:
       return ImGuiDataType_S16;
-    case vdl::GUI::DataType::eU16:
+    case vdl::GUI::Detail::DataType::eU16:
       return ImGuiDataType_U16;
-    case vdl::GUI::DataType::eS32:
+    case vdl::GUI::Detail::DataType::eS32:
       return ImGuiDataType_S32;
-    case vdl::GUI::DataType::eU32:
+    case vdl::GUI::Detail::DataType::eU32:
       return ImGuiDataType_U32;
-    case vdl::GUI::DataType::eS64:
+    case vdl::GUI::Detail::DataType::eS64:
       return ImGuiDataType_S64;
-    case vdl::GUI::DataType::eU64:
+    case vdl::GUI::Detail::DataType::eU64:
       return ImGuiDataType_U64;
-    case vdl::GUI::DataType::eFloat:
+    case vdl::GUI::Detail::DataType::eFloat:
       return ImGuiDataType_Float;
-    case vdl::GUI::DataType::eDouble:
+    case vdl::GUI::Detail::DataType::eDouble:
       return ImGuiDataType_Double;
     default: assert(false);
     }
@@ -580,35 +580,6 @@ namespace vdl::GUI
 
   //--------------------------------------------------
 
-  bool DragScalar(const char* _Label, DataType _Type, void* _pData, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
-  {
-    return ImGui::DragScalar(_Label, Cast(_Type), _pData, _Speed, _pMin, _pMax, _Format, _Power);
-  }
-
-  bool DragScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
-  {
-    return ImGui::DragScalarN(_Label, Cast(_Type), _pData, _Components, _Speed, _pMin, _pMax, _Format, _Power);
-  }
-
-  //--------------------------------------------------
-
-  bool SliderScalar(const char* _Label, DataType _Type, void* _pData, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
-  {
-    return ImGui::SliderScalar(_Label, Cast(_Type), _pData, _pMin, _pMax, _Format, _Power);
-  }
-
-  bool SliderScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
-  {
-    return ImGui::SliderScalarN(_Label, Cast(_Type), _pData, _Components, _pMin, _pMax, _Format, _Power);
-  }
-
-  bool VSliderScalar(const char* _Label, const float2& _Size, DataType _Type, void* _pData, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
-  {
-    return ImGui::VSliderScalar(_Label, Cast(_Size), Cast(_Type), _pData, _pMin, _pMax, _Format, _Power);
-  }
-
-  //--------------------------------------------------
-
   bool InputText(const char* _Label, char* _Buffer, size_t _BufferSize, const InputTextFlags& _Flags)
   {
     return ImGui::InputText(_Label, _Buffer, _BufferSize, _Flags);
@@ -622,16 +593,6 @@ namespace vdl::GUI
   bool InputTextWithHint(const char* _Label, const char* _Hint, char* _Buffer, size_t _BufferSize, const InputTextFlags& _Flags)
   {
     return ImGui::InputTextWithHint(_Label, _Hint, _Buffer, _BufferSize, _Flags);
-  }
-
-  bool InputScalar(const char* _Label, DataType _Type, void* _pData, const void* _pStep, const void* _pStepFast, const char* _Format, const InputTextFlags& _Flags)
-  {
-    return ImGui::InputScalar(_Label, Cast(_Type), _pData, _pStep, _pStepFast, _Format, _Flags);
-  }
-
-  bool InputScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pStep, const void* _pStepFast, const char* _Format, const InputTextFlags& _Flags)
-  {
-    return ImGui::InputScalarN(_Label, Cast(_Type), _pData, _Components, _pStep, _pStepFast, _Format, _Flags);
   }
 
   //--------------------------------------------------
@@ -1137,5 +1098,38 @@ namespace vdl::GUI
   const char* SaveIniSettingsToMemory(size_t* _OutIniSize)
   {
     return ImGui::SaveIniSettingsToMemory(_OutIniSize);
+  }
+
+  namespace Detail
+  {
+    bool DragScalar(const char* _Label, DataType _Type, void* _pData, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
+    {
+      return ImGui::DragScalar(_Label, Cast(_Type), _pData, _Speed, _pMin, _pMax, _Format, _Power);
+    }
+
+    bool DragScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
+    {
+      return ImGui::DragScalarN(_Label, Cast(_Type), _pData, _Components, _Speed, _pMin, _pMax, _Format, _Power);
+    }
+
+    bool SliderScalar(const char* _Label, DataType _Type, void* _pData, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
+    {
+      return ImGui::SliderScalar(_Label, Cast(_Type), _pData, _pMin, _pMax, _Format, _Power);
+    }
+
+    bool SliderScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
+    {
+      return ImGui::SliderScalarN(_Label, Cast(_Type), _pData, _Components, _pMin, _pMax, _Format, _Power);
+    }
+
+    bool InputScalar(const char* _Label, DataType _Type, void* _pData, const void* _pStep, const void* _pStepFast, const char* _Format, const InputTextFlags& _Flags)
+    {
+      return ImGui::InputScalar(_Label, Cast(_Type), _pData, _pStep, _pStepFast, _Format, _Flags);
+    }
+
+    bool InputScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pStep, const void* _pStepFast, const char* _Format, const InputTextFlags& _Flags)
+    {
+      return ImGui::InputScalarN(_Label, Cast(_Type), _pData, _Components, _pStep, _pStepFast, _Format, _Flags);
+    }
   }
 }
