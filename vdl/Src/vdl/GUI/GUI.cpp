@@ -1080,26 +1080,6 @@ namespace vdl::GUI
 
   //--------------------------------------------------
 
-  void LoadIniSettingsFromDisk(const char* _IniFilename)
-  {
-    ImGui::LoadIniSettingsFromDisk(_IniFilename);
-  }
-
-  void LoadIniSettingsFromMemory(const char* _IniData, size_t _IniSize)
-  {
-    ImGui::LoadIniSettingsFromMemory(_IniData, _IniSize);
-  }
-
-  void SaveIniSettingsToDisk(const char* _IniFilename)
-  {
-    ImGui::SaveIniSettingsToDisk(_IniFilename);
-  }
-
-  const char* SaveIniSettingsToMemory(size_t* _OutIniSize)
-  {
-    return ImGui::SaveIniSettingsToMemory(_OutIniSize);
-  }
-
   namespace Detail
   {
     bool DragScalar(const char* _Label, DataType _Type, void* _pData, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power)

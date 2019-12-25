@@ -527,14 +527,6 @@ namespace vdl::GUI
   // Clipboard Utilities (also see the LogToClipboard() function to capture or output text data to the clipboard)
   const char* GetClipboardText();
   void SetClipboardText(const char* _Text);
-
-  // Settings/.Ini Utilities
-  // - The disk functions are automatically called if io.IniFilename != nullptr (default is "imgui.ini").
-  // - Set io.IniFilename to nullptr to load/save manually. Read io.WantSaveIniSettings description about handling .ini saving manually.
-  void LoadIniSettingsFromDisk(const char* _IniFilename);                     // call after CreateContext() and before the first call to NewFrame(). NewFrame() automatically calls LoadIniSettingsFromDisk(io.IniFilename).
-  void LoadIniSettingsFromMemory(const char* _IniData, size_t _IniSize = 0);  // call after CreateContext() and before the first call to NewFrame() to provide .ini data from your own data source.
-  void SaveIniSettingsToDisk(const char* _IniFilename);                       // this is automatically called (if io.IniFilename is not empty) a few seconds after any modification that should be reflected in the .ini file (and also by DestroyContext).
-  const char* SaveIniSettingsToMemory(size_t* _OutIniSize = nullptr);         // return a zero-terminated string with the .ini data which you can save by your own mean. call when io.WantSaveIniSettings is set, then save data by your own mean and clear io.WantSaveIniSettings.
 }
 
 #include "GUI.inl"

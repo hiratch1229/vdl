@@ -107,6 +107,8 @@ namespace vdl::GUI
     bool InputScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pStep, const void* _pStepFast, const char* _Format, const InputTextFlags& _Flags);
   }
 
+  //--------------------------------------------------
+
   template<class Type>
   inline bool Drag(const char* _Label, Type* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
   {
@@ -128,6 +130,8 @@ namespace vdl::GUI
     return DragScalarN(_Label, Detail::GetDataType<Type>(), _pData, 4, _Speed, &_Min, &_Max, _Format, _Power);
   }
 
+  //--------------------------------------------------
+
   template<class Type>
   inline bool Slider(const char* _Label, Type* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
   {
@@ -148,6 +152,8 @@ namespace vdl::GUI
   {
     return SliderScalarN(_Label, Detail::GetDataType<Type>(), _pData, 4, &_Min, &_Max, _Format, _Power);
   }
+
+  //--------------------------------------------------
 
   template<class Type>
   inline bool Input(const char* _Label, Type* _pData, Type _Step = 0, Type _StepFast = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
