@@ -102,7 +102,6 @@
     <ClInclude Include="..\..\..\Src\vdl\Buffer\IBuffer.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\Computer\CComputer.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\Computer\IComputer.hpp" />
-    <ClInclude Include="..\..\..\Src\vdl\ConstantBufferAllocater\ConstantBufferAllocater.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\Constants\Constants.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\CPUProfiler\ICPUProfiler.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\DeviceContext\IDeviceContext.hpp" />
@@ -116,6 +115,7 @@
     <ClInclude Include="..\..\..\Src\vdl\Input\Keyboard\IKeyboard.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\Input\Mouse\IMouse.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\Input\XInput\IXInput.hpp" />
+    <ClInclude Include="..\..\..\Src\vdl\MemoryAllocator\MemoryAllocator.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\MemoryProfiler\IMemoryProfiler.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\Misc\Misc.hpp" />
     <ClInclude Include="..\..\..\Src\vdl\ModelManager\CModelManager.hpp" />
@@ -155,7 +155,6 @@
     <ClCompile Include="..\..\..\Src\vdl\Computer\CComputer.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Computer\Computer.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Computer\ComputerFactory.cpp" />
-    <ClCompile Include="..\..\..\Src\vdl\ConstantBufferAllocater\ConstantBufferAllocater.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\CPUProfiler\CPUProfilerFactory.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
@@ -173,6 +172,7 @@
     <ClCompile Include="..\..\..\Src\vdl\Input\Mouse\MouseFactory.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Input\XInput\XInput.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\Input\XInput\XInputFactory.cpp" />
+    <ClCompile Include="..\..\..\Src\vdl\MemoryAllocator\MemoryAllocator.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\MemoryProfiler\MemoryProfilerFactory.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\ModelData\ModelData.cpp" />
     <ClCompile Include="..\..\..\Src\vdl\ModelManager\CModelManager.cpp" />
@@ -202,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Include\vdl\GUI.inl" />
+    <None Include="..\..\..\Include\vdl\Stopwatch.hpp" />
     <None Include="..\..\..\Shader\Mesh\Mesh.hlsli" />
     <None Include="..\..\..\Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli" />
     <None Include="..\..\..\Shader\Mesh\StaticMesh\StaticMesh.hlsli" />

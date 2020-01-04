@@ -1,13 +1,13 @@
 #pragma once
 #include "../IDevice.hpp"
 
-#include <vdl/pch/DirectX12/pch.hpp>
+#include <vdl/MemoryAllocator/MemoryAllocator.hpp>
 
 #include <vdl/Buffer/DirectX12/CBuffer.hpp>
 #include <vdl/Texture/DirectX12/CTexture.hpp>
 #include <vdl/CommandList/DirectX12/CommandList.hpp>
 
-#include <vdl/ConstantBufferAllocater/ConstantBufferAllocater.hpp>
+#include <vdl/pch/DirectX12/pch.hpp>
 
 class IBufferManager;
 
@@ -22,7 +22,8 @@ class CDevice : public IDevice
   vdl::uint FenceValue_ = 0;
 private:
   IBufferManager* pBufferManager_;
-  ConstantBufferAllocater ConstantBufferAllocater_;
+  CConstantBuffer* pConstantBuffer_;
+  MemoryAllocator ConstantBufferAllocator_;
 public:
   [[nodiscard]] ID3D12Device5* GetDevice() { return pDevice_.Get(); }
   [[nodiscard]] IDXGIFactory6* GetFactory() { return pFactory_.Get(); }

@@ -88,9 +88,16 @@ namespace Constants
 
   constexpr vdl::FormatType kTextureFormat = vdl::FormatType::eR8G8B8A8_Unorm;
 
+  //  低グラフィック描画API用の定数
+#if defined VDL_USING_DIRECTX12 | VDL_USING_VULKAN
   constexpr vdl::uint kInstanceBufferSizeMultiple = 5;
 
   constexpr vdl::uint kGraphicsCommandBufferNum = 5;
 
   constexpr vdl::uint kComputeCommandBufferNum = 3;
+
+  constexpr vdl::uint kParentConstantBufferSize = 51200;
+
+  constexpr vdl::uint kConstantBufferAlignment = 256;
+#endif
 }

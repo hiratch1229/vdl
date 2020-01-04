@@ -96,4 +96,5 @@
 #include <vdl/Serialize.hpp>
 #include <vdl/Flag.hpp>
 #include <vdl/Random.hpp>
+#include <vdl/Stopwatch.hpp>
 #include <vdl/DetectMemoryLeak.hpp>

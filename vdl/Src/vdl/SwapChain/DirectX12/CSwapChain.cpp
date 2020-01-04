@@ -42,7 +42,7 @@ void CSwapChain::Initialize()
       SwapChainDesc.OutputWindow = hWnd;
       SwapChainDesc.Windowed = true;
       SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-      SwapChainDesc.Flags = 0;
+      SwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     }
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;

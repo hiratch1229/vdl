@@ -6,22 +6,22 @@
 #include <assert.h>
 #include <utility>
 
-class ConstantBufferAllocater;
+class MemoryAllocator;
 
 struct BufferData
 {
   Microsoft::WRL::ComPtr<ID3D12Resource> pResource;
-  void* pData;
+  void* pBuffer;
 public:
   BufferData() = default;
 
   BufferData(BufferData&& _Data)noexcept
-    : pResource(std::move(_Data.pResource)), pData(std::move(_Data.pData)) {}
+    : pResource(std::move(_Data.pResource)), pBuffer(std::move(_Data.pBuffer)) {}
 
   BufferData& operator=(BufferData&& _Data)noexcept
   {
     pResource = std::move(_Data.pResource);
-    pData = std::move(_Data.pData);
+    pBuffer = std::move(_Data.pBuffer);
 
     return *this;
   }
@@ -74,7 +74,7 @@ public:
 
   PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
 
-  void* GetBuffer()const final { return BufferData.pData; }
+  void* GetBuffer()const final { return BufferData.pBuffer; }
 
   vdl::uint GetBufferSize()const final { return BufferSize; }
 
@@ -83,9 +83,9 @@ public:
 
 struct CCopyConstantBuffer : public IConstantBuffer
 {
-  ConstantBufferAllocater* pConstantBufferAllocater;
+  MemoryAllocator* pConstantBufferAllocator;
   Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pConstantBufferViewHeap;
-  vdl::uint Offset;
+  void* pBuffer;
   vdl::uint BufferSize;
 public:
   CCopyConstantBuffer() = default;
@@ -94,7 +94,7 @@ public:
 
   PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
 
-  void* GetBuffer()const final;
+  void* GetBuffer()const final { return pBuffer; }
 
   vdl::uint GetBufferSize()const final { return BufferSize; }
 

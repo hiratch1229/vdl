@@ -1,7 +1,7 @@
 #pragma once
 #include "../IDevice.hpp"
 
-#include <vdl/ConstantBufferAllocater/ConstantBufferAllocater.hpp>
+#include <vdl/MemoryAllocator/MemoryAllocator.hpp>
 
 #include <vdl/Buffer/Vulkan/CBuffer.hpp>
 #include <vdl/Texture/Vulkan/CTexture.hpp>
@@ -24,7 +24,8 @@ private:
   vdl::uint ComputeQueueIndex_;
 private:
   IBufferManager* pBufferManager_;
-  ConstantBufferAllocater ConstantBufferAllocater_;
+  CConstantBuffer* pConstantBuffer_;
+  MemoryAllocator ConstantBufferAllocator_;
 private:
 #if defined(DEBUG) | defined(_DEBUG)
   PFN_vkDestroyDebugReportCallbackEXT	DestroyReportFunction_;

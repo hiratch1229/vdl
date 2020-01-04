@@ -1,17 +1,12 @@
 #include "CBuffer.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/ConstantBufferAllocater/ConstantBufferAllocater.hpp>
+#include <vdl/MemoryAllocator/MemoryAllocator.hpp>
 
 CCopyConstantBuffer::~CCopyConstantBuffer()
 {
   if (Engine::isActive())
   {
-    pConstantBufferAllocater->Release(Offset, BufferSize);
+    pConstantBufferAllocator->Release(pBuffer);
   }
-}
-
-void* CCopyConstantBuffer::GetBuffer()const
-{
-  return pConstantBufferAllocater->GetBuffer(Offset);
 }

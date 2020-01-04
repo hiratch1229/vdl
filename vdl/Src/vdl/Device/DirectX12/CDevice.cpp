@@ -170,8 +170,6 @@ void CDevice::Initialize()
   hr = ::D3D12CreateDevice(pAdapter.Get(), kMininumFeatureLevel, IID_PPV_ARGS(pDevice_.GetAddressOf()));
   ERROR_CHECK(hr);
 
-  ConstantBufferAllocater_.Initialize();
-
   //  コマンドキューの作成
   {
     D3D12_COMMAND_QUEUE_DESC CommandQueueDesc;
@@ -196,6 +194,15 @@ void CDevice::Initialize()
 
     FenceEvent_ = CreateEvent(nullptr, false, false, nullptr);
     assert(FenceEvent_ != nullptr);
+  }
+
+  //  定数バッファの作成&アロケーターの初期化
+  {
+    IBuffer* pConstantBuffer;
+    CreateConstantBuffer(&pConstantBuffer, Constants::kParentConstantBufferSize);
+    pConstantBuffer_ = Cast<CConstantBuffer>(pConstantBuffer);
+
+    ConstantBufferAllocator_.Initialize(pConstantBuffer_->GetBuffer(), Constants::kParentConstantBufferSize);
   }
 
 #if defined( DEBUG ) || defined( _DEBUG )
@@ -383,20 +390,20 @@ vdl::Detail::ConstantBufferData CDevice::CloneConstantBuffer(const vdl::Detail::
   {
     CCopyConstantBuffer* pCopyConstantBuffer = new CCopyConstantBuffer;
     {
-      pCopyConstantBuffer->pConstantBufferAllocater = &ConstantBufferAllocater_;
-      pCopyConstantBuffer->BufferSize = pSrcConstantBuffer->BufferSize;
-      pCopyConstantBuffer->Offset = ConstantBufferAllocater_.Secure(pCopyConstantBuffer->BufferSize);
+      pCopyConstantBuffer->pConstantBufferAllocator = &ConstantBufferAllocator_;
+      //  256にアライメントを揃える
+      pCopyConstantBuffer->BufferSize = (pSrcConstantBuffer->BufferSize + 255) & ~255;
+      pCopyConstantBuffer->pBuffer = ConstantBufferAllocator_.Allocate(pCopyConstantBuffer->BufferSize,Constants::kConstantBufferAlignment);
+    ::memcpy(pCopyConstantBuffer->pBuffer, pSrcConstantBuffer->BufferData.pBuffer, pCopyConstantBuffer->BufferSize);
       CreateDescriptorHeap(pCopyConstantBuffer->pConstantBufferViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     }
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantBufferView;
     {
-      ConstantBufferView.BufferLocation = Cast<CConstantBuffer>(ConstantBufferAllocater_.GetConstantBuffer())->BufferData.pResource->GetGPUVirtualAddress() + pCopyConstantBuffer->Offset;
-      ConstantBufferView.SizeInBytes = (pCopyConstantBuffer->BufferSize + 255) & ~255;
+      ConstantBufferView.BufferLocation = pConstantBuffer_->BufferData.pResource->GetGPUVirtualAddress() + (static_cast<vdl::uint8_t*>(pCopyConstantBuffer->pBuffer) - static_cast<vdl::uint8_t*>(pConstantBuffer_->BufferData.pBuffer));
+      ConstantBufferView.SizeInBytes = pCopyConstantBuffer->BufferSize;
     }
     pDevice_->CreateConstantBufferView(&ConstantBufferView, pCopyConstantBuffer->pConstantBufferViewHeap->GetCPUDescriptorHandleForHeapStart());
-
-    ::memcpy(ConstantBufferAllocater_.GetBuffer(pCopyConstantBuffer->Offset), pSrcConstantBuffer->BufferData.pData, pCopyConstantBuffer->BufferSize);
 
     pBufferManager_->SetBuffer(ConstantBuffer.GetID(), pCopyConstantBuffer);
   }
@@ -445,7 +452,7 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
       const vdl::uint Stride = _Image.Stride();
       for (vdl::uint y = 0; y < pTexture->TextureSize.y; ++y)
       {
-        ::memcpy(static_cast<vdl::uint8_t*>(StagingBuffer.pData) + PlacedFootprint.Footprint.RowPitch * y, Buffer + Stride * y, Stride);
+        ::memcpy(static_cast<vdl::uint8_t*>(StagingBuffer.pBuffer) + PlacedFootprint.Footprint.RowPitch * y, Buffer + Stride * y, Stride);
       }
     }
 
@@ -540,7 +547,7 @@ void CDevice::CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl:
         D3D12_PLACED_SUBRESOURCE_FOOTPRINT& PlacedFootprint = PlacedFootprints[i];
         for (vdl::uint y = 0; y < pCubeTexture->TextureSize.y; ++y)
         {
-          ::memcpy(static_cast<vdl::uint8_t*>(StagingBuffer.pData) + PlacedFootprint.Offset + PlacedFootprint.Footprint.RowPitch * y, Buffer + Stride * y, Stride);
+          ::memcpy(static_cast<vdl::uint8_t*>(StagingBuffer.pBuffer) + PlacedFootprint.Offset + PlacedFootprint.Footprint.RowPitch * y, Buffer + Stride * y, Stride);
         }
       }
     }
@@ -843,8 +850,8 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   case BufferType::eVertexBuffer:
   {
     CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(_pDstBuffer);
-    assert(pVertexBuffer->BufferData.pData);
-    ::memcpy(pVertexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
+    assert(pVertexBuffer->BufferData.pBuffer);
+    ::memcpy(pVertexBuffer->BufferData.pBuffer, _pSrcBuffer, _BufferSize);
   }
   break;
   case BufferType::eInstanceBuffer:
@@ -854,7 +861,7 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     {
       pInstanceBuffer->Offset = 0;
     }
-    ::memcpy(static_cast<vdl::uint8_t*>(pInstanceBuffer->BufferData.pData) + pInstanceBuffer->Offset, _pSrcBuffer, _BufferSize);
+    ::memcpy(static_cast<vdl::uint8_t*>(pInstanceBuffer->BufferData.pBuffer) + pInstanceBuffer->Offset, _pSrcBuffer, _BufferSize);
 
     pInstanceBuffer->PreviousOffset = pInstanceBuffer->Offset;
     pInstanceBuffer->Offset += _BufferSize;
@@ -863,8 +870,8 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   case BufferType::eIndexBuffer:
   {
     CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(_pDstBuffer);
-    assert(pIndexBuffer->BufferData.pData);
-    ::memcpy(pIndexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
+    assert(pIndexBuffer->BufferData.pBuffer);
+    ::memcpy(pIndexBuffer->BufferData.pBuffer, _pSrcBuffer, _BufferSize);
   }
   break;
   default: assert(false);
@@ -1093,7 +1100,7 @@ void CDevice::CreateBuffer(BufferData* _pBufferData, vdl::uint _BufferSize, D3D1
   {
     HRESULT hr = S_OK;
 
-    hr = _pBufferData->pResource->Map(0, nullptr, &_pBufferData->pData);
+    hr = _pBufferData->pResource->Map(0, nullptr, &_pBufferData->pBuffer);
     ERROR_CHECK(hr);
   }
 }
@@ -1107,7 +1114,7 @@ void CDevice::CreateStagingBuffer(BufferData * _pBuffer, const void* _Buffer, vd
   //  メモリへ書き込み
   if (_Buffer)
   {
-    ::memcpy(_pBuffer->pData, _Buffer, _BufferSize);
+    ::memcpy(_pBuffer->pBuffer, _Buffer, _BufferSize);
   }
 }
 

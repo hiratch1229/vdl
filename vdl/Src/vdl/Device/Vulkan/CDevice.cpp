@@ -426,8 +426,6 @@ void CDevice::Initialize()
     assert(VkDevice_);
   }
 
-  ConstantBufferAllocater_.Initialize();
-
   //  コマンドプールの作成
   {
     vk::CommandPoolCreateInfo CommandPoolInfo;
@@ -459,6 +457,15 @@ void CDevice::Initialize()
 
     ComputeQueue_ = VkDevice_->getQueue(ComputeQueueIndex_, (GraphicsQueueIndex_ == ComputeQueueIndex_ ? 1 : 0));
     assert(ComputeQueue_);
+  }
+
+  //  定数バッファの作成&アロケーターの初期化
+  {
+    IBuffer* pConstantBuffer;
+    CreateConstantBuffer(&pConstantBuffer, Constants::kParentConstantBufferSize);
+    pConstantBuffer_ = Cast<CConstantBuffer>(pConstantBuffer);
+
+    ConstantBufferAllocator_.Initialize(pConstantBuffer_->GetBuffer(), Constants::kParentConstantBufferSize);
   }
 
 #if defined(DEBUG) | defined(_DEBUG)
@@ -581,13 +588,13 @@ vdl::Detail::ConstantBufferData CDevice::CloneConstantBuffer(const vdl::Detail::
   {
     CCopyConstantBuffer* pCopyConstantBuffer = new CCopyConstantBuffer;
     {
-      pCopyConstantBuffer->pConstantBufferAllocater = &ConstantBufferAllocater_;
-      pCopyConstantBuffer->ParentBuffer = Cast<CConstantBuffer>(ConstantBufferAllocater_.GetConstantBuffer())->BufferData.Buffer.get();
-      pCopyConstantBuffer->BufferSize = pSrcConstantBuffer->BufferSize;
-      pCopyConstantBuffer->Offset = ConstantBufferAllocater_.Secure(pCopyConstantBuffer->BufferSize);
+      pCopyConstantBuffer->pConstantBufferAllocator = &ConstantBufferAllocator_;
+      //  256にアライメントを揃える
+      pCopyConstantBuffer->BufferSize = (pSrcConstantBuffer->BufferSize + 255) & ~255;
+      pCopyConstantBuffer->pBuffer = ConstantBufferAllocator_.Allocate(pCopyConstantBuffer->BufferSize, Constants::kConstantBufferAlignment);
+      pCopyConstantBuffer->Offset = static_cast<vdl::uint8_t*>(pCopyConstantBuffer->pBuffer) - static_cast<vdl::uint8_t*>(pConstantBuffer_->BufferData.pBuffer);
+      ::memcpy(pCopyConstantBuffer->pBuffer, pSrcConstantBuffer->BufferData.pBuffer, pCopyConstantBuffer->BufferSize);
     }
-
-    ::memcpy(ConstantBufferAllocater_.GetBuffer(pCopyConstantBuffer->Offset), pSrcConstantBuffer->BufferData.pData, pCopyConstantBuffer->BufferSize);
 
     pBufferManager_->SetBuffer(ConstantBuffer.GetID(), pCopyConstantBuffer);
   }
@@ -721,7 +728,7 @@ void CDevice::CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl:
         CopyRegions[i].imageOffset = { 0, 0, 0 };
         CopyRegions[i].imageExtent = ImageInfo.extent;
 
-        ::memcpy(static_cast<vdl::uint8_t*>(StagingBuffer.pData) + CopyRegions[i].bufferOffset, _Images[i].Buffer(), BufferSize);
+        ::memcpy(static_cast<vdl::uint8_t*>(StagingBuffer.pBuffer) + CopyRegions[i].bufferOffset, _Images[i].Buffer(), BufferSize);
       }
     }
 
@@ -987,8 +994,8 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   case BufferType::eVertexBuffer:
   {
     CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(_pDstBuffer);
-    assert(pVertexBuffer->BufferData.pData);
-    ::memcpy(pVertexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
+    assert(pVertexBuffer->BufferData.pBuffer);
+    ::memcpy(pVertexBuffer->BufferData.pBuffer, _pSrcBuffer, _BufferSize);
   }
   break;
   case BufferType::eInstanceBuffer:
@@ -998,7 +1005,7 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
     {
       pInstanceBuffer->Offset = 0;
     }
-    ::memcpy(static_cast<vdl::uint8_t*>(pInstanceBuffer->BufferData.pData) + pInstanceBuffer->Offset, _pSrcBuffer, _BufferSize);
+    ::memcpy(static_cast<vdl::uint8_t*>(pInstanceBuffer->BufferData.pBuffer) + pInstanceBuffer->Offset, _pSrcBuffer, _BufferSize);
 
     pInstanceBuffer->PreviousOffset = pInstanceBuffer->Offset;
     pInstanceBuffer->Offset += _BufferSize;
@@ -1007,8 +1014,8 @@ void CDevice::WriteMemory(IBuffer* _pDstBuffer, const void* _pSrcBuffer, vdl::ui
   case BufferType::eIndexBuffer:
   {
     CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(_pDstBuffer);
-    assert(pIndexBuffer->BufferData.pData);
-    ::memcpy(pIndexBuffer->BufferData.pData, _pSrcBuffer, _BufferSize);
+    assert(pIndexBuffer->BufferData.pBuffer);
+    ::memcpy(pIndexBuffer->BufferData.pBuffer, _pSrcBuffer, _BufferSize);
   }
   break;
   default: assert(false);
@@ -1286,7 +1293,7 @@ void CDevice::CreateBuffer(BufferData* _pBuffer, vk::DeviceSize _BufferSize, con
   //  ステージングしない時ポインタを取得する
   if (!(_Properties & vk::MemoryPropertyFlagBits::eDeviceLocal))
   {
-    _pBuffer->pData = VkDevice_->mapMemory(_pBuffer->Memory.get(), 0, _BufferSize);
+    _pBuffer->pBuffer = VkDevice_->mapMemory(_pBuffer->Memory.get(), 0, _BufferSize);
   }
 }
 
@@ -1299,7 +1306,7 @@ void CDevice::CreateStagingBuffer(BufferData* _pStagingBuffer, const void* _Buff
   //  メモリへ書き込み
   if (_Buffer)
   {
-    ::memcpy(_pStagingBuffer->pData, _Buffer, _BufferSize);
+    ::memcpy(_pStagingBuffer->pBuffer, _Buffer, _BufferSize);
   }
 }
 

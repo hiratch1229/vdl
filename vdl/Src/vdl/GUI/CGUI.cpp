@@ -779,7 +779,7 @@ void CGUI::Update()
 
 void CGUI::Draw()
 {
-  ImGui::ShowStyleEditor();
+  //ImGui::ShowStyleEditor();
 
   ImGui::Render();
 

@@ -5,24 +5,24 @@
 
 #include <assert.h>
 
-class ConstantBufferAllocater;
+class MemoryAllocator;
 
 struct BufferData
 {
   vk::UniqueBuffer Buffer;
   vk::UniqueDeviceMemory Memory;
-  void* pData;
+  void* pBuffer;
 public:
   BufferData() = default;
 
   BufferData(BufferData&& _Data)noexcept
-    : Buffer(std::move(_Data.Buffer)), Memory(std::move(_Data.Memory)), pData(std::move(_Data.pData)) {}
+    : Buffer(std::move(_Data.Buffer)), Memory(std::move(_Data.Memory)), pBuffer(std::move(_Data.pBuffer)) {}
 
   BufferData& operator=(BufferData&& _Data)noexcept
   {
     Buffer = std::move(_Data.Buffer);
     Memory = std::move(_Data.Memory);
-    pData = std::move(_Data.pData);
+    pBuffer = std::move(_Data.pBuffer);
 
     return *this;
   }
@@ -74,7 +74,7 @@ public:
 
   PlatformType GetPlatform()const final { return PlatformType::eVulkan; }
 
-  void* GetBuffer()const final { return BufferData.pData; }
+  void* GetBuffer()const final { return BufferData.pBuffer; }
 
   vdl::uint GetBufferSize()const final { return BufferSize; }
 
@@ -83,8 +83,9 @@ public:
 
 struct CCopyConstantBuffer : public IConstantBuffer
 {
-  ConstantBufferAllocater* pConstantBufferAllocater;
+  MemoryAllocator* pConstantBufferAllocator;
   vk::Buffer ParentBuffer;
+  void* pBuffer;
   vdl::uint BufferSize;
   vdl::uint Offset;
 public:
@@ -94,7 +95,7 @@ public:
 
   PlatformType GetPlatform()const final { return PlatformType::eVulkan; }
 
-  void* GetBuffer()const final;
+  void* GetBuffer()const final { return pBuffer; }
 
   vdl::uint GetBufferSize()const final { return BufferSize; }
 
