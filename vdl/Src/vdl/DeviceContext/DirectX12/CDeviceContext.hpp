@@ -39,11 +39,6 @@ class CDeviceContext : public IDeviceContext
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
   using UnorderedAccessObjects = std::vector<vdl::UnorderedAccessObject>;
 private:
-  //enum class CommandListState
-  //{
-  //  eIdle,
-  //  eBegin,
-  //};
   struct SyncState
   {
     Microsoft::WRL::ComPtr<ID3D12Fence> pFence;
@@ -212,11 +207,8 @@ private:
 
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pGraphicsRootSignature_;
   Microsoft::WRL::ComPtr<ID3D12CommandQueue> pGraphicsCommandQueue_;
-  //std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, Constants::kGraphicsCommandBufferNum> pGraphicsCommandAllocators_;
-  //std::array<Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>, Constants::kGraphicsCommandBufferNum> pGraphicsCommandLists_;
   std::array<CommandList, Constants::kGraphicsCommandBufferNum> GraphicsCommandLists_;
   vdl::uint GraphicsCommandBufferIndex_ = 0;
-  //CommandListState GraphicsCommandListState_ = CommandListState::eIdle;
   StateChangeFlags<GraphicsCommandType, vdl::uint32_t> GraphicsStateChangeFlags_;
   vdl::uint GraphicsRenderTargetCount_;
   GraphicsState CurrentGraphicsState_;

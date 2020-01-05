@@ -567,14 +567,16 @@ void CDevice::CreateUnorderedAccessBuffer(IBuffer** _ppUnorderedAccessBuffer, vd
   assert(_ppUnorderedAccessBuffer);
 
   CUnordererdAccessBuffer* pUnorderedAccessBuffer = new CUnordererdAccessBuffer;
-  pUnorderedAccessBuffer->BufferSize = _BufferSize;
-  CreateBuffer(&pUnorderedAccessBuffer->BufferData, pUnorderedAccessBuffer->BufferSize, vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst, vk::MemoryPropertyFlagBits::eDeviceLocal);
+  pUnorderedAccessBuffer->Descriptor.offset = 0;
+  pUnorderedAccessBuffer->Descriptor.range = _BufferSize;
+  CreateBuffer(&pUnorderedAccessBuffer->BufferData, static_cast<vdl::uint>(pUnorderedAccessBuffer->Descriptor.range), vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst, vk::MemoryPropertyFlagBits::eDeviceLocal);
+  pUnorderedAccessBuffer->Descriptor.buffer = pUnorderedAccessBuffer->BufferData.Buffer.get();
 
   if (_Buffer)
   {
     BufferData StagingBuffer;
-    CreateStagingBuffer(&StagingBuffer, _Buffer, pUnorderedAccessBuffer->BufferSize);
-    CopyBuffer(StagingBuffer.Buffer.get(), pUnorderedAccessBuffer->BufferData.Buffer.get(), pUnorderedAccessBuffer->BufferSize);
+    CreateStagingBuffer(&StagingBuffer, _Buffer, static_cast<vdl::uint>(pUnorderedAccessBuffer->Descriptor.range));
+    CopyBuffer(StagingBuffer.Buffer.get(), pUnorderedAccessBuffer->BufferData.Buffer.get(), static_cast<vdl::uint>(pUnorderedAccessBuffer->Descriptor.range));
   }
 
   (*_ppUnorderedAccessBuffer) = std::move(pUnorderedAccessBuffer);
@@ -589,11 +591,12 @@ vdl::Detail::ConstantBufferData CDevice::CloneConstantBuffer(const vdl::Detail::
     CCopyConstantBuffer* pCopyConstantBuffer = new CCopyConstantBuffer;
     {
       pCopyConstantBuffer->pConstantBufferAllocator = &ConstantBufferAllocator_;
+      pCopyConstantBuffer->Descriptor.buffer = pConstantBuffer_->BufferData.Buffer.get();
       //  256にアライメントを揃える
-      pCopyConstantBuffer->BufferSize = (pSrcConstantBuffer->BufferSize + 255) & ~255;
-      pCopyConstantBuffer->pBuffer = ConstantBufferAllocator_.Allocate(pCopyConstantBuffer->BufferSize, Constants::kConstantBufferAlignment);
-      pCopyConstantBuffer->Offset = static_cast<vdl::uint8_t*>(pCopyConstantBuffer->pBuffer) - static_cast<vdl::uint8_t*>(pConstantBuffer_->BufferData.pBuffer);
-      ::memcpy(pCopyConstantBuffer->pBuffer, pSrcConstantBuffer->BufferData.pBuffer, pCopyConstantBuffer->BufferSize);
+      pCopyConstantBuffer->Descriptor.range = (pSrcConstantBuffer->BufferSize + 255) & ~255;
+      pCopyConstantBuffer->pBuffer = ConstantBufferAllocator_.Allocate(static_cast<vdl::uint>(pCopyConstantBuffer->Descriptor.range), Constants::kConstantBufferAlignment);
+      ::memcpy(pCopyConstantBuffer->pBuffer, pSrcConstantBuffer->BufferData.pBuffer, pCopyConstantBuffer->Descriptor.range);
+      pCopyConstantBuffer->Descriptor.offset = static_cast<vdl::uint8_t*>(pCopyConstantBuffer->pBuffer) - static_cast<vdl::uint8_t*>(pConstantBuffer_->BufferData.pBuffer);
     }
 
     pBufferManager_->SetBuffer(ConstantBuffer.GetID(), pCopyConstantBuffer);
@@ -669,6 +672,8 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
   }
 
   CreateImageView(&pTexture->TextureData, kTextureFormat, SubresourceRange, vk::ImageViewType::e2D);
+  pTexture->Descriptor.imageView = pTexture->TextureData.View.get();
+  pTexture->Descriptor.imageLayout = pTexture->TextureData.CurrentLayout;
 
   (*_ppTexture) = std::move(pTexture);
 }
@@ -747,6 +752,8 @@ void CDevice::CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl:
   }
 
   CreateImageView(&pCubeTexture->TextureData, kTextureFormat, SubresourceRange, vk::ImageViewType::eCube);
+  pCubeTexture->Descriptor.imageView = pCubeTexture->TextureData.View.get();
+  pCubeTexture->Descriptor.imageLayout = pCubeTexture->TextureData.CurrentLayout;
 
   (*_ppCubeTexture) = std::move(pCubeTexture);
 }
@@ -787,8 +794,9 @@ void CDevice::CreateRenderTexture(ITexture** _ppRenderTexture, const vdl::uint2&
     SubresourceRange.baseArrayLayer = 0;
     SubresourceRange.layerCount = 1;
   }
-
   CreateImageView(&pRenderTexture->TextureData, pRenderTexture->VkFormat, SubresourceRange, vk::ImageViewType::e2D);
+  pRenderTexture->Descriptor.imageView = pRenderTexture->TextureData.View.get();
+  pRenderTexture->Descriptor.imageLayout = pRenderTexture->TextureData.CurrentLayout;
 
   //  レイアウトの変更
   {
@@ -849,8 +857,9 @@ void CDevice::CreateDepthStencilTexture(ITexture** _ppDepthStencilTexture, const
     SubresourceRange.baseArrayLayer = 0;
     SubresourceRange.layerCount = 1;
   }
-
   CreateImageView(&pDepthStencilTexture->TextureData, pDepthStencilTexture->VkFormat, SubresourceRange, vk::ImageViewType::e2D);
+  pDepthStencilTexture->Descriptor.imageView = pDepthStencilTexture->TextureData.View.get();
+  pDepthStencilTexture->Descriptor.imageLayout = pDepthStencilTexture->TextureData.CurrentLayout;
 
   //  レイアウトの変更
   {
@@ -896,6 +905,8 @@ void CDevice::CreateDepthTexture(ITexture** _ppDepthTexture, IDepthStencilTextur
     pDepthTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
     assert(pDepthTexture->View);
   }
+  pDepthTexture->Descriptor.imageView = pDepthTexture->View.get();
+  pDepthTexture->Descriptor.imageLayout = pDepthStencilTexture->TextureData.CurrentLayout;
 
   (*_ppDepthTexture) = std::move(pDepthTexture);
 }
@@ -926,6 +937,8 @@ void CDevice::CreateStencilTexture(ITexture** _ppStencilTexture, IDepthStencilTe
     pStencilTexture->View = VkDevice_->createImageViewUnique(ImageViewInfo);
     assert(pStencilTexture->View);
   }
+  pStencilTexture->Descriptor.imageView = pStencilTexture->View.get();
+  pStencilTexture->Descriptor.imageLayout = pDepthStencilTexture->TextureData.CurrentLayout;
 
   (*_ppStencilTexture) = std::move(pStencilTexture);
 }
@@ -968,6 +981,8 @@ void CDevice::CreateUnorderedAccessTexture(ITexture** _ppUnorderedAccessTexture,
   }
 
   CreateImageView(&pUnorderedAccessTexture->TextureData, VkFormat, SubresourceRange, vk::ImageViewType::e2D);
+  pUnorderedAccessTexture->Descriptor.imageView = pUnorderedAccessTexture->TextureData.View.get();
+  pUnorderedAccessTexture->Descriptor.imageLayout = pUnorderedAccessTexture->TextureData.CurrentLayout;
 
   //  レイアウトの変更
   {

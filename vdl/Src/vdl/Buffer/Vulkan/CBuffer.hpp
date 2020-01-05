@@ -84,10 +84,8 @@ public:
 struct CCopyConstantBuffer : public IConstantBuffer
 {
   MemoryAllocator* pConstantBufferAllocator;
-  vk::Buffer ParentBuffer;
+  vk::DescriptorBufferInfo Descriptor;
   void* pBuffer;
-  vdl::uint BufferSize;
-  vdl::uint Offset;
 public:
   CCopyConstantBuffer() = default;
 
@@ -97,7 +95,7 @@ public:
 
   void* GetBuffer()const final { return pBuffer; }
 
-  vdl::uint GetBufferSize()const final { return BufferSize; }
+  vdl::uint GetBufferSize()const final { return static_cast<vdl::uint>(Descriptor.range); }
 
   BufferType GetType()const final { return BufferType::eCopyConstantBuffer; }
 };
@@ -105,7 +103,7 @@ public:
 struct CUnordererdAccessBuffer : public IBuffer
 {
   BufferData BufferData;
-  vdl::uint BufferSize;
+  vk::DescriptorBufferInfo Descriptor;
 public:
   CUnordererdAccessBuffer() = default;
 

@@ -97,6 +97,11 @@ private:
     std::vector<vk::VertexInputBindingDescription> VertexInputBindingDescriptions;
     std::vector<vk::VertexInputAttributeDescription> VertexInputAttributeDescriptions;
   };
+  struct Sampler
+  {
+    vk::UniqueSampler VkSampler;
+    vk::DescriptorImageInfo Descriptor;
+  };
   struct RenderPassData
   {
     vk::UniqueRenderPass RenderPass;
@@ -221,7 +226,7 @@ private:
   std::unordered_map<bool, vk::PipelineMultisampleStateCreateInfo> MultisampleStates_;
   std::unordered_map<vdl::DepthStencilState, vk::PipelineDepthStencilStateCreateInfo> DepthStencilStates_;
   std::unordered_map<vdl::RenderTextureBlendState, vk::PipelineColorBlendAttachmentState> RenderTextureBlendStates_;
-  std::unordered_map<vdl::Sampler, vk::UniqueSampler> Samplers_;
+  std::unordered_map<vdl::Sampler, Sampler> Samplers_;
 private:
   vk::UniquePipelineLayout PipelineLayout_;
   vk::Semaphore LastSemaphore_;
@@ -267,7 +272,11 @@ private:
   const vk::PipelineDepthStencilStateCreateInfo& GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState& _DepthStencilState);
   const vk::PipelineColorBlendAttachmentState& GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState& _RenderTextureBlendState);
   const vk::PipelineMultisampleStateCreateInfo& GetMultisampleStateInfo(bool _AlphaToCoverageEnable);
-  const vk::Sampler& GetSampler(const vdl::Sampler& _Sampler);
+  const vk::DescriptorImageInfo& GetTextureDescriptor(ITexture* _pTexture, const vk::CommandBuffer& _CommandBuffer);
+  const vk::DescriptorImageInfo& GetSamplerDescriptor(const vdl::Sampler& _Sampler);
+  const vk::DescriptorBufferInfo& GetConstantBufferDescriptor(const vdl::Detail::ConstantBufferData& _ConstantBuffer);
+  const vk::DescriptorImageInfo& GetUnorderedAccessTextureDescriptor(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vk::CommandBuffer& _CommandBuffer);
+  const vk::DescriptorBufferInfo& GetUnorderedAccessBufferDescriptor(const vdl::Detail::UnorderedAccessBufferData& _UnorderedAccessBuffer);
 public:
   void Present();
 public:

@@ -408,13 +408,13 @@ namespace
 
   struct DescriptorImageData
   {
-    vk::DescriptorImageInfo Info;
+    vk::DescriptorImageInfo Descriptor;
     vdl::uint Bind;
   };
 
   struct DescriptorBufferData
   {
-    vk::DescriptorBufferInfo Info;
+    vk::DescriptorBufferInfo Descriptor;
     vdl::uint Bind;
   };
 }
@@ -1269,64 +1269,22 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
           DescriptorImageData& ImageData = TextureDatas.emplace_back();
           {
-            ImageData.Info.imageLayout = kImageLayout;
+            ImageData.Descriptor = GetTextureDescriptor(pTexture, CurrentGraphicsCommandBuffer);
             ImageData.Bind = ShaderResourceCount;
-          }
-
-          switch (pTexture->GetType())
-          {
-          case TextureType::eDepthStencilTexture:
-            assert(false);
-          case TextureType::eDepthTexture:
-          {
-            CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
-            ImageData.Info.imageView = pDepthTexture->View.get();
-
-            if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
-            {
-              pDepthTexture->pParent->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
-            }
-          }
-          break;
-          case TextureType::eStencilTexture:
-          {
-            CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
-            ImageData.Info.imageView = pStencilTexture->View.get();
-
-            if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
-            {
-              pStencilTexture->pParent->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
-            }
-          }
-          break;
-          default:
-          {
-            CTexture* pColorTexture = Cast<CTexture>(pTexture);
-            ImageData.Info.imageView = pColorTexture->TextureData.View.get();
-
-            if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
-            {
-              pColorTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-            }
-          }
-          break;
           }
         }
         //  UnorderedAccessBuffer
-        else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
+        else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
         {
-          const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(ShaderResource);
-
-          if (!UnorderedAccessBuffer.isEmpty())
+          if (pShaderResource->isEmpty())
           {
-            CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
-            DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
-            {
-              BufferData.Info.buffer = pUnorderedAccessBuffer->BufferData.Buffer.get();
-              BufferData.Info.offset = 0;
-              BufferData.Info.range = pUnorderedAccessBuffer->BufferSize;
-              BufferData.Bind = ShaderResourceCount;
-            }
+            continue;
+          }
+
+          DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+          {
+            BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pShaderResource);
+            BufferData.Bind = ShaderResourceCount;
           }
         }
       }
@@ -1359,7 +1317,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             WriteDescriptorSet.dstArrayElement = 0;
             WriteDescriptorSet.descriptorCount = 1;
             WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-            WriteDescriptorSet.pImageInfo = &TextureData.Info;
+            WriteDescriptorSet.pImageInfo = &TextureData.Descriptor;
           }
         }
       }
@@ -1398,7 +1356,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             WriteDescriptorSet.dstArrayElement = 0;
             WriteDescriptorSet.descriptorCount = 1;
             WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-            WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Info;
+            WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
           }
         }
       }
@@ -1431,8 +1389,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
       {
         DescriptorImageData& ImageData = SamplerDatas.emplace_back();
         {
-          ImageData.Info.sampler = GetSampler(Samplers[SamplerCount]);
-          ImageData.Info.imageLayout = vk::ImageLayout::eUndefined;
+          ImageData.Descriptor = GetSamplerDescriptor(Samplers[SamplerCount]);
           ImageData.Bind = SamplerCount;
         }
       }
@@ -1462,7 +1419,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             WriteDescriptorSet.dstArrayElement = 0;
             WriteDescriptorSet.descriptorCount = 1;
             WriteDescriptorSet.descriptorType = Cast(DescriptorType::eSampler);
-            WriteDescriptorSet.pImageInfo = &SamplerData.Info;
+            WriteDescriptorSet.pImageInfo = &SamplerData.Descriptor;
           }
         }
       }
@@ -1486,13 +1443,15 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
       for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
       {
-        CCopyConstantBuffer* pConstantBuffer = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
+        const vdl::Detail::ConstantBufferData& ConstantBuffer = ConstantBuffers[ConstantBufferCount];
+        if (ConstantBuffer.isEmpty())
+        {
+          continue;
+        }
 
         DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
         {
-          BufferData.Info.buffer = pConstantBuffer->ParentBuffer;
-          BufferData.Info.offset = pConstantBuffer->Offset;
-          BufferData.Info.range = pConstantBuffer->BufferSize;
+          BufferData.Descriptor = GetConstantBufferDescriptor(ConstantBuffer);
           BufferData.Bind = ConstantBufferCount;
         }
       }
@@ -1522,7 +1481,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             WriteDescriptorSet.dstArrayElement = 0;
             WriteDescriptorSet.descriptorCount = 1;
             WriteDescriptorSet.descriptorType = Cast(DescriptorType::eConstantBuffer);
-            WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Info;
+            WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Descriptor;
           }
         }
       }
@@ -1552,42 +1511,31 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
         const vdl::UnorderedAccessObject& UnorderedAccessObject = UnorderedAccessObjects[UnorderedAccessObjectCount];
 
         //  UnorderedAccessTexture
-        if (std::get_if<vdl::UnorderedAccessTexture>(&UnorderedAccessObject))
+        if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = std::get_if<vdl::UnorderedAccessTexture>(&UnorderedAccessObject))
         {
-          const vdl::UnorderedAccessTexture& UnorderedAccessTexture = std::get<vdl::UnorderedAccessTexture>(UnorderedAccessObject);
-          if (!UnorderedAccessTexture.isEmpty())
+          if (pUnorderedAccessObject->isEmpty())
           {
-            constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eGeneral;
+            continue;
+          }
 
-            CTexture* pTexture = Cast<CTexture>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()));
-            if (pTexture->TextureData.CurrentLayout != kImageLayout)
-            {
-              pTexture->TextureData.SetImageLayout(CurrentGraphicsCommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-            }
-
-            DescriptorImageData& ImageData = UnorderedAccessTextureDatas.emplace_back();
-            {
-              ImageData.Info.imageView = pTexture->TextureData.View.get();
-              ImageData.Info.imageLayout = kImageLayout;
-              ImageData.Bind = UnorderedAccessObjectCount;
-            }
+          DescriptorImageData& ImageData = UnorderedAccessTextureDatas.emplace_back();
+          {
+            ImageData.Descriptor = GetUnorderedAccessTextureDescriptor(*pUnorderedAccessObject, CurrentGraphicsCommandBuffer);
+            ImageData.Bind = UnorderedAccessObjectCount;
           }
         }
         //  UnorderedAccessBuffer
-        else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&UnorderedAccessObject))
+        else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessBuffer = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&UnorderedAccessObject))
         {
-          const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(UnorderedAccessObject);
-
-          if (!UnorderedAccessBuffer.isEmpty())
+          if (pUnorderedAccessBuffer->isEmpty())
           {
-            CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
-            DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
-            {
-              BufferData.Info.buffer = pUnorderedAccessBuffer->BufferData.Buffer.get();
-              BufferData.Info.offset = 0;
-              BufferData.Info.range = pUnorderedAccessBuffer->BufferSize;
-              BufferData.Bind = UnorderedAccessObjectCount;
-            }
+            continue;
+          }
+
+          DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+          {
+            BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pUnorderedAccessBuffer);
+            BufferData.Bind = UnorderedAccessObjectCount;
           }
         }
       }
@@ -1620,7 +1568,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             WriteDescriptorSet.dstArrayElement = 0;
             WriteDescriptorSet.descriptorCount = 1;
             WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-            WriteDescriptorSet.pImageInfo = &UnorderedAccessTextureData.Info;
+            WriteDescriptorSet.pImageInfo = &UnorderedAccessTextureData.Descriptor;
           }
         }
       }
@@ -1659,7 +1607,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
             WriteDescriptorSet.dstArrayElement = 0;
             WriteDescriptorSet.descriptorCount = 1;
             WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-            WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Info;
+            WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
           }
         }
       }
@@ -2385,47 +2333,18 @@ void CDeviceContext::PreprocessingDraw()
 
               DescriptorImageData& ImageData = TextureDatas.emplace_back();
               {
-                ImageData.Info.imageLayout = kImageLayout;
+                ImageData.Descriptor = GetTextureDescriptor(pTexture, CurrentGraphicsCommandBuffer);
                 ImageData.Bind = ShaderResourceCount;
-              }
-
-              switch (pTexture->GetType())
-              {
-              case TextureType::eDepthStencilTexture:
-                assert(false);
-              case TextureType::eDepthTexture:
-              {
-                CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
-                ImageData.Info.imageView = pDepthTexture->View.get();
-              }
-              break;
-              case TextureType::eStencilTexture:
-              {
-                CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
-                ImageData.Info.imageView = pStencilTexture->View.get();
-              }
-              break;
-              default:
-              {
-                CTexture* pColorTexture = Cast<CTexture>(pTexture);
-                ImageData.Info.imageView = pColorTexture->TextureData.View.get();
-              }
-              break;
               }
             }
             //  UnorderedAccessBuffer
-            else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
+            else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
             {
-              const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(ShaderResource);
-
-              if (!UnorderedAccessBuffer.isEmpty())
+              if (pShaderResource->isEmpty())
               {
-                CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()));
                 DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
                 {
-                  BufferData.Info.buffer = pUnorderedAccessBuffer->BufferData.Buffer.get();
-                  BufferData.Info.offset = 0;
-                  BufferData.Info.range = pUnorderedAccessBuffer->BufferSize;
+                  BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pShaderResource);
                   BufferData.Bind = ShaderResourceCount;
                 }
               }
@@ -2462,7 +2381,7 @@ void CDeviceContext::PreprocessingDraw()
                 WriteDescriptorSet.dstArrayElement = 0;
                 WriteDescriptorSet.descriptorCount = 1;
                 WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-                WriteDescriptorSet.pImageInfo = &TextureData.Info;
+                WriteDescriptorSet.pImageInfo = &TextureData.Descriptor;
               }
             }
           }
@@ -2503,7 +2422,7 @@ void CDeviceContext::PreprocessingDraw()
                 WriteDescriptorSet.dstArrayElement = 0;
                 WriteDescriptorSet.descriptorCount = 1;
                 WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-                WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Info;
+                WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
               }
             }
           }
@@ -2564,8 +2483,7 @@ void CDeviceContext::PreprocessingDraw()
           {
             DescriptorImageData& ImageData = SamplerDatas.emplace_back();
             {
-              ImageData.Info.sampler = GetSampler(Samplers[SamplerCount]);
-              ImageData.Info.imageLayout = vk::ImageLayout::eUndefined;
+              ImageData.Descriptor = GetSamplerDescriptor(Samplers[SamplerCount]);
               ImageData.Bind = SamplerCount;
             }
           }
@@ -2600,7 +2518,7 @@ void CDeviceContext::PreprocessingDraw()
               WriteDescriptorSet.dstArrayElement = 0;
               WriteDescriptorSet.descriptorCount = 1;
               WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-              WriteDescriptorSet.pImageInfo = &SamplerData.Info;
+              WriteDescriptorSet.pImageInfo = &SamplerData.Descriptor;
             }
           }
         }
@@ -2651,18 +2569,15 @@ void CDeviceContext::PreprocessingDraw()
           const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
           for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
           {
-            if (ConstantBuffers[ConstantBufferCount].isEmpty())
+            const vdl::Detail::ConstantBufferData& ConstantBuffer = ConstantBuffers[ConstantBufferCount];
+            if (ConstantBuffer.isEmpty())
             {
               continue;
             }
 
-            CCopyConstantBuffer* pConstantBuffer = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(ConstantBuffers[ConstantBufferCount].GetID()));
-
             DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
             {
-              BufferData.Info.buffer = pConstantBuffer->ParentBuffer;
-              BufferData.Info.offset = pConstantBuffer->Offset;
-              BufferData.Info.range = pConstantBuffer->BufferSize;
+              BufferData.Descriptor = GetConstantBufferDescriptor(ConstantBuffer);
               BufferData.Bind = ConstantBufferCount;
             }
           }
@@ -2697,7 +2612,7 @@ void CDeviceContext::PreprocessingDraw()
               WriteDescriptorSet.dstArrayElement = 0;
               WriteDescriptorSet.descriptorCount = 1;
               WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-              WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Info;
+              WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Descriptor;
             }
           }
         }
@@ -2897,10 +2812,58 @@ const vk::PipelineMultisampleStateCreateInfo& CDeviceContext::GetMultisampleStat
   return MultisampleStates_.at(_AlphaToCoverageEnable);
 }
 
-const vk::Sampler& CDeviceContext::GetSampler(const vdl::Sampler& _Sampler)
+const vk::DescriptorImageInfo& CDeviceContext::GetTextureDescriptor(ITexture* _pTexture, const vk::CommandBuffer& _CommandBuffer)
+{
+  assert(_pTexture);
+
+  constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+  switch (_pTexture->GetType())
+  {
+  case TextureType::eDepthStencilTexture:
+    assert(false);
+  case TextureType::eDepthTexture:
+  {
+    CDepthTexture* pDepthTexture = Cast<CDepthTexture>(_pTexture);
+
+    if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
+    {
+      pDepthTexture->pParent->TextureData.SetImageLayout(_CommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 });
+    }
+    pDepthTexture->Descriptor.imageLayout = kImageLayout;
+    return pDepthTexture->Descriptor;
+  }
+  case TextureType::eStencilTexture:
+  {
+    CStencilTexture* pStencilTexture = Cast<CStencilTexture>(_pTexture);
+
+    if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
+    {
+      pStencilTexture->pParent->TextureData.SetImageLayout(_CommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1 });
+    }
+    pStencilTexture->Descriptor.imageLayout = kImageLayout;
+    return pStencilTexture->Descriptor;
+  }
+  default:
+  {
+    CTexture* pColorTexture = Cast<CTexture>(_pTexture);
+
+    if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
+    {
+      pColorTexture->TextureData.SetImageLayout(_CommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+    }
+    pColorTexture->Descriptor.imageLayout = kImageLayout;
+    return pColorTexture->Descriptor;
+  }
+  }
+}
+
+const vk::DescriptorImageInfo& CDeviceContext::GetSamplerDescriptor(const vdl::Sampler& _Sampler)
 {
   if (Samplers_.find(_Sampler) == Samplers_.end())
   {
+    Sampler Sampler;
+
     vk::SamplerCreateInfo SamplerInfo;
     {
       SamplerInfo.magFilter = GetMag(_Sampler.Filter);
@@ -2920,11 +2883,48 @@ const vk::Sampler& CDeviceContext::GetSampler(const vdl::Sampler& _Sampler)
       SamplerInfo.unnormalizedCoordinates = false;
     }
 
-    vk::UniqueSampler Sampler = VkDevice_.createSamplerUnique(SamplerInfo);
-    assert(Sampler);
+    Sampler.VkSampler = VkDevice_.createSamplerUnique(SamplerInfo);
+    assert(Sampler.VkSampler);
+
+    Sampler.Descriptor.sampler = Sampler.VkSampler.get();
+    Sampler.Descriptor.imageLayout = vk::ImageLayout::eUndefined;
 
     Samplers_.insert(std::make_pair(_Sampler, std::move(Sampler)));
   }
 
-  return Samplers_.at(_Sampler).get();
+  return Samplers_.at(_Sampler).Descriptor;
+}
+
+const vk::DescriptorBufferInfo& CDeviceContext::GetConstantBufferDescriptor(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
+{
+  assert(!_ConstantBuffer.isEmpty());
+
+  CCopyConstantBuffer* pConstantBuffer = Cast<CCopyConstantBuffer>(pBufferManager_->GetBuffer(_ConstantBuffer.GetID()));
+
+  return pConstantBuffer->Descriptor;
+}
+
+const vk::DescriptorImageInfo& CDeviceContext::GetUnorderedAccessTextureDescriptor(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vk::CommandBuffer& _CommandBuffer)
+{
+  assert(!_UnorderedAccessTexture.isEmpty());
+
+  constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eGeneral;
+
+  CTexture* pTexture = Cast<CTexture>(pTextureManager_->GetTexture(_UnorderedAccessTexture.GetID()));
+  if (pTexture->TextureData.CurrentLayout != kImageLayout)
+  {
+    pTexture->TextureData.SetImageLayout(_CommandBuffer, kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+    pTexture->Descriptor.imageLayout = kImageLayout;
+  }
+
+  return pTexture->Descriptor;
+}
+
+const vk::DescriptorBufferInfo& CDeviceContext::GetUnorderedAccessBufferDescriptor(const vdl::Detail::UnorderedAccessBufferData& _UnorderedAccessBuffer)
+{
+  assert(!_UnorderedAccessBuffer.isEmpty());
+
+  CUnordererdAccessBuffer* pUnorderedAccessBuffer = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(_UnorderedAccessBuffer.GetID()));
+
+  return pUnorderedAccessBuffer->Descriptor;
 }

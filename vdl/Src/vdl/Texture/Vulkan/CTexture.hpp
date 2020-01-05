@@ -37,6 +37,7 @@ struct CTexture : public ITexture
 {
   TextureData TextureData;
   vdl::uint2 TextureSize;
+  vk::DescriptorImageInfo Descriptor;
 public:
   CTexture() = default;
 
@@ -90,6 +91,7 @@ struct CDepthStencilTexture : public IDepthStencilTexture
 {
   TextureData TextureData;
   vdl::uint2 TextureSize;
+  vk::DescriptorImageInfo Descriptor;
   vdl::Texture DepthTexture;
   vdl::Texture StencilTexture;
   vk::Format VkFormat;
@@ -115,6 +117,7 @@ struct CDepthTexture : public ITexture
 {
   CDepthStencilTexture* pParent;
   vk::UniqueImageView View;
+  vk::DescriptorImageInfo Descriptor;
 public:
   CDepthTexture() = default;
 
@@ -133,6 +136,7 @@ struct CStencilTexture : public ITexture
 {
   CDepthStencilTexture* pParent;
   vk::UniqueImageView View;
+  vk::DescriptorImageInfo Descriptor;
 public:
   CStencilTexture() = default;
 
