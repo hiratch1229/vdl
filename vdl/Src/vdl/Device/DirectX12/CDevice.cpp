@@ -200,7 +200,7 @@ void CDevice::Initialize()
   {
     IBuffer* pConstantBuffer;
     CreateConstantBuffer(&pConstantBuffer, Constants::kParentConstantBufferSize);
-    pConstantBuffer_ = Cast<CConstantBuffer>(pConstantBuffer);
+    pConstantBuffer_.reset(Cast<CConstantBuffer>(pConstantBuffer));
 
     ConstantBufferAllocator_.Initialize(pConstantBuffer_->GetBuffer(), Constants::kParentConstantBufferSize);
   }
@@ -393,8 +393,8 @@ vdl::Detail::ConstantBufferData CDevice::CloneConstantBuffer(const vdl::Detail::
       pCopyConstantBuffer->pConstantBufferAllocator = &ConstantBufferAllocator_;
       //  256‚ÉƒAƒ‰ƒCƒƒ“ƒg‚ð‘µ‚¦‚é
       pCopyConstantBuffer->BufferSize = (pSrcConstantBuffer->BufferSize + 255) & ~255;
-      pCopyConstantBuffer->pBuffer = ConstantBufferAllocator_.Allocate(pCopyConstantBuffer->BufferSize,Constants::kConstantBufferAlignment);
-    ::memcpy(pCopyConstantBuffer->pBuffer, pSrcConstantBuffer->BufferData.pBuffer, pCopyConstantBuffer->BufferSize);
+      pCopyConstantBuffer->pBuffer = ConstantBufferAllocator_.Allocate(pCopyConstantBuffer->BufferSize, Constants::kConstantBufferAlignment);
+      ::memcpy(pCopyConstantBuffer->pBuffer, pSrcConstantBuffer->BufferData.pBuffer, pCopyConstantBuffer->BufferSize);
       CreateDescriptorHeap(pCopyConstantBuffer->pConstantBufferViewHeap.GetAddressOf(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     }
 

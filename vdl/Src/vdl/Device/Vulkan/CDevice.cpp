@@ -463,7 +463,7 @@ void CDevice::Initialize()
   {
     IBuffer* pConstantBuffer;
     CreateConstantBuffer(&pConstantBuffer, Constants::kParentConstantBufferSize);
-    pConstantBuffer_ = Cast<CConstantBuffer>(pConstantBuffer);
+    pConstantBuffer_.reset(Cast<CConstantBuffer>(pConstantBuffer));
 
     ConstantBufferAllocator_.Initialize(pConstantBuffer_->GetBuffer(), Constants::kParentConstantBufferSize);
   }

@@ -106,41 +106,13 @@ private:
   static constexpr vdl::uint kSecondVisionExponent = 4;
   //  第2カテゴリーの分割数
   static constexpr vdl::uint kSecondVisionNum = 1 << kSecondVisionExponent;
+  //  メモリの最大値
   static constexpr vdl::uint kMaxSize = ~(1 << 31);
-  //  
+  //  メモリの最小値
   static constexpr vdl::uint kMinSize = kSecondVisionNum;
   //  ブロックの分割の最小サイズ
   static constexpr vdl::uint kMinBlockVisionSize = kBlockSize + kMinSize;
 private:
-  //  立っているビット数を取得
-  static constexpr vdl::uint GetBitNum(vdl::uint _Value)
-  {
-    //  A SWAR Algorithm for Popcount
-    //  https://www.playingwithpointers.com/blog/swar.html
-    _Value -= (_Value >> 1) & 0x55555555;
-    _Value = (_Value & 0x33333333) + ((_Value >> 2) & 0x33333333);
-    return (((_Value + (_Value >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
-
-    ////  分割統治ビット数カウントアルゴリズム
-    //_Value = (_Value & 0x55555555) + ((_Value >> 1) & 0x55555555);
-    //_Value = (_Value & 0x33333333) + ((_Value >> 2) & 0x33333333);
-    //_Value = (_Value & 0x0f0f0f0f) + ((_Value >> 4) & 0x0f0f0f0f);
-    //_Value = (_Value & 0x00ff00ff) + ((_Value >> 8) & 0x00ff00ff);
-    //return (_Value & 0x0000ffff) + ((_Value >> 16) & 0x0000ffff);
-  }
-  //  最上位ビットを取得
-  static constexpr vdl::uint GetMSB(vdl::uint _Value)
-  {
-    vdl::uint Bit = 32;
-
-    if (!(_Value & 0xffff0000)) { _Value <<= 16; Bit -= 16; }
-    if (!(_Value & 0xff000000)) { _Value <<= 8; Bit -= 8; }
-    if (!(_Value & 0xf0000000)) { _Value <<= 4; Bit -= 4; }
-    if (!(_Value & 0xc0000000)) { _Value <<= 2; Bit -= 2; }
-    if (!(_Value & 0x80000000)) { _Value <<= 1; --Bit; }
-
-    return Bit - 1;
-  }
   //  最下位ビットを取得
   static constexpr vdl::uint GetLSB(vdl::uint _Value)
   {
@@ -164,19 +136,21 @@ private:
   //  第1カテゴリーのインデックスを取得
   static constexpr vdl::uint GetFirstLevelIndex(vdl::uint _Size)
   {
-    _Size |= (_Size >> 1);
-    _Size |= (_Size >> 2);
-    _Size |= (_Size >> 4);
-    _Size |= (_Size >> 8);
-    _Size |= (_Size >> 16);
+    vdl::uint Bit = 32;
 
-    return GetBitNum(_Size) - 1;
+    if (!(_Size & 0xffff0000)) { _Size <<= 16; Bit -= 16; }
+    if (!(_Size & 0xff000000)) { _Size <<= 8; Bit -= 8; }
+    if (!(_Size & 0xf0000000)) { _Size <<= 4; Bit -= 4; }
+    if (!(_Size & 0xc0000000)) { _Size <<= 2; Bit -= 2; }
+    if (!(_Size & 0x80000000)) { _Size <<= 1; --Bit; }
+
+    return Bit - 1;
   }
   //  第2カテゴリーのインデックスを取得
   static constexpr vdl::uint GetSecondLevelIndex(vdl::uint _Size, vdl::uint _FLI)
   {
     //  最上位ビット未満のみ有効にするビット
-    const vdl::uint32_t Mask = ~(0xffffffff << _FLI);
+    const vdl::uint32_t Mask = ~static_cast<vdl::uint32_t>(0xff << _FLI);
 
     //  最上位ビットの1つ下のビットから分割数の指数桁を取得
     return (_Size & Mask) >> (_FLI - kSecondVisionExponent);

@@ -54,7 +54,7 @@ void* MemoryAllocator::Allocate(vdl::uint _Size, vdl::uint _Alignment)
       //  ‘¶Ý‚µ‚Ä–³‚©‚Á‚½ê‡‘æ1ƒJƒeƒSƒŠ[‚©‚çÄŽæ“¾
       if (SLI >= kSecondVisionNum)
       {
-        FLI = GetFreeListFLI(FLI);
+        FLI = GetFreeListFLI(FLI + 1);
         //  Š„‚è“–‚Ä‚ê‚éƒƒ‚ƒŠ‚ª‘¶Ý‚µ‚È‚¢Žžnullptr‚ð•Ô‚·
         if (FLI >= kMaxFirstVisionNum)
         {

@@ -24,7 +24,7 @@ private:
   vdl::uint ComputeQueueIndex_;
 private:
   IBufferManager* pBufferManager_;
-  CConstantBuffer* pConstantBuffer_;
+  std::unique_ptr<CConstantBuffer> pConstantBuffer_;
   MemoryAllocator ConstantBufferAllocator_;
 private:
 #if defined(DEBUG) | defined(_DEBUG)

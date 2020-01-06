@@ -22,7 +22,7 @@ class CDevice : public IDevice
   vdl::uint FenceValue_ = 0;
 private:
   IBufferManager* pBufferManager_;
-  CConstantBuffer* pConstantBuffer_;
+  std::unique_ptr<CConstantBuffer> pConstantBuffer_;
   MemoryAllocator ConstantBufferAllocator_;
 public:
   [[nodiscard]] ID3D12Device5* GetDevice() { return pDevice_.Get(); }
