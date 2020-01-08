@@ -1,11 +1,11 @@
 #pragma once
 #include "Fwd.hpp"
+#include "Resource.hpp"
 
 namespace vdl
 {
-  class VertexShader
+  class VertexShader : public Resource
   {
-    ID ID_;
   public:
     VertexShader() = default;
 
@@ -27,16 +27,11 @@ namespace vdl
 
     [[nodiscard]] constexpr bool operator!=(const VertexShader& _VertexShader)const noexcept { return ID_ != _VertexShader.ID_; }
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-
     [[nodiscard]] InputLayoutType GetInputLayout()const;
   };
 
-  class HullShader
+  class HullShader : public Resource
   {
-    ID ID_;
   public:
     HullShader() = default;
 
@@ -57,15 +52,10 @@ namespace vdl
     [[nodiscard]] constexpr bool operator==(const HullShader& _HullShader)const noexcept { return ID_ == _HullShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const HullShader& _HullShader)const noexcept { return ID_ != _HullShader.ID_; }
-  public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
-  class DomainShader
+  class DomainShader : public Resource
   {
-    ID ID_;
   public:
     DomainShader() = default;
 
@@ -86,15 +76,10 @@ namespace vdl
     [[nodiscard]] constexpr bool operator==(const DomainShader& _DomainShader)const noexcept { return ID_ == _DomainShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const DomainShader& _DomainShader)const noexcept { return ID_ != _DomainShader.ID_; }
-  public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
-  class GeometryShader
+  class GeometryShader : public Resource
   {
-    ID ID_;
   public:
     GeometryShader() = default;
 
@@ -115,15 +100,10 @@ namespace vdl
     [[nodiscard]] constexpr bool operator==(const GeometryShader& _GeometryShader)const noexcept { return ID_ == _GeometryShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const GeometryShader& _GeometryShader)const noexcept { return ID_ != _GeometryShader.ID_; }
-  public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
-  class PixelShader
+  class PixelShader : public Resource
   {
-    ID ID_;
   public:
     PixelShader() = default;
 
@@ -144,15 +124,10 @@ namespace vdl
     [[nodiscard]] constexpr bool operator==(const PixelShader& _PixelShader)const noexcept { return ID_ == _PixelShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const PixelShader& _PixelShader)const noexcept { return ID_ != _PixelShader.ID_; }
-  public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
-  class ComputeShader
+  class ComputeShader : public Resource
   {
-    ID ID_;
   public:
     ComputeShader() = default;
 
@@ -173,10 +148,6 @@ namespace vdl
     [[nodiscard]] constexpr bool operator==(const ComputeShader& _ComputeShader)const noexcept { return ID_ == _ComputeShader.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const ComputeShader& _ComputeShader)const noexcept { return ID_ != _ComputeShader.ID_; }
-  public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
   struct GraphicsShaders

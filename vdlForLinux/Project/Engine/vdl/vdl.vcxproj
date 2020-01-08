@@ -65,6 +65,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>Remote_GCC_1_0</PlatformToolset>
+    <RemoteRootDir>~/デスクトップ</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -83,6 +84,9 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteProjectDir>$(RemoteRootDir)/vdl</RemoteProjectDir>
+  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Include\vdl.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Angle.hpp" />
@@ -127,6 +131,7 @@
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer2D.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer3D.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Resource.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Sampler.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Scissor.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Serialize.hpp" />

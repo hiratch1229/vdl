@@ -17,7 +17,8 @@ namespace vdl
 
   StaticMesh::StaticMesh(const StaticMesh& _StaticMesh)
   {
-    if (ID_ = _StaticMesh.ID_)
+    ID_ = _StaticMesh.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IModelManager>()->AddRef(ID_);
     }
@@ -26,18 +27,19 @@ namespace vdl
   StaticMesh::StaticMesh(StaticMesh&& _StaticMesh)noexcept
   {
     ID_ = _StaticMesh.ID_;
-    _StaticMesh.ID_ = std::nullopt;
+    _StaticMesh.ID_ = Constants::kDisableID;
   }
 
   StaticMesh& StaticMesh::operator=(const StaticMesh& _StaticMesh)
   {
     if (ID_ != _StaticMesh.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<IModelManager>()->Release(ID_);
       }
-      if (ID_ = _StaticMesh.ID_)
+      ID_ = _StaticMesh.ID_;
+      if (!isEmpty())
       {
         Engine::Get<IModelManager>()->AddRef(ID_);
       }
@@ -48,20 +50,20 @@ namespace vdl
 
   StaticMesh& StaticMesh::operator=(StaticMesh&& _StaticMesh)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IModelManager>()->Release(ID_);
     }
 
     ID_ = _StaticMesh.ID_;
-    _StaticMesh.ID_ = std::nullopt;
+    _StaticMesh.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   StaticMesh::~StaticMesh()
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IModelManager>()->Release(ID_);
     }

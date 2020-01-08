@@ -32,11 +32,11 @@ public:
 
   [[nodiscard]] virtual vdl::ID CreateUnorderedAccessTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format) = 0;
 
-  virtual void AddRef(const vdl::ID& _ID) = 0;
+  virtual void AddRef(vdl::ID _ID) = 0;
 
-  virtual void Release(const vdl::ID& _ID) = 0;
+  virtual void Release(vdl::ID _ID) = 0;
 
-  [[nodiscard]] virtual ITexture* GetTexture(const vdl::ID& _ID) = 0;
+  [[nodiscard]] virtual ITexture* GetTexture(vdl::ID _ID) = 0;
 
-  virtual void SetTexture(const vdl::ID& _ID, ITexture* _pTexture) = 0;
+  virtual void SetTexture(vdl::ID _ID, ITexture* _pTexture) = 0;
 };

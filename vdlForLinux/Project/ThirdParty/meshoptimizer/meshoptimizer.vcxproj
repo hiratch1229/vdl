@@ -64,6 +64,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
     <ConfigurationType>StaticLibrary</ConfigurationType>
+    <RemoteRootDir>~/デスクトップ</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -82,6 +83,9 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteProjectDir>$(RemoteRootDir)/vdl</RemoteProjectDir>
+  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\allocator.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\clusterizer.cpp" />

@@ -78,6 +78,7 @@
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer2D.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer3D.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Resource.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Sampler.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Scissor.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Serialize.hpp" />

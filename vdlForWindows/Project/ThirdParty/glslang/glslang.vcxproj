@@ -32,7 +32,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\localintermediate.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\ParseHelper.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\parseVersions.h" />
-    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\pch.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\preprocessor\PpContext.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\preprocessor\PpTokens.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\propagateNoContraction.h" />
@@ -52,7 +51,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\hlslScanContext.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\hlslTokens.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\hlslTokenStream.h" />
-    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\pch.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\OGLCompilersDLL\InitializeDll.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\SPIRV\bitutils.h" />
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\SPIRV\disassemble.h" />
@@ -92,7 +90,6 @@
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\parseConst.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\ParseContextBase.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\ParseHelper.cpp" />
-    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\pch.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\PoolAlloc.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\preprocessor\Pp.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\preprocessor\PpAtom.cpp" />
@@ -114,7 +111,6 @@
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\hlslParseHelper.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\hlslScanContext.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\hlslTokenStream.cpp" />
-    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\pch.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\OGLCompilersDLL\InitializeDll.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\SPIRV\disassemble.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\SPIRV\doc.cpp" />

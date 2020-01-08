@@ -32,11 +32,11 @@ public:
 
   vdl::ID CreateUnorderedAccessTexture(const vdl::uint2& _TextureSize, vdl::FormatType _Format)override;
 
-  void AddRef(const vdl::ID& _ID)override { Textures_.Get(_ID).AddRef(); }
+  void AddRef(vdl::ID _ID)override { Textures_.Get(_ID).AddRef(); }
 
-  void Release(const vdl::ID& _ID)override { Textures_.Get(_ID).Release(); }
+  void Release(vdl::ID _ID)override { Textures_.Get(_ID).Release(); }
 
-  ITexture* GetTexture(const vdl::ID& _ID) { return Textures_.Get(_ID).Get(); }
+  ITexture* GetTexture(vdl::ID _ID) { return Textures_.Get(_ID).Get(); }
 
-  void SetTexture(const vdl::ID& _ID, ITexture* _pTexture)override { Textures_.Get(_ID) = _pTexture; }
+  void SetTexture(vdl::ID _ID, ITexture* _pTexture)override { Textures_.Get(_ID) = _pTexture; }
 };

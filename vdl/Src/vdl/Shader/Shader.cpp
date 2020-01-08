@@ -35,7 +35,8 @@ namespace vdl
 
   VertexShader::VertexShader(const VertexShader& _VertexShader)
   {
-    if (ID_ = _VertexShader.ID_)
+    ID_ = _VertexShader.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->AddRef(ID_);
     }
@@ -44,18 +45,19 @@ namespace vdl
   VertexShader::VertexShader(VertexShader&& _VertexShader)noexcept
   {
     ID_ = _VertexShader.ID_;
-    _VertexShader.ID_ = std::nullopt;
+    _VertexShader.ID_ = Constants::kDisableID;
   }
 
   VertexShader& VertexShader::operator=(const VertexShader& _VertexShader)
   {
     if (ID_ != _VertexShader.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->Release(ID_);
       }
-      if (ID_ = _VertexShader.ID_)
+      ID_ = _VertexShader.ID_;
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
@@ -66,20 +68,20 @@ namespace vdl
 
   VertexShader& VertexShader::operator=(VertexShader&& _VertexShader)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
 
     ID_ = _VertexShader.ID_;
-    _VertexShader.ID_ = std::nullopt;
+    _VertexShader.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   VertexShader::~VertexShader()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -106,7 +108,8 @@ namespace vdl
 
   HullShader::HullShader(const HullShader& _HullShader)
   {
-    if (ID_ = _HullShader.ID_)
+    ID_ = _HullShader.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->AddRef(ID_);
     }
@@ -115,18 +118,19 @@ namespace vdl
   HullShader::HullShader(HullShader&& _HullShader)noexcept
   {
     ID_ = _HullShader.ID_;
-    _HullShader.ID_ = std::nullopt;
+    _HullShader.ID_ = Constants::kDisableID;
   }
 
   HullShader& HullShader::operator=(const HullShader& _HullShader)
   {
     if (ID_ != _HullShader.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->Release(ID_);
       }
-      if (ID_ = _HullShader.ID_)
+      ID_ = _HullShader.ID_;
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
@@ -137,20 +141,20 @@ namespace vdl
 
   HullShader& HullShader::operator=(HullShader&& _HullShader)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
 
     ID_ = _HullShader.ID_;
-    _HullShader.ID_ = std::nullopt;
+    _HullShader.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   HullShader::~HullShader()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -170,7 +174,8 @@ namespace vdl
 
   DomainShader::DomainShader(const DomainShader& _DomainShader)
   {
-    if (ID_ = _DomainShader.ID_)
+    ID_ = _DomainShader.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->AddRef(ID_);
     }
@@ -179,18 +184,19 @@ namespace vdl
   DomainShader::DomainShader(DomainShader&& _DomainShader)noexcept
   {
     ID_ = _DomainShader.ID_;
-    _DomainShader.ID_ = std::nullopt;
+    _DomainShader.ID_ = Constants::kDisableID;
   }
 
   DomainShader& DomainShader::operator=(const DomainShader& _DomainShader)
   {
     if (ID_ != _DomainShader.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->Release(ID_);
       }
-      if (ID_ = _DomainShader.ID_)
+      ID_ = _DomainShader.ID_;
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
@@ -201,20 +207,20 @@ namespace vdl
 
   DomainShader& DomainShader::operator=(DomainShader&& _DomainShader)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
 
     ID_ = _DomainShader.ID_;
-    _DomainShader.ID_ = std::nullopt;
+    _DomainShader.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   DomainShader::~DomainShader()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -234,7 +240,8 @@ namespace vdl
 
   GeometryShader::GeometryShader(const GeometryShader& _GeometryShader)
   {
-    if (ID_ = _GeometryShader.ID_)
+    ID_ = _GeometryShader.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->AddRef(ID_);
     }
@@ -243,18 +250,19 @@ namespace vdl
   GeometryShader::GeometryShader(GeometryShader&& _GeometryShader)noexcept
   {
     ID_ = _GeometryShader.ID_;
-    _GeometryShader.ID_ = std::nullopt;
+    _GeometryShader.ID_ = Constants::kDisableID;
   }
 
   GeometryShader& GeometryShader::operator=(const GeometryShader& _GeometryShader)
   {
     if (ID_ != _GeometryShader.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->Release(ID_);
       }
-      if (ID_ = _GeometryShader.ID_)
+      ID_ = _GeometryShader.ID_;
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
@@ -265,20 +273,20 @@ namespace vdl
 
   GeometryShader& GeometryShader::operator=(GeometryShader&& _GeometryShader)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
 
     ID_ = _GeometryShader.ID_;
-    _GeometryShader.ID_ = std::nullopt;
+    _GeometryShader.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   GeometryShader::~GeometryShader()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -298,7 +306,8 @@ namespace vdl
 
   PixelShader::PixelShader(const PixelShader& _PixelShader)
   {
-    if (ID_ = _PixelShader.ID_)
+    ID_ = _PixelShader.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->AddRef(ID_);
     }
@@ -307,18 +316,19 @@ namespace vdl
   PixelShader::PixelShader(PixelShader&& _PixelShader)noexcept
   {
     ID_ = _PixelShader.ID_;
-    _PixelShader.ID_ = std::nullopt;
+    _PixelShader.ID_ = Constants::kDisableID;
   }
 
   PixelShader& PixelShader::operator=(const PixelShader& _PixelShader)
   {
     if (ID_ != _PixelShader.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->Release(ID_);
       }
-      if (ID_ = _PixelShader.ID_)
+      ID_ = _PixelShader.ID_;
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
@@ -329,20 +339,20 @@ namespace vdl
 
   PixelShader& PixelShader::operator=(PixelShader&& _PixelShader)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
 
     ID_ = _PixelShader.ID_;
-    _PixelShader.ID_ = std::nullopt;
+    _PixelShader.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   PixelShader::~PixelShader()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
@@ -362,7 +372,8 @@ namespace vdl
 
   ComputeShader::ComputeShader(const ComputeShader& _ComputeShader)
   {
-    if (ID_ = _ComputeShader.ID_)
+    ID_ = _ComputeShader.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->AddRef(ID_);
     }
@@ -371,18 +382,19 @@ namespace vdl
   ComputeShader::ComputeShader(ComputeShader&& _ComputeShader)noexcept
   {
     ID_ = _ComputeShader.ID_;
-    _ComputeShader.ID_ = std::nullopt;
+    _ComputeShader.ID_ = Constants::kDisableID;
   }
 
   ComputeShader& ComputeShader::operator=(const ComputeShader& _ComputeShader)
   {
     if (ID_ != _ComputeShader.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->Release(ID_);
       }
-      if (ID_ = _ComputeShader.ID_)
+      ID_ = _ComputeShader.ID_;
+      if (!isEmpty())
       {
         Engine::Get<IShaderManager>()->AddRef(ID_);
       }
@@ -393,20 +405,20 @@ namespace vdl
 
   ComputeShader& ComputeShader::operator=(ComputeShader&& _ComputeShader)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }
 
     ID_ = _ComputeShader.ID_;
-    _ComputeShader.ID_ = std::nullopt;
+    _ComputeShader.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   ComputeShader::~ComputeShader()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<IShaderManager>()->Release(ID_);
     }

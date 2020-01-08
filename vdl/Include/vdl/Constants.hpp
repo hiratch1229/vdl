@@ -4,7 +4,7 @@
 
 namespace vdl::Constants
 {
-  constexpr Type2<uint> kDefaultWindowSize = { 1280, 720 };
+  constexpr uint2 kDefaultWindowSize = { 1280, 720 };
 
   constexpr uint kDefaultMaxFPS = 60;
 
@@ -25,6 +25,8 @@ namespace vdl::Constants
   constexpr uint kMaxConstantBufferNum = 14;
 
   constexpr uint kMaxUnorderedAccessObjectNum = 8;
+
+  constexpr ID kDisableID = 0xffffffff;
 
   constexpr const char kDefaultTextureShaderCode[] = {
     "struct VS_IN"

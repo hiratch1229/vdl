@@ -80,7 +80,7 @@ namespace vdl
 
     Sampler(PreDefined _PreDefined)
     {
-      static constexpr Sampler PreDefineds[static_cast<UINT>(PreDefined::eNum)] =
+      static constexpr Sampler PreDefineds[static_cast<uint>(PreDefined::eNum)] =
       {
         { AddressModeType::eWrap, AddressModeType::eWrap, AddressModeType::eWrap, FilterType::eMinMagMipLinear },
         { AddressModeType::eWrap, AddressModeType::eWrap, AddressModeType::eWrap, FilterType::eAnisotropic }

@@ -1,14 +1,13 @@
 #pragma once
 #include "Fwd.hpp"
+#include "Resource.hpp"
 
 #include <vector>
 
 namespace vdl
 {
-  class StaticMesh
+  class StaticMesh : public Resource
   {
-  protected:
-    ID ID_;
   public:
     StaticMesh() = default;
 
@@ -30,10 +29,6 @@ namespace vdl
 
     [[nodiscard]] constexpr bool operator!=(const StaticMesh& _StaticMesh)const noexcept { return ID_ != _StaticMesh.ID_; }
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-
     [[nodiscard]] Matrix GetGlobalTransform()const;
   };
 

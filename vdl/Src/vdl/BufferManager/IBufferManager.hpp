@@ -41,11 +41,11 @@ public:
 
   [[nodiscard]] virtual vdl::ID CreateUnorderedAccessBuffer(vdl::uint _Stride, vdl::uint _BufferSize, void* _Buffer) = 0;
 
-  virtual void AddRef(const vdl::ID& _ID) = 0;
+  virtual void AddRef(vdl::ID _ID) = 0;
 
-  virtual void Release(const vdl::ID& _ID) = 0;
+  virtual void Release(vdl::ID _ID) = 0;
 
-  [[nodiscard]] virtual IBuffer* GetBuffer(const vdl::ID& _ID) = 0;
+  [[nodiscard]] virtual IBuffer* GetBuffer(vdl::ID _ID) = 0;
 
-  virtual void SetBuffer(const vdl::ID& _ID, IBuffer* _pBuffer) = 0;
+  virtual void SetBuffer(vdl::ID _ID, IBuffer* _pBuffer) = 0;
 };

@@ -34,21 +34,21 @@ public:
 
   std::vector<vdl::SkinnedMesh> Load(const char* _FilePath)override;
 
-  void AddRef(const vdl::ID& _ID)override
+  void AddRef(vdl::ID _ID)override
   {
     ReferenceCount<Mesh>& Mesh = Meshes_.Get(_ID);
-    VertexBufferDatas_[*Mesh->VertexBuffer.GetID()].AddRef();
-    IndexBufferDatas_[*Mesh->IndexBuffer.GetID()].AddRef();
+    VertexBufferDatas_[Mesh->VertexBuffer.GetID()].AddRef();
+    IndexBufferDatas_[Mesh->IndexBuffer.GetID()].AddRef();
     Mesh.AddRef();
   }
 
-  void Release(const vdl::ID& _ID)override
+  void Release(vdl::ID _ID)override
   {
     ReferenceCount<Mesh>& Mesh = Meshes_.Get(_ID);
-    VertexBufferDatas_[*Mesh->VertexBuffer.GetID()].Release();
-    IndexBufferDatas_[*Mesh->IndexBuffer.GetID()].Release();
+    VertexBufferDatas_[Mesh->VertexBuffer.GetID()].Release();
+    IndexBufferDatas_[Mesh->IndexBuffer.GetID()].Release();
     Mesh.Release();
   }
 
-  Mesh* GetMesh(const vdl::ID& _ID)override { return Meshes_.Get(_ID).Get(); }
+  Mesh* GetMesh(vdl::ID _ID)override { return Meshes_.Get(_ID).Get(); }
 };

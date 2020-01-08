@@ -14,7 +14,8 @@ namespace vdl::Detail
 
   ConstantBufferData::ConstantBufferData(const ConstantBufferData& _ConstantBufferData)
   {
-    if (ID_ = _ConstantBufferData.ID_)
+    ID_ = _ConstantBufferData.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IBufferManager>()->AddRef(ID_);
     }
@@ -23,7 +24,7 @@ namespace vdl::Detail
   ConstantBufferData::ConstantBufferData(ConstantBufferData&& _ConstantBufferData)noexcept
   {
     ID_ = _ConstantBufferData.ID_;
-    _ConstantBufferData.ID_ = std::nullopt;
+    _ConstantBufferData.ID_ = Constants::kDisableID;
   }
 
   ConstantBufferData& ConstantBufferData::operator=(const ConstantBufferData& _ConstantBufferData)
@@ -32,12 +33,12 @@ namespace vdl::Detail
 
     if (ID_ != _ConstantBufferData.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         pBufferManager->Release(ID_);
       }
-
-      if (ID_ = _ConstantBufferData.ID_)
+      ID_ = _ConstantBufferData.ID_;
+      if (!isEmpty())
       {
         pBufferManager->AddRef(ID_);
       }
@@ -48,20 +49,20 @@ namespace vdl::Detail
 
   ConstantBufferData& ConstantBufferData::operator=(ConstantBufferData&& _ConstantBufferData)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IBufferManager>()->Release(ID_);
     }
 
     ID_ = _ConstantBufferData.ID_;
-    _ConstantBufferData.ID_ = std::nullopt;
+    _ConstantBufferData.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   ConstantBufferData::~ConstantBufferData()
   {
-    if (ID_)
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<IBufferManager>()->Release(ID_);
     }

@@ -480,6 +480,9 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\BufferManager\IBufferManager.hpp">
       <Filter>Src\BufferManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Resource.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\vdl\Include\vdl\GUI.inl">

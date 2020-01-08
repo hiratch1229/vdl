@@ -453,9 +453,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\Shader.hpp">
       <Filter>Src\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.hpp">
-      <Filter>Src\ShaderManager</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\IShaderManager.hpp">
       <Filter>Src\ShaderManager</Filter>
     </ClInclude>
@@ -488,6 +485,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Window\IWindow.hpp">
       <Filter>Src\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Resource.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.hpp">
+      <Filter>Src\ShaderManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -608,9 +611,6 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Shader\Shader.cpp">
       <Filter>Src\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.cpp">
-      <Filter>Src\ShaderManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\ShaderManager\ShaderManagerFactory.cpp">
       <Filter>Src\ShaderManager</Filter>
     </ClCompile>
@@ -649,6 +649,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\WindowFactory.cpp">
       <Filter>Src\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.cpp">
+      <Filter>Src\ShaderManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

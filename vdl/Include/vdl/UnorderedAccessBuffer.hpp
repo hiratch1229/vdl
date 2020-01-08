@@ -1,13 +1,13 @@
 #pragma once
 #include "Fwd.hpp"
+#include "Resource.hpp"
 
 namespace vdl
 {
   namespace Detail
   {
-    class UnorderedAccessBufferData
+    class UnorderedAccessBufferData : public Resource
     {
-      ID ID_;
     public:
       UnorderedAccessBufferData() = default;
 
@@ -26,10 +26,6 @@ namespace vdl
       [[nodiscard]] bool operator==(const UnorderedAccessBufferData& _UnorderedAccessBufferData)const noexcept { return ID_ == _UnorderedAccessBufferData.ID_; }
 
       [[nodiscard]] bool operator!=(const UnorderedAccessBufferData& _UnorderedAccessBufferData)const noexcept { return ID_ != _UnorderedAccessBufferData.ID_; }
-    public:
-      [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-      [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
     };
   }
 

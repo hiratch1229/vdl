@@ -126,9 +126,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\hlslTokenStream.h">
       <Filter>Src\hlsl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\pch.h">
-      <Filter>Src\hlsl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\Public\ShaderLang.h">
       <Filter>Src\glslang\Public</Filter>
     </ClInclude>
@@ -166,9 +163,6 @@
       <Filter>Src\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\parseVersions.h">
-      <Filter>Src\glslang\MachineIndependent</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\pch.h">
       <Filter>Src\glslang\MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\propagateNoContraction.h">
@@ -287,9 +281,6 @@
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\hlslTokenStream.cpp">
       <Filter>Src\hlsl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\hlsl\pch.cpp">
-      <Filter>Src\hlsl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\OSDependent\ossource.cpp">
       <Filter>Src\glslang\OSDependent</Filter>
     </ClCompile>
@@ -348,9 +339,6 @@
       <Filter>Src\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\ParseHelper.cpp">
-      <Filter>Src\glslang\MachineIndependent</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\pch.cpp">
       <Filter>Src\glslang\MachineIndependent</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\glslang\glslang\MachineIndependent\PoolAlloc.cpp">

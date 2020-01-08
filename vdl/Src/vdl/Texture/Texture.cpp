@@ -36,7 +36,7 @@ namespace vdl
   Texture::Texture(const Color3& _Color, uint8_t _Alpha)
     : Texture(Color4(_Color, _Alpha))
   {
-  
+
   }
 
   Texture::Texture(const Color4& _Color)
@@ -52,7 +52,8 @@ namespace vdl
 
   Texture::Texture(const Texture& _Texture)
   {
-    if (ID_ = _Texture.ID_)
+    ID_ = _Texture.ID_;
+    if (!isEmpty())
     {
       Engine::Get<ITextureManager>()->AddRef(ID_);
     }
@@ -61,18 +62,19 @@ namespace vdl
   Texture::Texture(Texture&& _Texture)noexcept
   {
     ID_ = _Texture.ID_;
-    _Texture.ID_ = std::nullopt;
+    _Texture.ID_ = Constants::kDisableID;
   }
 
   Texture& Texture::operator=(const Texture& _Texture)
   {
     if (ID_ != _Texture.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<ITextureManager>()->Release(ID_);
       }
-      if (ID_ = _Texture.ID_)
+      ID_ = _Texture.ID_;
+      if (!isEmpty())
       {
         Engine::Get<ITextureManager>()->AddRef(ID_);
       }
@@ -83,20 +85,20 @@ namespace vdl
 
   Texture& Texture::operator=(Texture&& _Texture)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }
 
     ID_ = _Texture.ID_;
-    _Texture.ID_ = std::nullopt;
+    _Texture.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   Texture::~Texture()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }
@@ -123,7 +125,8 @@ namespace vdl
 
   CubeTexture::CubeTexture(const CubeTexture& _CubeTexture)
   {
-    if (ID_ = _CubeTexture.ID_)
+    ID_ = _CubeTexture.ID_;
+    if (!isEmpty())
     {
       Engine::Get<ITextureManager>()->AddRef(ID_);
     }
@@ -132,18 +135,19 @@ namespace vdl
   CubeTexture::CubeTexture(CubeTexture&& _CubeTexture)noexcept
   {
     ID_ = _CubeTexture.ID_;
-    _CubeTexture.ID_ = std::nullopt;
+    _CubeTexture.ID_ = Constants::kDisableID;
   }
 
   CubeTexture& CubeTexture::operator=(const CubeTexture& _CubeTexture)
   {
     if (ID_ != _CubeTexture.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<ITextureManager>()->Release(ID_);
       }
-      if (ID_ = _CubeTexture.ID_)
+      ID_ = _CubeTexture.ID_;
+      if (!isEmpty())
       {
         Engine::Get<ITextureManager>()->AddRef(ID_);
       }
@@ -154,20 +158,20 @@ namespace vdl
 
   CubeTexture& CubeTexture::operator=(CubeTexture&& _CubeTexture)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }
 
     ID_ = _CubeTexture.ID_;
-    _CubeTexture.ID_ = std::nullopt;
+    _CubeTexture.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   CubeTexture::~CubeTexture()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }
@@ -196,7 +200,8 @@ namespace vdl
 
   DepthStencilTexture::DepthStencilTexture(const DepthStencilTexture& _DepthStencilTexture)
   {
-    if (ID_ = _DepthStencilTexture.ID_)
+    ID_ = _DepthStencilTexture.ID_;
+    if (!isEmpty())
     {
       Engine::Get<ITextureManager>()->AddRef(ID_);
     }
@@ -205,18 +210,19 @@ namespace vdl
   DepthStencilTexture::DepthStencilTexture(DepthStencilTexture&& _DepthStencilTexture)noexcept
   {
     ID_ = _DepthStencilTexture.ID_;
-    _DepthStencilTexture.ID_ = std::nullopt;
+    _DepthStencilTexture.ID_ = Constants::kDisableID;
   }
 
   DepthStencilTexture& DepthStencilTexture::operator=(const DepthStencilTexture& _DepthStencilTexture)
   {
     if (ID_ != _DepthStencilTexture.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         Engine::Get<ITextureManager>()->Release(ID_);
       }
-      if (ID_ = _DepthStencilTexture.ID_)
+      ID_ = _DepthStencilTexture.ID_;
+      if (!isEmpty())
       {
         Engine::Get<ITextureManager>()->AddRef(ID_);
       }
@@ -227,20 +233,20 @@ namespace vdl
 
   DepthStencilTexture& DepthStencilTexture::operator=(DepthStencilTexture&& _DepthStencilTexture)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }
 
     ID_ = _DepthStencilTexture.ID_;
-    _DepthStencilTexture.ID_ = std::nullopt;
+    _DepthStencilTexture.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   DepthStencilTexture::~DepthStencilTexture()
   {
-    if (ID_ && Engine::isActive())
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<ITextureManager>()->Release(ID_);
     }

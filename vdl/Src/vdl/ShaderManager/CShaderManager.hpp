@@ -26,9 +26,9 @@ public:
   //  頂点シェーダー用
   vdl::ID LoadFromMemory(const char* _Source, vdl::uint _DataSize, const char* _EntryPoint, vdl::InputLayoutType _InputLayout)override;
 
-  void AddRef(const vdl::ID& _ID)override { Shaders_.Get(_ID).AddRef(); }
+  void AddRef(vdl::ID _ID)override { Shaders_.Get(_ID).AddRef(); }
 
-  void Release(const vdl::ID& _ID)override { Shaders_.Get(_ID).Release(); }
+  void Release(vdl::ID _ID)override { Shaders_.Get(_ID).Release(); }
 
-  IShader* GetShader(const vdl::ID& _ID)override { return Shaders_.Get(_ID).Get(); }
+  IShader* GetShader(vdl::ID _ID)override { return Shaders_.Get(_ID).Get(); }
 };

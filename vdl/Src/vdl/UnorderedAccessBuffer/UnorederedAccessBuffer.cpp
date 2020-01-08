@@ -15,7 +15,8 @@ namespace vdl::Detail
 
   UnorderedAccessBufferData::UnorderedAccessBufferData(const UnorderedAccessBufferData& _UnorderedAccessBufferData)
   {
-    if (ID_ = _UnorderedAccessBufferData.ID_)
+    ID_ = _UnorderedAccessBufferData.ID_;
+    if (!isEmpty())
     {
       Engine::Get<IBufferManager>()->AddRef(ID_);
     }
@@ -24,7 +25,7 @@ namespace vdl::Detail
   UnorderedAccessBufferData::UnorderedAccessBufferData(UnorderedAccessBufferData&& _UnorderedAccessBufferData)noexcept
   {
     ID_ = _UnorderedAccessBufferData.ID_;
-    _UnorderedAccessBufferData.ID_ = std::nullopt;
+    _UnorderedAccessBufferData.ID_ = Constants::kDisableID;
   }
 
   UnorderedAccessBufferData& UnorderedAccessBufferData::operator=(const UnorderedAccessBufferData& _UnorderedAccessBufferData)
@@ -33,12 +34,12 @@ namespace vdl::Detail
 
     if (ID_ != _UnorderedAccessBufferData.ID_)
     {
-      if (ID_)
+      if (!isEmpty())
       {
         pBufferManager->Release(ID_);
       }
-
-      if (ID_ = _UnorderedAccessBufferData.ID_)
+      ID_ = _UnorderedAccessBufferData.ID_;
+      if (!isEmpty())
       {
         pBufferManager->AddRef(ID_);
       }
@@ -49,20 +50,20 @@ namespace vdl::Detail
 
   UnorderedAccessBufferData& UnorderedAccessBufferData::operator=(UnorderedAccessBufferData&& _UnorderedAccessBufferData)noexcept
   {
-    if (ID_)
+    if (!isEmpty())
     {
       Engine::Get<IBufferManager>()->Release(ID_);
     }
 
     ID_ = _UnorderedAccessBufferData.ID_;
-    _UnorderedAccessBufferData.ID_ = std::nullopt;
+    _UnorderedAccessBufferData.ID_ = Constants::kDisableID;
 
     return *this;
   }
 
   UnorderedAccessBufferData::~UnorderedAccessBufferData()
   {
-    if (ID_)
+    if (!isEmpty() && Engine::isActive())
     {
       Engine::Get<IBufferManager>()->Release(ID_);
     }

@@ -27,7 +27,7 @@ public:
 
   vdl::ID Load(const char* _FilePath)override;
 
-  void AddRef(const vdl::ID& _ID)override { Datas_.Get(_ID).AddRef(); }
+  void AddRef(vdl::ID _ID)override { Datas_.Get(_ID).AddRef(); }
 
-  void Release(const vdl::ID& _ID)override { Datas_.Get(_ID).Release(); }
+  void Release(vdl::ID _ID)override { Datas_.Get(_ID).Release(); }
 };

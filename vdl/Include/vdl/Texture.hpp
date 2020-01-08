@@ -2,13 +2,12 @@
 #include "Fwd.hpp"
 #include "Color.hpp"
 #include "Constants.hpp"
+#include "Resource.hpp"
 
 namespace vdl
 {
-  class Texture
+  class Texture : public Resource
   {
-  protected:
-    ID ID_;
   public:
     Texture() = default;
 
@@ -38,10 +37,6 @@ namespace vdl
 
     [[nodiscard]] constexpr bool operator!=(const Texture& _Texture)const noexcept { return ID_ != _Texture.ID_; }
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-
     [[nodiscard]] uint2 GetSize()const;
   };
 
@@ -65,10 +60,8 @@ namespace vdl
     [[nodiscard]] FormatType GetFormat()const;
   };
 
-  class DepthStencilTexture
+  class DepthStencilTexture : public Resource
   {
-  protected:
-    ID ID_;
   public:
     DepthStencilTexture() = default;
 
@@ -88,10 +81,6 @@ namespace vdl
 
     [[nodiscard]] constexpr bool operator!=(const DepthStencilTexture& _DepthStencilTexture)const noexcept { return ID_ != _DepthStencilTexture.ID_; }
   public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-
     [[nodiscard]] FormatType GetFormat()const;
 
     [[nodiscard]] vdl::Texture GetDepthTexture()const;
@@ -99,10 +88,8 @@ namespace vdl
     [[nodiscard]] vdl::Texture GetStencilTexture()const;
   };
 
-  class CubeTexture
+  class CubeTexture : public Resource
   {
-  protected:
-    ID ID_;
   public:
     CubeTexture() = default;
 
@@ -125,10 +112,6 @@ namespace vdl
     [[nodiscard]] constexpr bool operator==(const CubeTexture& _CubeTexture)const noexcept { return ID_ == _CubeTexture.ID_; }
 
     [[nodiscard]] constexpr bool operator!=(const CubeTexture& _CubeTexture)const noexcept { return ID_ != _CubeTexture.ID_; }
-  public:
-    [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-    [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
   };
 
   struct OutputManager

@@ -1,13 +1,13 @@
 #pragma once
 #include "Fwd.hpp"
+#include "Resource.hpp"
 
 namespace vdl
 {
   namespace Detail
   {
-    class ConstantBufferData
+    class ConstantBufferData : public Resource
     {
-      ID ID_;
     public:
       ConstantBufferData() = default;
 
@@ -27,10 +27,6 @@ namespace vdl
 
       [[nodiscard]] bool operator!=(const ConstantBufferData& _ConstantBufferData)const noexcept { return ID_ != _ConstantBufferData.ID_; }
     public:
-      [[nodiscard]] ID GetID()const noexcept { return ID_; }
-
-      [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
-
       [[nodiscard]] void* GetData()const;
 
       [[nodiscard]] uint GetBufferSize()const;

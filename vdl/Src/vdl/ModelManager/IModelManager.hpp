@@ -24,9 +24,9 @@ public:
 
   [[nodiscard]] virtual std::vector<vdl::SkinnedMesh> Load(const char* _FilePath) = 0;
 
-  virtual void AddRef(const vdl::ID& _ID) = 0;
+  virtual void AddRef(vdl::ID _ID) = 0;
 
-  virtual void Release(const vdl::ID& _ID) = 0;
+  virtual void Release(vdl::ID _ID) = 0;
 
-  [[nodiscard]] virtual Mesh* GetMesh(const vdl::ID& _ID) = 0;
+  [[nodiscard]] virtual Mesh* GetMesh(vdl::ID _ID) = 0;
 };

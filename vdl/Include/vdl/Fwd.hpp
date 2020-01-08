@@ -4,35 +4,10 @@
 
 #include <array>
 #include <vector>
-#include <optional>
 #include <variant>
 
 namespace vdl
 {
-  //-------------------------
-  //  Type2.hpp
-  //-------------------------
-  template<class Type> struct Type2;
-  using int2 = Type2<int>;
-  using uint2 = Type2<unsigned int>;
-  using float2 = Type2<float>;
-
-  //-------------------------
-  //  Type3.hpp
-  //-------------------------
-  template<class Type> struct Type3;
-  using int3 = Type3<int>;
-  using uint3 = Type3<unsigned int>;
-  using float3 = Type3<float>;
-
-  //-------------------------
-  //  Type4.hpp
-  //-------------------------
-  template<class Type> struct Type4;
-  using int4 = Type4<int>;
-  using uint4 = Type4<unsigned int>;
-  using float4 = Type4<float>;
-
   //-------------------------
   //  Half.hpp
   //-------------------------
@@ -147,6 +122,12 @@ namespace vdl
   //  Format.hpp
   //-------------------------
   enum class FormatType : uint8_t;
+
+  //-------------------------
+  //  Resource.hpp
+  //-------------------------
+  using ID = uint;
+  class Resource;
 
   //-------------------------
   //  Texture.hpp
@@ -318,7 +299,6 @@ namespace vdl
 
   //-------------------------
   //-------------------------
-  using ID = std::optional<uint>;
   using ShaderResource = std::variant<Texture, CubeTexture, Detail::UnorderedAccessBufferData>;
   using UnorderedAccessObject = std::variant<UnorderedAccessTexture, Detail::UnorderedAccessBufferData>;
 }

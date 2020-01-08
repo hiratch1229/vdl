@@ -45,7 +45,7 @@ vdl::ID CModelManager::Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl:
     {
       if (VertexBufferDatas_.size() <= Buffer.GetID())
       {
-        VertexBufferDatas_.resize(*Buffer.GetID() + 1);
+        VertexBufferDatas_.resize(Buffer.GetID() + 1);
       }
       VertexBufferData* pData = new VertexBufferData;
       {
@@ -53,7 +53,7 @@ vdl::ID CModelManager::Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl:
         pData->Vertices = _Vertices;
       }
 
-      VertexBufferDatas_[*Buffer.GetID()] = pData;
+      VertexBufferDatas_[Buffer.GetID()] = pData;
     }
 
     return Buffer;
@@ -72,7 +72,7 @@ vdl::ID CModelManager::Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl:
     {
       if (IndexBufferDatas_.size() <= Buffer.GetID())
       {
-        IndexBufferDatas_.resize(*Buffer.GetID() + 1);
+        IndexBufferDatas_.resize(Buffer.GetID() + 1);
       }
       IndexBufferData* pData = new IndexBufferData;
       {
@@ -80,7 +80,7 @@ vdl::ID CModelManager::Load(const vdl::VertexSkinnedMeshs& _Vertices, const vdl:
         pData->Indices = _Indices;
       }
 
-      IndexBufferDatas_[*Buffer.GetID()] = pData;
+      IndexBufferDatas_[Buffer.GetID()] = pData;
     }
 
     return Buffer;

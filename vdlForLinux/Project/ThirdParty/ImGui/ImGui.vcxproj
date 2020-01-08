@@ -64,6 +64,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
     <ConfigurationType>StaticLibrary</ConfigurationType>
+    <RemoteRootDir>~/デスクトップ</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -84,6 +85,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <NMakeIncludeSearchPath>..\..\..\..\vdl\Include;..\..\..\..\vdl\Src</NMakeIncludeSearchPath>
+    <RemoteProjectDir>$(RemoteRootDir)/vdl</RemoteProjectDir>
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\ImGui\imconfig.h" />
@@ -103,6 +105,7 @@
     <ClCompile>
       <CppLanguageStandard>c++17</CppLanguageStandard>
       <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Src</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>__clang__</UndefinePreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

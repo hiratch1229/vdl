@@ -1,5 +1,6 @@
 #pragma once
 #include <vdl/Fwd.hpp>
+#include <vdl/Resource.hpp>
 
 enum class IndexType : vdl::uint8_t
 {
@@ -7,9 +8,8 @@ enum class IndexType : vdl::uint8_t
   eUint32,
 };
 
-class VertexBuffer
+class VertexBuffer : public vdl::Resource
 {
-  vdl::ID ID_;
 public:
   VertexBuffer() = default;
 
@@ -30,15 +30,10 @@ public:
   [[nodiscard]] constexpr bool operator==(const VertexBuffer& _VertexBuffer)const noexcept { return ID_ == _VertexBuffer.ID_; }
 
   [[nodiscard]] constexpr bool operator!=(const VertexBuffer& _VertexBuffer)const noexcept { return ID_ != _VertexBuffer.ID_; }
-public:
-  [[nodiscard]] vdl::ID GetID()const noexcept { return ID_; }
-
-  [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
 };
 
-class InstanceBuffer
+class InstanceBuffer : public vdl::Resource
 {
-  vdl::ID ID_;
 public:
   InstanceBuffer() = default;
 
@@ -57,15 +52,10 @@ public:
   [[nodiscard]] constexpr bool operator==(const InstanceBuffer& _InstanceBuffer)const noexcept { return ID_ == _InstanceBuffer.ID_; }
 
   [[nodiscard]] constexpr bool operator!=(const InstanceBuffer& _InstanceBuffer)const noexcept { return ID_ != _InstanceBuffer.ID_; }
-public:
-  [[nodiscard]] vdl::ID GetID()const noexcept { return ID_; }
-
-  [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
 };
 
-class IndexBuffer
+class IndexBuffer : public vdl::Resource
 {
-  vdl::ID ID_;
 public:
   IndexBuffer() = default;
 
@@ -86,8 +76,4 @@ public:
   [[nodiscard]] constexpr bool operator==(const IndexBuffer& _IndexBuffer)const noexcept { return ID_ == _IndexBuffer.ID_; }
 
   [[nodiscard]] constexpr bool operator!=(const IndexBuffer& _IndexBuffer)const noexcept { return ID_ != _IndexBuffer.ID_; }
-public:
-  [[nodiscard]] vdl::ID GetID()const noexcept { return ID_; }
-
-  [[nodiscard]] bool isEmpty()const noexcept { return ID_ == std::nullopt; }
 };
