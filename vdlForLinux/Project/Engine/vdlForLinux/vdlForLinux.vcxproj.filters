@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{ecabb2cb-612c-42cc-b1a3-7f7da353ea66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\pch">
+      <UniqueIdentifier>{c4379d64-514f-4e59-bc95-667e6294034b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\CPUProfiler">
+      <UniqueIdentifier>{a4378cac-b78b-4b89-8ce9-e24dfb4d9539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input">
+      <UniqueIdentifier>{c0f43674-b199-48fc-a7af-e7335f7621f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input\Mouse">
+      <UniqueIdentifier>{639af97e-5583-4abf-a266-f364612e2d03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input\Keyboard">
+      <UniqueIdentifier>{79e8bd27-c285-4094-a80c-b92396257d5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input\XInput">
+      <UniqueIdentifier>{ad5decf0-9f71-4c6f-89fa-d3893863b907}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input\Gamepad">
+      <UniqueIdentifier>{9242b622-9ba8-43cf-8b00-a352ab05617b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Main">
+      <UniqueIdentifier>{9d1a35d4-e727-4519-9d36-15b3be20d3ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\MemoryProfiler">
+      <UniqueIdentifier>{9268d17c-a759-4a09-8aa7-77b24292f091}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Misc">
+      <UniqueIdentifier>{11881ba6-5c57-4378-b1a9-837f030b01b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Window">
+      <UniqueIdentifier>{4d358d0a-5a76-4958-b061-7d2c0c56ed5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\SoundManager">
+      <UniqueIdentifier>{75c632a7-3595-415c-bab7-5976439c1940}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Resource">
+      <UniqueIdentifier>{9fbd88e9-4d1a-4ac0-989c-11ae36d1d3c5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -44,6 +44,8 @@ namespace
     }
     else
     {
+      _ASSERT_EXPR_A(existOriginalFile, std::string(std::string(_FilePath) + "‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB").c_str());
+
       wchar_t wFilePath[Constants::kMaxCharacterNum]{};
       ::mbstowcs_s(nullptr, wFilePath, _FilePath, Constants::kMaxCharacterNum);
 

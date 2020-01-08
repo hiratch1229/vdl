@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{3867e35a-bc78-4cb7-aed5-1045c5e08bed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Buffer">
+      <UniqueIdentifier>{184010d9-5de5-4674-a76e-04d8ac91e44f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Device">
+      <UniqueIdentifier>{fe910d00-6c7e-4a90-b9c3-cd0452bb158f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\DeviceContext">
+      <UniqueIdentifier>{2e5e5eef-def0-46d6-991c-aa9ce8427960}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Shader">
+      <UniqueIdentifier>{207c4b13-500a-4229-8c87-c147e25154d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\SwapChain">
+      <UniqueIdentifier>{f376c5df-0115-4d3a-b5a3-b4b2473a4433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Format">
+      <UniqueIdentifier>{b9595e12-fde2-4be6-a8bf-2f7f59ea2b20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scissor">
+      <UniqueIdentifier>{1cfaf4ea-dd31-44a5-8ab5-a264a6ff305e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Texture">
+      <UniqueIdentifier>{b64028df-b107-4416-8d12-94a4419541ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Topology">
+      <UniqueIdentifier>{f9a765c2-d862-4d88-aa80-7562ef94b424}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Viewport">
+      <UniqueIdentifier>{492eced0-ff43-463e-8ad9-1366c24395cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\pch">
+      <UniqueIdentifier>{34938c31-214a-4942-a159-f620b0563077}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\Vulkan\CBuffer.cpp">
+      <Filter>Src\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\Vulkan\CTexture.cpp">
+      <Filter>Src\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\Vulkan\CSwapChain.cpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\Vulkan\pch.cpp">
+      <Filter>Src\pch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\CDeviceContext.cpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\Vulkan\CDevice.cpp">
+      <Filter>Src\Device</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\Vulkan\CBuffer.hpp">
+      <Filter>Src\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Viewport\Vulkan\Viewport.hpp">
+      <Filter>Src\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Topology\Vulkan\Topology.hpp">
+      <Filter>Src\Topology</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\Vulkan\CTexture.hpp">
+      <Filter>Src\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\Vulkan\CSwapChain.hpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\Vulkan\CShader.hpp">
+      <Filter>Src\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Scissor\Vulkan\Scissor.hpp">
+      <Filter>Src\Scissor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\Vulkan\pch.hpp">
+      <Filter>Src\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Format\Vulkan\Format.hpp">
+      <Filter>Src\Format</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\CDeviceContext.hpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\Vulkan\CDevice.hpp">
+      <Filter>Src\Device</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

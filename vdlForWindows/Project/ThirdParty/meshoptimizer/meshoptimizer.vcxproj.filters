@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\allocator.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\clusterizer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\indexcodec.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\indexgenerator.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\overdrawanalyzer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\overdrawoptimizer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\simplifier.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\spatialorder.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\stripifier.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\vcacheanalyzer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\vcacheoptimizer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\vertexcodec.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\vfetchanalyzer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\vfetchoptimizer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{850442cf-3bfe-4f6d-9be5-2b28ea97d674}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\meshoptimizer\meshoptimizer.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

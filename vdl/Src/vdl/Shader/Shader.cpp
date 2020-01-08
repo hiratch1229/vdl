@@ -3,9 +3,6 @@
 #include <vdl/Engine.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
 
-#include <vdl/Misc/Misc.hpp>
-
-#include <filesystem>
 #include <assert.h>
 
 namespace
@@ -28,9 +25,6 @@ namespace vdl
 {
   VertexShader::VertexShader(const char* _FilePath, InputLayoutType _InputLayout, const char* _EntryPoint)
   {
-    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
-
     ID_ = Engine::Get<IShaderManager>()->LoadFromFile(_FilePath, _EntryPoint, _InputLayout);
   }
 
@@ -102,9 +96,6 @@ namespace vdl
 
   HullShader::HullShader(const char* _FilePath, const char* _EntryPoint)
   {
-    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
-
     ID_ = Engine::Get<IShaderManager>()->LoadFromFile(_FilePath, _EntryPoint, ShaderType::eHullShader);
   }
 
@@ -169,9 +160,6 @@ namespace vdl
 
   DomainShader::DomainShader(const char* _FilePath, const char* _EntryPoint)
   {
-    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
-
     ID_ = Engine::Get<IShaderManager>()->LoadFromFile(_FilePath, _EntryPoint, ShaderType::eDomainShader);
   }
 
@@ -236,9 +224,6 @@ namespace vdl
 
   GeometryShader::GeometryShader(const char* _FilePath, const char* _EntryPoint)
   {
-    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
-
     ID_ = Engine::Get<IShaderManager>()->LoadFromFile(_FilePath, _EntryPoint, ShaderType::eGeometryShader);
   }
 
@@ -303,9 +288,6 @@ namespace vdl
 
   PixelShader::PixelShader(const char* _FilePath, const char* _EntryPoint)
   {
-    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
-
     ID_ = Engine::Get<IShaderManager>()->LoadFromFile(_FilePath, _EntryPoint, ShaderType::ePixelShader);
   }
 
@@ -370,9 +352,6 @@ namespace vdl
 
   ComputeShader::ComputeShader(const char* _FilePath, const char* _EntryPoint)
   {
-    _ASSERT_EXPR_A(std::filesystem::exists(std::filesystem::path(_FilePath)),
-      std::string(std::string(_FilePath) + "が見つかりません。").c_str());
-
     ID_ = Engine::Get<IShaderManager>()->LoadFromFile(_FilePath, _EntryPoint, ShaderType::eComputeShader);
   }
 

@@ -133,6 +133,8 @@ namespace
     }
     else
     {
+      _ASSERT_EXPR_A(existOriginalFile, std::string(std::string(_FilePath) + "‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB").c_str());
+
       const EShLanguage Stage = Cast(_Type);
 
       bool Result = true;
@@ -141,7 +143,6 @@ namespace
       std::string Data;
       {
         std::ifstream IStream(_FilePath);
-        _ASSERT_EXPR_A(IStream, (std::string(_FilePath) + "‚ª‘¶İ‚µ‚Ü‚¹‚ñB").c_str());
 
         IStream.seekg(0, std::ios::end);
         Data.reserve(static_cast<std::string::size_type>(IStream.tellg()));

@@ -1,0 +1,685 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{b2496b6e-9ecb-42ae-8ad6-3d141a85e5c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{ac700dad-d6da-49b4-a629-7ae6634ff14a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{f05efaa9-d4ce-4895-a78e-7f4b24eae716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include\vdl">
+      <UniqueIdentifier>{b48a22f4-c851-4baa-a287-55e55feb300a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Texture">
+      <UniqueIdentifier>{04b1132f-19a4-4c0e-bdff-31baf6759d52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Mesh">
+      <UniqueIdentifier>{de7d5ef3-a93c-43a7-b1e8-af2832d76ead}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Option">
+      <UniqueIdentifier>{2b6faf1e-653b-40e5-9526-93a53be3814c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Mesh\StaticMesh">
+      <UniqueIdentifier>{e013b2e0-0211-4c76-ba0e-35234aba7651}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Mesh\SkinnedMesh">
+      <UniqueIdentifier>{386a803f-16c9-4a22-91b1-d4be5ebf6609}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Buffer">
+      <UniqueIdentifier>{8a7e0824-4acf-4a0a-87e8-32498c6a7ba4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\BufferManager">
+      <UniqueIdentifier>{d7742a0c-37b0-44e7-9984-034030c415ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Camera">
+      <UniqueIdentifier>{06778b10-5868-47d8-b04b-530e010371a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Collision2D">
+      <UniqueIdentifier>{d765d6a5-4bda-4283-a569-0a33a28807a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Collision3D">
+      <UniqueIdentifier>{cf86afdc-bf1a-4c03-bd04-181a32ddc6a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Computer">
+      <UniqueIdentifier>{3e4e30ac-99d6-49f9-8057-8aa5bc356a37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ConstantBuffer">
+      <UniqueIdentifier>{504010d7-3c19-4761-b649-8f65edaca2ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Constants">
+      <UniqueIdentifier>{219f9410-fee3-4428-8756-0081219f6f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\CPUProfiler">
+      <UniqueIdentifier>{21f2f783-f006-4887-a9cb-2b429358811d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\GUI">
+      <UniqueIdentifier>{e0e6d5b3-0677-440d-a918-a3330aa7d96e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Image">
+      <UniqueIdentifier>{af066eba-57f8-429a-90c3-24c1a50f39f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Device">
+      <UniqueIdentifier>{858d5259-d6f9-4a13-ba4e-60f15c9d2e37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\DeviceContext">
+      <UniqueIdentifier>{60c1a464-f2c6-49d3-adaf-5f7b6a3cf6b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Format">
+      <UniqueIdentifier>{a014cb4c-95a4-4faa-8263-b5148a1c9e26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\GPUProfiler">
+      <UniqueIdentifier>{2b8291f8-2c5e-4683-bcc4-febf442f5542}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input">
+      <UniqueIdentifier>{52c837b5-0ed4-4226-92fe-1602265cf025}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input\Gamepad">
+      <UniqueIdentifier>{260aedeb-8e76-4fe1-97c0-05787d75e450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input\Keyboard">
+      <UniqueIdentifier>{739700f8-2543-49f7-a402-d391cb62b771}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input\Mouse">
+      <UniqueIdentifier>{a15d851d-44b5-40d8-8189-d207fdc1c010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input\XInput">
+      <UniqueIdentifier>{8ddb41fb-3f8d-439b-9c60-4d1bc35722de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\MemoryAllocator">
+      <UniqueIdentifier>{c9b0a029-fbd5-47b2-8c69-1dd55fad12ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\MemoryProfiler">
+      <UniqueIdentifier>{8ed1aaa0-47ca-46c7-843e-a62b1b4d668e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Misc">
+      <UniqueIdentifier>{71c7d5f3-f00a-4930-b530-ca9bc6626caa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Model">
+      <UniqueIdentifier>{138178b0-a996-43ee-9654-d04b181a5613}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ModelData">
+      <UniqueIdentifier>{2efe6069-4222-4670-bc3f-7bbc7e2f7562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ModelManager">
+      <UniqueIdentifier>{867a40c5-ff6d-42a3-a336-f2ce8c3dc428}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Platform">
+      <UniqueIdentifier>{1c90d2c9-589e-4f27-8bbf-453910e4f1e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\RefrenceCount">
+      <UniqueIdentifier>{d09184af-a8b7-41d9-89b2-c1af70471958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Renderer">
+      <UniqueIdentifier>{22834044-ca8f-4a18-8ea9-ebf75dfff08c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Renderer\RendererCommand">
+      <UniqueIdentifier>{a5534476-ae5c-4799-b249-9609a6ea5360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Shader">
+      <UniqueIdentifier>{32da4dbe-dc9c-4292-9ba0-77f2c0799ddc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ShaderManager">
+      <UniqueIdentifier>{e320253d-02a9-4c27-b5ea-f0f7925a7190}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\SoundManager">
+      <UniqueIdentifier>{7aa19875-1f03-4707-9f8d-bbd7ddac89f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\StateChangeFlags">
+      <UniqueIdentifier>{dc7c4bd0-06dd-4fe4-99a3-e9ac0eb7b7f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\SwapChain">
+      <UniqueIdentifier>{301cca99-c77e-4db2-b193-320d556f9fbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\System">
+      <UniqueIdentifier>{2cb69160-31c8-4c0f-96d8-d6092293891b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Texture">
+      <UniqueIdentifier>{9447bfa1-647e-46e1-8b41-049500140064}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\TextureManager">
+      <UniqueIdentifier>{53e8aa84-bea2-4131-a134-72d2a90816d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\UnorderedAccessBuffer">
+      <UniqueIdentifier>{3583a54c-5393-4731-a771-5231c22c34eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Window">
+      <UniqueIdentifier>{44a5fa88-92c4-4985-891b-d5d543f73b1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ModelManager\ModelLoader">
+      <UniqueIdentifier>{a1cfb7a9-b31a-42b9-8d1b-13e1016bb6e9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Angle.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\BlendState.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Box.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Button.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Camera.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Capsule.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Circle.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Collision2D.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Collision3D.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Color.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Computer.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\ConstantBuffer.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Constants.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\DepthStencilState.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\DetectMemoryLeak.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Flag.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Format.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Fwd.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Gamepad.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\GraphicsStates.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\GUI.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Half.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Hash.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Image.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\InputLayout.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Keyboard.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Light.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Macro.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Math.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\MathConstants.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Matrix.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Model.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\ModelData.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\MotionData.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Mouse.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Platform.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Quaternion.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Random.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\RasterizerState.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer2D.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer3D.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Sampler.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Scissor.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Serialize.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Shader.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Singleton.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Sphere.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Stopwatch.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\System.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Texture.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Topology.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Type2.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Type3.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Type4.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Types.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\UnorderedAccessBuffer.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Vertex.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Viewport.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Window.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\XInput.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Engine.hpp">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\Buffer.hpp">
+      <Filter>Src\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\IBuffer.hpp">
+      <Filter>Src\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Platform\Platform.hpp">
+      <Filter>Src\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ReferenceCount\ReferenceCount.hpp">
+      <Filter>Src\RefrenceCount</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\CRenderer.hpp">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\IRenderer.hpp">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.hpp">
+      <Filter>Src\Renderer\RendererCommand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\IShader.hpp">
+      <Filter>Src\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\Shader.hpp">
+      <Filter>Src\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.hpp">
+      <Filter>Src\ShaderManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\IShaderManager.hpp">
+      <Filter>Src\ShaderManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SoundManager\ISoundManager.hpp">
+      <Filter>Src\SoundManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\StateChangeFlags\StateChangeFlags.hpp">
+      <Filter>Src\StateChangeFlags</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\ISwapChain.hpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\System\CSystem.hpp">
+      <Filter>Src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\System\ISystem.hpp">
+      <Filter>Src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\ITexture.hpp">
+      <Filter>Src\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\TextureManager\CTextureManager.hpp">
+      <Filter>Src\TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\TextureManager\ITextureManager.hpp">
+      <Filter>Src\TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Window\IWindow.hpp">
+      <Filter>Src\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\CModelManager.hpp">
+      <Filter>Src\ModelManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\IModelManager.hpp">
+      <Filter>Src\ModelManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\Mesh.hpp">
+      <Filter>Src\ModelManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\FBXLoader.hpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\glTFLoader.hpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\MeshData.hpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\ModelData.hpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Misc\Misc.hpp">
+      <Filter>Src\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\IMemoryProfiler.hpp">
+      <Filter>Src\MemoryProfiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\MemoryAllocator\MemoryAllocator.hpp">
+      <Filter>Src\MemoryAllocator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\XInput\IXInput.hpp">
+      <Filter>Src\Input\XInput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\InputState.hpp">
+      <Filter>Src\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\IMouse.hpp">
+      <Filter>Src\Input\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\IKeyboard.hpp">
+      <Filter>Src\Input\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\IGamepad.hpp">
+      <Filter>Src\Input\Gamepad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Format\Format.hpp">
+      <Filter>Src\Format</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\IDeviceContext.hpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\IDevice.hpp">
+      <Filter>Src\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\GUI\CGUI.hpp">
+      <Filter>Src\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\GUI\IGUI.hpp">
+      <Filter>Src\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\ICPUProfiler.hpp">
+      <Filter>Src\CPUProfiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Constants\Constants.hpp">
+      <Filter>Src\Constants</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Computer\CComputer.hpp">
+      <Filter>Src\Computer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Computer\IComputer.hpp">
+      <Filter>Src\Computer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\BufferManager\CBufferManager.hpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\BufferManager\IBufferManager.hpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\vdl\Include\vdl\GUI.inl">
+      <Filter>Include\vdl</Filter>
+    </None>
+    <None Include="..\..\..\..\vdl\Shader\Texture\Texture.hlsli">
+      <Filter>Shader\Texture</Filter>
+    </None>
+    <None Include="..\..\..\..\vdl\Shader\Option\GaussianBlur.hlsli">
+      <Filter>Shader\Option</Filter>
+    </None>
+    <None Include="..\..\..\..\vdl\Shader\Option\Light.hlsli">
+      <Filter>Shader\Option</Filter>
+    </None>
+    <None Include="..\..\..\..\vdl\Shader\Mesh\StaticMesh\StaticMesh.hlsli">
+      <Filter>Shader\Mesh\StaticMesh</Filter>
+    </None>
+    <None Include="..\..\..\..\vdl\Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli">
+      <Filter>Shader\Mesh\SkinnedMesh</Filter>
+    </None>
+    <None Include="..\..\..\..\vdl\Shader\Mesh\Mesh.hlsli">
+      <Filter>Shader\Mesh</Filter>
+    </None>
+    <None Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.inl">
+      <Filter>Src\Renderer\RendererCommand</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Texture\TexturePS.hlsl">
+      <Filter>Shader\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Texture\TextureVS.hlsl">
+      <Filter>Shader\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Option\FullScreenTriangleVS.hlsl">
+      <Filter>Shader\Option</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Mesh\StaticMesh\StaticMeshVS.hlsl">
+      <Filter>Shader\Mesh\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Mesh\SkinnedMesh\SkinnedMeshVS.hlsl">
+      <Filter>Shader\Mesh\SkinnedMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Mesh\MeshPS.hlsl">
+      <Filter>Shader\Mesh</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Engine.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\Buffer.cpp">
+      <Filter>Src\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\CRenderer.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\Renderer.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererFactory.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Shader\Shader.cpp">
+      <Filter>Src\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.cpp">
+      <Filter>Src\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ShaderManager\ShaderManagerFactory.cpp">
+      <Filter>Src\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SoundManager\SoundManagerFactory.cpp">
+      <Filter>Src\SoundManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\SwapChainFactory.cpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\CSystem.cpp">
+      <Filter>Src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\System.cpp">
+      <Filter>Src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\SystemFactory.cpp">
+      <Filter>Src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\Texture.cpp">
+      <Filter>Src\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\TextureManager\CTextureManager.cpp">
+      <Filter>Src\TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\TextureManager\TextureManagerFactory.cpp">
+      <Filter>Src\TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\UnorderedAccessBuffer\UnorederedAccessBuffer.cpp">
+      <Filter>Src\UnorderedAccessBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\Window.cpp">
+      <Filter>Src\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\WindowFactory.cpp">
+      <Filter>Src\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\CModelManager.cpp">
+      <Filter>Src\ModelManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelManagerFactory.cpp">
+      <Filter>Src\ModelManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\FBXLoader.cpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\glTFLoader.cpp">
+      <Filter>Src\ModelManager\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelData\ModelData.cpp">
+      <Filter>Src\ModelData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Model\Model.cpp">
+      <Filter>Src\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\MemoryProfilerFactory.cpp">
+      <Filter>Src\MemoryProfiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\MemoryAllocator\MemoryAllocator.cpp">
+      <Filter>Src\MemoryAllocator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\XInput\XInput.cpp">
+      <Filter>Src\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\XInput\XInputFactory.cpp">
+      <Filter>Src\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Button.cpp">
+      <Filter>Src\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Mouse.cpp">
+      <Filter>Src\Input\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\MouseFactory.cpp">
+      <Filter>Src\Input\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\KeyboardFactory.cpp">
+      <Filter>Src\Input\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\Gamepad.cpp">
+      <Filter>Src\Input\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\GamepadFactory.cpp">
+      <Filter>Src\Input\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DeviceContextFactory.cpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DeviceFactory.cpp">
+      <Filter>Src\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Image\Image.cpp">
+      <Filter>Src\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\GUI\CGUI.cpp">
+      <Filter>Src\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\GUI\GUI.cpp">
+      <Filter>Src\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\GUI\GUIFactory.cpp">
+      <Filter>Src\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\CPUProfilerFactory.cpp">
+      <Filter>Src\CPUProfiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ConstantBuffer\ConstantBuffer.cpp">
+      <Filter>Src\ConstantBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\CComputer.cpp">
+      <Filter>Src\Computer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\Computer.cpp">
+      <Filter>Src\Computer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\ComputerFactory.cpp">
+      <Filter>Src\Computer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Collision3D\Collision3D.cpp">
+      <Filter>Src\Collision3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Collision2D\Collision2D.cpp">
+      <Filter>Src\Collision2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Camera\Camera.cpp">
+      <Filter>Src\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\BufferManager\BufferManagerFactory.cpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\BufferManager\CBufferManager.cpp">
+      <Filter>Src\BufferManager</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

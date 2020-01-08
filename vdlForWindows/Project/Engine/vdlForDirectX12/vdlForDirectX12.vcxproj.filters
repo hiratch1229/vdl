@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{2e5babb1-5e88-4d83-9313-1213d264674e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Device">
+      <UniqueIdentifier>{32043da6-8301-48ee-a80b-3cec068bfdc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\DeviceContext">
+      <UniqueIdentifier>{1d7c98a7-cfd9-4bc5-afa7-7362ebc6c9e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\SwapChain">
+      <UniqueIdentifier>{026c8490-6459-4bee-9905-cb59f3f05857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Buffer">
+      <UniqueIdentifier>{e457e18e-2699-45db-a126-1e8e9a4d106a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Shader">
+      <UniqueIdentifier>{2d3e5f8a-37c6-4530-bf51-d5f27ce6fb5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Format">
+      <UniqueIdentifier>{3ea96745-9e78-4ded-96bc-12f709e0f4fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Viewport">
+      <UniqueIdentifier>{215cb931-c617-4876-bf81-da6a0ace3bf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scissor">
+      <UniqueIdentifier>{cad2f03a-d02b-46d7-97e3-6d01dcac0ac8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Topology">
+      <UniqueIdentifier>{58abaa40-53b7-45cd-87f1-5a931e27e3e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Texture">
+      <UniqueIdentifier>{16301419-7e73-4984-8bd7-6c9ad0dacec0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\pch">
+      <UniqueIdentifier>{8dc518eb-96ed-40e9-8d73-dc994c27e8aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\DeviceContext\DescriptorHeap">
+      <UniqueIdentifier>{2f19ab90-6c93-4f1c-ba24-62f340e2f28c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\CommandList">
+      <UniqueIdentifier>{65b5b7ce-5a71-4833-ad76-198d8adfc9c1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.cpp">
+      <Filter>Src\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CommandList\DirectX12\CommandList.cpp">
+      <Filter>Src\CommandList</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CDevice.cpp">
+      <Filter>Src\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\CDeviceContext.cpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\DescriptorHeap\DescriptorHeap.cpp">
+      <Filter>Src\DeviceContext\DescriptorHeap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\DirectX12\pch.cpp">
+      <Filter>Src\pch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\DirectX12\CSwapChain.cpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX12\CTexture.cpp">
+      <Filter>Src\Texture</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.hpp">
+      <Filter>Src\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\DirectX12\CommandList.hpp">
+      <Filter>Src\CommandList</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CDevice.hpp">
+      <Filter>Src\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\CDeviceContext.hpp">
+      <Filter>Src\DeviceContext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\DescriptorHeap\DescriptorHeap.hpp">
+      <Filter>Src\DeviceContext\DescriptorHeap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Format\DirectX\Format.hpp">
+      <Filter>Src\Format</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\DirectX12\pch.hpp">
+      <Filter>Src\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Scissor\DirectX\Scissor.hpp">
+      <Filter>Src\Scissor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\DirectX12\CShader.hpp">
+      <Filter>Src\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\DirectX12\CSwapChain.hpp">
+      <Filter>Src\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX12\CTexture.hpp">
+      <Filter>Src\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Topology\DirectX\Topology.hpp">
+      <Filter>Src\Topology</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Viewport\DirectX12\Viewport.hpp">
+      <Filter>Src\Viewport</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

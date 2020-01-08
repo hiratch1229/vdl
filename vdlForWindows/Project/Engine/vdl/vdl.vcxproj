@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DirectX11OnWindows_Debug|x64">
+      <Configuration>DirectX11OnWindows_Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DirectX11OnWindows_Release|x64">
+      <Configuration>DirectX11OnWindows_Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DirectX12OnWindows_Debug|x64">
+      <Configuration>DirectX12OnWindows_Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DirectX12OnWindows_Release|x64">
+      <Configuration>DirectX12OnWindows_Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="VulkanOnWindows_Debug|x64">
+      <Configuration>VulkanOnWindows_Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="VulkanOnWindows_Release|x64">
+      <Configuration>VulkanOnWindows_Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Angle.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\BlendState.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Box.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Button.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Camera.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Capsule.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Circle.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Collision2D.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Collision3D.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Color.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Computer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\ConstantBuffer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Constants.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\DepthStencilState.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\DetectMemoryLeak.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Flag.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Format.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Fwd.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Gamepad.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\GraphicsStates.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\GUI.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Half.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Hash.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Image.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\InputLayout.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Keyboard.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Light.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Macro.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Math.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\MathConstants.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Matrix.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Model.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\ModelData.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\MotionData.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Mouse.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Platform.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Quaternion.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Random.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\RasterizerState.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer2D.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Renderer3D.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Sampler.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Scissor.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Serialize.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Shader.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Singleton.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Sphere.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Stopwatch.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\System.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Texture.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Topology.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Type2.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Type3.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Type4.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Types.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\UnorderedAccessBuffer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Vertex.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Viewport.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Window.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\XInput.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\BufferManager\CBufferManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\BufferManager\IBufferManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\Buffer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\IBuffer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Computer\CComputer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Computer\IComputer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Constants\Constants.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\ICPUProfiler.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\IDeviceContext.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\IDevice.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Engine.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Format\Format.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\GUI\CGUI.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\GUI\IGUI.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\IGamepad.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\InputState.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\IKeyboard.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\IMouse.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\XInput\IXInput.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\MemoryAllocator\MemoryAllocator.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\IMemoryProfiler.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Misc\Misc.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\CModelManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\IModelManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\Mesh.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\FBXLoader.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\glTFLoader.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\MeshData.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\ModelData.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Platform\Platform.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\CRenderer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\IRenderer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\IShaderManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\IShader.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\Shader.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SoundManager\ISoundManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\StateChangeFlags\StateChangeFlags.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\ISwapChain.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\System\CSystem.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\System\ISystem.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\TextureManager\CTextureManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\TextureManager\ITextureManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\TextureManager\TextureLoader\TextureLoader.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\ITexture.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Window\IWindow.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\BufferManager\BufferManagerFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\BufferManager\CBufferManager.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\Buffer.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Camera\Camera.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Collision2D\Collision2D.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Collision3D\Collision3D.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\CComputer.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\Computer.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\ComputerFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ConstantBuffer\ConstantBuffer.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\CPUProfilerFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DeviceContextFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DeviceFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Engine.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\GUI\CGUI.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\GUI\GUI.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\GUI\GUIFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Image\Image.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Button.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\Gamepad.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\GamepadFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\KeyboardFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Mouse.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\MouseFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\XInput\XInput.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\XInput\XInputFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\MemoryAllocator\MemoryAllocator.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\MemoryProfilerFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelData\ModelData.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\CModelManager.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\FBXLoader.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\glTFLoader.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelManagerFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Model\Model.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\MotionData\MotionData.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\CRenderer.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\Renderer.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\ShaderManager\ShaderManagerFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Shader\Shader.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SoundManager\SoundManagerFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\SwapChainFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\CSystem.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\System.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\SystemFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\TextureManager\CTextureManager.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\TextureManager\TextureLoader\TextureLoader.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\TextureManager\TextureManagerFactory.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\Texture.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\UnorderedAccessBuffer\UnorederedAccessBuffer.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\Window.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\WindowFactory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\vdl\Include\vdl\GUI.inl" />
+    <None Include="..\..\..\..\vdl\Shader\Mesh\Mesh.hlsli" />
+    <None Include="..\..\..\..\vdl\Shader\Mesh\SkinnedMesh\SkinnedMesh.hlsli" />
+    <None Include="..\..\..\..\vdl\Shader\Mesh\StaticMesh\StaticMesh.hlsli" />
+    <None Include="..\..\..\..\vdl\Shader\Option\GaussianBlur.hlsli" />
+    <None Include="..\..\..\..\vdl\Shader\Option\Light.hlsli" />
+    <None Include="..\..\..\..\vdl\Shader\Texture\Texture.hlsli" />
+    <None Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Mesh\MeshPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Mesh\SkinnedMesh\SkinnedMeshVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Mesh\StaticMesh\StaticMeshVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Option\FullScreenTriangleVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Texture\TexturePS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\vdl\Shader\Texture\TextureVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{1E5C018D-53C0-4937-A2C7-6C50D7454B33}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>vdl</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>vdlForDirectX11OnWindows_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>vdlForDirectX12OnWindows_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>vdlForVulkanOnWindows_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>vdlForVulkanOnWindows</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>vdlForDirectX11OnWindows</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>vdlForDirectX12OnWindows</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_DIRECTX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX11_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_DIRECTX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX12_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vdlForWindows_d.lib;vdlForVulkan_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='VulkanOnWindows_Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>vdlForWindows.lib;vdlForVulkan.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_DIRECTX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX11.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DirectX12OnWindows_Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_DIRECTX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX12.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
