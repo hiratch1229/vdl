@@ -11,6 +11,7 @@
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/UnorderedAccessBuffer.hpp>
 #include <vdl/Hash.hpp>
+#include <vdl/Variant.hpp>
 
 #include <vdl/Buffer/Buffer.hpp>
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
@@ -34,7 +35,7 @@ class CDeviceContext : public IDeviceContext
   static constexpr vdl::uint kGraphicsDescriptorPoolMaxSet = kGraphicsDescriptorLayoutNum * Constants::kGraphicsCommandBufferNum * kDescriptorMultipleNum;
   static constexpr vdl::uint kComputeDescriptorPoolMaxSet = kComputeDescriptorTypeNum * Constants::kComputeCommandBufferNum * kDescriptorMultipleNum;
 private:
-  using Texture = std::variant<vdl::Texture, vdl::DepthStencilTexture>;
+  using Texture = vdl::Variant<vdl::Texture, vdl::DepthStencilTexture>;
   using ShaderResources = std::vector<vdl::ShaderResource>;
   using Samplers = std::vector<vdl::Sampler>;
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;

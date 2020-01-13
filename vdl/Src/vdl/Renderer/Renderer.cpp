@@ -47,7 +47,7 @@ namespace
 
     for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < _ShaderResourceNum; ++ShaderResourceCount)
     {
-      if (const vdl::Texture* pTexture = std::get_if<vdl::Texture>(&_ShaderResources[ShaderResourceCount]);
+      if (const vdl::Texture* pTexture = _ShaderResources[ShaderResourceCount].GetIf<vdl::Texture>();
         pTexture && !pTexture->isEmpty())
       {
         if (pTextureManager->GetTexture(pTexture->GetID())->GetType() == TextureType::eSwapChainRenderTexture)

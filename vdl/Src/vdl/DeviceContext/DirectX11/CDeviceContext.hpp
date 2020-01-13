@@ -8,6 +8,7 @@
 #include <vdl/Texture.hpp>
 #include <vdl/Sampler.hpp>
 #include <vdl/Hash.hpp>
+#include <vdl/Variant.hpp>
 
 #include <unordered_map>
 

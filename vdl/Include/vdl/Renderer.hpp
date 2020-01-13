@@ -5,6 +5,7 @@
 #include "Texture.hpp"
 #include "ConstantBuffer.hpp"
 #include "UnorderedAccessBuffer.hpp"
+#include "Variant.hpp"
 
 namespace vdl::Renderer
 {

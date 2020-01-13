@@ -15,6 +15,7 @@
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/UnorderedAccessBuffer.hpp>
 #include <vdl/Hash.hpp>
+#include <vdl/Variant.hpp>
 
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
 #include <vdl/Constants/Constants.hpp>
@@ -33,7 +34,7 @@ class IShaderManager;
 
 class CDeviceContext : public IDeviceContext
 {
-  using Texture = std::variant<vdl::Texture, vdl::DepthStencilTexture>;
+  using Texture = vdl::Variant<vdl::Texture, vdl::DepthStencilTexture>;
   using ShaderResources = std::vector<vdl::ShaderResource>;
   using Samplers = std::vector<vdl::Sampler>;
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;

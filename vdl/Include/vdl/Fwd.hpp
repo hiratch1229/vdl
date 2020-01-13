@@ -4,7 +4,6 @@
 
 #include <array>
 #include <vector>
-#include <variant>
 
 namespace vdl
 {
@@ -164,6 +163,13 @@ namespace vdl
   template<class T> class UnorderedAccessBuffer;
 
   //-------------------------
+  //  Variant.hpp
+  //-------------------------
+  template<class... Arg> class Variant;
+  using ShaderResource = Variant<Texture, CubeTexture, Detail::UnorderedAccessBufferData>;
+  using UnorderedAccessObject = Variant<UnorderedAccessTexture, Detail::UnorderedAccessBufferData>;
+
+  //-------------------------
   //  Camera.hpp
   //-------------------------
   struct Camera;
@@ -296,9 +302,4 @@ namespace vdl
     enum class ColorEditFlag : uint;
     using ColorEditFlags = Flags<ColorEditFlag, uint>;
   }
-
-  //-------------------------
-  //-------------------------
-  using ShaderResource = std::variant<Texture, CubeTexture, Detail::UnorderedAccessBufferData>;
-  using UnorderedAccessObject = std::variant<UnorderedAccessTexture, Detail::UnorderedAccessBufferData>;
 }

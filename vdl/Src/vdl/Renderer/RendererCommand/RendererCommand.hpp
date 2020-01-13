@@ -7,6 +7,7 @@
 #include <vdl/Sampler.hpp>
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/UnorderedAccessBuffer.hpp>
+#include <vdl/Variant.hpp>
 
 #include <vdl/Model.hpp>
 

@@ -8,6 +8,7 @@
 #include "Shader.hpp"
 #include "ConstantBuffer.hpp"
 #include "UnorderedAccessBuffer.hpp"
+#include "Variant.hpp"
 
 #include <assert.h>
 

@@ -85,7 +85,7 @@ void Main()
     GUI::Text("FPS:%d(1 / %f)", System::GetFPS(), System::GetDeltaTime());
     GUI::Text("CPU:%f%%", System::GetCPUUseRate());
     GUI::Text("Memory:%f%%", System::GetMemoryUseRate());
-    if (GUI::Input("MaxFPS", reinterpret_cast<int*>(&MaxFPS)))
+    if (GUI::Input("MaxFPS", &MaxFPS))
     {
       System::SetMaxFPS(MaxFPS);
     }

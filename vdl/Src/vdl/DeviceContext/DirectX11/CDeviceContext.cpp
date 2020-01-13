@@ -999,12 +999,11 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
   ID3D11ShaderResourceView* pShaderResourceView = nullptr;
   {
     //  Texture
-    if (std::get_if<vdl::Texture>(&_ShaderResource))
+    if (const vdl::Texture* pShaderResource = _ShaderResource.GetIf<vdl::Texture>())
     {
-      const vdl::Texture& Texture = std::get<vdl::Texture>(_ShaderResource);
-      if (!Texture.isEmpty())
+      if (!pShaderResource->isEmpty())
       {
-        ITexture* pTexture = pTextureManager_->GetTexture(Texture.GetID());
+        ITexture* pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
 
         switch (pTexture->GetType())
         {
@@ -1032,22 +1031,20 @@ ID3D11ShaderResourceView* CDeviceContext::GetShaderResourceView(const vdl::Shade
         }
       }
     }
-    if (std::get_if<vdl::CubeTexture>(&_ShaderResource))
+    //  CubeTexture
+    if (const vdl::CubeTexture* pShaderResource = _ShaderResource.GetIf<vdl::CubeTexture>())
     {
-      const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(_ShaderResource);
-      if (!CubeTexture.isEmpty())
+      if (!pShaderResource->isEmpty())
       {
-        pShaderResourceView = Cast<CCubeTexture>(pTextureManager_->GetTexture(CubeTexture.GetID()))->pShaderResourceView.Get();
+        pShaderResourceView = Cast<CCubeTexture>(pTextureManager_->GetTexture(pShaderResource->GetID()))->pShaderResourceView.Get();
       }
     }
     //  UnorderedAccessBuffer
-    else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_ShaderResource))
+    else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = _ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
     {
-      const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(_ShaderResource);
-
-      if (!UnorderedAccessBuffer.isEmpty())
+      if (!pShaderResource->isEmpty())
       {
-        pShaderResourceView = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()))->pShaderResourceView.Get();
+        pShaderResourceView = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(pShaderResource->GetID()))->pShaderResourceView.Get();
       }
     }
   }
@@ -1105,23 +1102,19 @@ ID3D11UnorderedAccessView* CDeviceContext::GetUnorderedAccessView(const vdl::Uno
   ID3D11UnorderedAccessView* pUnorderedAccessView = nullptr;
   {
     //  UnorderedAccessTexture
-    if (std::get_if<vdl::UnorderedAccessTexture>(&_UnorderedAccessObject))
+    if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = _UnorderedAccessObject.GetIf<vdl::UnorderedAccessTexture>())
     {
-      const vdl::UnorderedAccessTexture& UnorderedAccessTexture = std::get<vdl::UnorderedAccessTexture>(_UnorderedAccessObject);
-
-      if (!UnorderedAccessTexture.isEmpty())
+      if (!pUnorderedAccessObject->isEmpty())
       {
-        pUnorderedAccessView = Cast<CUnorderedAccessTexture>(pTextureManager_->GetTexture(UnorderedAccessTexture.GetID()))->pUnorderedAccessView.Get();
+        pUnorderedAccessView = Cast<CUnorderedAccessTexture>(pTextureManager_->GetTexture(pUnorderedAccessObject->GetID()))->pUnorderedAccessView.Get();
       }
     }
     //  UnorderedAccessBuffer
-    else if (std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_UnorderedAccessObject))
+    else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessObject = _UnorderedAccessObject.GetIf<vdl::Detail::UnorderedAccessBufferData>())
     {
-      const vdl::Detail::UnorderedAccessBufferData& UnorderedAccessBuffer = std::get<vdl::Detail::UnorderedAccessBufferData>(_UnorderedAccessObject);
-
-      if (!UnorderedAccessBuffer.isEmpty())
+      if (!pUnorderedAccessObject->isEmpty())
       {
-        pUnorderedAccessView = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(UnorderedAccessBuffer.GetID()))->pUnorderedAccessView.Get();
+        pUnorderedAccessView = Cast<CUnordererdAccessBuffer>(pBufferManager_->GetBuffer(pUnorderedAccessObject->GetID()))->pUnorderedAccessView.Get();
       }
     }
   }

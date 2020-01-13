@@ -94,6 +94,7 @@
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Type4.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Types.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\UnorderedAccessBuffer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Variant.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Vertex.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Viewport.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Window.hpp" />

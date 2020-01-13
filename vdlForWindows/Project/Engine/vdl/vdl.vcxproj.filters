@@ -492,6 +492,9 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.hpp">
       <Filter>Src\ShaderManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Variant.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Engine.cpp">

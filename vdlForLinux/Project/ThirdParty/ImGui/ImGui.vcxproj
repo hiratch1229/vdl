@@ -97,7 +97,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\ImGui\imgui.cpp" />
-    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\ImGui\imgui_demo.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\ImGui\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\ImGui\imgui_widgets.cpp" />
   </ItemGroup>

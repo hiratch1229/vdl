@@ -1,10 +1,9 @@
 #pragma once
 #include "Type2.hpp"
 #include "Type3.hpp"
-#include "Type3.hpp"
+#include "Type4.hpp"
 #include "Quaternion.hpp"
 #include "Matrix.hpp"
-#include "Angle.hpp"
 #include "Angle.hpp"
 #include "Vertex.hpp"
 

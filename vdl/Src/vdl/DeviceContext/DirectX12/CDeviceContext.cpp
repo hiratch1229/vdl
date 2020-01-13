@@ -1676,7 +1676,7 @@ ID3D12DescriptorHeap* CDeviceContext::GetShaderResourceDescriptorHeap(const vdl:
     constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
     //  Texture
-    if (const vdl::Texture* pShaderResource = std::get_if<vdl::Texture>(&_ShaderResource))
+    if (const vdl::Texture* pShaderResource = _ShaderResource.GetIf<vdl::Texture>())
     {
       if (!pShaderResource->isEmpty())
       {
@@ -1721,7 +1721,7 @@ ID3D12DescriptorHeap* CDeviceContext::GetShaderResourceDescriptorHeap(const vdl:
       }
     }
     //  CubeTexture
-    if (const vdl::CubeTexture* pShaderResource = std::get_if<vdl::CubeTexture>(&_ShaderResource))
+    if (const vdl::CubeTexture* pShaderResource = _ShaderResource.GetIf<vdl::CubeTexture>())
     {
       if (!pShaderResource->isEmpty())
       {
@@ -1734,7 +1734,7 @@ ID3D12DescriptorHeap* CDeviceContext::GetShaderResourceDescriptorHeap(const vdl:
       }
     }
     //  UnorderedAccessBuffer
-    else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_ShaderResource))
+    else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = _ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
     {
       if (!pShaderResource->isEmpty())
       {
@@ -1801,7 +1801,7 @@ ID3D12DescriptorHeap* CDeviceContext::GetUnorderedAccessObjectDescriptorHeap(con
     constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
     //  UnorderedAccessTexture
-    if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = std::get_if<vdl::UnorderedAccessTexture>(&_UnorderedAccessObject))
+    if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = _UnorderedAccessObject.GetIf<vdl::UnorderedAccessTexture>())
     {
       if (!pUnorderedAccessObject->isEmpty())
       {
@@ -1814,7 +1814,7 @@ ID3D12DescriptorHeap* CDeviceContext::GetUnorderedAccessObjectDescriptorHeap(con
       }
     }
     //  UnorderedAccessBuffer
-    else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessObject = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&_UnorderedAccessObject))
+    else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessObject = _UnorderedAccessObject.GetIf<vdl::Detail::UnorderedAccessBufferData>())
     {
       if (!pUnorderedAccessObject->isEmpty())
       {

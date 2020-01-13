@@ -1244,20 +1244,18 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
         ITexture* pTexture = nullptr;
         {
-          if (std::get_if<vdl::Texture>(&ShaderResource))
+          if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
           {
-            const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
-            if (!Texture.isEmpty())
+            if (!pShaderResource->isEmpty())
             {
-              pTexture = pTextureManager_->GetTexture(Texture.GetID());
+              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
             }
           }
-          else if (std::get_if<vdl::CubeTexture>(&ShaderResource))
+          else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
           {
-            const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(ShaderResource);
-            if (!CubeTexture.isEmpty())
+            if (!pShaderResource->isEmpty())
             {
-              pTexture = pTextureManager_->GetTexture(CubeTexture.GetID());
+              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
             }
           }
         }
@@ -1274,7 +1272,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
           }
         }
         //  UnorderedAccessBuffer
-        else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
+        else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
         {
           if (pShaderResource->isEmpty())
           {
@@ -1511,7 +1509,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
         const vdl::UnorderedAccessObject& UnorderedAccessObject = UnorderedAccessObjects[UnorderedAccessObjectCount];
 
         //  UnorderedAccessTexture
-        if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = std::get_if<vdl::UnorderedAccessTexture>(&UnorderedAccessObject))
+        if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = UnorderedAccessObject.GetIf<vdl::UnorderedAccessTexture>())
         {
           if (pUnorderedAccessObject->isEmpty())
           {
@@ -1525,7 +1523,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
           }
         }
         //  UnorderedAccessBuffer
-        else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessBuffer = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&UnorderedAccessObject))
+        else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessBuffer = UnorderedAccessObject.GetIf<vdl::Detail::UnorderedAccessBufferData>())
         {
           if (pUnorderedAccessBuffer->isEmpty())
           {
@@ -1985,20 +1983,18 @@ void CDeviceContext::PreprocessingDraw()
 
         ITexture* pTexture = nullptr;
         {
-          if (std::get_if<vdl::Texture>(&ShaderResource))
+          if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
           {
-            const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
-            if (!Texture.isEmpty())
+            if (!pShaderResource->isEmpty())
             {
-              pTexture = pTextureManager_->GetTexture(Texture.GetID());
+              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
             }
           }
-          else if (std::get_if<vdl::CubeTexture>(&ShaderResource))
+          else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
           {
-            const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(ShaderResource);
-            if (!CubeTexture.isEmpty())
+            if (!pShaderResource->isEmpty())
             {
-              pTexture = pTextureManager_->GetTexture(CubeTexture.GetID());
+              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
             }
           }
         }
@@ -2308,20 +2304,18 @@ void CDeviceContext::PreprocessingDraw()
 
             ITexture* pTexture = nullptr;
             {
-              if (std::get_if<vdl::Texture>(&ShaderResource))
+              if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
               {
-                const vdl::Texture& Texture = std::get<vdl::Texture>(ShaderResource);
-                if (!Texture.isEmpty())
+                if (!pShaderResource->isEmpty())
                 {
-                  pTexture = pTextureManager_->GetTexture(Texture.GetID());
+                  pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
                 }
               }
-              else if (std::get_if<vdl::CubeTexture>(&ShaderResource))
+              else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
               {
-                const vdl::CubeTexture& CubeTexture = std::get<vdl::CubeTexture>(ShaderResource);
-                if (!CubeTexture.isEmpty())
+                if (!pShaderResource->isEmpty())
                 {
-                  pTexture = pTextureManager_->GetTexture(CubeTexture.GetID());
+                  pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
                 }
               }
             }
@@ -2338,7 +2332,7 @@ void CDeviceContext::PreprocessingDraw()
               }
             }
             //  UnorderedAccessBuffer
-            else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = std::get_if<vdl::Detail::UnorderedAccessBufferData>(&ShaderResource))
+            else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
             {
               if (pShaderResource->isEmpty())
               {

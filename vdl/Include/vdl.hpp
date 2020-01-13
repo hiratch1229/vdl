@@ -54,6 +54,7 @@
 #include <vdl/Sampler.hpp>
 #include <vdl/ConstantBuffer.hpp>
 #include <vdl/UnorderedAccessBuffer.hpp>
+#include <vdl/Variant.hpp>
 #include <vdl/ModelData.hpp>
 #include <vdl/MotionData.hpp>
 #include <vdl/Model.hpp>
@@ -62,7 +63,6 @@
 #include <vdl/Renderer3D.hpp>
 #include <vdl/Computer.hpp>
 #include <vdl/GUI.hpp>
-#include <vdl/Light.hpp>
 
 //--------------------------------------------------
 //  “ü—Í
@@ -95,6 +95,7 @@
 #include <vdl/Hash.hpp>
 #include <vdl/Serialize.hpp>
 #include <vdl/Flag.hpp>
+#include <vdl/Light.hpp>
 #include <vdl/Random.hpp>
 #include <vdl/Stopwatch.hpp>
 #include <vdl/DetectMemoryLeak.hpp>

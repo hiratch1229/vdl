@@ -483,6 +483,9 @@
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Resource.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Variant.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\vdl\Include\vdl\GUI.inl">
