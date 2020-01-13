@@ -21,7 +21,7 @@ public:
 public:
   CDevice() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX11; }
 
   void Initialize()override;
 

@@ -91,6 +91,7 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\CDeviceContext.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\Vulkan\CDevice.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\Vulkan\pch.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Vulkan\CPlatform.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\Vulkan\CSwapChain.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\Vulkan\CTexture.cpp" />
   </ItemGroup>

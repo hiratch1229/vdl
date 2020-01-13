@@ -1,5 +1,6 @@
 #pragma once
 
+class IPlatform;
 class ISystem;
 class IWindow;
 class IDevice;
@@ -42,6 +43,7 @@ class Engine
 {
   inline static Engine* pEngine = nullptr;
 private:
+  Component<IPlatform> pPlatform_;
   Component<ISystem> pSystem_;
   Component<IWindow> pWindow_;
   Component<IDevice> pDevice_;
@@ -68,6 +70,7 @@ public:
   [[nodiscard]] static bool isActive() { return pEngine != nullptr; }
 public:
   template<class T> [[nodiscard]] static T* Get() { return nullptr; }
+  template<> [[nodiscard]] static IPlatform* Get() { return pEngine->pPlatform_.Get(); }
   template<> [[nodiscard]] static ISystem* Get() { return pEngine->pSystem_.Get(); }
   template<> [[nodiscard]] static IWindow* Get() { return pEngine->pWindow_.Get(); }
   template<> [[nodiscard]] static IDevice* Get() { return pEngine->pDevice_.Get(); }

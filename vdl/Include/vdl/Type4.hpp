@@ -5,19 +5,19 @@
 
 #define ARITHMETIC_OPERATOR(Operator)\
 template<class T>\
-[[nodiscard]] constexpr auto operator##Operator(const Type4<T>& _v)const noexcept->Type4<decltype(x Operator _v.x)>\
+[[nodiscard]] constexpr auto operator Operator(const Type4<T>& _v)const noexcept->Type4<decltype(x Operator _v.x)>\
 {\
   return{ x Operator _v.x, y Operator _v.y, z Operator _v.z, w Operator _v.w };\
 }\
 template<class T>\
-[[nodiscard]] constexpr auto operator##Operator(T _s)const noexcept->Type4<decltype(x Operator _s)>\
+[[nodiscard]] constexpr auto operator Operator(T _s)const noexcept->Type4<decltype(x Operator _s)>\
 {\
   return{ x Operator _s, y Operator _s, z Operator _s, w Operator _s };\
 }\
 
 #define ASSIGNMENT_OPERATOR(Operator)\
 template<class T>\
-Type4& operator##Operator(const Type4<T>& _v)noexcept\
+Type4& operator Operator(const Type4<T>& _v)noexcept\
 {\
   x Operator static_cast<Type>(_v.x);\
   y Operator static_cast<Type>(_v.y);\
@@ -27,7 +27,7 @@ Type4& operator##Operator(const Type4<T>& _v)noexcept\
   return *this;\
 }\
 template<class T>\
-Type4& operator##Operator(T _s)noexcept\
+Type4& operator Operator(T _s)noexcept\
 {\
   x Operator static_cast<Type>(_s);\
   y Operator static_cast<Type>(_s);\
@@ -42,7 +42,7 @@ namespace vdl
   template<class Type>
   struct Type4
   {
-    static_assert(std::is_fundamental<Type>::value);
+    static_assert(std::is_fundamental<Type>::value, "");
 
     Type x, y, z, w;
   public:
@@ -150,11 +150,11 @@ namespace vdl
 
     ASSIGNMENT_OPERATOR(/= );
   public:
-    [[nodiscard]] constexpr Type Length()const noexcept { return std::sqrt(LengthSq()); }
+    [[nodiscard]] Type Length()const noexcept { return std::sqrt(LengthSq()); }
 
     [[nodiscard]] constexpr Type LengthSq()const noexcept { return x * x + y * y + z * z + w * w; }
 
-    [[nodiscard]] constexpr Type4 Normalize()const noexcept { return *this / Length(); }
+    [[nodiscard]] Type4 Normalize()const noexcept { return *this / Length(); }
 
     template<class T>
     [[nodiscard]] constexpr auto Dot(const Type4<T>& _v)const noexcept->decltype(x* _v.x) { return x * _v.x + y * _v.y + z * _v.z + w * _v.w; }

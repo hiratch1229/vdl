@@ -43,6 +43,9 @@
     <Filter Include="Src\MemoryProfiler">
       <UniqueIdentifier>{af937ae9-f1dd-4cfa-a350-e0abd3c1569f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Platform">
+      <UniqueIdentifier>{ccbed34f-849e-4ef2-ad3c-f442d1f02c34}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\Windows\CWindow.cpp">
@@ -74,6 +77,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\Windows\CCPUProfiler.cpp">
       <Filter>Src\CPUProfiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Windows\CPlatform.cpp">
+      <Filter>Src\Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

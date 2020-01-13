@@ -33,9 +33,9 @@ namespace vdl
 
     Texture& operator=(Texture&& _Texture)noexcept;
 
-    [[nodiscard]] constexpr bool operator==(const Texture& _Texture)const noexcept { return ID_ == _Texture.ID_; }
+    [[nodiscard]] bool operator==(const Texture& _Texture)const noexcept { return ID_ == _Texture.ID_; }
 
-    [[nodiscard]] constexpr bool operator!=(const Texture& _Texture)const noexcept { return ID_ != _Texture.ID_; }
+    [[nodiscard]] bool operator!=(const Texture& _Texture)const noexcept { return ID_ != _Texture.ID_; }
   public:
     [[nodiscard]] uint2 GetSize()const;
   };
@@ -77,9 +77,9 @@ namespace vdl
 
     DepthStencilTexture& operator=(DepthStencilTexture&& _DepthStencilTexture)noexcept;
 
-    [[nodiscard]] constexpr bool operator==(const DepthStencilTexture& _DepthStencilTexture)const noexcept { return ID_ == _DepthStencilTexture.ID_; }
+    [[nodiscard]] bool operator==(const DepthStencilTexture& _DepthStencilTexture)const noexcept { return ID_ == _DepthStencilTexture.ID_; }
 
-    [[nodiscard]] constexpr bool operator!=(const DepthStencilTexture& _DepthStencilTexture)const noexcept { return ID_ != _DepthStencilTexture.ID_; }
+    [[nodiscard]] bool operator!=(const DepthStencilTexture& _DepthStencilTexture)const noexcept { return ID_ != _DepthStencilTexture.ID_; }
   public:
     [[nodiscard]] FormatType GetFormat()const;
 
@@ -109,9 +109,9 @@ namespace vdl
 
     CubeTexture& operator=(CubeTexture&& _CubeTexture)noexcept;
 
-    [[nodiscard]] constexpr bool operator==(const CubeTexture& _CubeTexture)const noexcept { return ID_ == _CubeTexture.ID_; }
+    [[nodiscard]] bool operator==(const CubeTexture& _CubeTexture)const noexcept { return ID_ == _CubeTexture.ID_; }
 
-    [[nodiscard]] constexpr bool operator!=(const CubeTexture& _CubeTexture)const noexcept { return ID_ != _CubeTexture.ID_; }
+    [[nodiscard]] bool operator!=(const CubeTexture& _CubeTexture)const noexcept { return ID_ != _CubeTexture.ID_; }
   };
 
   struct OutputManager

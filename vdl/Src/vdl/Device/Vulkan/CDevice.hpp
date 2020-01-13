@@ -56,7 +56,7 @@ public:
 
   ~CDevice();
 
-  PlatformType GetPlatform()const final { return PlatformType::eVulkan; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eVulkan; }
 
   void Initialize()override;
 

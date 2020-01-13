@@ -37,6 +37,9 @@
     <Filter Include="Src\pch">
       <UniqueIdentifier>{28bc0ef1-1032-4c77-af99-e395331756d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Platform">
+      <UniqueIdentifier>{6c65df0a-9876-42ae-a6d0-dd3ad1776cab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX11\CBuffer.hpp">
@@ -88,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX11\CTexture.cpp">
       <Filter>Src\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\DirectX11\CPlatform.cpp">
+      <Filter>Src\Platform</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

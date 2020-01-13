@@ -19,7 +19,7 @@ struct IBuffer
 
   virtual ~IBuffer() = default;
 
-  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
+  [[nodiscard]] virtual PlatformFlags GetPlatform()const = 0;
 
   [[nodiscard]] virtual BufferType GetType()const = 0;
 };

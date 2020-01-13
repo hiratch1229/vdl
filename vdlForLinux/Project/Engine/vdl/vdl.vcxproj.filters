@@ -486,6 +486,12 @@
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Variant.hpp">
       <Filter>Include\vdl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Platform\CPlatform.hpp">
+      <Filter>Src\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Platform\IPlatform.hpp">
+      <Filter>Src\Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\vdl\Include\vdl\GUI.inl">
@@ -686,6 +692,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\BufferManager\CBufferManager.cpp">
       <Filter>Src\BufferManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\PlatformFactory.cpp">
+      <Filter>Src\Platform</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

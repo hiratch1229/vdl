@@ -5,19 +5,19 @@
 
 #define ARITHMETIC_OPERATOR(Operator)\
 template<class T>\
-[[nodiscard]] constexpr auto operator##Operator(const Type3<T>& _v)const noexcept->Type3<decltype(x Operator _v.x)>\
+[[nodiscard]] constexpr auto operator Operator(const Type3<T>& _v)const noexcept->Type3<decltype(x Operator _v.x)>\
 {\
   return{ x Operator _v.x, y Operator _v.y, z Operator _v.z };\
 }\
 template<class T>\
-[[nodiscard]] constexpr auto operator##Operator(T _s)const noexcept->Type3<decltype(x Operator _s)>\
+[[nodiscard]] constexpr auto operator Operator(T _s)const noexcept->Type3<decltype(x Operator _s)>\
 {\
   return{ x Operator _s, y Operator _s, z Operator _s };\
 }\
 
 #define ASSIGNMENT_OPERATOR(Operator)\
 template<class T>\
-Type3& operator##Operator(const Type3<T>& _v)noexcept\
+Type3& operator Operator(const Type3<T>& _v)noexcept\
 {\
   x Operator static_cast<Type>(_v.x);\
   y Operator static_cast<Type>(_v.y);\
@@ -26,7 +26,7 @@ Type3& operator##Operator(const Type3<T>& _v)noexcept\
   return *this;\
 }\
 template<class T>\
-Type3& operator##Operator(T _s)noexcept\
+Type3& operator Operator(T _s)noexcept\
 {\
   x Operator static_cast<Type>(_s);\
   y Operator static_cast<Type>(_s);\
@@ -40,7 +40,7 @@ namespace vdl
   template<class Type>
   struct Type3
   {
-    static_assert(std::is_fundamental<Type>::value);
+    static_assert(std::is_fundamental<Type>::value, "");
 
     Type x, y, z;
   public:
@@ -95,7 +95,7 @@ namespace vdl
     [[nodiscard]] constexpr Type3 operator+()const noexcept { return *this; }
 
     [[nodiscard]] constexpr Type3 operator-()const noexcept { return { -x, -y, -z }; }
-    
+
     ARITHMETIC_OPERATOR(+);
 
     ARITHMETIC_OPERATOR(-);
@@ -114,11 +114,11 @@ namespace vdl
 
     ASSIGNMENT_OPERATOR(/= );
   public:
-    [[nodiscard]] constexpr Type Length()const noexcept { return std::sqrt(LengthSq()); }
+    [[nodiscard]] Type Length()const noexcept { return std::sqrt(LengthSq()); }
 
     [[nodiscard]] constexpr Type LengthSq()const noexcept { return x * x + y * y + z * z; }
 
-    [[nodiscard]] constexpr Type3 Normalize()const noexcept { return *this / Length(); }
+    [[nodiscard]] Type3 Normalize()const noexcept { return *this / Length(); }
 
     template<class T>
     [[nodiscard]] constexpr auto Dot(const Type3<T>& _v)const noexcept->decltype(x * _v.x) { return x * _v.x + y * _v.y + z * _v.z; }

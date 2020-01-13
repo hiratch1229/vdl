@@ -23,7 +23,7 @@ struct ITexture
 
   virtual ~ITexture() = default;
 
-  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
+  [[nodiscard]] virtual PlatformFlags GetPlatform()const = 0;
 
   [[nodiscard]] virtual TextureType GetType()const = 0;
 

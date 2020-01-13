@@ -10,7 +10,7 @@ public:
 
   virtual ~IMemoryProfiler() = default;
 
-  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
+  [[nodiscard]] virtual PlatformFlags GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
 

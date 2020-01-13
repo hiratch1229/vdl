@@ -2,6 +2,7 @@
 #include "../IShader.hpp"
 
 #include <vdl/pch/DirectX11/pch.hpp>
+#include <vdl/Platform/IPlatform.hpp>
 
 struct CVertexShader : public IVertexShader
 {
@@ -10,7 +11,7 @@ struct CVertexShader : public IVertexShader
 public:
   CVertexShader() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX11; }
 
   ShaderType GetType()const final { return ShaderType::eVertexShader; }
 
@@ -23,7 +24,7 @@ struct CHullShader : public IShader
 public:
   CHullShader() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX11; }
 
   ShaderType GetType()const final { return ShaderType::eHullShader; }
 };
@@ -34,7 +35,7 @@ struct CDomainShader : public IShader
 public:
   CDomainShader() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX11; }
 
   ShaderType GetType()const final { return ShaderType::eDomainShader; }
 };
@@ -45,7 +46,7 @@ struct CGeometryShader : public IShader
 public:
   CGeometryShader() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX11; }
 
   ShaderType GetType()const final { return ShaderType::eGeometryShader; }
 };
@@ -56,7 +57,7 @@ struct CPixelShader : public IShader
 public:
   CPixelShader() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX11; }
 
   ShaderType GetType()const final { return ShaderType::ePixelShader; }
 };
@@ -67,7 +68,7 @@ struct CComputeShader : public IShader
 public:
   CComputeShader() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX11; }
 
   ShaderType GetType()const final { return ShaderType::eComputeShader; }
 };

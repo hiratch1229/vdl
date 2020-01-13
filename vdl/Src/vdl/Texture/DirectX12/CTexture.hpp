@@ -5,6 +5,7 @@
 
 #include <vdl/Window.hpp>
 
+#include <vdl/Platform/IPlatform.hpp>
 #include <vdl/Constants/Constants.hpp>
 
 #include <utility>
@@ -38,7 +39,7 @@ struct CTexture : public ITexture
 public:
   CTexture() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   TextureType GetType()const override { return TextureType::eTexture; }
 
@@ -76,7 +77,7 @@ struct CSwapChainRenderTexture : public ITexture
 public:
   CSwapChainRenderTexture() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   TextureType GetType()const final { return TextureType::eSwapChainRenderTexture; }
 
@@ -97,7 +98,7 @@ struct CDepthStencilTexture : public IDepthStencilTexture
 public:
   CDepthStencilTexture() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   TextureType GetType()const override { return TextureType::eDepthStencilTexture; }
 
@@ -119,7 +120,7 @@ public:
 
   ~CDepthTexture();
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   TextureType GetType()const final { return TextureType::eDepthTexture; }
 
@@ -137,7 +138,7 @@ public:
 
   ~CStencilTexture();
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   TextureType GetType()const final { return TextureType::eStencilTexture; }
 

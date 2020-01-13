@@ -5,8 +5,7 @@
 #include "Type4.hpp"
 #include "Quaternion.hpp"
 #include "Angle.hpp"
-
-#include <DirectXMath.h>
+#include "Macro.hpp"
 
 #include <string>
 #include <fstream>
@@ -15,7 +14,7 @@ namespace vdl
 {
   struct Matrix
   {
-  #pragma warning(disable:4201)
+#pragma warning(disable:4201)
     union
     {
       float4 r[4];
@@ -28,7 +27,7 @@ namespace vdl
       };
       float m[4][4];
     };
-  #pragma warning(default:4201)
+#pragma warning(default:4201)
   public:
     Matrix() = default;
 
@@ -46,26 +45,39 @@ namespace vdl
       , _21(_r1.x), _22(_r1.y), _23(_r1.z), _24(_r1.w)
       , _31(_r2.x), _32(_r2.y), _33(_r2.z), _34(_r2.w)
       , _41(_r3.x), _42(_r3.y), _43(_r3.z), _44(_r3.w) {}
-
-    Matrix(const DirectX::XMMATRIX& _m)noexcept
-      : _11(_m.r[0].m128_f32[0]), _12(_m.r[0].m128_f32[1]), _13(_m.r[0].m128_f32[2]), _14(_m.r[0].m128_f32[3])
-      , _21(_m.r[1].m128_f32[0]), _22(_m.r[1].m128_f32[1]), _23(_m.r[1].m128_f32[2]), _24(_m.r[1].m128_f32[3])
-      , _31(_m.r[2].m128_f32[0]), _32(_m.r[2].m128_f32[1]), _33(_m.r[2].m128_f32[2]), _34(_m.r[2].m128_f32[3])
-      , _41(_m.r[3].m128_f32[0]), _42(_m.r[3].m128_f32[1]), _43(_m.r[3].m128_f32[2]), _44(_m.r[3].m128_f32[3]) {}
-  public:
-    operator DirectX::XMMATRIX()const noexcept { return { _11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44 }; }
   public:
     [[nodiscard]] constexpr bool operator==(const Matrix& _m)const noexcept { return r[0] == _m.r[0] && r[1] == _m.r[1] && r[2] == _m.r[2] && r[3] == _m.r[3]; }
 
     [[nodiscard]] constexpr bool operator!=(const Matrix& _m)const noexcept { return r[0] != _m.r[0] || r[1] != _m.r[1] || r[2] != _m.r[2] || r[3] != _m.r[3]; }
 
-    [[nodiscard]] Matrix operator*(const Matrix& _m)const { return DirectX::XMMatrixMultiply(*this, _m); }
-
-    Matrix& operator*=(const Matrix& _m)
+    [[nodiscard]] constexpr Matrix operator*(const Matrix& _m)const noexcept
     {
-      *this = DirectX::XMMatrixMultiply(*this, _m);
+      return {
+        _11 * _m._11 + _12 * _m._21 + _13 * _m._31 + _14 * _m._41,
+        _11 * _m._12 + _12 * _m._22 + _13 * _m._32 + _14 * _m._42,
+        _11 * _m._13 + _12 * _m._23 + _13 * _m._33 + _14 * _m._43,
+        _11 * _m._14 + _12 * _m._24 + _13 * _m._34 + _14 * _m._44,
 
-      return *this;
+        _21 * _m._11 + _22 * _m._21 + _23 * _m._31 + _24 * _m._41,
+        _21 * _m._12 + _22 * _m._22 + _23 * _m._32 + _24 * _m._42,
+        _21 * _m._13 + _22 * _m._23 + _23 * _m._33 + _24 * _m._43,
+        _21 * _m._14 + _22 * _m._24 + _23 * _m._34 + _24 * _m._44,
+
+        _31 * _m._11 + _32 * _m._21 + _33 * _m._31 + _34 * _m._41,
+        _31 * _m._12 + _32 * _m._22 + _33 * _m._32 + _34 * _m._42,
+        _31 * _m._13 + _32 * _m._23 + _33 * _m._33 + _34 * _m._43,
+        _31 * _m._14 + _32 * _m._24 + _33 * _m._34 + _34 * _m._44,
+
+        _41 * _m._11 + _42 * _m._21 + _43 * _m._31 + _44 * _m._41,
+        _41 * _m._12 + _42 * _m._22 + _43 * _m._32 + _44 * _m._42,
+        _41 * _m._13 + _42 * _m._23 + _43 * _m._33 + _44 * _m._43,
+        _41 * _m._14 + _42 * _m._24 + _43 * _m._34 + _44 * _m._44
+      };
+    }
+
+    Matrix& operator*=(const Matrix& _m)noexcept
+    {
+      return *this = *this * _m;
     }
   public:
     [[nodiscard]] constexpr float3 Right()const noexcept { return { _11, _12, _13 }; }
@@ -80,51 +92,127 @@ namespace vdl
 
     [[nodiscard]] constexpr float3 Back()const noexcept { return { -_31,-_32, -_33 }; }
 
-    [[nodiscard]] Matrix Inverse()const { return DirectX::XMMatrixInverse(nullptr, *this); }
+    [[nodiscard]] Matrix Inverse()const noexcept
+    {
+      //  ë|Ç´èoÇµñ@
+      //  https://risalc.info/src/inverse-elimination-ex4.html
 
-    [[nodiscard]] Matrix Transpose()const { return DirectX::XMMatrixTranspose(*this); }
+      Matrix m = *this;
+      {
+        m.r[1] -= m.r[0];
+        m.r[2] -= m.r[0];
+        m.r[3] += m.r[0];
+        Macro::Swap(m.r[1], m.r[3]);
+        m.r[1] *= 0.5f;
+        m.r[0] -= m.r[1];
+        m.r[2] *= 0.5f;
+        m.r[1] -= m.r[2];
+        m.r[3] *= m.r[2] * 2.0f;
+        m.r[3] *= 0.25f;
+        m.r[0] += m.r[3];
+        m.r[1] += m.r[3];
+        m.r[2] -= m.r[3];
+      }
+
+      return m;
+    }
+
+    [[nodiscard]] constexpr Matrix Transpose()const noexcept
+    {
+      return {
+        _11, _21, _31, _41,
+        _12, _22, _32, _42,
+        _13, _23, _33, _43,
+        _14, _24, _34, _44
+      };
+    }
   public:
     [[nodiscard]] static constexpr Matrix Identity()noexcept
     {
-      return Matrix(1.0f, 0.0f, 0.0f, 0.0f,
+      return {
+        1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f);
+        0.0f, 0.0f, 0.0f, 1.0f };
     }
 
-    [[nodiscard]] static Matrix Translate(const float3& _Pos)
+    [[nodiscard]] static constexpr Matrix Translate(const float3& _Pos)noexcept
     {
-      return DirectX::XMMatrixTranslation(_Pos.x, _Pos.y, _Pos.z);
+      return {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        _Pos.x, _Pos.y, _Pos.z, 1.0f
+      };
     }
 
-    [[nodiscard]] static Matrix Scale(const float3& _Scale)
+    [[nodiscard]] static constexpr Matrix Scale(const float3& _Scale)noexcept
     {
-      return DirectX::XMMatrixScaling(_Scale.x, _Scale.y, _Scale.z);
+      return {
+        _Scale.x, 0.0f, 0.0f, 0.0f,
+        0.0f, _Scale.y, 0.0f, 0.0f,
+        0.0f, 0.0f, _Scale.z, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+      };
     }
 
-    [[nodiscard]] static Matrix Rotate(const Radian& _Pitch, const Radian& _Yaw, const Radian& _Roll)
+    [[nodiscard]] static Matrix Rotate(const Radian& _Pitch, const Radian& _Yaw, const Radian& _Roll)noexcept
     {
-      return DirectX::XMMatrixRotationRollPitchYaw(_Pitch, _Yaw, _Roll);
+      const float CosX = std::cos(_Pitch);
+      const float SinX = std::sin(_Pitch);
+      const float CosY = std::cos(_Yaw);
+      const float SinY = std::sin(_Yaw);
+      const float CosZ = std::cos(_Roll);
+      const float SinZ = std::sin(_Roll);
+
+      return Matrix(CosZ, SinZ, 0.0f, 0.0f,
+        -SinZ, CosZ, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f) *
+        Matrix(CosY, 0.0f, -SinY, 0.0f,
+          0.0f, 1.0f, 0.0f, 0.0f,
+          SinY, 0.0f, CosY, 0.0f,
+          0.0f, 0.0f, 0.0f, 1.0f) *
+        Matrix(1.0f, 0.0f, 0.0f, 0.0f,
+          0.0f, CosX, SinX, 0.0f,
+          0.0f, -SinX, CosX, 0.0f,
+          0.0f, 0.0f, 0.0f, 1.0f);
     }
 
-    [[nodiscard]] static Matrix Rotate(const Quaternion& _Orientation)
+    [[nodiscard]] static constexpr Matrix Rotate(const Quaternion& _Orientation)noexcept
     {
-      return DirectX::XMMatrixRotationQuaternion(_Orientation);
+      const float xx = _Orientation.x * _Orientation.x;
+      const float xy = _Orientation.x * _Orientation.y;
+      const float xz = _Orientation.x * _Orientation.z;
+      const float yy = _Orientation.y * _Orientation.y;
+      const float yz = _Orientation.y * _Orientation.z;
+      const float zz = _Orientation.z * _Orientation.z;
+      const float wx = _Orientation.w * _Orientation.x;
+      const float wy = _Orientation.w * _Orientation.y;
+      const float wz = _Orientation.w * _Orientation.z;
+
+      return {
+        1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz), 2.0f * (xz - wy), 0.0f,
+        2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz * wx), 0.0f,
+        2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy), 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+      };
     }
   };
-  
-  [[nodiscard]] inline float3 operator*(const float3& _v, const Matrix& _m)
+
+  [[nodiscard]] inline constexpr float4 operator*(const float4& _v, const Matrix& _m)
   {
-    const DirectX::XMVECTOR v = DirectX::XMVector3TransformCoord({ _v.x, _v.y, _v.z, 1.0f }, _m);
-  
-    return { v.m128_f32[0], v.m128_f32[1], v.m128_f32[2] };
+    return {
+      _v.x * _m._11 + _v.y * _m._21 + _v.z * _m._31 + _v.w * _m._41,
+      _v.x * _m._12 + _v.y * _m._22 + _v.z * _m._32 + _v.w * _m._42,
+      _v.x * _m._13 + _v.y * _m._23 + _v.z * _m._33 + _v.w * _m._43,
+      _v.x * _m._14 + _v.y * _m._24 + _v.z * _m._34 + _v.w * _m._44 };
   }
-  
-  [[nodiscard]] inline float4 operator*(const float4& _v, const Matrix& _m)
+
+  [[nodiscard]] inline constexpr float3 operator*(const float3& _v, const Matrix& _m)
   {
-    const DirectX::XMVECTOR v = DirectX::XMVector4Transform({ _v.x, _v.y, _v.z, _v.w }, _m);
-  
-    return { v.m128_f32[0], v.m128_f32[1], v.m128_f32[2], v.m128_f32[3] };
+    const float4 v = float4(_v, 1.0f) * _m;
+    return v.xyz() / v.w;
   }
 }
 

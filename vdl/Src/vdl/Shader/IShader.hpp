@@ -25,7 +25,7 @@ struct IShader
 
   virtual ~IShader() = default;
 
-  [[nodiscard]] virtual PlatformType GetPlatform()const = 0;
+  [[nodiscard]] virtual PlatformFlags GetPlatform()const = 0;
 
   [[nodiscard]] virtual ShaderType GetType()const = 0;
 

@@ -253,7 +253,7 @@ public:
 public:
   CDeviceContext() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   void Initialize()override;
 

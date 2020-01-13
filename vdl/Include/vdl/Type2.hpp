@@ -5,19 +5,19 @@
 
 #define ARITHMETIC_OPERATOR(Operator)\
 template<class T>\
-[[nodiscard]] constexpr auto operator##Operator(const Type2<T>& _v)const noexcept->Type2<decltype(x Operator _v.x)>\
+[[nodiscard]] constexpr auto operator Operator(const Type2<T>& _v)const noexcept->Type2<decltype(x Operator _v.x)>\
 {\
   return{ x Operator _v.x, y Operator _v.y };\
 }\
 template<class T>\
-[[nodiscard]] constexpr auto operator##Operator(T _s)const noexcept->Type2<decltype(x Operator _s)>\
+[[nodiscard]] constexpr auto operator Operator(T _s)const noexcept->Type2<decltype(x Operator _s)>\
 {\
   return{ x Operator _s, y Operator _s };\
 }\
 
 #define ASSIGNMENT_OPERATOR(Operator)\
 template<class T>\
-Type2& operator##Operator(const Type2<T>& _v)noexcept\
+Type2& operator Operator(const Type2<T>& _v)noexcept\
 {\
   x Operator static_cast<Type>(_v.x);\
   y Operator static_cast<Type>(_v.y);\
@@ -25,7 +25,7 @@ Type2& operator##Operator(const Type2<T>& _v)noexcept\
   return *this;\
 }\
 template<class T>\
-Type2& operator##Operator(T _s)noexcept\
+Type2& operator Operator(T _s)noexcept\
 {\
   x Operator static_cast<Type>(_s);\
   y Operator static_cast<Type>(_s);\
@@ -38,7 +38,7 @@ namespace vdl
   template<class Type>
   struct Type2
   {
-    static_assert(std::is_fundamental<Type>::value);
+    static_assert(std::is_fundamental<Type>::value, "");
 
     Type x, y;
   public:
@@ -96,11 +96,11 @@ namespace vdl
 
     ASSIGNMENT_OPERATOR(/= );
   public:
-    [[nodiscard]] constexpr Type Length()const noexcept { return std::sqrt(LengthSq()); }
+    [[nodiscard]] Type Length()const noexcept { return std::sqrt(LengthSq()); }
 
     [[nodiscard]] constexpr Type LengthSq()const noexcept { return x * x + y * y; }
 
-    [[nodiscard]] constexpr Type2 Normalize()const noexcept { return *this / Length(); }
+    [[nodiscard]] Type2 Normalize()const noexcept { return *this / Length(); }
 
     template<class T>
     [[nodiscard]] constexpr auto Dot(const Type2<T>& _v)const noexcept->decltype(x* _v.x) { return x * _v.x + y * _v.y; }

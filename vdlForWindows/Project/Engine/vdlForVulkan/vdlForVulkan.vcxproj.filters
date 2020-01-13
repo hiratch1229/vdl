@@ -37,6 +37,9 @@
     <Filter Include="Src\pch">
       <UniqueIdentifier>{34938c31-214a-4942-a159-f620b0563077}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Platform">
+      <UniqueIdentifier>{d6483eeb-7aee-42aa-83c7-e7ccc73d8233}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\Vulkan\CBuffer.cpp">
@@ -56,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\Vulkan\CDevice.cpp">
       <Filter>Src\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Vulkan\CPlatform.cpp">
+      <Filter>Src\Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

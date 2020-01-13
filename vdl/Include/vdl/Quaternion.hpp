@@ -3,8 +3,6 @@
 #include "Type3.hpp"
 #include "Angle.hpp"
 
-#include <DirectXMath.h>
-
 namespace vdl
 {
   struct Quaternion
@@ -13,40 +11,61 @@ namespace vdl
   public:
     Quaternion() = default;
 
-    Quaternion(const DirectX::XMVECTOR& _v)noexcept
-      : x(_v.m128_f32[0]), y(_v.m128_f32[1]), z(_v.m128_f32[2]), w(_v.m128_f32[3]) {}
-
     constexpr Quaternion(float _x, float _y, float _z, float _w)noexcept
       : x(_x), y(_y), z(_z), w(_w) {}
-  public:
-    operator DirectX::XMVECTOR()const noexcept { return { x, y, z, w }; }
   public:
     [[nodiscard]] constexpr bool operator==(const Quaternion& _q)const noexcept { return x == _q.x && y == _q.y && z == _q.z && w == _q.w; }
 
     [[nodiscard]] constexpr bool operator!=(const Quaternion& _q)const noexcept { return x != _q.x || y != _q.y || z != _q.z || w != _q.w; }
-    
-    [[nodiscard]] Quaternion operator*(const Quaternion& _q)const { return DirectX::XMQuaternionMultiply(*this, _q); }
 
-    Quaternion& operator*=(const Quaternion& _q)
+    [[nodiscard]] constexpr Quaternion operator*(const Quaternion& _q)const noexcept
     {
-      *this = DirectX::XMQuaternionMultiply(*this, _q);
+      return {
+        x * _q.w - y * _q.z + z * _q.y + w * _q.x,
+        x * _q.z + y * _q.w - z * _q.x + w * _q.y,
+        -x * _q.y + y * _q.x + z * _q.w + w * _q.z,
+        -x * _q.x - y * _q.y - z * _q.z + w * _q.w
+      };
+    }
 
-      return *this;
+    Quaternion& operator*=(const Quaternion& _q)noexcept
+    {
+      return *this = *this * _q;
     }
   public:
-    [[nodiscard]] float Dot(const Quaternion& _q)const { return DirectX::XMQuaternionDot(*this, _q).m128_f32[0]; }
+    [[nodiscard]] constexpr float Dot(const Quaternion& _q)const noexcept { return x * _q.x + y * _q.y + z * _q.z + w * _q.w; }
 
-    [[nodiscard]] Quaternion Slerp(const Quaternion& _q, float _t)const { return DirectX::XMQuaternionSlerp(*this, _q, _t); }
+    [[nodiscard]] Quaternion Slerp(const Quaternion& _q, float _t)const noexcept
+    {
+      const float Angle = std::acos(Dot(_q));
+      const float Sin = std::sin(Angle);
 
-    [[nodiscard]] Quaternion Inverse()const { return DirectX::XMQuaternionInverse(*this); }
+      const float Sin0 = std::sin(Angle * (1.0f - _t)) / Sin;
+      const float Sin1 = std::sin(Angle * _t) / Sin;
 
-    [[nodiscard]] Quaternion Normalize()const { return DirectX::XMQuaternionNormalize(*this); }
+      return { x * Sin0 + _q.x * Sin1, y * Sin0 + _q.y * Sin1, z * Sin0 + _q.z * Sin1, w * Sin0 + _q.w * Sin1, };
+    }
+
+    [[nodiscard]] Quaternion Inverse()const
+    {
+      const float LengthSq = x * x + y * y + z * z + w * w;
+      return { -x / LengthSq, -y / LengthSq, -z / LengthSq, w / LengthSq };
+    }
+
+    [[nodiscard]] Quaternion Normalize()const noexcept
+    {
+      const float Length = std::sqrt(x * x + y * y + z * z + w * w);
+      return { x / Length, y / Length , z / Length , w / Length };
+    }
   public:
     [[nodiscard]] static constexpr Quaternion Identity()noexcept { return { 0.0f, 0.0f, 0.0f, 1.0f }; }
 
     [[nodiscard]] static Quaternion RotationAxis(const float3& _Axis, const Radian& _Angle)
     {
-      return DirectX::XMQuaternionRotationAxis(Quaternion(_Axis.x, _Axis.y, _Axis.z, 0.0f), _Angle);
+      const float Cos = std::cos(_Angle * 0.5f);
+      const float Sin = std::sin(_Angle * 0.5f);
+
+      return { _Axis.x * Sin,_Axis.y * Sin,_Axis.z * Sin, Cos };
     }
   };
 }

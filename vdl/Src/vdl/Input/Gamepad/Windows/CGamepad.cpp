@@ -1,6 +1,7 @@
 #include "CGamepad.hpp"
 
 #include <vdl/Engine.hpp>
+#include <vdl/Platform/IPlatform.hpp>
 #include <vdl/Window/IWindow.hpp>
 #include <vdl/Input/XInput/IXInput.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>

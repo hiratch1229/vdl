@@ -2,6 +2,7 @@
 #include "../IBuffer.hpp"
 
 #include <vdl/pch/DirectX11/pch.hpp>
+#include <vdl/Platform/IPlatform.hpp>
 
 #include <vdl/Macro.hpp>
 
@@ -13,7 +14,7 @@ struct CVertexBuffer : public IBuffer
 public:
   CVertexBuffer() = default;
 
-  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const override final { return PlatformFlag::eDirectX11; }
 
   BufferType GetType()const override final { return BufferType::eVertexBuffer; }
 };
@@ -24,7 +25,7 @@ struct CInstanceBuffer : public IBuffer
 public:
   CInstanceBuffer() = default;
 
-  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const override final { return PlatformFlag::eDirectX11; }
 
   BufferType GetType()const override final { return BufferType::eInstanceBuffer; }
 };
@@ -36,7 +37,7 @@ struct CIndexBuffer : public IBuffer
 public:
   CIndexBuffer() = default;
 
-  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const override final { return PlatformFlag::eDirectX11; }
 
   BufferType GetType()const override final { return BufferType::eIndexBuffer; }
 };
@@ -53,7 +54,7 @@ public:
 
   ~CConstantBuffer() { vdl::Macro::SafeDelete(Buffer); }
 
-  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const override final { return PlatformFlag::eDirectX11; }
 
   BufferType GetType()const override final { return BufferType::eConstantBuffer; }
 
@@ -75,7 +76,7 @@ public:
 
   ~CCopyConstantBuffer() { vdl::Macro::SafeDelete(Buffer); }
 
-  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const override final { return PlatformFlag::eDirectX11; }
 
   void* GetBuffer()const final { return Buffer; }
 
@@ -95,7 +96,7 @@ public:
   CUnordererdAccessBuffer(vdl::uint _Stride, vdl::uint _BufferSize)
     : Stride(_Stride), BufferSize(_BufferSize) {}
 
-  PlatformType GetPlatform()const override final { return PlatformType::eDirectX11; }
+  PlatformFlags GetPlatform()const override final { return PlatformFlag::eDirectX11; }
 
   BufferType GetType()const override final { return BufferType::eUnorderedAccessBuffer; }
 };

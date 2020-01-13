@@ -21,7 +21,7 @@ private:
 public:
   CSoundManager() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eWindows; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eWindows; }
 
   void Initialize()override;
 

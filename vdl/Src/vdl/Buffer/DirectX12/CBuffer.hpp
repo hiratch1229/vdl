@@ -2,6 +2,7 @@
 #include "../IBuffer.hpp"
 
 #include <vdl/pch/DirectX12/pch.hpp>
+#include <vdl/Platform/IPlatform.hpp>
 
 #include <assert.h>
 #include <utility>
@@ -34,7 +35,7 @@ struct CVertexBuffer : public IBuffer
 public:
   CVertexBuffer() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   BufferType GetType()const final { return BufferType::eVertexBuffer; }
 };
@@ -48,7 +49,7 @@ struct CInstanceBuffer : public IBuffer
 public:
   CInstanceBuffer() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   BufferType GetType()const final { return BufferType::eInstanceBuffer; }
 };
@@ -60,7 +61,7 @@ struct CIndexBuffer : public IBuffer
 public:
   CIndexBuffer() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   BufferType GetType()const final { return BufferType::eIndexBuffer; }
 };
@@ -72,7 +73,7 @@ struct CConstantBuffer : public IConstantBuffer
 public:
   CConstantBuffer() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   void* GetBuffer()const final { return BufferData.pBuffer; }
 
@@ -92,7 +93,7 @@ public:
 
   ~CCopyConstantBuffer();
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   void* GetBuffer()const final { return pBuffer; }
 
@@ -111,7 +112,7 @@ struct CUnordererdAccessBuffer : public IBuffer
 public:
   CUnordererdAccessBuffer() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eDirectX12; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
 
   BufferType GetType()const final { return BufferType::eUnorderedAccessBuffer; }
 };

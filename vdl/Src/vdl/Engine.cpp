@@ -1,5 +1,6 @@
 #include "Engine.hpp"
 
+#include "Platform/IPlatform.hpp"
 #include "System/ISystem.hpp"
 #include "Window/IWindow.hpp"
 #include "Device/IDevice.hpp"
@@ -38,6 +39,7 @@ Engine::Engine()
 #if defined USING_MULTI_THREAD
   std::thread DeviceThread = std::thread([&]()->void
   {
+    pPlatform_->Initialize();
     pSystem_->Initialize();
     pDevice_->Initialize();
     pDeviceContext_->Initialize();
@@ -73,6 +75,7 @@ Engine::Engine()
   SwapChainThread.join();
   ProfilerThread.join();
 #else
+  pPlatform_->Initialize();
   pSystem_->Initialize();
 
   pWindow_->Initialize();
@@ -124,6 +127,7 @@ Engine::~Engine()
   pDevice_.Release();
   pWindow_.Release();
   pSystem_.Release();
+  pPlatform_.Release();
 
   pEngine = nullptr;
 }

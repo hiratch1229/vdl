@@ -181,6 +181,8 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\glTFLoader.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\MeshData.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\ModelData.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Platform\CPlatform.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Platform\IPlatform.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Platform\Platform.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\CRenderer.hpp" />
@@ -253,6 +255,7 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelLoader\glTFLoader.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\ModelManager\ModelManagerFactory.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Model\Model.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\PlatformFactory.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\CRenderer.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\Renderer.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererFactory.cpp" />

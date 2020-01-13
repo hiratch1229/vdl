@@ -14,7 +14,7 @@ private:
 public:
   CTextureManager() = default;
 
-  PlatformType GetPlatform()const final { return PlatformType::eCommon; }
+  PlatformFlags GetPlatform()const final { return PlatformFlag::eCommon; }
 
   void Initialize()override;
 
