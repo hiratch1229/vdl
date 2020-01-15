@@ -1,9 +1,9 @@
 #pragma once
 #if defined(DEBUG) | defined(_DEBUG)
 #include <vdl/Engine.hpp>
-#include <assert.h>
 #endif
 #include "Platform.hpp"
+#include <assert.h>
 
 class IPlatform
 {

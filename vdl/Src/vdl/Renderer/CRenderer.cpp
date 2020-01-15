@@ -449,8 +449,7 @@ void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftT
   {
     const vdl::Viewport& CurrentViewport = TextureRendererCommandList_.GetCurrentViewport();
 
-    Instance.NDCTransform = vdl::Matrix(DirectX::XMMatrixAffineTransformation2D(DirectX::XMVectorSet(_DestSize.x, _DestSize.y, 0.0f, 0.0f), DirectX::XMVectorZero(),
-      _Angle, DirectX::XMVectorSet(_DestLeftTop.x + _DestSize.x * 0.5f, _DestLeftTop.y + _DestSize.y * 0.5f, 0.0f, 0.0f))
+    Instance.NDCTransform = (vdl::Matrix::Scale({ _DestSize, 0.0f }) * vdl::Matrix::RotateZ(_Angle) * vdl::Matrix::Translate({ _DestLeftTop + _DestSize * 0.5f, 0.0f })
       * vdl::Matrix::Scale({ 2.0f / CurrentViewport.Size.x, -2.0f / CurrentViewport.Size.y, 1.0f }) * vdl::Matrix::Translate({ -1.0f, 1.0f, 0.0f }))
 #if !defined VDL_EXECUTE_VULKAN
       .Transpose()

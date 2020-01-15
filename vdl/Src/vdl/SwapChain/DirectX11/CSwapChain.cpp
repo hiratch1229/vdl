@@ -1,7 +1,7 @@
 #include "CSwapChain.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Window/IWindow.hpp>
+#include <vdl/Window/Windows/CWindow.hpp>
 #include <vdl/Device/DirectX11/CDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
@@ -25,7 +25,7 @@ void CSwapChain::Initialize()
   pD3D11Device_ = pDevice->GetDevice();
   pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
 
-  const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
+  const HWND& hWnd = Cast<CWindow>(pWindow_)->GetHandle();
 
   //  エラーチェック用
   HRESULT hr = S_OK;

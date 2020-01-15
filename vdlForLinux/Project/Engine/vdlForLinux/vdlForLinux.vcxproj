@@ -87,8 +87,34 @@
     <RemoteProjectDir>$(RemoteRootDir)/vdl</RemoteProjectDir>
   </PropertyGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\Linux\CCPUProfiler.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\Linux\CGamepad.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\Linux\CKeyboard.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Linux\CMouse.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\XInput\Linux\CXInput.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\Linux\CMemoryProfiler.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\Linux\pch.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SoundManager\Linux\CSoundManager.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Window\Linux\CWindow.hpp" />
   </ItemGroup>
-  <ItemDefinitionGroup />
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\Linux\CCPUProfiler.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\Linux\CGamepad.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\Linux\CKeyboard.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Linux\CMouse.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\XInput\Linux\CXInput.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\Linux\CMemoryProfiler.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\Linux\pch.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Linux\CPlatform.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SoundManager\Linux\CSoundManager.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\Linux\CWindow.cpp" />
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

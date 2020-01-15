@@ -5,6 +5,8 @@
 
 #include <vdl/Image.hpp>
 
+#include <assert.h>
+
 namespace
 {
   template<class Texture>

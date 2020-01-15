@@ -22,9 +22,9 @@ public:
 
   void Show(bool _isShow)override;
 
-  void* GetHandle()const override { return hWnd_; }
-
   const vdl::uint2& GetWindowSize()const override { return WindowSize_; }
 
   const vdl::Color4F& GetScreenClearColor()const override { return ScreenClearColor; }
+
+  [[nodiscard]] const HWND& GetHandle()const { return hWnd_; }
 };

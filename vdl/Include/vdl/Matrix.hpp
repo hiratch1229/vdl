@@ -95,26 +95,40 @@ namespace vdl
     [[nodiscard]] Matrix Inverse()const noexcept
     {
       //  ë|Ç´èoÇµñ@
-      //  https://risalc.info/src/inverse-elimination-ex4.html
+      //  https://thira.plavox.info/blog/2008/06/_c.html
 
-      Matrix m = *this;
+      Matrix Original = *this;
+      Matrix Inverse = Identity();
       {
-        m.r[1] -= m.r[0];
-        m.r[2] -= m.r[0];
-        m.r[3] += m.r[0];
-        Macro::Swap(m.r[1], m.r[3]);
-        m.r[1] *= 0.5f;
-        m.r[0] -= m.r[1];
-        m.r[2] *= 0.5f;
-        m.r[1] -= m.r[2];
-        m.r[3] *= m.r[2] * 2.0f;
-        m.r[3] *= 0.25f;
-        m.r[0] += m.r[3];
-        m.r[1] += m.r[3];
-        m.r[2] -= m.r[3];
+        float Temp;
+        uint i, j, k;
+        for (i = 0; i < 4; ++i)
+        {
+          Temp = 1.0f / Original.r[i][i];
+          for (j = 0; j < 4; ++j)
+          {
+            Original.r[i][j] *= Temp;
+            Inverse.r[i][j] *= Temp;
+          }
+
+          for (j = 0; j < 4; ++j)
+          {
+            if (i == j)
+            {
+              continue;
+            }
+
+            Temp = Original.r[j][i];
+            for (k = 0; k < 4; ++k)
+            {
+              Original.r[j][k] -= Original.r[i][k] * Temp;
+              Inverse.r[j][k] -= Inverse.r[i][k] * Temp;
+            }
+          }
+        }
       }
 
-      return m;
+      return Inverse;
     }
 
     [[nodiscard]] constexpr Matrix Transpose()const noexcept
@@ -156,27 +170,43 @@ namespace vdl
       };
     }
 
+    [[nodiscard]] static Matrix RotateX(const Radian& _Angle)noexcept
+    {
+      const float Cos = std::cos(_Angle);
+      const float Sin = std::sin(_Angle);
+
+      return {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, Cos, Sin, 0.0f,
+        0.0f, -Sin, Cos, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f };
+    }
+
+    [[nodiscard]] static Matrix RotateY(const Radian& _Angle)noexcept
+    {
+      const float Cos = std::cos(_Angle);
+      const float Sin = std::sin(_Angle);
+
+      return { Cos, 0.0f, -Sin, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        Sin, 0.0f, Cos, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f };
+    }
+
+    [[nodiscard]] static Matrix RotateZ(const Radian& _Angle)noexcept
+    {
+      const float Cos = std::cos(_Angle);
+      const float Sin = std::sin(_Angle);
+
+      return { Cos, Sin, 0.0f, 0.0f,
+        -Sin, Cos, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f };
+    }
+
     [[nodiscard]] static Matrix Rotate(const Radian& _Pitch, const Radian& _Yaw, const Radian& _Roll)noexcept
     {
-      const float CosX = std::cos(_Pitch);
-      const float SinX = std::sin(_Pitch);
-      const float CosY = std::cos(_Yaw);
-      const float SinY = std::sin(_Yaw);
-      const float CosZ = std::cos(_Roll);
-      const float SinZ = std::sin(_Roll);
-
-      return Matrix(CosZ, SinZ, 0.0f, 0.0f,
-        -SinZ, CosZ, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f) *
-        Matrix(CosY, 0.0f, -SinY, 0.0f,
-          0.0f, 1.0f, 0.0f, 0.0f,
-          SinY, 0.0f, CosY, 0.0f,
-          0.0f, 0.0f, 0.0f, 1.0f) *
-        Matrix(1.0f, 0.0f, 0.0f, 0.0f,
-          0.0f, CosX, SinX, 0.0f,
-          0.0f, -SinX, CosX, 0.0f,
-          0.0f, 0.0f, 0.0f, 1.0f);
+      return RotateZ(_Roll) * RotateY(_Yaw) * RotateX(_Pitch);
     }
 
     [[nodiscard]] static constexpr Matrix Rotate(const Quaternion& _Orientation)noexcept

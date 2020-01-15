@@ -112,7 +112,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\..\..\vdl\Include;..\..\..\..\vdl\Src;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++17</CppLanguageStandard>
-      <PreprocessorDefinitions>_DEBUG;_LIB;VDL_USING_VULKAN</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;VDL_USING_LINUX;VDL_USING_VULKAN</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

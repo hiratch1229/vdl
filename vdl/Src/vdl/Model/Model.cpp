@@ -3,6 +3,8 @@
 #include <vdl/Engine.hpp>
 #include <vdl/ModelManager/IModelManager.hpp>
 
+#include <assert.h>
+
 namespace vdl
 {
   StaticMesh::StaticMesh(const VertexStaticMeshs& _Vertices, const Indices& _Indices, const StaticMeshData& _MeshData)

@@ -4,7 +4,7 @@ using namespace vdl;
 
 void SceneSprite::Initialize()
 {
-  Texture_ = Texture("Data/SAOîwåi.png");
+  Texture_ = Texture("Data/asphalt/asphalt.jpg");
 }
 
 void SceneSprite::Update()

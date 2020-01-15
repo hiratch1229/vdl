@@ -1,7 +1,8 @@
 #include "CKeyboard.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Window/IWindow.hpp>
+#include <vdl/Platform/IPlatform.hpp>
+#include <vdl/Window/Windows/CWindow.hpp>
 
 #include <vdl/DetectMemoryLeak.hpp>
 
@@ -11,7 +12,7 @@ void CKeyboard::Update()
 {
   if (!isInputAttach_)
   {
-    ::AttachThreadInput(::GetWindowThreadProcessId(static_cast<HWND>(Engine::Get<IWindow>()->GetHandle()), nullptr), ::GetCurrentThreadId(), TRUE);
+    ::AttachThreadInput(::GetWindowThreadProcessId(Cast<CWindow>(Engine::Get<IWindow>())->GetHandle(), nullptr), ::GetCurrentThreadId(), TRUE);
     isInputAttach_ = true;
   }
 

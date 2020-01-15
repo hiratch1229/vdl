@@ -43,5 +43,69 @@
     <Filter Include="Src\Resource">
       <UniqueIdentifier>{9fbd88e9-4d1a-4ac0-989c-11ae36d1d3c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Platform">
+      <UniqueIdentifier>{e3288ec9-e054-4450-9817-0c4e47137bd2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\Linux\CCPUProfiler.hpp">
+      <Filter>Src\CPUProfiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\Linux\CGamepad.hpp">
+      <Filter>Src\Input\Gamepad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\Linux\CKeyboard.hpp">
+      <Filter>Src\Input\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Linux\CMouse.hpp">
+      <Filter>Src\Input\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\XInput\Linux\CXInput.hpp">
+      <Filter>Src\Input\XInput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\Linux\CMemoryProfiler.hpp">
+      <Filter>Src\MemoryProfiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\Linux\pch.hpp">
+      <Filter>Src\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SoundManager\Linux\CSoundManager.hpp">
+      <Filter>Src\SoundManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Window\Linux\CWindow.hpp">
+      <Filter>Src\Window</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\Linux\CCPUProfiler.cpp">
+      <Filter>Src\CPUProfiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Gamepad\Linux\CGamepad.cpp">
+      <Filter>Src\Input\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\Linux\CKeyboard.cpp">
+      <Filter>Src\Input\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Linux\CMouse.cpp">
+      <Filter>Src\Input\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\XInput\Linux\CXInput.cpp">
+      <Filter>Src\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\Linux\CMemoryProfiler.cpp">
+      <Filter>Src\MemoryProfiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\Linux\pch.cpp">
+      <Filter>Src\pch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Linux\CPlatform.cpp">
+      <Filter>Src\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SoundManager\Linux\CSoundManager.cpp">
+      <Filter>Src\SoundManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\Linux\CWindow.cpp">
+      <Filter>Src\Window</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

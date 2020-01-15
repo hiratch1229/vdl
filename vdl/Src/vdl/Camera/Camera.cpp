@@ -13,19 +13,41 @@ namespace vdl
 {
   Matrix Camera::View()const
   {
-    return DirectX::XMMatrixLookAtLH({ Position.x, Position.y, Position.z, 1.0f },
-      { Target.x, Target.y, Target.z, 1.0f }, { Up.x, Up.y, Up.z, 0.0f });
+    const float3 Z = ViewVector().Normalize();
+    const float3 X = Up.Cross(Z).Normalize();
+    const float3 Y = Z.Cross(X);
+
+    const float3 NegPosition = -Position;
+
+    return Matrix({ X, X.Dot(NegPosition) }, { Y, Y.Dot(NegPosition) }, { Z, Z.Dot(NegPosition) }, { 0.0f, 0.0f, 0.0f, 1.0f }).Transpose();
   }
 
   Matrix Camera::Projection(const float2& _Size)const
   {
     if (isPerspective)
     {
-      return DirectX::XMMatrixPerspectiveFovLH(vdl::Math::ToRadian(Fov), _Size.x / _Size.y, Near, Far);
+      const float AspectRatio = _Size.x / _Size.y;
+      const float Height = 1.0f / std::tan(vdl::Math::ToRadian(Fov) * 0.5f);
+      const float Width = Height / AspectRatio;
+      const float Range = Far / (Far - Near);
+
+      return {
+        Width, 0.0f, 0.0f, 0.0f,
+        0.0f, Height, 0.0f, 0.0f,
+        0.0f, 0.0f, Range, 1.0f,
+        0.0f, 0.0f, -Range * Near, 0.0f
+      };
     }
     else
     {
-      return DirectX::XMMatrixOrthographicLH(_Size.x, _Size.y, Near, Far);
+      const float Range = 1.0f / (Far - Near);
+
+      return {
+        2.0f / _Size.x, 0.0f, 0.0f, 0.0f,
+        0.0f, 2.0f / _Size.y, 0.0f, 0.0f,
+        0.0f, 0.0f, Range, 0.0f,
+        0.0f, 0.0f, -Range * Near, 1.0f
+      };
     }
   }
 

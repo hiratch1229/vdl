@@ -124,6 +124,10 @@ namespace vdl
 
     Type4& operator=(Type4&&) = default;
 
+    [[nodiscard]] constexpr Type& operator[](uint _Index) { return (&x)[_Index]; }
+
+    [[nodiscard]] constexpr const Type& operator[](uint _Index)const { return (&x)[_Index]; }
+
     [[nodiscard]] constexpr bool operator==(const Type4& _v)const noexcept { return x == _v.x && y == _v.y && z == _v.z && w == _v.w; }
 
     [[nodiscard]] constexpr bool operator!=(const Type4& _v)const noexcept { return x != _v.x || y != _v.y || z != _v.z || w != _v.w; }
@@ -131,7 +135,7 @@ namespace vdl
     [[nodiscard]] constexpr Type4 operator+()const noexcept { return *this; }
 
     [[nodiscard]] constexpr Type4 operator-()const noexcept { return { -x, -y, -z, -w }; }
-
+    
     ARITHMETIC_OPERATOR(+);
 
     ARITHMETIC_OPERATOR(-);

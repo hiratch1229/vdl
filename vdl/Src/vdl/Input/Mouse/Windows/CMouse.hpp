@@ -32,10 +32,7 @@ private:
   //  ƒXƒNƒ[ƒ‹‚Ì”r‘¼§Œä
   std::mutex ScrollMutex_;
 private:
-  bool isWithinRange(vdl::uint _Code)const
-  {
-    return (0 <= _Code && _Code < kButtonNum);
-  }
+  bool isWithinRange(vdl::uint _Code)const { return (0 <= _Code && _Code < kButtonNum); }
 public:
   CMouse() = default;
 
@@ -45,40 +42,19 @@ public:
 
   void Update()override;
 
-  bool Press(vdl::uint _Code)const override
-  {
-    return isWithinRange(_Code) ? InputStatus_[_Code].Press() : false;
-  }
+  bool Press(vdl::uint _Code)const override { return isWithinRange(_Code) ? InputStatus_[_Code].Press() : false; }
 
-  bool Pressed(vdl::uint _Code)const override
-  {
-    return isWithinRange(_Code) ? InputStatus_[_Code].Pressed() : false;
-  }
+  bool Pressed(vdl::uint _Code)const override { return isWithinRange(_Code) ? InputStatus_[_Code].Pressed() : false; }
 
-  bool Released(vdl::uint _Code)const override
-  {
-    return isWithinRange(_Code) ? InputStatus_[_Code].Released() : false;
-  }
+  bool Released(vdl::uint _Code)const override { return isWithinRange(_Code) ? InputStatus_[_Code].Released() : false; }
 
-  bool Release(vdl::uint _Code)const override
-  {
-    return isWithinRange(_Code) ? InputStatus_[_Code].Release() : false;
-  }
+  bool Release(vdl::uint _Code)const override { return isWithinRange(_Code) ? InputStatus_[_Code].Release() : false; }
 
-  vdl::int2 GetPos()const override
-  {
-    return Pos_;
-  }
+  vdl::int2 GetPos()const override { return Pos_; }
 
-  vdl::int2 GetDelta()const override
-  {
-    return Delta_;
-  }
+  vdl::int2 GetDelta()const override { return Delta_; }
 
-  vdl::int2 GetWheel()const override
-  {
-    return Scroll_;
-  }
+  vdl::int2 GetWheel()const override { return Scroll_; }
 
   void SetPos(const vdl::int2& _Pos)override;
 

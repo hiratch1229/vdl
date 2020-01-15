@@ -2,6 +2,8 @@
 
 #if defined VDL_USING_WINDOWS
 #define VDL_TARGET_WINDOWS
+#elif defined VDL_USING_LINUX
+#define VDL_TARGET_LINUX
 #endif
 
 #if defined VDL_USING_DIRECTX11

@@ -88,6 +88,10 @@ namespace vdl
 
     Type3& operator=(Type3&&) = default;
 
+    [[nodiscard]] constexpr Type& operator[](uint _Index) { return (&x)[_Index]; }
+
+    [[nodiscard]] constexpr const Type& operator[](uint _Index)const { return (&x)[_Index]; }
+
     [[nodiscard]] constexpr bool operator==(const Type3& _v)const noexcept { return x == _v.x && y == _v.y && z == _v.z; }
 
     [[nodiscard]] constexpr bool operator!=(const Type3& _v)const noexcept { return x != _v.x || y != _v.y || z != _v.z; }
@@ -95,7 +99,7 @@ namespace vdl
     [[nodiscard]] constexpr Type3 operator+()const noexcept { return *this; }
 
     [[nodiscard]] constexpr Type3 operator-()const noexcept { return { -x, -y, -z }; }
-
+    
     ARITHMETIC_OPERATOR(+);
 
     ARITHMETIC_OPERATOR(-);

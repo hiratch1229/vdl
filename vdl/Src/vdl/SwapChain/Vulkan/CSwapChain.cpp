@@ -1,10 +1,15 @@
 #include "CSwapChain.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/Vulkan/CDevice.hpp>
 #include <vdl/DeviceContext/Vulkan/CDeviceContext.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
+
+#if defined VDL_TARGET_WINDOWS
+#include <vdl/Window/Windows/CWindow.hpp>
+#elif defined VDL_TARGET_LINUX
+#include <vdl/Window/Linux/CWindow.hpp>
+#endif
 
 #include <vdl/Format/Vulkan/Format.hpp>
 
@@ -21,7 +26,6 @@ void CSwapChain::Initialize()
   CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
   VkDevice_ = pDevice->GetDevice();
 
-  const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
   const vk::PhysicalDevice& PhysicalDevice = pDevice->GetPhysicalDevice();
 
   constexpr vk::Format kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
@@ -36,7 +40,7 @@ void CSwapChain::Initialize()
       vk::Win32SurfaceCreateInfoKHR SurfaceInfo;
       {
         SurfaceInfo.hinstance = ::GetModuleHandle(nullptr);
-        SurfaceInfo.hwnd = hWnd;
+        SurfaceInfo.hwnd = Cast<CWindow>(pWindow_)->GetHandle();
       }
 
       Surface_ = pDevice->GetInstance().createWin32SurfaceKHRUnique(SurfaceInfo);

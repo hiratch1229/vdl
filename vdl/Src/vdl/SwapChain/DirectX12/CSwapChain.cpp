@@ -1,7 +1,7 @@
 #include "CSwapChain.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Window/IWindow.hpp>
+#include <vdl/Window/Windows/CWindow.hpp>
 #include <vdl/Device/DirectX12/CDevice.hpp>
 #include <vdl/DeviceContext/DirectX12/CDeviceContext.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
@@ -18,7 +18,8 @@ void CSwapChain::Initialize()
   ID3D12Device5* pD3D12Device = pDevice->GetDevice();
   IDXGIFactory6* pFactory = pDevice->GetFactory();
 
-  const HWND hWnd = static_cast<HWND>(pWindow_->GetHandle());
+  
+  const HWND hWnd = Cast<CWindow>(pWindow_)->GetHandle();
   constexpr DXGI_FORMAT kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
 
   //  エラーチェック用
