@@ -103,6 +103,7 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\Linux\CKeyboard.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Linux\CMouse.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\XInput\Linux\CXInput.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Main\Linux\Main.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\Linux\CMemoryProfiler.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\Linux\pch.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Linux\CPlatform.cpp" />
@@ -113,6 +114,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++17</CppLanguageStandard>
+      <PreprocessorDefinitions>_DEBUG;</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

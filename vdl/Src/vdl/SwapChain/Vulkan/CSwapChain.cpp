@@ -37,13 +37,23 @@ void CSwapChain::Initialize()
   {
     //  サーフェスの作成
     {
+#if defined VK_USE_PLATFORM_WIN32_KHR
       vk::Win32SurfaceCreateInfoKHR SurfaceInfo;
       {
         SurfaceInfo.hinstance = ::GetModuleHandle(nullptr);
         SurfaceInfo.hwnd = Cast<CWindow>(pWindow_)->GetHandle();
       }
-
       Surface_ = pDevice->GetInstance().createWin32SurfaceKHRUnique(SurfaceInfo);
+#elif defined VK_USE_PLATFORM_XCB_KHR
+      vk::XcbSurfaceCreateInfoKHR SurfaceInfo;
+      {
+        CWindow* pWindow = Cast<CWindow>(pWindow_);
+        SurfaceInfo.connection = pWindow->GetConnection();
+        SurfaceInfo.window = pWindow->GetWindow();
+      }
+      Surface_ = pDevice->GetInstance().createXcbSurfaceKHRUnique(SurfaceInfo);
+#endif // defined VK_USE_PLATFORM_WIN32_KHR
+
       assert(Surface_);
     }
 

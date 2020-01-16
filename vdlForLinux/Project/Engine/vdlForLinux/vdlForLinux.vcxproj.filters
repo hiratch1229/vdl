@@ -107,5 +107,8 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\Linux\CWindow.cpp">
       <Filter>Src\Window</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Main\Linux\Main.cpp">
+      <Filter>Src\Main</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -27,11 +27,11 @@ public:
 
   [[nodiscard]] virtual bool Release(vdl::uint _Code)const = 0;
 
-  [[nodiscard]] virtual vdl::int2 GetPos()const = 0;
+  [[nodiscard]] virtual const vdl::int2& GetPos()const = 0;
 
-  [[nodiscard]] virtual vdl::int2 GetDelta()const = 0;
+  [[nodiscard]] virtual const vdl::int2& GetDelta()const = 0;
 
-  [[nodiscard]] virtual vdl::int2 GetWheel()const = 0;
+  [[nodiscard]] virtual const vdl::int2& GetWheel()const = 0;
 
   virtual void SetPos(const vdl::int2& _Pos) = 0;
 

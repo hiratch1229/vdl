@@ -22,7 +22,7 @@ void CWindow::Initialize()
     Rect.bottom - Rect.top,
     ::GetDesktopWindow(),
     nullptr,
-    GetModuleHandle(NULL),
+    ::GetModuleHandle(nullptr),
     nullptr);
 }
 

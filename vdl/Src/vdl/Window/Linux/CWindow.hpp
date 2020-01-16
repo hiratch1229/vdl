@@ -5,8 +5,14 @@
 #include <vdl/Color.hpp>
 #include <vdl/Constants/Constants.hpp>
 
+#include <vdl/pch/Linux/pch.hpp>
+
 class CWindow : public IWindow
 {
+  xcb_connection_t* pConnect_;
+  xcb_screen_t* pScreen_;
+  vdl::uint Window_;
+  xcb_intern_atom_reply_t* pDestoryReply_;
   vdl::uint2 WindowSize_ = Constants::kDefaultWindowSize;
   vdl::Color4F ScreenClearColor = Constants::kDefaultScreenClearColor;
 public:
@@ -18,9 +24,11 @@ public:
 
   void Show(bool _isShow)override{}
 
-  void* GetHandle()const override { return nullptr; }
-
   const vdl::uint2& GetWindowSize()const override { return WindowSize_; }
 
   const vdl::Color4F& GetScreenClearColor()const override { return ScreenClearColor; }
+
+  xcb_connection_t* GetConnection()const { return pConnect_; }
+
+  vdl::uint GetWindow()const { return Window_; }
 };

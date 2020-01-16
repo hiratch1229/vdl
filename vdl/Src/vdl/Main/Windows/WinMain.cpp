@@ -6,8 +6,6 @@
 #include <vdl/Resource/Windows/Resource.hpp>
 #include <vdl/pch/Windows/pch.hpp>
 
-#include <ThirdParty/ImGui/imgui.h>
-
 #include <vdl/System.hpp>
 
 #include <crtdbg.h>
