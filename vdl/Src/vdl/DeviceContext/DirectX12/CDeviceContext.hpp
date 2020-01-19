@@ -189,6 +189,7 @@ private:
   };
 private:
   ID3D12Device5* pD3D12Device_;
+  IDXGISwapChain* pDXGISwapChain_;
 private:
   CDevice* pDevice_;
   CSwapChain* pSwapChain_;
@@ -206,8 +207,8 @@ private:
 private:
   Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pDefaultViewDescriptorHeap_;
 
+  ID3D12CommandQueue* pGraphicsCommandQueue_;
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pGraphicsRootSignature_;
-  Microsoft::WRL::ComPtr<ID3D12CommandQueue> pGraphicsCommandQueue_;
   std::array<CommandList, Constants::kGraphicsCommandBufferNum> GraphicsCommandLists_;
   vdl::uint GraphicsCommandBufferIndex_ = 0;
   StateChangeFlags<GraphicsCommandType, vdl::uint32_t> GraphicsStateChangeFlags_;
@@ -216,8 +217,8 @@ private:
   std::array<SyncState, Constants::kGraphicsCommandBufferNum> GraphicsSyncStates_;
   std::array<GraphicsReserveData, Constants::kGraphicsCommandBufferNum> GraphicsReserveDatas_;
 private:
+  ID3D12CommandQueue* pComputeCommandQueue_;
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pComputeRootSignature_;
-  Microsoft::WRL::ComPtr<ID3D12CommandQueue> pComputeCommandQueue_;
   std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, Constants::kComputeCommandBufferNum> pComputeCommandAllocators_;
   std::array<Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>, Constants::kComputeCommandBufferNum> pComputeCommandLists_;
   vdl::uint ComputeCommandBufferIndex_ = 0;
@@ -246,8 +247,6 @@ private:
   ID3D12DescriptorHeap* GetUnorderedAccessObjectDescriptorHeap(const vdl::UnorderedAccessObject& _UnorderedAccessObject, ID3D12GraphicsCommandList* _pCommandList);
   vdl::uint GetVertexBufferStride()const;
   vdl::uint GetInstanceBufferStride()const;
-public:
-  ID3D12CommandQueue* GetGraphicsCommandQueue()const { return pGraphicsCommandQueue_.Get(); }
 public:
   void Present();
 public:

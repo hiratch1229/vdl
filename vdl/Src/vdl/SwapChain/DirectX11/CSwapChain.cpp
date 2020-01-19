@@ -1,9 +1,10 @@
 #include "CSwapChain.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Window/Windows/CWindow.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/DirectX11/CDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
+#include <vdl/Renderer/IRenderer.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/Texture/DirectX11/CTexture.hpp>
 
@@ -20,56 +21,15 @@ void CSwapChain::Initialize()
 {
   pWindow_ = Engine::Get<IWindow>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
+  pRenderer_ = Engine::Get<IRenderer>();
 
   CDevice* pDevice = Cast<CDevice>(Engine::Get<IDevice>());
   pD3D11Device_ = pDevice->GetDevice();
   pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
-
-  const HWND& hWnd = Cast<CWindow>(pWindow_)->GetHandle();
+  pSwapChain_ = pDevice->GetSwapChain();
 
   //  エラーチェック用
   HRESULT hr = S_OK;
-
-  //  スワップチェーンの作成
-  {
-    DXGI_SWAP_CHAIN_DESC SwapChainDesc;
-    {
-      SwapChainDesc.BufferDesc.Width = Constants::kDefaultWindowSize.x;
-      SwapChainDesc.BufferDesc.Height = Constants::kDefaultWindowSize.y;
-      SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
-      SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-      SwapChainDesc.BufferDesc.Format = Cast(vdl::FormatType::eSwapChain);
-      SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-      SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-      SwapChainDesc.SampleDesc.Count = 1;
-      SwapChainDesc.SampleDesc.Quality = 0;
-      SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-      SwapChainDesc.BufferCount = Constants::kBackBufferNum;
-      SwapChainDesc.OutputWindow = hWnd;
-      SwapChainDesc.Windowed = true;
-      SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-      SwapChainDesc.Flags = 0;
-    }
-
-    Microsoft::WRL::ComPtr<IDXGIFactory> pFactory;
-    {
-      Microsoft::WRL::ComPtr<IDXGIDevice> pDXGIDevice;
-      hr = pD3D11Device_->QueryInterface(IID_PPV_ARGS(pDXGIDevice.GetAddressOf()));
-      ERROR_CHECK(hr);
-      Microsoft::WRL::ComPtr<IDXGIAdapter> pAdapter;
-      hr = pDXGIDevice->GetParent(IID_PPV_ARGS(pAdapter.GetAddressOf()));
-      ERROR_CHECK(hr);
-      hr = pAdapter->GetParent(IID_PPV_ARGS(pFactory.GetAddressOf()));
-      ERROR_CHECK(hr);
-    }
-    
-    hr = pFactory->CreateSwapChain(pD3D11Device_, &SwapChainDesc, pSwapChain_.GetAddressOf());
-    ERROR_CHECK(hr);
-
-    //  ALT+Enterの無効化
-    hr = pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
-    ERROR_CHECK(hr);
-  }
 
   //  バックバッファの作成
   {
@@ -98,7 +58,7 @@ void CSwapChain::ScreenClear()
 {
   pDeviceContext_->ClearRenderTexture(RenderTextures_[0], pWindow_->GetScreenClearColor());
   pDeviceContext_->ClearDepthStencilTexture(DepthStencilTexture_, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
-  pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
+  pRenderer_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
 }
 
 void CSwapChain::Present()

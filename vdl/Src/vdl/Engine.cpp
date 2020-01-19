@@ -24,9 +24,8 @@
 #include <vdl/DetectMemoryLeak.hpp>
 
 #include <assert.h>
-#include <thread>
 
-//#define USING_MULTI_THREAD
+#define USING_MULTI_THREAD
 
 Engine::Engine()
 {
@@ -37,31 +36,24 @@ Engine::Engine()
   pEngine = this;
 
 #if defined USING_MULTI_THREAD
-  std::thread DeviceThread = std::thread([&]()->void
+  pPlatform_->Initialize();
+  pSystem_->Initialize();
+  pWindow_->Initialize();
+
+  ThreadPool* ThreadPool = pSystem_->GetThreadPool();
+
+  std::future<void> DeviceAndManagers = ThreadPool->Enqueue([&]
   {
-    pPlatform_->Initialize();
-    pSystem_->Initialize();
     pDevice_->Initialize();
     pDeviceContext_->Initialize();
     pTextureManager_->Initialize();
-    pBufferManager_->Initialize();
-    pSoundManager_->Initialize();
-  });
-
-  pWindow_->Initialize();
-
-  DeviceThread.join();
-
-  std::thread SwapChainThread = std::thread([&]()->void
-  {
     pSwapChain_->Initialize();
-    pModelManager_->Initialize();
+    pBufferManager_->Initialize();
     pShaderManager_->Initialize();
-    pCPUProfiler_->Initialize();
-    pMemoryProfiler_->Initialize();
   });
+  DeviceAndManagers.get();
 
-  std::thread ProfilerThread = std::thread([&]()->void
+  std::future<void> InputsAndGraphics = ThreadPool->Enqueue([&]
   {
     pKeyboard_->Initialize();
     pMouse_->Initialize();
@@ -71,9 +63,15 @@ Engine::Engine()
     pComputer_->Initialize();
     pGUI_->Initialize();
   });
-
-  SwapChainThread.join();
-  ProfilerThread.join();
+  std::future<void> ManagersAndProfilers = ThreadPool->Enqueue([&]
+  {
+    pSoundManager_->Initialize();
+    pModelManager_->Initialize();
+    pCPUProfiler_->Initialize();
+    pMemoryProfiler_->Initialize();
+  });
+  InputsAndGraphics.get();
+  ManagersAndProfilers.get();
 #else
   pPlatform_->Initialize();
   pSystem_->Initialize();

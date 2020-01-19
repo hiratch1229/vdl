@@ -7,16 +7,18 @@
 
 #include <vdl/pch/Vulkan/pch.hpp>
 
-class CDeviceContext;
 class IWindow;
+class CDeviceContext;
+class IRenderer;
 
 class CSwapChain : public ISwapChain
 {
+  IWindow* pWindow_;
+  CDeviceContext* pDeviceContext_;
+  IRenderer* pRenderer_;
+private:
   vk::Device VkDevice_;
   vk::Queue GraphicsQueue_;
-private:
-  CDeviceContext* pDeviceContext_;
-  IWindow* pWindow_;
 private:
   vk::UniqueSurfaceKHR Surface_;
   vk::UniqueSwapchainKHR VkSwapChain_;

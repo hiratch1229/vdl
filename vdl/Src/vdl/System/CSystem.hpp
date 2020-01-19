@@ -34,7 +34,7 @@ private:
   IRenderer* pRenderer_;
   IGUI* pGUI_;
 private:
-private:
+  ThreadPool ThreadPool_;
   SystemState SystemState_;
   vdl::System::DefaultActionFlags DefaultActionFlags_ = 0;
   vdl::System::DefaultActionFlags ValidDefaultActions_ = ~0;
@@ -72,6 +72,8 @@ public:
   float GetCPUUseRate()const override { return static_cast<float>(CurrentCPUUseRate_); }
 
   float GetMemoryUseRate()const override { return static_cast<float>(CurrentMemoryUseRate_); }
+
+  ThreadPool* GetThreadPool()override { return &ThreadPool_; }
 
   void Pause()override { SystemState_ = SystemState::ePause; }
 

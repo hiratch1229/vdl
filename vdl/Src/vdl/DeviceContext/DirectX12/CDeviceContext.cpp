@@ -362,6 +362,9 @@ void CDeviceContext::Initialize()
   pShaderManager_ = Engine::Get<IShaderManager>();
 
   pD3D12Device_ = pDevice_->GetDevice();
+  pDXGISwapChain_ = pDevice_->GetSwapChain();
+  pGraphicsCommandQueue_ = pDevice_->GetCommandQueueManager()->GetGraphicsQueue();
+  pComputeCommandQueue_ = pDevice_->GetCommandQueueManager()->GetComputeQueue();
 
   //  入力レイアウトの作成
   {
@@ -505,20 +508,6 @@ void CDeviceContext::Initialize()
       ERROR_CHECK(hr);
     }
 
-    //  コマンドキューの作成
-    {
-      D3D12_COMMAND_QUEUE_DESC CommandQueueDesc;
-      {
-        CommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-        CommandQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
-        CommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-        CommandQueueDesc.NodeMask = 0;
-      }
-
-      hr = pD3D12Device_->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(pGraphicsCommandQueue_.GetAddressOf()));
-      ERROR_CHECK(hr);
-    }
-
     //  コマンドリストの作成
     {
       for (vdl::uint i = 0; i < Constants::kGraphicsCommandBufferNum; ++i)
@@ -570,20 +559,6 @@ void CDeviceContext::Initialize()
       _ASSERT_EXPR_A(SUCCEEDED(hr), pError->GetBufferPointer());
 
       hr = pD3D12Device_->CreateRootSignature(0, pSignature->GetBufferPointer(), pSignature->GetBufferSize(), IID_PPV_ARGS(pComputeRootSignature_.GetAddressOf()));
-      ERROR_CHECK(hr);
-    }
-
-    //  コマンドキューの作成
-    {
-      D3D12_COMMAND_QUEUE_DESC CommandQueueDesc;
-      {
-        CommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
-        CommandQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
-        CommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-        CommandQueueDesc.NodeMask = 0;
-      }
-
-      hr = pD3D12Device_->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(pComputeCommandQueue_.GetAddressOf()));
       ERROR_CHECK(hr);
     }
 
@@ -1135,14 +1110,14 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
   pCurrentComputeCommandList->Close();
 
-  WaitFence(pGraphicsCommandQueue_.Get(), &GraphicsSyncStates_[LastGraphicsCommandBufferIndex]);
+  WaitFence(pGraphicsCommandQueue_, &GraphicsSyncStates_[LastGraphicsCommandBufferIndex]);
 
   ID3D12CommandList* pCurrentCommandList = pCurrentComputeCommandList;
   pComputeCommandQueue_->ExecuteCommandLists(1, &pCurrentCommandList);
 
-  SingnalFence(pComputeCommandQueue_.Get(), &ComputeSyncStates_[ComputeCommandBufferIndex_]);
+  SingnalFence(pComputeCommandQueue_, &ComputeSyncStates_[ComputeCommandBufferIndex_]);
   ++ComputeCommandBufferIndex_ %= Constants::kComputeCommandBufferNum;
-  WaitFence(pComputeCommandQueue_.Get(), &ComputeSyncStates_[ComputeCommandBufferIndex_]);
+  WaitFence(pComputeCommandQueue_, &ComputeSyncStates_[ComputeCommandBufferIndex_]);
   pLastComputeSyncState_ = &ComputeSyncStates_[ComputeCommandBufferIndex_];
 
   ComputeReserveDatas_[ComputeCommandBufferIndex_].Clear();
@@ -1157,16 +1132,16 @@ void CDeviceContext::Flush()
   //  コンピュートパイプラインの待機
   if (pLastComputeSyncState_)
   {
-    WaitFence(pComputeCommandQueue_.Get(), pLastComputeSyncState_);
+    WaitFence(pComputeCommandQueue_, pLastComputeSyncState_);
     pLastComputeSyncState_ = nullptr;
   }
 
   ID3D12CommandList* pCurrentCommandList = pCurrentGraphicsCommandList->Get();
   pGraphicsCommandQueue_->ExecuteCommandLists(1, &pCurrentCommandList);
 
-  SingnalFence(pGraphicsCommandQueue_.Get(), &GraphicsSyncStates_[GraphicsCommandBufferIndex_]);
+  SingnalFence(pGraphicsCommandQueue_, &GraphicsSyncStates_[GraphicsCommandBufferIndex_]);
   ++GraphicsCommandBufferIndex_ %= Constants::kGraphicsCommandBufferNum;
-  WaitFence(pGraphicsCommandQueue_.Get(), &GraphicsSyncStates_[GraphicsCommandBufferIndex_]);
+  WaitFence(pGraphicsCommandQueue_, &GraphicsSyncStates_[GraphicsCommandBufferIndex_]);
 
   GraphicsReserveData* pCurrentGraphicsReseveData = GetCurrentGraphicsReserveData();
 
@@ -1190,7 +1165,7 @@ void CDeviceContext::Present()
 
   HRESULT hr = S_OK;
 
-  hr = pSwapChain_->GetSwapChain()->Present(0, 0);
+  hr = pDXGISwapChain_->Present(0, 0);
   ERROR_CHECK(hr);
 }
 

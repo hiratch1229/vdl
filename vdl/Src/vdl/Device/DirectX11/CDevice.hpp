@@ -11,6 +11,7 @@ class CDevice : public IDevice
 {
   Microsoft::WRL::ComPtr<ID3D11Device> pD3D11Device_;
   Microsoft::WRL::ComPtr<ID3D11DeviceContext> pD3D11ImmediateContext_;
+  Microsoft::WRL::ComPtr<IDXGISwapChain> pDXGISwapChain_;
 private:
   CDeviceContext* pDeviceContext_;
   ITextureManager* pTextureManager_;
@@ -18,6 +19,7 @@ private:
 public:
   [[nodiscard]] ID3D11Device* GetDevice()const { return pD3D11Device_.Get(); }
   [[nodiscard]] ID3D11DeviceContext* GetImmediateContext()const { return pD3D11ImmediateContext_.Get(); }
+  [[nodiscard]] IDXGISwapChain* GetSwapChain()const { return pDXGISwapChain_.Get(); }
 public:
   CDevice() = default;
 

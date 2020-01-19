@@ -11,21 +11,22 @@
 
 class IWindow;
 class CDeviceContext;
+class IRenderer;
 
 class CSwapChain : public ISwapChain
 {
   IWindow* pWindow_;
   CDeviceContext* pDeviceContext_;
+  IRenderer* pRenderer_;
 private:
-  Microsoft::WRL::ComPtr<IDXGISwapChain4> pSwapChain_;
+  IDXGISwapChain4* pSwapChain_;
   std::vector<CRenderTexture> D3D12RenderTextures_;
   vdl::uint CurrentBufferIndex_ = 0;
 private:
   vdl::RenderTextures RenderTextures_;
   vdl::DepthStencilTexture DepthStencilTexture_;
 public:
-    [[nodiscard]] IDXGISwapChain4* GetSwapChain() { return pSwapChain_.Get(); }
-    [[nodiscard]] CRenderTexture* GetD3D12RenderTexture() { return &D3D12RenderTextures_[CurrentBufferIndex_]; }
+  [[nodiscard]] CRenderTexture* GetD3D12RenderTexture() { return &D3D12RenderTextures_[CurrentBufferIndex_]; }
 public:
   CSwapChain() = default;
 

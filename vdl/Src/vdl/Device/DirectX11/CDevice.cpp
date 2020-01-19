@@ -1,10 +1,10 @@
 #include "CDevice.hpp"
 
 #include <vdl/Engine.hpp>
+#include <vdl/Window/Windows/CWindow.hpp>
 #include <vdl/DeviceContext/DirectX11/CDeviceContext.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
-
 #include <vdl/Format/DirectX/Format.hpp>
 #include <vdl/Buffer/DirectX11/CBuffer.hpp>
 #include <vdl/Texture/DirectX11/CTexture.hpp>
@@ -107,6 +107,8 @@ void CDevice::Initialize()
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
 
+  const HWND& hWnd = Cast<CWindow>(Engine::Get<IWindow>())->GetHandle();
+
   //  エラーチェック用
   HRESULT hr = S_OK;
 
@@ -138,6 +140,7 @@ void CDevice::Initialize()
   };
   constexpr vdl::uint kFeatureLevelNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kFeatureLevels));
 
+  //  ファクトリーの作成
   Microsoft::WRL::ComPtr<IDXGIFactory6> pFactory;
   {
     Microsoft::WRL::ComPtr<IDXGIFactory2> pFactory2;
@@ -150,6 +153,7 @@ void CDevice::Initialize()
 
   bool useWrapAdapter = false;
 
+  //  アダプターの検索
   Microsoft::WRL::ComPtr<IDXGIAdapter4> pAdapter;
   {
     DXGI_ADAPTER_DESC3 AdapterDesc;
@@ -180,20 +184,53 @@ void CDevice::Initialize()
     ERROR_CHECK(hr);
   }
 
-  D3D_FEATURE_LEVEL FeatureLevel;
-  for (auto i : kDriverTypes)
+  //  デバイスの作成
   {
-    //  デバイスを作成
-    hr = ::D3D11CreateDevice(pAdapter.Get(), kDriverTypes[i], nullptr, kCreateDeviceFlag, kFeatureLevels,
-      kFeatureLevelNum, D3D11_SDK_VERSION, pD3D11Device_.GetAddressOf(), &FeatureLevel, pD3D11ImmediateContext_.GetAddressOf());
-
-    //  成功時に終了
-    if (SUCCEEDED(hr))
+    D3D_FEATURE_LEVEL FeatureLevel;
+    for (auto i : kDriverTypes)
     {
-      break;
+      //  デバイスを作成
+      hr = ::D3D11CreateDevice(pAdapter.Get(), kDriverTypes[i], nullptr, kCreateDeviceFlag, kFeatureLevels,
+        kFeatureLevelNum, D3D11_SDK_VERSION, pD3D11Device_.GetAddressOf(), &FeatureLevel, pD3D11ImmediateContext_.GetAddressOf());
+
+      //  成功時に終了
+      if (SUCCEEDED(hr))
+      {
+        break;
+      }
     }
+    ERROR_CHECK(hr);
   }
-  ERROR_CHECK(hr);
+
+  //  スワップチェーンの作成
+  {
+    DXGI_SWAP_CHAIN_DESC SwapChainDesc;
+    {
+      SwapChainDesc.BufferDesc.Width = Constants::kDefaultWindowSize.x;
+      SwapChainDesc.BufferDesc.Height = Constants::kDefaultWindowSize.y;
+      SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
+      SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+      SwapChainDesc.BufferDesc.Format = Cast(vdl::FormatType::eSwapChain);
+      SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+      SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+      SwapChainDesc.SampleDesc.Count = 1;
+      SwapChainDesc.SampleDesc.Quality = 0;
+      SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+      SwapChainDesc.BufferCount = Constants::kBackBufferNum;
+      SwapChainDesc.OutputWindow = hWnd;
+      SwapChainDesc.Windowed = true;
+      SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+      SwapChainDesc.Flags = 0;
+    }
+
+    hr = pFactory->CreateSwapChain(pD3D11Device_.Get(), &SwapChainDesc, pDXGISwapChain_.GetAddressOf());
+    ERROR_CHECK(hr);
+
+    //  ALT+Enterの無効化
+    hr = pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
+    ERROR_CHECK(hr);
+  }
+
 }
 
 void CDevice::CreateVertexBuffer(IBuffer** _ppVertexBuffer, vdl::uint _BufferSize)

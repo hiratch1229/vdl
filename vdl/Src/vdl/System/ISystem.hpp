@@ -3,6 +3,9 @@
 #include <vdl/Flag.hpp>
 
 #include <vdl/Platform/Platform.hpp>
+#include <vdl/ThreadPool/ThreadPool.hpp>
+
+class ThreadPool;
 
 class ISystem
 {
@@ -34,6 +37,8 @@ public:
   [[nodiscard]] virtual float GetCPUUseRate()const = 0;
 
   [[nodiscard]] virtual float GetMemoryUseRate()const = 0;
+
+  [[nodiscard]] virtual ThreadPool* GetThreadPool() = 0;
 
   virtual void Pause() = 0;
 

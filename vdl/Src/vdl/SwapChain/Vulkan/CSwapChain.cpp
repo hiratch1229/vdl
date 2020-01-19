@@ -3,6 +3,7 @@
 #include <vdl/Engine.hpp>
 #include <vdl/Device/Vulkan/CDevice.hpp>
 #include <vdl/DeviceContext/Vulkan/CDeviceContext.hpp>
+#include <vdl/Renderer/IRenderer.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 
 #if defined VDL_TARGET_WINDOWS
@@ -20,10 +21,11 @@
 
 void CSwapChain::Initialize()
 {
-  pDeviceContext_ = static_cast<CDeviceContext*>(Engine::Get<IDeviceContext>());
   pWindow_ = Engine::Get<IWindow>();
+  pDeviceContext_ = Cast<CDeviceContext>(Engine::Get<IDeviceContext>());
+  pRenderer_ = Engine::Get<IRenderer>();
 
-  CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
+  CDevice* pDevice = Cast<CDevice>(Engine::Get<IDevice>());
   VkDevice_ = pDevice->GetDevice();
 
   const vk::PhysicalDevice& PhysicalDevice = pDevice->GetPhysicalDevice();
@@ -239,7 +241,7 @@ void CSwapChain::ScreenClear()
 
   pDeviceContext_->ClearRenderTexture(RenderTextures_[0], pWindow_->GetScreenClearColor());
   pDeviceContext_->ClearDepthStencilTexture(DepthStencilTexture_, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
-  pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
+  pRenderer_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
 }
 
 void CSwapChain::Present()

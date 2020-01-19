@@ -46,6 +46,9 @@
     <Filter Include="Src\Platform">
       <UniqueIdentifier>{fe65f2df-0360-4840-9bc3-f535c168a5c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\CommandQueue">
+      <UniqueIdentifier>{7a1f69d0-04f7-422f-8e6d-dff057cc3cd8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.cpp">
@@ -74,6 +77,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\DirectX12\CPlatform.cpp">
       <Filter>Src\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CommandQueue\DirectX12\CommandQueueManager.cpp">
+      <Filter>Src\CommandQueue</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Viewport\DirectX12\Viewport.hpp">
       <Filter>Src\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandQueue\DirectX12\CommandQueueManager.hpp">
+      <Filter>Src\CommandQueue</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

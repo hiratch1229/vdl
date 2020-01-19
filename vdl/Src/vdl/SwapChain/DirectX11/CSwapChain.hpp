@@ -7,17 +7,19 @@
 
 class IWindow;
 class IDeviceContext;
+class IRenderer;
 
 class CSwapChain : public ISwapChain
 {
-  Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain_;
+  IWindow* pWindow_;
+  IDeviceContext* pDeviceContext_;
+  IRenderer* pRenderer_;
+private:
+  IDXGISwapChain* pSwapChain_;
   Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView_;
 private:
   ID3D11Device* pD3D11Device_;
   ID3D11DeviceContext* pD3D11ImmediateContext_;
-private:
-  IWindow* pWindow_;
-  IDeviceContext* pDeviceContext_;
 private:
   vdl::RenderTextures RenderTextures_;
   vdl::DepthStencilTexture DepthStencilTexture_;

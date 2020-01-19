@@ -101,7 +101,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR,
     //  エンジンの作成
     Engine Engine;
 
-    const std::future<void> Future = std::async(std::launch::async, Main);
+    //  Main関数を別スレッドで実行
+    const std::future<void> Future = Engine::Get<ISystem>()->GetThreadPool()->Enqueue(Main);
 
     MSG Msg = {};
     while (!Future._Is_ready())

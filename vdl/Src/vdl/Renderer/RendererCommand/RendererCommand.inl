@@ -115,8 +115,8 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Adjust()
 {
   if constexpr (!std::is_same<DisplayObject, Empty>::value)
   {
-    Thread_ = std::thread([this]()->void
-    {
+    //Thread_ = std::thread([this]()->void
+    //{
       bool canSort = false;
       vdl::uint StartDrawCallIndex;
       vdl::uint ContinuousDrawCallNum = 0;
@@ -164,7 +164,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Adjust()
           break;
         }
       }
-    });
+    //});
   }
 }
 
@@ -174,7 +174,7 @@ inline void RendererCommandList<DisplayObject, InstanceData>::Flush(IDeviceConte
   if constexpr (!std::is_same<DisplayObject, Empty>::value)
   {
     //  ソートが終わるまで待機
-    Thread_.join();
+    //Thread_.join();
   }
 
   const vdl::uint RendererCommandNum = static_cast<vdl::uint>(RendererCommands_.size());

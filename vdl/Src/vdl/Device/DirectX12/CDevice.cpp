@@ -1,6 +1,7 @@
 #include "CDevice.hpp"
 
 #include <vdl/Engine.hpp>
+#include <vdl/Window/Windows/CWindow.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 
 #include <vdl/Format/DirectX/Format.hpp>
@@ -106,6 +107,8 @@ void CDevice::Initialize()
 {
   pBufferManager_ = Engine::Get<IBufferManager>();
 
+  const HWND& hWnd = Cast<CWindow>(Engine::Get<IWindow>())->GetHandle();
+
   //  エラーチェック用
   HRESULT hr = S_OK;
 
@@ -129,17 +132,19 @@ void CDevice::Initialize()
   constexpr D3D_FEATURE_LEVEL kMininumFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 
   //  ファクトリーの作成
+  Microsoft::WRL::ComPtr<IDXGIFactory6> pFactory;
   {
     Microsoft::WRL::ComPtr<IDXGIFactory2> pFactory2;
 
     hr = ::CreateDXGIFactory2(kDxgiCreateFactoryFlag, IID_PPV_ARGS(pFactory2.GetAddressOf()));
     ERROR_CHECK(hr);
 
-    pFactory2.As(&pFactory_);
+    pFactory2.As(&pFactory);
   }
 
   bool useWrapAdapter = false;
 
+  //  アダプターの検索
   Microsoft::WRL::ComPtr<IDXGIAdapter4> pAdapter;
   {
     DXGI_ADAPTER_DESC3 AdapterDesc;
@@ -147,7 +152,7 @@ void CDevice::Initialize()
     for (vdl::uint i = 0; ; ++i)
     {
       //  高性能な物から優先で列挙
-      if (pFactory_->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(pAdapter.GetAddressOf())) == DXGI_ERROR_NOT_FOUND)
+      if (pFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(pAdapter.GetAddressOf())) == DXGI_ERROR_NOT_FOUND)
       {
         useWrapAdapter = true;
         break;
@@ -163,31 +168,58 @@ void CDevice::Initialize()
     }
   }
 
+  //  GPUが無い場合CPUでエミュレートする
   if (useWrapAdapter)
   {
-    hr = pFactory_->EnumWarpAdapter(IID_PPV_ARGS(pAdapter.GetAddressOf()));
+    hr = pFactory->EnumWarpAdapter(IID_PPV_ARGS(pAdapter.GetAddressOf()));
     ERROR_CHECK(hr);
   }
 
-  hr = ::D3D12CreateDevice(pAdapter.Get(), kMininumFeatureLevel, IID_PPV_ARGS(pDevice_.GetAddressOf()));
-  ERROR_CHECK(hr);
+  //  デバイスの作成
+  {
+    hr = ::D3D12CreateDevice(pAdapter.Get(), kMininumFeatureLevel, IID_PPV_ARGS(pDevice_.GetAddressOf()));
+    ERROR_CHECK(hr);
+  }
 
   //  コマンドキューの作成
-  {
-    D3D12_COMMAND_QUEUE_DESC CommandQueueDesc;
-    {
-      CommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-      CommandQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-      CommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-      CommandQueueDesc.NodeMask = 0;
-    }
-
-    hr = pDevice_->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(pCommandQueue_.GetAddressOf()));
-    ERROR_CHECK(hr);
-  }
+  CommandQueueManager_.Initialize(pDevice_.Get());
+  pCommandQueue_ = CommandQueueManager_.GetGraphicsQueue();
 
   //  コマンドリストの作成
   CommandList_ = CommandList(pDevice_.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+  //  スワップチェーンの作成
+  {
+    DXGI_SWAP_CHAIN_DESC SwapChainDesc;
+    {
+      SwapChainDesc.BufferDesc.Width = Constants::kDefaultWindowSize.x;
+      SwapChainDesc.BufferDesc.Height = Constants::kDefaultWindowSize.y;
+      SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
+      SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+      SwapChainDesc.BufferDesc.Format = Cast(vdl::FormatType::eSwapChain);
+      SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+      SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+      SwapChainDesc.SampleDesc.Count = 1;
+      SwapChainDesc.SampleDesc.Quality = 0;
+      SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+      SwapChainDesc.BufferCount = Constants::kBackBufferNum;
+      SwapChainDesc.OutputWindow = hWnd;
+      SwapChainDesc.Windowed = true;
+      SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+      SwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+    }
+
+    Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
+    hr = pFactory->CreateSwapChain(CommandQueueManager_.GetGraphicsQueue(), &SwapChainDesc, pSwapChain.GetAddressOf());
+    ERROR_CHECK(hr);
+
+    hr = pSwapChain->QueryInterface(IID_PPV_ARGS(pSwapChain_.GetAddressOf()));
+    ERROR_CHECK(hr);
+
+    //  ALT+Enterの無効化
+    hr = pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
+    ERROR_CHECK(hr);
+  }
 
   //  フェンスの作成
   {

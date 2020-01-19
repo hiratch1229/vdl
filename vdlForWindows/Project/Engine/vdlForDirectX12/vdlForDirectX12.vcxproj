@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\CommandList\DirectX12\CommandList.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CommandQueue\DirectX12\CommandQueueManager.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\CDeviceContext.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\DescriptorHeap\DescriptorHeap.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CDevice.cpp" />
@@ -27,6 +28,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\DirectX12\CommandList.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandQueue\DirectX12\CommandQueueManager.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\CDeviceContext.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\DescriptorHeap\DescriptorHeap.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CDevice.hpp" />

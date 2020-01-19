@@ -6,6 +6,7 @@
 #include <vdl/Buffer/DirectX12/CBuffer.hpp>
 #include <vdl/Texture/DirectX12/CTexture.hpp>
 #include <vdl/CommandList/DirectX12/CommandList.hpp>
+#include <vdl/CommandQueue/DirectX12/CommandQueueManager.hpp>
 
 #include <vdl/pch/DirectX12/pch.hpp>
 
@@ -14,10 +15,11 @@ class IBufferManager;
 class CDevice : public IDevice
 {
   Microsoft::WRL::ComPtr<ID3D12Device5> pDevice_;
-  Microsoft::WRL::ComPtr<ID3D12CommandQueue> pCommandQueue_;
+  Microsoft::WRL::ComPtr<IDXGISwapChain4> pSwapChain_;
+  CommandQueueManager CommandQueueManager_;
+  ID3D12CommandQueue* pCommandQueue_;
   CommandList CommandList_;
   Microsoft::WRL::ComPtr<ID3D12Fence> pFence_;
-  Microsoft::WRL::ComPtr<IDXGIFactory6> pFactory_;
   HANDLE FenceEvent_;
   vdl::uint FenceValue_ = 0;
 private:
@@ -26,7 +28,8 @@ private:
   MemoryAllocator ConstantBufferAllocator_;
 public:
   [[nodiscard]] ID3D12Device5* GetDevice() { return pDevice_.Get(); }
-  [[nodiscard]] IDXGIFactory6* GetFactory() { return pFactory_.Get(); }
+  [[nodiscard]] IDXGISwapChain4* GetSwapChain() { return pSwapChain_.Get(); }
+  [[nodiscard]] CommandQueueManager* GetCommandQueueManager() { return &CommandQueueManager_; }
 public:
   void CreateDescriptorHeap(ID3D12DescriptorHeap** _ppDescriptorHeap, D3D12_DESCRIPTOR_HEAP_TYPE _Type)const;
 public:
