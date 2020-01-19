@@ -4,7 +4,7 @@ using namespace vdl;
 
 void SceneModel::Initialize()
 {
-  Model_ = Model("Data/DamagedHelmet/DamagedHelmet.gltf");
+  Model_ = Model("Data/bossenemy_1.fbx");
   Camera_ = Camera(vdl::float3(0.0f, 0.0f, -15.0f));
 }
 

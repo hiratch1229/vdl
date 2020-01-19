@@ -148,6 +148,7 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\TextureManager\ITextureManager.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\TextureManager\TextureLoader\TextureLoader.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\ITexture.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ThreadPool\ThreadPool.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Window\IWindow.hpp" />
   </ItemGroup>
   <ItemGroup>

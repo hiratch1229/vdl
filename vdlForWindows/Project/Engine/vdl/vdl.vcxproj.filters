@@ -157,6 +157,9 @@
     <Filter Include="Src\MemoryAllocator">
       <UniqueIdentifier>{2d14349c-21b6-479b-b03d-8abe968e40dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\ThreadPool">
+      <UniqueIdentifier>{3c52a304-cfc4-4ec9-8d09-67b2d81a2196}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Angle.hpp">
@@ -500,6 +503,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Platform\Platform.hpp">
       <Filter>Src\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\ThreadPool\ThreadPool.hpp">
+      <Filter>Src\ThreadPool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
