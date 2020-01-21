@@ -36,8 +36,17 @@ namespace vdl::Macro
   template<class T>
   inline void Swap(T& _Obj1, T& _Obj2)
   {
-    T Temp = _Obj1;
-    _Obj1 = _Obj2;
-    _Obj2 = Temp;
+    if constexpr (std::is_move_assignable<T>::value)
+    {
+      T Temp = std::move(_Obj1);
+      _Obj1 = std::move(_Obj2);
+      _Obj2 = std::move(Temp);
+    }
+    else
+    {
+      T Temp = _Obj1;
+      _Obj1 = _Obj2;
+      _Obj2 = Temp;
+    }
   }
 }

@@ -53,7 +53,7 @@ void Main()
     "PBR"
   };
   static constexpr uint kSceneTypeNum = static_cast<uint>(Macro::ArraySize(kSceneTypes));
-  static constexpr uint kInitSceneType = 4;
+  static constexpr uint kInitSceneType = 1;
   static_assert(kInitSceneType < kSceneTypeNum);
 
   const VertexShader DefaultVertexShader2D = VertexShader("Shader/Texture/TextureVS.hlsl", InputLayoutType::eTexture);
@@ -66,8 +66,6 @@ void Main()
   const BlendState DefaultBlendState3D = BlendState::kDefault;
   const DepthStencilState DefaultDepthStencilState3D = DepthStencilState::kDefault3D;
   const RasterizerState DefaultRasterizerState3D = RasterizerState::kDefault3D;
-  const RenderTexture SwapChainRenderTexture = Window::GetRenderTexture();
-  const DepthStencilTexture SwapChainDepthStencilTexture = Window::GetDepthStencilTexture();
 
   uint SceneType = kInitSceneType;
   uint MaxFPS = Constants::kDefaultMaxFPS;
@@ -106,7 +104,6 @@ void Main()
       {
         pCurrentScene.reset(pNextScene);
 
-        Renderer::SetRenderTexture(SwapChainRenderTexture, SwapChainDepthStencilTexture);
         Renderer::SetTopology(TopologyType::eDefaultNone);
         Renderer2D::SetTopology(TopologyType::eDefaultTexture);
         Renderer2D::SetGraphicsStates(DefaultBlendState2D, DefaultDepthStencilState2D, DefaultRasterizerState2D);

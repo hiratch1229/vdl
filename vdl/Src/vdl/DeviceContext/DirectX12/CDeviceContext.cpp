@@ -15,8 +15,9 @@
 #include <vdl/Shader/DirectX12/CShader.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
-#include <vdl/Vertex.hpp>
 #include <ThirdParty/ImGui/imgui.h>
+
+#include <vdl/Vertex.hpp>
 
 namespace
 {

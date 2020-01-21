@@ -31,6 +31,10 @@ namespace vdl
   public:
     Matrix() = default;
 
+    Matrix(const Matrix&) = default;
+
+    Matrix(Matrix&&) = default;
+
     constexpr Matrix(float _m00, float _m01, float _m02, float _m03,
       float _m10, float _m11, float _m12, float _m13,
       float _m20, float _m21, float _m22, float _m23,
@@ -46,6 +50,14 @@ namespace vdl
       , _31(_r2.x), _32(_r2.y), _33(_r2.z), _34(_r2.w)
       , _41(_r3.x), _42(_r3.y), _43(_r3.z), _44(_r3.w) {}
   public:
+    Matrix& operator=(const Matrix&) = default;
+
+    Matrix& operator=(Matrix&&) = default;
+
+    [[nodiscard]] constexpr float4& operator[](uint _Index) { return r[_Index]; }
+
+    [[nodiscard]] constexpr const float4& operator[](uint _Index)const { return r[_Index]; }
+
     [[nodiscard]] constexpr bool operator==(const Matrix& _m)const noexcept { return r[0] == _m.r[0] && r[1] == _m.r[1] && r[2] == _m.r[2] && r[3] == _m.r[3]; }
 
     [[nodiscard]] constexpr bool operator!=(const Matrix& _m)const noexcept { return r[0] != _m.r[0] || r[1] != _m.r[1] || r[2] != _m.r[2] || r[3] != _m.r[3]; }
@@ -94,23 +106,42 @@ namespace vdl
 
     [[nodiscard]] Matrix Inverse()const noexcept
     {
-      //  掃き出し法
-      //  https://thira.plavox.info/blog/2008/06/_c.html
-
       Matrix Original = *this;
       Matrix Inverse = Identity();
       {
-        float Temp;
+        float Temp, Big;
         uint i, j, k;
+
+        //  ピボット選択を行ったGauss-Jordan法
         for (i = 0; i < 4; ++i)
         {
-          Temp = 1.0f / Original.r[i][i];
-          for (j = 0; j < 4; ++j)
+          //  ピボット選択 k行k列目の要素の絶対値が最大に
+          Big = 0.0f;
+          for (j = i; j < 4; ++j)
           {
-            Original.r[i][j] *= Temp;
-            Inverse.r[i][j] *= Temp;
+            Temp = ::fabs(Original[j][i]);
+            if (Temp > Big)
+            {
+              Big = Temp;
+              k = j;
+            }
           }
 
+          //  行の入れ替え
+          if (i != k)
+          {
+            Macro::Swap(Original[i], Original[k]);
+            Macro::Swap(Inverse[i], Inverse[k]);
+          }
+
+          // k行k列目の要素が1になるように
+          {
+            Temp = 1.0f / Original[i][i];
+            Original[i] *= Temp;
+            Inverse[i] *= Temp;
+          }
+
+          // k行目のk列目以外の要素が0になるように
           for (j = 0; j < 4; ++j)
           {
             if (i == j)
@@ -118,13 +149,14 @@ namespace vdl
               continue;
             }
 
-            Temp = Original.r[j][i];
+            Temp = Original[j][i] / Original[i][i];
             for (k = 0; k < 4; ++k)
             {
-              Original.r[j][k] -= Original.r[i][k] * Temp;
-              Inverse.r[j][k] -= Inverse.r[i][k] * Temp;
+              Original[j][k] -= Original[i][k] * Temp;
+              Inverse[j][k] -= Inverse[i][k] * Temp;
             }
           }
+
         }
       }
 
@@ -223,7 +255,7 @@ namespace vdl
 
       return {
         1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz), 2.0f * (xz - wy), 0.0f,
-        2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz * wx), 0.0f,
+        2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + wx), 0.0f,
         2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy), 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
       };
