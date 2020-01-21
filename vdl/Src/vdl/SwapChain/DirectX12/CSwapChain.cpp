@@ -20,6 +20,8 @@ void CSwapChain::Initialize()
   ID3D12Device5* pD3D12Device = pDevice->GetDevice();
   pSwapChain_ = pDevice->GetSwapChain();
   
+  DescriptorAllocator* pRenderTextureHeapAllocator = pDevice->GetDescriptorAllocator(DescriptorHeapType::eRTV);
+
   constexpr DXGI_FORMAT kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
 
   //  エラーチェック用
@@ -51,17 +53,14 @@ void CSwapChain::Initialize()
       //D3D12RenderTexture.TextureData.ResourceState = D3D12_RESOURCE_STATE_PRESENT;
 
       //  レンダーターゲットのデスクリプタヒープ作成
-      {
-        hr = pD3D12Device->CreateDescriptorHeap(&RenderTargetDescriptorHeapDesc, IID_PPV_ARGS(D3D12RenderTexture.pRenderTargetViewHeap.GetAddressOf()));
-        ERROR_CHECK(hr);
-      }
+      pRenderTextureHeapAllocator->Allocate(&D3D12RenderTexture.RenderTargetViewHeap);
 
       //  レンダーターゲットビューの作成
       {
         hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(D3D12RenderTexture.TextureData.pResource.GetAddressOf()));
         ERROR_CHECK(hr);
 
-        pD3D12Device->CreateRenderTargetView(D3D12RenderTexture.TextureData.pResource.Get(), nullptr, D3D12RenderTexture.pRenderTargetViewHeap->GetCPUDescriptorHandleForHeapStart());
+        pD3D12Device->CreateRenderTargetView(D3D12RenderTexture.TextureData.pResource.Get(), nullptr, D3D12RenderTexture.RenderTargetViewHeap.CPUHandle);
       }
     }
   }

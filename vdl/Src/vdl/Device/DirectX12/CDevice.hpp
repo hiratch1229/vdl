@@ -1,12 +1,16 @@
 #pragma once
 #include "../IDevice.hpp"
 
+#include <vdl/Fwd.hpp>
+#include <vdl/Macro.hpp>
+
 #include <vdl/MemoryAllocator/MemoryAllocator.hpp>
 
+#include "CommandList/CommandList.hpp"
+#include "CommandQueue/CommandQueueManager.hpp"
+#include "DescriptorHeap/DescriptorHeap.hpp"
 #include <vdl/Buffer/DirectX12/CBuffer.hpp>
 #include <vdl/Texture/DirectX12/CTexture.hpp>
-#include <vdl/CommandList/DirectX12/CommandList.hpp>
-#include <vdl/CommandQueue/DirectX12/CommandQueueManager.hpp>
 
 #include <vdl/pch/DirectX12/pch.hpp>
 
@@ -14,11 +18,20 @@ class IBufferManager;
 
 class CDevice : public IDevice
 {
+  static constexpr DescriptorHeapType kDescriptorHeapTypes[] = {
+    DescriptorHeapType::eCBV_SRV_UAV,
+    DescriptorHeapType::eSampler,
+    DescriptorHeapType::eRTV,
+    DescriptorHeapType::eDSV,
+  };
+  static constexpr vdl::uint kDescriptorHeapNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kDescriptorHeapTypes));
+private:
   Microsoft::WRL::ComPtr<ID3D12Device5> pDevice_;
   Microsoft::WRL::ComPtr<IDXGISwapChain4> pSwapChain_;
   CommandQueueManager CommandQueueManager_;
   ID3D12CommandQueue* pCommandQueue_;
   CommandList CommandList_;
+  std::array<DescriptorAllocator, kDescriptorHeapNum> DescriptorAllocators_;
   Microsoft::WRL::ComPtr<ID3D12Fence> pFence_;
   HANDLE FenceEvent_;
   vdl::uint FenceValue_ = 0;
@@ -30,8 +43,7 @@ public:
   [[nodiscard]] ID3D12Device5* GetDevice() { return pDevice_.Get(); }
   [[nodiscard]] IDXGISwapChain4* GetSwapChain() { return pSwapChain_.Get(); }
   [[nodiscard]] CommandQueueManager* GetCommandQueueManager() { return &CommandQueueManager_; }
-public:
-  void CreateDescriptorHeap(ID3D12DescriptorHeap** _ppDescriptorHeap, D3D12_DESCRIPTOR_HEAP_TYPE _Type)const;
+  [[nodiscard]] DescriptorAllocator* GetDescriptorAllocator(DescriptorHeapType _Type) { return &DescriptorAllocators_[static_cast<vdl::uint>(_Type)]; }
 public:
   void ExecuteAndWait(ID3D12CommandList* _pCommandList);
 private:

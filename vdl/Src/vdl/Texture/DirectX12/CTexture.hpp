@@ -1,12 +1,13 @@
 #pragma once
 #include "../ITexture.hpp"
 
-#include <vdl/pch/DirectX12/pch.hpp>
-
 #include <vdl/Window.hpp>
 
 #include <vdl/Platform/IPlatform.hpp>
 #include <vdl/Constants/Constants.hpp>
+#include <vdl/Device/DirectX12/DescriptorHeap/DescriptorHeap.hpp>
+
+#include <vdl/pch/DirectX12/pch.hpp>
 
 #include <utility>
 
@@ -35,7 +36,7 @@ struct CTexture : public ITexture
 {
   TextureData TextureData;
   vdl::uint2 TextureSize;
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pShaderResourceViewHeap;
+  DescriptorHeap ShaderResourceViewHeap;
 public:
   CTexture() = default;
 
@@ -61,7 +62,7 @@ public:
 
 struct CRenderTexture : public CTexture
 {
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pRenderTargetViewHeap;
+  DescriptorHeap RenderTargetViewHeap;
   DXGI_FORMAT DXFormat;
   vdl::FormatType Format;
 public:
@@ -89,7 +90,7 @@ public:
 struct CDepthStencilTexture : public IDepthStencilTexture
 {
   TextureData TextureData;
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pDepthStencilViewHeap;
+  DescriptorHeap DepthStencilViewHeap;
   vdl::uint2 TextureSize;
   vdl::Texture DepthTexture;
   vdl::Texture StencilTexture;
@@ -114,7 +115,7 @@ public:
 struct CDepthTexture : public ITexture
 {
   CDepthStencilTexture* pParent;
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pShaderResourceViewHeap;
+  DescriptorHeap ShaderResourceViewHeap;
 public:
   CDepthTexture() = default;
 
@@ -132,7 +133,7 @@ public:
 struct CStencilTexture : public ITexture
 {
   CDepthStencilTexture* pParent;
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pShaderResourceViewHeap;
+  DescriptorHeap ShaderResourceViewHeap;
 public:
   CStencilTexture() = default;
 
@@ -149,7 +150,7 @@ public:
 
 struct CUnorderedAccessTexture : public CTexture
 {
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pUnorderedAccessViewHeap;
+  DescriptorHeap UnorderedAccessViewHeap;
   vdl::FormatType Format;
 public:
   CUnorderedAccessTexture() = default;

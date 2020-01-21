@@ -37,34 +37,28 @@
     <Filter Include="Src\pch">
       <UniqueIdentifier>{8dc518eb-96ed-40e9-8d73-dc994c27e8aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\DeviceContext\DescriptorHeap">
-      <UniqueIdentifier>{2f19ab90-6c93-4f1c-ba24-62f340e2f28c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\CommandList">
-      <UniqueIdentifier>{65b5b7ce-5a71-4833-ad76-198d8adfc9c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Platform">
       <UniqueIdentifier>{fe65f2df-0360-4840-9bc3-f535c168a5c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\CommandQueue">
-      <UniqueIdentifier>{7a1f69d0-04f7-422f-8e6d-dff057cc3cd8}</UniqueIdentifier>
+    <Filter Include="Src\Device\CommandList">
+      <UniqueIdentifier>{2d74105f-a3bd-49e1-b761-8daf9718fe82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Device\CommandQueue">
+      <UniqueIdentifier>{6961812e-b985-4ea8-a40b-f0bbfd248d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Device\DescriptorHeap">
+      <UniqueIdentifier>{38a5f218-cd7e-4d85-8dcb-e68ca0e8f442}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.cpp">
       <Filter>Src\Buffer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CommandList\DirectX12\CommandList.cpp">
-      <Filter>Src\CommandList</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CDevice.cpp">
       <Filter>Src\Device</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\CDeviceContext.cpp">
       <Filter>Src\DeviceContext</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\DescriptorHeap\DescriptorHeap.cpp">
-      <Filter>Src\DeviceContext\DescriptorHeap</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\DirectX12\pch.cpp">
       <Filter>Src\pch</Filter>
@@ -78,25 +72,25 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\DirectX12\CPlatform.cpp">
       <Filter>Src\Platform</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CommandQueue\DirectX12\CommandQueueManager.cpp">
-      <Filter>Src\CommandQueue</Filter>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandList\CommandList.cpp">
+      <Filter>Src\Device\CommandList</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandQueue\CommandQueueManager.cpp">
+      <Filter>Src\Device\CommandQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\DescriptorHeap\DescriptorHeap.cpp">
+      <Filter>Src\Device\DescriptorHeap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.hpp">
       <Filter>Src\Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\DirectX12\CommandList.hpp">
-      <Filter>Src\CommandList</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CDevice.hpp">
       <Filter>Src\Device</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\CDeviceContext.hpp">
       <Filter>Src\DeviceContext</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\DescriptorHeap\DescriptorHeap.hpp">
-      <Filter>Src\DeviceContext\DescriptorHeap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Format\DirectX\Format.hpp">
       <Filter>Src\Format</Filter>
@@ -122,8 +116,14 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Viewport\DirectX12\Viewport.hpp">
       <Filter>Src\Viewport</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandQueue\DirectX12\CommandQueueManager.hpp">
-      <Filter>Src\CommandQueue</Filter>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandList\CommandList.hpp">
+      <Filter>Src\Device\CommandList</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandQueue\CommandQueueManager.hpp">
+      <Filter>Src\Device\CommandQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\DescriptorHeap\DescriptorHeap.hpp">
+      <Filter>Src\Device\DescriptorHeap</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

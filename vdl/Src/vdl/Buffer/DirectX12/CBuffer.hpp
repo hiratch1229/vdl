@@ -4,6 +4,8 @@
 #include <vdl/pch/DirectX12/pch.hpp>
 #include <vdl/Platform/IPlatform.hpp>
 
+#include <Vdl/Device/DirectX12/DescriptorHeap/DescriptorHeap.hpp>
+
 #include <assert.h>
 #include <utility>
 
@@ -85,7 +87,7 @@ public:
 struct CCopyConstantBuffer : public IConstantBuffer
 {
   MemoryAllocator* pConstantBufferAllocator;
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pConstantBufferViewHeap;
+  DescriptorHeap ConstantBufferViewHeap;
   void* pBuffer;
   vdl::uint BufferSize;
 public:
@@ -106,8 +108,8 @@ struct CUnordererdAccessBuffer : public IBuffer
 {
   BufferData BufferData;
   vdl::uint BufferSize;
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pShaderResourceViewHeap;
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pUnordererdAccessViewHeap;
+  DescriptorHeap ShaderResourceViewHeap;
+  DescriptorHeap UnorderedAccessViewHeap;
   D3D12_RESOURCE_STATES ResourceState;
 public:
   CUnordererdAccessBuffer() = default;

@@ -1,10 +1,6 @@
 #pragma once
 #include "../IDeviceContext.hpp"
 
-#include <vdl/pch/DirectX12/pch.hpp>
-
-#include <vdl/Texture/DirectX12/CTexture.hpp>
-
 #include <vdl/InputLayout.hpp>
 #include <vdl/Scissor.hpp>
 #include <vdl/Viewport.hpp>
@@ -20,8 +16,13 @@
 #include <vdl/StateChangeFlags/StateChangeFlags.hpp>
 #include <vdl/Constants/Constants.hpp>
 
-#include "DescriptorHeap/DescriptorHeap.hpp"
-#include <vdl/CommandList/DirectX12/CommandList.hpp>
+#include <vdl/pch/DirectX12/pch.hpp>
+
+#include <vdl/Texture/DirectX12/CTexture.hpp>
+#include <vdl/Shader/DirectX12/CShader.hpp>
+
+#include <vdl/Device/DirectX12/CommandList/CommandList.hpp>
+#include <vdl/Device/DirectX12/DescriptorHeap/DescriptorHeap.hpp>
 
 #include <array>
 #include <unordered_map>
@@ -34,6 +35,12 @@ class IShaderManager;
 
 class CDeviceContext : public IDeviceContext
 {
+  static constexpr DescriptorHeapType kDescriptorHeapTypes[] = {
+    DescriptorHeapType::eCBV_SRV_UAV,
+    DescriptorHeapType::eSampler,
+  };
+  static constexpr vdl::uint kDescriptorHeapNum = static_cast<vdl::uint>(vdl::Macro::ArraySize(kDescriptorHeapTypes));
+private:
   using Texture = vdl::Variant<vdl::Texture, vdl::DepthStencilTexture>;
   using ShaderResources = std::vector<vdl::ShaderResource>;
   using Samplers = std::vector<vdl::Sampler>;
@@ -121,6 +128,10 @@ private:
     std::vector<vdl::PixelShader> PixelShaders;
     std::vector<ShaderResources> ShaderResources;
     std::vector<ConstantBuffers> ConstantBuffers;
+    std::vector<DescriptorHeap> ShaderResourceHeaps;
+    std::vector<DescriptorHeap> SamplerHeaps;
+    std::vector<DescriptorHeap> ConstantBufferHeaps;
+    std::vector<DescriptorHeap> UnorderedAccessHeaps;
 
     std::unordered_map<vdl::ID, Texture> ClearTextures;
 
@@ -141,6 +152,11 @@ private:
       PixelShaders.clear();
       ShaderResources.clear();
       ConstantBuffers.clear();
+
+      ShaderResourceHeaps.clear();
+      SamplerHeaps.clear();
+      ConstantBufferHeaps.clear();
+      ConstantBufferHeaps.clear();
 
       ClearTextures.clear();
 
@@ -173,6 +189,10 @@ private:
     ShaderResources ShaderResources;
     ConstantBuffers ConstantBuffers;
     UnorderedAccessObjects UnorderedAccessObjects;
+    DescriptorHeap ShaderResourceHeap;
+    DescriptorHeap SamplerHeap;
+    DescriptorHeap ConstantBufferHeap;
+    DescriptorHeap UnorderedAccessHeap;
 
     std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> PipelineStates;
   public:
@@ -201,12 +221,14 @@ private:
   std::unordered_map<vdl::BlendState, D3D12_BLEND_DESC> BlendStates_;
   std::unordered_map<vdl::RasterizerState, D3D12_RASTERIZER_DESC> RasterizerStates_;
   std::unordered_map<vdl::DepthStencilState, D3D12_DEPTH_STENCIL_DESC> DepthStencilStates_;
-  std::unordered_map<vdl::Sampler, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>> Samplers_;
-  std::array<DescriptorHeap, kDescriptorHeapTypeNum> DescriptorHeaps_;
+  std::unordered_map<vdl::Sampler, DescriptorHeap> Samplers_;
+  DescriptorAllocator* pSamplerDescriptorAllocator_;
+  std::array<DescriptorAllocator, kDescriptorHeapNum> DescriptorAllocators_;
+  std::array<ID3D12DescriptorHeap*, kDescriptorHeapNum> ppDescriptorHeaps_;
+  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pDefaultViewDescriptorHeap_;
+  D3D12_CPU_DESCRIPTOR_HANDLE DefaultViewCPUHandle_;
   HANDLE FenceEvent_;
 private:
-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pDefaultViewDescriptorHeap_;
-
   ID3D12CommandQueue* pGraphicsCommandQueue_;
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pGraphicsRootSignature_;
   std::array<CommandList, Constants::kGraphicsCommandBufferNum> GraphicsCommandLists_;
@@ -241,10 +263,10 @@ private:
   const D3D12_BLEND_DESC& GetBlendDesc(const vdl::BlendState& _BlendState);
   const D3D12_DEPTH_STENCIL_DESC& GetDepthStecilDesc(const vdl::DepthStencilState& _DepthStencilState);
   const D3D12_RASTERIZER_DESC& GetRasterizerDesc(const vdl::RasterizerState& _RasterizerState);
-  ID3D12DescriptorHeap* GetShaderResourceDescriptorHeap(const vdl::ShaderResource& _ShaderResource, ID3D12GraphicsCommandList* _pCommandList);
-  ID3D12DescriptorHeap* GetSamplerDescriptorHeap(const vdl::Sampler& _Sampler);
-  ID3D12DescriptorHeap* GetConstantBufferDescriptorHeap(const vdl::Detail::ConstantBufferData& _ConstantBuffer);
-  ID3D12DescriptorHeap* GetUnorderedAccessObjectDescriptorHeap(const vdl::UnorderedAccessObject& _UnorderedAccessObject, ID3D12GraphicsCommandList* _pCommandList);
+  const D3D12_CPU_DESCRIPTOR_HANDLE& GetShaderResourceCPUHandle(const vdl::ShaderResource& _ShaderResource, ID3D12GraphicsCommandList* _pCommandList);
+  const D3D12_CPU_DESCRIPTOR_HANDLE& GetSamplerCPUHandle(const vdl::Sampler& _Sampler);
+  const D3D12_CPU_DESCRIPTOR_HANDLE& GetConstantBufferCPUHandle(const vdl::Detail::ConstantBufferData& _ConstantBuffer);
+  const D3D12_CPU_DESCRIPTOR_HANDLE& GetUnorderedAccessObjectCPUHandle(const vdl::UnorderedAccessObject& _UnorderedAccessObject, ID3D12GraphicsCommandList* _pCommandList);
   vdl::uint GetVertexBufferStride()const;
   vdl::uint GetInstanceBufferStride()const;
 public:
