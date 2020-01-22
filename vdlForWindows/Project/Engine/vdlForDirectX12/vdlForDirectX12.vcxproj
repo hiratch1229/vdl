@@ -17,6 +17,7 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandList\CommandList.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandQueue\CommandQueueManager.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\DescriptorHeap\DescriptorHeap.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\Fence\Fence.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\DirectX12\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -32,6 +33,7 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandList\CommandList.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandQueue\CommandQueueManager.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\DescriptorHeap\DescriptorHeap.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\Fence\Fence.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Format\DirectX\Format.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\DirectX12\pch.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Scissor\DirectX\Scissor.hpp" />

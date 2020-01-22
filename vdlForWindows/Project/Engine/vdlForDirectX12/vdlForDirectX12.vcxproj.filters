@@ -49,6 +49,9 @@
     <Filter Include="Src\Device\DescriptorHeap">
       <UniqueIdentifier>{38a5f218-cd7e-4d85-8dcb-e68ca0e8f442}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Device\Fence">
+      <UniqueIdentifier>{9c001504-837d-4fff-9ab4-8dcbca3c0ee3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.cpp">
@@ -80,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\DescriptorHeap\DescriptorHeap.cpp">
       <Filter>Src\Device\DescriptorHeap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\Fence\Fence.cpp">
+      <Filter>Src\Device\Fence</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\DescriptorHeap\DescriptorHeap.hpp">
       <Filter>Src\Device\DescriptorHeap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\Fence\Fence.hpp">
+      <Filter>Src\Device\Fence</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

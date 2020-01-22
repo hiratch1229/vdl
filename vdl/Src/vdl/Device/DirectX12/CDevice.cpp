@@ -232,8 +232,7 @@ void CDevice::Initialize()
 
   //  ƒtƒFƒ“ƒX‚Ìì¬
   {
-    hr = pDevice_->CreateFence(FenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(pFence_.GetAddressOf()));
-    ERROR_CHECK(hr);
+    Fence_.Initialize(pDevice_.Get());
 
     FenceEvent_ = CreateEvent(nullptr, false, false, nullptr);
     assert(FenceEvent_ != nullptr);
@@ -1166,11 +1165,6 @@ void CDevice::ExecuteAndWait(CommandList* _pCommandList)
 
   _pCommandList->Execute(pCommandQueue_);
 
-  pCommandQueue_->Signal(pFence_.Get(), ++FenceValue_);
-
-  if (pFence_->GetCompletedValue() < FenceValue_)
-  {
-    pFence_->SetEventOnCompletion(FenceValue_, FenceEvent_);
-    ::WaitForSingleObject(FenceEvent_, INFINITE);
-  }
+  Fence_.Signal(pCommandQueue_);
+  Fence_.Wait(FenceEvent_);
 }

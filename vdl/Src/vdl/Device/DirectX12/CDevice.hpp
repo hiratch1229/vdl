@@ -9,6 +9,7 @@
 #include "CommandList/CommandList.hpp"
 #include "CommandQueue/CommandQueueManager.hpp"
 #include "DescriptorHeap/DescriptorHeap.hpp"
+#include "Fence/Fence.hpp"
 #include <vdl/Buffer/DirectX12/CBuffer.hpp>
 #include <vdl/Texture/DirectX12/CTexture.hpp>
 
@@ -32,9 +33,8 @@ private:
   ID3D12CommandQueue* pCommandQueue_;
   CommandList CommandList_;
   std::array<DescriptorAllocator, kDescriptorHeapNum> DescriptorAllocators_;
-  Microsoft::WRL::ComPtr<ID3D12Fence> pFence_;
+  Fence Fence_;
   HANDLE FenceEvent_;
-  vdl::uint FenceValue_ = 0;
 private:
   IBufferManager* pBufferManager_;
   std::unique_ptr<CConstantBuffer> pConstantBuffer_;

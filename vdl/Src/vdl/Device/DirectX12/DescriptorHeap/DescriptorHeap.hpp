@@ -37,7 +37,7 @@ public:
 
   ~DescriptorAllocator() = default;
 
-  ID3D12DescriptorHeap* GetDescriptorHeap() { return pDescriptorHeap_.Get(); }
+  [[nodiscard]] ID3D12DescriptorHeap* GetDescriptorHeap() { return pDescriptorHeap_.Get(); }
 
   void Initialize(ID3D12Device* _pDevice, D3D12_DESCRIPTOR_HEAP_TYPE _Type, D3D12_DESCRIPTOR_HEAP_FLAGS _Flag = D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 

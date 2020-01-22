@@ -18,11 +18,11 @@
 
 #include <vdl/pch/DirectX12/pch.hpp>
 
-#include <vdl/Texture/DirectX12/CTexture.hpp>
-#include <vdl/Shader/DirectX12/CShader.hpp>
-
 #include <vdl/Device/DirectX12/CommandList/CommandList.hpp>
 #include <vdl/Device/DirectX12/DescriptorHeap/DescriptorHeap.hpp>
+#include <vdl/Device/DirectX12/Fence/Fence.hpp>
+#include <vdl/Texture/DirectX12/CTexture.hpp>
+#include <vdl/Shader/DirectX12/CShader.hpp>
 
 #include <array>
 #include <unordered_map>
@@ -46,12 +46,6 @@ private:
   using Samplers = std::vector<vdl::Sampler>;
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
   using UnorderedAccessObjects = std::vector<vdl::UnorderedAccessObject>;
-private:
-  struct SyncState
-  {
-    Microsoft::WRL::ComPtr<ID3D12Fence> pFence;
-    vdl::uint64_t Value = 0;
-  };
 private:
   enum class GraphicsCommandType
   {
@@ -237,29 +231,27 @@ private:
   StateChangeFlags<GraphicsCommandType, vdl::uint32_t> GraphicsStateChangeFlags_;
   vdl::uint GraphicsRenderTargetCount_;
   GraphicsState CurrentGraphicsState_;
-  std::array<SyncState, Constants::kGraphicsCommandBufferNum> GraphicsSyncStates_;
+  std::array<Fence, Constants::kGraphicsCommandBufferNum> GraphicsFences_;
   std::array<GraphicsReserveData, Constants::kGraphicsCommandBufferNum> GraphicsReserveDatas_;
 private:
   ID3D12CommandQueue* pComputeCommandQueue_;
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pComputeRootSignature_;
   std::array<CommandList, Constants::kGraphicsCommandBufferNum> ComputeCommandLists_;
-  //std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, Constants::kComputeCommandBufferNum> pComputeCommandAllocators_;
-  //std::array<Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>, Constants::kComputeCommandBufferNum> pComputeCommandLists_;
   vdl::uint ComputeCommandBufferIndex_ = 0;
   StateChangeFlags<ComputeCommandType, vdl::uint8_t> ComputeStateChangeFlags_;
   ComputeState CurrentComputeState_;
-  std::array<SyncState, Constants::kComputeCommandBufferNum> ComputeSyncStates_;
+  std::array<Fence, Constants::kComputeCommandBufferNum> ComputeFences_;
   std::array<ComputeReserveData, Constants::kComputeCommandBufferNum> ComputeReserveDatas_;
-  SyncState* pLastComputeSyncState_ = nullptr;
+  Fence* pLastFence_ = nullptr;
 private:
   GraphicsReserveData& GetCurrentGraphicsReserveData() { return GraphicsReserveDatas_[GraphicsCommandBufferIndex_]; }
   CommandList& GetCurrentGraphicsCommandList() { return GraphicsCommandLists_[GraphicsCommandBufferIndex_]; }
+  Fence& GetCurrentGraphicsFence() { return GraphicsFences_[GraphicsCommandBufferIndex_]; }
   ComputeReserveData& GetCurrentComputeReserveData() { return ComputeReserveDatas_[ComputeCommandBufferIndex_]; }
   CommandList& GetCurrentComputeCommandList() { return ComputeCommandLists_[ComputeCommandBufferIndex_]; }
+  Fence& GetCurrentComputeFence() { return ComputeFences_[GraphicsCommandBufferIndex_]; }
 private:
   void PreprocessingDraw();
-  void SingnalFence(ID3D12CommandQueue* _pQueue, SyncState* _pSyncState);
-  void WaitFence(ID3D12CommandQueue* _pQueue, SyncState* _pSyncState);
   CRenderTexture* GetD3D12RenderTexture(const vdl::RenderTexture& _RenderTexture);
   const D3D12_BLEND_DESC& GetBlendDesc(const vdl::BlendState& _BlendState);
   const D3D12_DEPTH_STENCIL_DESC& GetDepthStecilDesc(const vdl::DepthStencilState& _DepthStencilState);
