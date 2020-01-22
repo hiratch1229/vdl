@@ -41,7 +41,7 @@ public:
 
   void Initialize(ID3D12Device* _pDevice, D3D12_DESCRIPTOR_HEAP_TYPE _Type, D3D12_DESCRIPTOR_HEAP_FLAGS _Flag = D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-  void Allocate(DescriptorHeap* _Heap, vdl::uint _Num = 1);
+  void Allocate(DescriptorHeap* _Heap, vdl::uint _Size = 1);
 
   void Release(const D3D12_CPU_DESCRIPTOR_HANDLE& _CPUHandle, vdl::uint _Size);
 };

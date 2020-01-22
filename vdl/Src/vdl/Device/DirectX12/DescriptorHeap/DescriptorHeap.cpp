@@ -54,20 +54,21 @@ void DescriptorAllocator::Initialize(ID3D12Device* _pDevice, D3D12_DESCRIPTOR_HE
   }
 }
 
-void DescriptorAllocator::Allocate(DescriptorHeap* _Heap, vdl::uint _Num)
+void DescriptorAllocator::Allocate(DescriptorHeap* _Heap, vdl::uint _Size)
 {
   assert(!FreeSpaceDatas_.empty());
+  assert(_Size > 0);
 
   //  配列の後ろからデータを検索
   //  (後ろにあるものの方がキャッシュが残っている可能性が高いため)
   for (auto Itr = FreeSpaceDatas_.end() - 1, Start = FreeSpaceDatas_.begin(); Start <= Itr; --Itr)
   {
-    if (Itr->Size >= _Num)
+    if (Itr->Size >= _Size)
     {
-      const vdl::uint Index = Itr->Index + (Itr->Size -= _Num);
+      const vdl::uint Index = Itr->Index + (Itr->Size -= _Size);
 
       _Heap->Allocator = this;
-      _Heap->Size = _Num;
+      _Heap->Size = _Size;
       _Heap->CPUHandle = BaseCPUHandle_;
       _Heap->CPUHandle.ptr += DescriptorIncrementSize_ * Index;
       _Heap->GPUHandle = BaseGPUHandle_;
@@ -88,6 +89,8 @@ void DescriptorAllocator::Allocate(DescriptorHeap* _Heap, vdl::uint _Num)
 
 void DescriptorAllocator::Release(const D3D12_CPU_DESCRIPTOR_HANDLE& _CPUHandle, vdl::uint _Size)
 {
+  assert(_Size > 0);
+
   const vdl::uint Index = static_cast<vdl::uint>((_CPUHandle.ptr - BaseCPUHandle_.ptr) / DescriptorIncrementSize_);
 
   //  マージ可能なものを検索

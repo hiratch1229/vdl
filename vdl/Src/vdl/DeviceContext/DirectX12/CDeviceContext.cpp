@@ -578,9 +578,13 @@ void CDeviceContext::Initialize()
     }
 
     //  コマンドリストの作成
-    for (vdl::uint i = 0; i < Constants::kComputeCommandBufferNum; ++i)
     {
-      ComputeCommandLists_[i].Initialize(pD3D12Device_, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+      for (vdl::uint i = 0; i < Constants::kComputeCommandBufferNum; ++i)
+      {
+        ComputeCommandLists_[i].Initialize(pD3D12Device_, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+      }
+
+      GetCurrentComputeReserveData().PipelineStates.resize(1);
     }
 
     //  フェンスの初期化
@@ -929,17 +933,16 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 {
   HRESULT hr = S_OK;
 
+  ComputeReserveData& CurrentComputeReserveData = GetCurrentComputeReserveData();
+
   //  コマンドリストの初期設定
   CommandList& CurrentComputeCommandList = GetCurrentComputeCommandList();
   {
-    CurrentComputeCommandList.Close();
+    CurrentComputeCommandList.Reset(CurrentComputeReserveData.PipelineStates[0].Get());
     CurrentComputeCommandList->SetComputeRootSignature(pComputeRootSignature_.Get());
     CurrentComputeCommandList->SetDescriptorHeaps(kDescriptorHeapNum, ppDescriptorHeaps_.data());
   }
 
-  ComputeReserveData& CurrentComputeReserveData = GetCurrentComputeReserveData();
-
-  const vdl::uint LastGraphicsCommandBufferIndex = GraphicsCommandBufferIndex_;
   //  SetDescriptor
   {
     CommandList& CurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
@@ -948,56 +951,65 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
     {
       const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(CurrentComputeState_.ShaderResources.size());
 
-      //  データの読み込み
-      std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> ShaderResourceDatas(ShaderResourceNum);
+      if (ShaderResourceNum)
       {
-        for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
+        if (ComputeStateChangeFlags_.Has(ComputeCommandType::eSetShaderResource))
         {
-          ShaderResourceDatas[ShaderResourceCount] = GetShaderResourceCPUHandle(CurrentComputeState_.ShaderResources[ShaderResourceCount], &CurrentGraphicsCommandList);
+          //  データの読み込み
+          std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> ShaderResourceDatas(ShaderResourceNum);
+          {
+            for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
+            {
+              ShaderResourceDatas[ShaderResourceCount] = GetShaderResourceCPUHandle(CurrentComputeState_.ShaderResources[ShaderResourceCount], &CurrentGraphicsCommandList);
+            }
+          }
+
+          constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
+          DescriptorAllocator& DescriptorAllocator = DescriptorAllocators_[static_cast<vdl::uint>(kDescriptorHeapType)];
+
+          DescriptorHeap& DescriptorHeap = CurrentComputeReserveData.ShaderResourceHeaps.emplace_back();
+          DescriptorAllocator.Allocate(&DescriptorHeap, ShaderResourceNum);
+
+          pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.CPUHandle, &ShaderResourceNum,
+            ShaderResourceNum, ShaderResourceDatas.data(), nullptr, Cast(kDescriptorHeapType));
+
+          CurrentComputeReserveData.ShaderResources = CurrentComputeState_.ShaderResources;
         }
+
+        constexpr DescriptorType kDescriptorType = DescriptorType::eShaderResource;
+        CurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), CurrentComputeReserveData.ShaderResourceHeaps.back().GPUHandle);
       }
-
-      constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
-      DescriptorAllocator& DescriptorAllocator = DescriptorAllocators_[static_cast<vdl::uint>(kDescriptorHeapType)];
-
-      DescriptorHeap DescriptorHeap;
-      DescriptorAllocator.Allocate(&DescriptorHeap, ShaderResourceNum);
-
-      pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.CPUHandle, &ShaderResourceNum,
-        ShaderResourceNum, ShaderResourceDatas.data(), nullptr, Cast(kDescriptorHeapType));
-
-      constexpr DescriptorType kDescriptorType = DescriptorType::eShaderResource;
-      CurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GPUHandle);
-      CurrentComputeReserveData.ShaderResources = CurrentComputeState_.ShaderResources;
-      CurrentComputeReserveData.ShaderResourceHeap = std::move(DescriptorHeap);
     }
 
     //  SetSampler
     {
       const vdl::uint SamplerNum = static_cast<vdl::uint>(CurrentComputeState_.Samplers.size());
+
       if (SamplerNum)
       {
-        //  データの読み込み
-        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> SamplerDatas(SamplerNum);
+        if (ComputeStateChangeFlags_.Has(ComputeCommandType::eSetSampler))
         {
-          for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+          //  データの読み込み
+          std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> SamplerDatas(SamplerNum);
           {
-            SamplerDatas[SamplerCount] = GetSamplerCPUHandle(CurrentComputeState_.Samplers[SamplerCount]);
+            for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+            {
+              SamplerDatas[SamplerCount] = GetSamplerCPUHandle(CurrentComputeState_.Samplers[SamplerCount]);
+            }
           }
+
+          constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eSampler;
+          DescriptorAllocator& DescriptorAllocator = DescriptorAllocators_[static_cast<vdl::uint>(kDescriptorHeapType)];
+
+          DescriptorHeap& DescriptorHeap = CurrentComputeReserveData.SamplerHeaps.emplace_back();
+          DescriptorAllocator.Allocate(&DescriptorHeap, SamplerNum);
+
+          pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.CPUHandle, &SamplerNum,
+            SamplerNum, SamplerDatas.data(), nullptr, Cast(kDescriptorHeapType));
         }
 
-        constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eSampler;
-        DescriptorAllocator& DescriptorAllocator = DescriptorAllocators_[static_cast<vdl::uint>(kDescriptorHeapType)];
-
-        DescriptorHeap DescriptorHeap;
-        DescriptorAllocator.Allocate(&DescriptorHeap, SamplerNum);
-
-        pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.CPUHandle, &SamplerNum,
-          SamplerNum, SamplerDatas.data(), nullptr, Cast(kDescriptorHeapType));
-
         constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
-        CurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GPUHandle);
-        CurrentComputeReserveData.SamplerHeap = std::move(DescriptorHeap);
+        CurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), CurrentComputeReserveData.SamplerHeaps.back().GPUHandle);
       }
     }
 
@@ -1005,62 +1017,75 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
     {
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(CurrentComputeState_.ConstantBuffers.size());
 
-      //  データの読み込み
-      std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> ConstantBufferDatas(ConstantBufferNum);
+      if (ConstantBufferNum)
       {
-        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+        if (ComputeStateChangeFlags_.Has(ComputeCommandType::eSetConstantBuffer))
         {
-          ConstantBufferDatas[ConstantBufferCount] = GetConstantBufferCPUHandle(CurrentComputeState_.ConstantBuffers[ConstantBufferCount]);
+          //  データの読み込み
+          std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> ConstantBufferDatas(ConstantBufferNum);
+          {
+            for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+            {
+              ConstantBufferDatas[ConstantBufferCount] = GetConstantBufferCPUHandle(CurrentComputeState_.ConstantBuffers[ConstantBufferCount]);
+            }
+          }
+
+          constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
+          DescriptorAllocator& DescriptorAllocator = DescriptorAllocators_[static_cast<vdl::uint>(kDescriptorHeapType)];
+
+          DescriptorHeap& DescriptorHeap = CurrentComputeReserveData.ConstantBufferHeaps.emplace_back();
+          DescriptorAllocator.Allocate(&DescriptorHeap, ConstantBufferNum);
+
+          pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.CPUHandle, &ConstantBufferNum,
+            ConstantBufferNum, ConstantBufferDatas.data(), nullptr, Cast(kDescriptorHeapType));
+
+          CurrentComputeReserveData.ConstantBuffers = CurrentComputeState_.ConstantBuffers;
         }
+
+        constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
+        CurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), CurrentComputeReserveData.ConstantBufferHeaps.back().GPUHandle);
       }
-
-      constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
-      DescriptorAllocator& DescriptorAllocator = DescriptorAllocators_[static_cast<vdl::uint>(kDescriptorHeapType)];
-
-      DescriptorHeap DescriptorHeap;
-      DescriptorAllocator.Allocate(&DescriptorHeap, ConstantBufferNum);
-
-      pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.CPUHandle, &ConstantBufferNum,
-        ConstantBufferNum, ConstantBufferDatas.data(), nullptr, Cast(kDescriptorHeapType));
-
-      constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
-      CurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GPUHandle);
-      CurrentComputeReserveData.ConstantBuffers = CurrentComputeState_.ConstantBuffers;
-      CurrentComputeReserveData.ConstantBufferHeap = std::move(DescriptorHeap);
     }
 
     //  SetUnorderedAccessObject
     {
       const vdl::uint UnorderedAccessObjectNum = static_cast<vdl::uint>(CurrentComputeState_.UnorderedAccessObjects.size());
 
-      //  データの読み込み
-      std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> UnorderedAccessObjectDatas(UnorderedAccessObjectNum);
+      if (UnorderedAccessObjectNum)
       {
-        for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
+        if (ComputeStateChangeFlags_.Has(ComputeCommandType::eSetUnorderedAccessObject))
         {
-          UnorderedAccessObjectDatas[UnorderedAccessObjectCount] = GetUnorderedAccessObjectCPUHandle(CurrentComputeState_.UnorderedAccessObjects[UnorderedAccessObjectCount], &CurrentGraphicsCommandList);
+          //  データの読み込み
+          std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> UnorderedAccessObjectDatas(UnorderedAccessObjectNum);
+          {
+            for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
+            {
+              UnorderedAccessObjectDatas[UnorderedAccessObjectCount] = GetUnorderedAccessObjectCPUHandle(CurrentComputeState_.UnorderedAccessObjects[UnorderedAccessObjectCount], &CurrentGraphicsCommandList);
+            }
+          }
+
+          constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
+          DescriptorAllocator& DescriptorAllocator = DescriptorAllocators_[static_cast<vdl::uint>(kDescriptorHeapType)];
+
+          DescriptorHeap& DescriptorHeap = CurrentComputeReserveData.UnorderedAccessHeaps.emplace_back();
+          DescriptorAllocator.Allocate(&DescriptorHeap, UnorderedAccessObjectNum);
+
+          pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.CPUHandle, &UnorderedAccessObjectNum,
+            UnorderedAccessObjectNum, UnorderedAccessObjectDatas.data(), nullptr, Cast(kDescriptorHeapType));
+
+          CurrentComputeReserveData.UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
         }
+
+        constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessObject;
+        CurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), CurrentComputeReserveData.UnorderedAccessHeaps.back().GPUHandle);
       }
-
-      constexpr DescriptorHeapType kDescriptorHeapType = DescriptorHeapType::eCBV_SRV_UAV;
-      DescriptorAllocator& DescriptorAllocator = DescriptorAllocators_[static_cast<vdl::uint>(kDescriptorHeapType)];
-
-      DescriptorHeap DescriptorHeap;
-      DescriptorAllocator.Allocate(&DescriptorHeap, UnorderedAccessObjectNum);
-
-      pD3D12Device_->CopyDescriptors(1, &DescriptorHeap.CPUHandle, &UnorderedAccessObjectNum,
-        UnorderedAccessObjectNum, UnorderedAccessObjectDatas.data(), nullptr, Cast(kDescriptorHeapType));
-
-      constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessObject;
-      CurrentComputeCommandList->SetComputeRootDescriptorTable(GetDescriptorOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorHeap.GPUHandle);
-      CurrentComputeReserveData.UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
-      CurrentComputeReserveData.UnorderedAccessHeap = std::move(DescriptorHeap);
     }
 
     Flush();
   }
 
   //  SetPipeline
+  if (ComputeStateChangeFlags_.Has(ComputeCommandType::eSetComputeShader))
   {
     assert(!CurrentComputeState_.ComputeShader.isEmpty());
     const CComputeShader* pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(CurrentComputeState_.ComputeShader.GetID()));
@@ -1096,7 +1121,7 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
   //  最後のフェンスを更新してGPUで更新設定
   {
-    pLastFence_ = &GetCurrentGraphicsFence();
+    pLastFence_ = &GetCurrentComputeFence();
     pLastFence_->Signal(pComputeCommandQueue_);
   }
 
@@ -1104,7 +1129,32 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
   {
     ++ComputeCommandBufferIndex_ %= Constants::kComputeCommandBufferNum;
 
-    GetCurrentComputeReserveData().Clear();
+    //  最終データの引き継ぎ
+    {
+      ComputeReserveData& NextComputeReserveData = GetCurrentComputeReserveData();
+      NextComputeReserveData.Clear();
+      if (!CurrentComputeReserveData.ShaderResourceHeaps.empty())
+      {
+        NextComputeReserveData.ShaderResourceHeaps.resize(1);
+        NextComputeReserveData.ShaderResourceHeaps[0] = std::move(CurrentComputeReserveData.ShaderResourceHeaps.back());
+      }
+      if (!CurrentComputeReserveData.SamplerHeaps.empty())
+      {
+        NextComputeReserveData.SamplerHeaps.resize(1);
+        NextComputeReserveData.SamplerHeaps[0] = std::move(CurrentComputeReserveData.SamplerHeaps.back());
+      }
+      if (!CurrentComputeReserveData.ConstantBufferHeaps.empty())
+      {
+        NextComputeReserveData.ConstantBufferHeaps.resize(1);
+        NextComputeReserveData.ConstantBufferHeaps[0] = std::move(CurrentComputeReserveData.ConstantBufferHeaps.back());
+      }
+      if (!CurrentComputeReserveData.UnorderedAccessHeaps.empty())
+      {
+        NextComputeReserveData.UnorderedAccessHeaps.resize(1);
+        NextComputeReserveData.UnorderedAccessHeaps[0] = std::move(CurrentComputeReserveData.UnorderedAccessHeaps.back());
+      }
+      NextComputeReserveData.PipelineStates = { std::move(CurrentComputeReserveData.PipelineStates.back()) };
+    }
     ComputeStateChangeFlags_.Clear();
   }
 }

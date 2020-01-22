@@ -182,16 +182,26 @@ void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::
   pDeviceContext_->SetRenderTextures(vdl::RenderTextures(), vdl::DepthStencilTexture());
 
   const vdl::uint PreviousShaderResourcesNum = static_cast<vdl::uint>(PreviousShaderResources_.size());
-  pDeviceContext_->CSSetShaderResources(0, PreviousShaderResourcesNum, PreviousShaderResources_.data());
-
+  if (PreviousShaderResourcesNum)
+  {
+    pDeviceContext_->CSSetShaderResources(0, PreviousShaderResourcesNum, PreviousShaderResources_.data());
+  }
   const vdl::uint PreviousUnorderedAccessObjectNum = static_cast<vdl::uint>(PreviousUnorderedAccessObjects_.size());
-  pDeviceContext_->CSSetUnorderedAccessObjects(0, PreviousUnorderedAccessObjectNum, PreviousUnorderedAccessObjects_.data());
+  if (PreviousUnorderedAccessObjectNum)
+  {
+    pDeviceContext_->CSSetUnorderedAccessObjects(0, PreviousUnorderedAccessObjectNum, PreviousUnorderedAccessObjects_.data());
+  }
 
   pDeviceContext_->Dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
 
-  ShaderResources ShaderResources(PreviousShaderResourcesNum);
-  pDeviceContext_->CSSetShaderResources(0, PreviousShaderResourcesNum, ShaderResources.data());
-
-  UnorderedAccessObjects UnorderedAccessObjects(PreviousUnorderedAccessObjectNum);
-  pDeviceContext_->CSSetUnorderedAccessObjects(0, PreviousUnorderedAccessObjectNum, UnorderedAccessObjects.data());
+  if (PreviousShaderResourcesNum)
+  {
+    ShaderResources ShaderResources(PreviousShaderResourcesNum);
+    pDeviceContext_->CSSetShaderResources(0, PreviousShaderResourcesNum, ShaderResources.data());
+  }
+  if (PreviousUnorderedAccessObjectNum)
+  {
+    UnorderedAccessObjects UnorderedAccessObjects(PreviousUnorderedAccessObjectNum);
+    pDeviceContext_->CSSetUnorderedAccessObjects(0, PreviousUnorderedAccessObjectNum, UnorderedAccessObjects.data());
+  }
 }

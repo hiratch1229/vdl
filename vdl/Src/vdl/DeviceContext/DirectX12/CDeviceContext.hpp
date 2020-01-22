@@ -184,10 +184,10 @@ private:
     ShaderResources ShaderResources;
     ConstantBuffers ConstantBuffers;
     UnorderedAccessObjects UnorderedAccessObjects;
-    DescriptorHeap ShaderResourceHeap;
-    DescriptorHeap SamplerHeap;
-    DescriptorHeap ConstantBufferHeap;
-    DescriptorHeap UnorderedAccessHeap;
+    std::vector<DescriptorHeap> ShaderResourceHeaps;
+    std::vector<DescriptorHeap> SamplerHeaps;
+    std::vector<DescriptorHeap> ConstantBufferHeaps;
+    std::vector<DescriptorHeap> UnorderedAccessHeaps;
 
     std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> PipelineStates;
   public:
@@ -198,6 +198,11 @@ private:
       ShaderResources.clear();
       ConstantBuffers.clear();
       UnorderedAccessObjects.clear();
+
+      ShaderResourceHeaps.clear();
+      SamplerHeaps.clear();
+      ConstantBufferHeaps.clear();
+      UnorderedAccessHeaps.clear();
 
       PipelineStates.clear();
     }
@@ -223,6 +228,7 @@ private:
   Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pDefaultViewDescriptorHeap_;
   D3D12_CPU_DESCRIPTOR_HANDLE DefaultViewCPUHandle_;
   HANDLE FenceEvent_;
+  Fence* pLastFence_ = nullptr;
 private:
   ID3D12CommandQueue* pGraphicsCommandQueue_;
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pGraphicsRootSignature_;
@@ -242,14 +248,13 @@ private:
   ComputeState CurrentComputeState_;
   std::array<Fence, Constants::kComputeCommandBufferNum> ComputeFences_;
   std::array<ComputeReserveData, Constants::kComputeCommandBufferNum> ComputeReserveDatas_;
-  Fence* pLastFence_ = nullptr;
 private:
   GraphicsReserveData& GetCurrentGraphicsReserveData() { return GraphicsReserveDatas_[GraphicsCommandBufferIndex_]; }
   CommandList& GetCurrentGraphicsCommandList() { return GraphicsCommandLists_[GraphicsCommandBufferIndex_]; }
   Fence& GetCurrentGraphicsFence() { return GraphicsFences_[GraphicsCommandBufferIndex_]; }
   ComputeReserveData& GetCurrentComputeReserveData() { return ComputeReserveDatas_[ComputeCommandBufferIndex_]; }
   CommandList& GetCurrentComputeCommandList() { return ComputeCommandLists_[ComputeCommandBufferIndex_]; }
-  Fence& GetCurrentComputeFence() { return ComputeFences_[GraphicsCommandBufferIndex_]; }
+  Fence& GetCurrentComputeFence() { return ComputeFences_[ComputeCommandBufferIndex_]; }
 private:
   void PreprocessingDraw();
   CRenderTexture* GetD3D12RenderTexture(const vdl::RenderTexture& _RenderTexture);
