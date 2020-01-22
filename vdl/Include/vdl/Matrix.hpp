@@ -104,13 +104,13 @@ namespace vdl
 
     [[nodiscard]] constexpr float3 Back()const noexcept { return { -_31,-_32, -_33 }; }
 
-    [[nodiscard]] Matrix Inverse()const noexcept
+    [[nodiscard]] Matrix constexpr Inverse()const noexcept
     {
       Matrix Original = *this;
       Matrix Inverse = Identity();
       {
-        float Temp, Big;
-        uint i, j, k;
+        float Temp = 0.0f, Big = 0.0f;
+        uint i = 0, j = 0, k = 0;
 
         //  ピボット選択を行ったGauss-Jordan法
         for (i = 0; i < 4; ++i)

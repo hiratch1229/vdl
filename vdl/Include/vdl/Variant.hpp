@@ -336,8 +336,8 @@ namespace vdl
     Variant(Variant&& _Variant)
       : ID_(_Variant.ID_)
     {
-      _Variant.ID_ = 0;
       VariantVisiter::Move(ID_, &Storage_, &_Variant.Storage_);
+      _Variant.ID_ = VariantTypeID<typename VariantIndexType<0>::Type>::Assign(&_Variant.Storage_, typename VariantIndexType<0>::Type());
     }
 
     template<class T, std::enable_if_t<VariantConstructibleTypeID<T>::kID != Constants::kDisableID, std::nullptr_t> = nullptr>
@@ -364,8 +364,8 @@ namespace vdl
       Visit(Deleter());
 
       ID_ = _Variant.ID_;
-      _Variant.ID_ = 0;
       VariantVisiter::Move(ID_, &Storage_, &_Variant.Storage_);
+      _Variant.ID_ = VariantTypeID<typename VariantIndexType<0>::Type>::Assign(&_Variant.Storage_, typename VariantIndexType<0>::Type());
 
       return *this;
     }
