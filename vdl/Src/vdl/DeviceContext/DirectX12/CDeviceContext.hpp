@@ -128,6 +128,7 @@ private:
     std::vector<vdl::PixelShader> PixelShaders;
     std::vector<ShaderResources> ShaderResources;
     std::vector<ConstantBuffers> ConstantBuffers;
+
     std::vector<DescriptorHeap> ShaderResourceHeaps;
     std::vector<DescriptorHeap> SamplerHeaps;
     std::vector<DescriptorHeap> ConstantBufferHeaps;
@@ -156,7 +157,7 @@ private:
       ShaderResourceHeaps.clear();
       SamplerHeaps.clear();
       ConstantBufferHeaps.clear();
-      ConstantBufferHeaps.clear();
+      UnorderedAccessHeaps.clear();
 
       ClearTextures.clear();
 
@@ -241,8 +242,9 @@ private:
 private:
   ID3D12CommandQueue* pComputeCommandQueue_;
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pComputeRootSignature_;
-  std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, Constants::kComputeCommandBufferNum> pComputeCommandAllocators_;
-  std::array<Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>, Constants::kComputeCommandBufferNum> pComputeCommandLists_;
+  std::array<CommandList, Constants::kGraphicsCommandBufferNum> ComputeCommandLists_;
+  //std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>, Constants::kComputeCommandBufferNum> pComputeCommandAllocators_;
+  //std::array<Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>, Constants::kComputeCommandBufferNum> pComputeCommandLists_;
   vdl::uint ComputeCommandBufferIndex_ = 0;
   StateChangeFlags<ComputeCommandType, vdl::uint8_t> ComputeStateChangeFlags_;
   ComputeState CurrentComputeState_;
@@ -250,11 +252,10 @@ private:
   std::array<ComputeReserveData, Constants::kComputeCommandBufferNum> ComputeReserveDatas_;
   SyncState* pLastComputeSyncState_ = nullptr;
 private:
-  GraphicsReserveData* GetCurrentGraphicsReserveData() { return &GraphicsReserveDatas_[GraphicsCommandBufferIndex_]; }
-  CommandList* GetCurrentGraphicsCommandList() { return &GraphicsCommandLists_[GraphicsCommandBufferIndex_]; }
-  ComputeReserveData* GetCurrentComputeReserveData() { return &ComputeReserveDatas_[ComputeCommandBufferIndex_]; }
-  ID3D12CommandAllocator* GetCurrentComputeCommandAllocator()const { return pComputeCommandAllocators_[ComputeCommandBufferIndex_].Get(); }
-  ID3D12GraphicsCommandList* GetCurrentComputeCommandList()const { return pComputeCommandLists_[ComputeCommandBufferIndex_].Get(); }
+  GraphicsReserveData& GetCurrentGraphicsReserveData() { return GraphicsReserveDatas_[GraphicsCommandBufferIndex_]; }
+  CommandList& GetCurrentGraphicsCommandList() { return GraphicsCommandLists_[GraphicsCommandBufferIndex_]; }
+  ComputeReserveData& GetCurrentComputeReserveData() { return ComputeReserveDatas_[ComputeCommandBufferIndex_]; }
+  CommandList& GetCurrentComputeCommandList() { return ComputeCommandLists_[ComputeCommandBufferIndex_]; }
 private:
   void PreprocessingDraw();
   void SingnalFence(ID3D12CommandQueue* _pQueue, SyncState* _pSyncState);
@@ -263,10 +264,10 @@ private:
   const D3D12_BLEND_DESC& GetBlendDesc(const vdl::BlendState& _BlendState);
   const D3D12_DEPTH_STENCIL_DESC& GetDepthStecilDesc(const vdl::DepthStencilState& _DepthStencilState);
   const D3D12_RASTERIZER_DESC& GetRasterizerDesc(const vdl::RasterizerState& _RasterizerState);
-  const D3D12_CPU_DESCRIPTOR_HANDLE& GetShaderResourceCPUHandle(const vdl::ShaderResource& _ShaderResource, ID3D12GraphicsCommandList* _pCommandList);
+  const D3D12_CPU_DESCRIPTOR_HANDLE& GetShaderResourceCPUHandle(const vdl::ShaderResource& _ShaderResource, CommandList* _pCommandList);
   const D3D12_CPU_DESCRIPTOR_HANDLE& GetSamplerCPUHandle(const vdl::Sampler& _Sampler);
   const D3D12_CPU_DESCRIPTOR_HANDLE& GetConstantBufferCPUHandle(const vdl::Detail::ConstantBufferData& _ConstantBuffer);
-  const D3D12_CPU_DESCRIPTOR_HANDLE& GetUnorderedAccessObjectCPUHandle(const vdl::UnorderedAccessObject& _UnorderedAccessObject, ID3D12GraphicsCommandList* _pCommandList);
+  const D3D12_CPU_DESCRIPTOR_HANDLE& GetUnorderedAccessObjectCPUHandle(const vdl::UnorderedAccessObject& _UnorderedAccessObject, CommandList* _pCommandList);
   vdl::uint GetVertexBufferStride()const;
   vdl::uint GetInstanceBufferStride()const;
 public:

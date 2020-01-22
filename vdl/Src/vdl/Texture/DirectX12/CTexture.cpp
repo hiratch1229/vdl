@@ -4,9 +4,11 @@
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 
+#include <vdl/Device/DirectX12/CommandList/CommandList.hpp>
+
 #include <vdl/Format/Format.hpp>
 
-void CTexture::TransitionResourceBarrier(ID3D12GraphicsCommandList* _pCommandList, ID3D12Resource* _pResource,
+void CTexture::TransitionResourceBarrier(CommandList* _pCommandList, ID3D12Resource* _pResource,
   D3D12_RESOURCE_STATES _BeforeState, D3D12_RESOURCE_STATES _AfterState)
 {
   D3D12_RESOURCE_BARRIER ResourceBarrier;
@@ -19,12 +21,12 @@ void CTexture::TransitionResourceBarrier(ID3D12GraphicsCommandList* _pCommandLis
     ResourceBarrier.Transition.StateAfter = _AfterState;
   }
 
-  _pCommandList->ResourceBarrier(1, &ResourceBarrier);
+  (*_pCommandList)->ResourceBarrier(1, &ResourceBarrier);
 }
 
 //--------------------------------------------------
 
-void TextureData::TransitionResourceBarrier(ID3D12GraphicsCommandList* _pCommandList, D3D12_RESOURCE_STATES _AfterState)
+void TextureData::TransitionResourceBarrier(CommandList* _pCommandList, D3D12_RESOURCE_STATES _AfterState)
 {
   CTexture::TransitionResourceBarrier(_pCommandList, pResource.Get(), ResourceState, _AfterState);
   ResourceState = _AfterState;

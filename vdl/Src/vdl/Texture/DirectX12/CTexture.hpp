@@ -11,6 +11,8 @@
 
 #include <utility>
 
+class CommandList;
+
 struct TextureData
 {
   Microsoft::WRL::ComPtr<ID3D12Resource> pResource;
@@ -29,7 +31,7 @@ public:
     return *this;
   }
 
-  void TransitionResourceBarrier(ID3D12GraphicsCommandList* _pCommandList, D3D12_RESOURCE_STATES _AfterState);
+  void TransitionResourceBarrier(CommandList* _pCommandList, D3D12_RESOURCE_STATES _AfterState);
 };
 
 struct CTexture : public ITexture
@@ -48,7 +50,7 @@ public:
 
   vdl::FormatType GetFormat()const override { return Constants::kTextureFormat; }
 public:
-  static void TransitionResourceBarrier(ID3D12GraphicsCommandList* _pCommandList, ID3D12Resource* _pResource,
+  static void TransitionResourceBarrier(CommandList* _pCommandList, ID3D12Resource* _pResource,
     D3D12_RESOURCE_STATES _BeforeState, D3D12_RESOURCE_STATES _AfterState);
 };
 

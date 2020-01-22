@@ -4,7 +4,7 @@
 
 #include <assert.h>
 
-CommandList::CommandList(ID3D12Device4* _pDevice, D3D12_COMMAND_LIST_TYPE _Type)
+void CommandList::Initialize(ID3D12Device4* _pDevice, D3D12_COMMAND_LIST_TYPE _Type)
 {
   HRESULT hr = S_OK;
 
@@ -52,4 +52,10 @@ void CommandList::Close()
   ERROR_CHECK(hr);
 
   State_ = State::eClose;
+}
+
+void CommandList::Execute(ID3D12CommandQueue* _pCommandQueue)
+{
+  ID3D12CommandList* pCommandList = pCommandList_.Get();
+  _pCommandQueue->ExecuteCommandLists(1, &pCommandList);
 }

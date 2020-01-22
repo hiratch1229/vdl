@@ -21,9 +21,11 @@ public:
 public:
   CommandList() = default;
 
-  CommandList(ID3D12Device4* _pDevice, D3D12_COMMAND_LIST_TYPE _Type);
+  void Initialize(ID3D12Device4* _pDevice, D3D12_COMMAND_LIST_TYPE _Type);
 
   void Reset(ID3D12PipelineState* _pPipelineState = nullptr);
 
   void Close();
+
+  void Execute(ID3D12CommandQueue* _pCommandQueue);
 };

@@ -186,9 +186,9 @@ void CDevice::Initialize()
   pCommandQueue_ = CommandQueueManager_.GetGraphicsQueue();
 
   //  コマンドリストの作成
-  CommandList_ = CommandList(pDevice_.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
+  CommandList_.Initialize(pDevice_.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-  //  デスクリプタアロケーターの初期化
+  //  ディスクリプタアロケーターの初期化
   {
     for (vdl::uint i = 0; i < kDescriptorHeapNum; ++i)
     {
@@ -516,10 +516,10 @@ void CDevice::CreateTexture(ITexture** _ppTexture, const vdl::Image& _Image)
       CommandList_.Reset();
 
       CommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
-      pTexture->TextureData.TransitionResourceBarrier(CommandList_.Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+      pTexture->TextureData.TransitionResourceBarrier(&CommandList_, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
       CommandList_.Close();
 
-      ExecuteAndWait(CommandList_.Get());
+      ExecuteAndWait(&CommandList_);
     }
 
     //  ビューの作成
@@ -616,10 +616,10 @@ void CDevice::CreateCubeTexture(ITexture** _ppCubeTexture, const std::array<vdl:
         CommandList_->CopyTextureRegion(&DstCopyLocation, 0, 0, 0, &SrcCopyLocation, nullptr);
       }
 
-      pCubeTexture->TextureData.TransitionResourceBarrier(CommandList_.Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+      pCubeTexture->TextureData.TransitionResourceBarrier(&CommandList_, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
       CommandList_.Close();
 
-      ExecuteAndWait(CommandList_.Get());
+      ExecuteAndWait(&CommandList_);
     }
 
     //  ビューの作成
@@ -1066,23 +1066,6 @@ void CDevice::LoadShader(IVertexShader** _ppVertexShader, const char* _Source, v
 
 //--------------------------------------------------
 
-void CDevice::ExecuteAndWait(ID3D12CommandList* _pCommandList)
-{
-  assert(_pCommandList);
-
-  pCommandQueue_->ExecuteCommandLists(1, &_pCommandList);
-
-  pCommandQueue_->Signal(pFence_.Get(), ++FenceValue_);
-
-  if (pFence_->GetCompletedValue() < FenceValue_)
-  {
-    pFence_->SetEventOnCompletion(FenceValue_, FenceEvent_);
-    ::WaitForSingleObject(FenceEvent_, INFINITE);
-  }
-}
-
-//--------------------------------------------------
-
 void CDevice::CreateResource(ID3D12Resource** _ppResource, const D3D12_RESOURCE_DESC& _ResourceDesc, D3D12_HEAP_TYPE _HeapType, D3D12_RESOURCE_STATES _InitialResourceState)const
 {
   assert(_ppResource);
@@ -1165,7 +1148,7 @@ void CDevice::CopyBuffer(BufferData * _pSrcBuffer, BufferData * _pDstBuffer, vdl
   CommandList_->ResourceBarrier(1, &ResourceBarrier);
   CommandList_.Close();
 
-  ExecuteAndWait(CommandList_.Get());
+  ExecuteAndWait(&CommandList_);
 }
 
 void CDevice::CreateTexture(TextureData * _pTextureData, const D3D12_RESOURCE_DESC& _TextureDesc, D3D12_RESOURCE_STATES _InitialResourceState)const
@@ -1175,4 +1158,19 @@ void CDevice::CreateTexture(TextureData * _pTextureData, const D3D12_RESOURCE_DE
   CreateResource(_pTextureData->pResource.GetAddressOf(), _TextureDesc, D3D12_HEAP_TYPE_DEFAULT, _InitialResourceState);
 
   _pTextureData->ResourceState = _InitialResourceState;
+}
+
+void CDevice::ExecuteAndWait(CommandList* _pCommandList)
+{
+  assert(_pCommandList);
+
+  _pCommandList->Execute(pCommandQueue_);
+
+  pCommandQueue_->Signal(pFence_.Get(), ++FenceValue_);
+
+  if (pFence_->GetCompletedValue() < FenceValue_)
+  {
+    pFence_->SetEventOnCompletion(FenceValue_, FenceEvent_);
+    ::WaitForSingleObject(FenceEvent_, INFINITE);
+  }
 }
