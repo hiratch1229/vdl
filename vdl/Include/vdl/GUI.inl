@@ -97,6 +97,32 @@ namespace vdl::GUI
       }
     }
 
+    template<class Type>
+    inline constexpr auto GetStep()
+    {
+      if constexpr (std::is_integral<Type>::value)
+      {
+        return static_cast<Type>(1);
+      }
+      else
+      {
+        return static_cast<Type>(0);
+      }
+    }
+
+    template<class Type>
+    inline constexpr auto GetStepFast()
+    {
+      if constexpr (std::is_integral<Type>::value)
+      {
+        return static_cast<Type>(100);
+      }
+      else
+      {
+        return static_cast<Type>(0);
+      }
+    }
+
     bool DragScalar(const char* _Label, DataType _Type, void* _pData, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power);
     bool DragScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power);
 
@@ -156,23 +182,23 @@ namespace vdl::GUI
   //--------------------------------------------------
 
   template<class Type>
-  inline bool Input(const char* _Label, Type* _pData, Type _Step = 0, Type _StepFast = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
+  inline bool Input(const char* _Label, Type* _pData, Type _Step = Detail::GetStep<Type>(), Type _StepFast = Detail::GetStepFast<Type>(), const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
   {
-    return InputScalar(_Label, Detail::GetDataType<Type>(), _pData, &_Step, &_StepFast, _Format, _Flags);
+    return InputScalar(_Label, Detail::GetDataType<Type>(), _pData, (_Step > static_cast<Type>(0) ? &_Step : nullptr), (_StepFast > static_cast<Type>(0) ? &_StepFast : nullptr), _Format, _Flags);
   }
   template<class Type>
-  inline bool Input(const char* _Label, Type2<Type>* _pData, Type _Step = 0, Type _StepFast = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
+  inline bool Input(const char* _Label, Type2<Type>* _pData, const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
   {
-    return InputScalarN(_Label, Detail::GetDataType<Type>(), _pData, 2, &_Step, &_StepFast, _Format, _Flags);
+    return InputScalarN(_Label, Detail::GetDataType<Type>(), _pData, 2, nullptr, nullptr, _Format, _Flags);
   }
   template<class Type>
-  inline bool Input(const char* _Label, Type3<Type>* _pData, Type _Step = 0, Type _StepFast = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
+  inline bool Input(const char* _Label, Type3<Type>* _pData, const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
   {
-    return InputScalarN(_Label, Detail::GetDataType<Type>(), _pData, 3, &_Step, &_StepFast, _Format, _Flags);
+    return InputScalarN(_Label, Detail::GetDataType<Type>(), _pData, 3, nullptr, nullptr, _Format, _Flags);
   }
   template<class Type>
-  inline bool Input(const char* _Label, Type4<Type>* _pData, Type _Step = 0, Type _StepFast = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
+  inline bool Input(const char* _Label, Type4<Type>* _pData, const char* _Format = Detail::GetDefaultFormat<Type>(), const InputTextFlags& _Flags = InputTextFlag::eNone)
   {
-    return InputScalarN(_Label, Detail::GetDataType<Type>(), _pData, 4, &_Step, &_StepFast, _Format, _Flags);
+    return InputScalarN(_Label, Detail::GetDataType<Type>(), _pData, 4, nullptr, nullptr, _Format, _Flags);
   }
 }

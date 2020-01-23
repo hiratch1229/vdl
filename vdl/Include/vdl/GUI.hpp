@@ -381,9 +381,9 @@ namespace vdl::GUI
   bool InputTextMultiline(const char* _Label, char* _Buffer, size_t _BufferSize, const float2& _Size = float2(0.0f, 0.0f), const InputTextFlags& _Flags = InputTextFlag::eNone);
   bool InputTextWithHint(const char* _Label, const char* _Hint, char* _Buffer, size_t _BufferSize, const InputTextFlags& _Flags = InputTextFlag::eNone);
   template<class Type> bool Input(const char* _Label, Type* _pData, Type _Step, Type _StepFast, const char* _Format, const InputTextFlags& _Flags);
-  template<class Type> bool Input(const char* _Label, Type2<Type>* _pData, Type _Step, Type _StepFast, const char* _Format, const InputTextFlags& _Flags);
-  template<class Type> bool Input(const char* _Label, Type3<Type>* _pData, Type _Step, Type _StepFast, const char* _Format, const InputTextFlags& _Flags);
-  template<class Type> bool Input(const char* _Label, Type4<Type>* _pData, Type _Step, Type _StepFast, const char* _Format, const InputTextFlags& _Flags);
+  template<class Type> bool Input(const char* _Label, Type2<Type>* _pData, const char* _Format, const InputTextFlags& _Flags);
+  template<class Type> bool Input(const char* _Label, Type3<Type>* _pData, const char* _Format, const InputTextFlags& _Flags);
+  template<class Type> bool Input(const char* _Label, Type4<Type>* _pData, const char* _Format, const InputTextFlags& _Flags);
 
   // Widgets: Color Editor/Picker (tip: the ColorEdit* functions have a little colored preview square that can be left-clicked to open a picker, and right-clicked to open an option menu.)
   // - Note that in C++ a 'float v[X]' function argument is the _same_ as 'float* v', the array syntax is just a way to document the number of elements that are expected to be accessible.
