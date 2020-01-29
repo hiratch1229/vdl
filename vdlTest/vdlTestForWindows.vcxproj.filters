@@ -239,9 +239,6 @@
     <FxCompile Include="Shader\TBDR\PointLightUpdateCS.hlsl">
       <Filter>シェーダーファイル\TBDR</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\TBDR\ShadowMapVS.hlsl">
-      <Filter>シェーダーファイル\TBDR</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\TBDR\TileBaseCS.hlsl">
       <Filter>シェーダーファイル\TBDR</Filter>
     </FxCompile>
@@ -364,6 +361,9 @@
     </FxCompile>
     <FxCompile Include="Shader\GBufferPass\GBufferPassVS.hlsl">
       <Filter>シェーダーファイル\GBufferPass</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\TBDR\LuminanceCS.hlsl">
+      <Filter>シェーダーファイル\TBDR</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

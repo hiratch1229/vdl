@@ -3,7 +3,7 @@
 Texture2D DiffuseGBuffer : register(t0);
 Texture2D NormalGBuffer : register(t1);
 Texture2D DepthBuffer : register(t2);
-StructuredBuffer<PointLight> PointLights : register(t4);
+StructuredBuffer<PointLight> PointLights : register(t3);
 
 cbuffer LightData : register(b0)
 {
@@ -40,7 +40,6 @@ float4 main(float4 _Position : SV_POSITION) : SV_TARGET
     for (int i = 0; i < PointLightNum; ++i)
     {
       LightColor += Calc(PointLights[i], Position.xyz, Normal);
-
     }
   }
     

@@ -1,5 +1,8 @@
 #include "PointLight.hlsli"
 
+RWStructuredBuffer<Data> Datas : register(u0);
+RWStructuredBuffer<PointLight> PointLights : register(u1);
+
 cbuffer ConstantBuffer : register(b0)
 {
   float DeltaTime;
@@ -7,9 +10,6 @@ cbuffer ConstantBuffer : register(b0)
   float PointLightRange;
   float Padding;
 };
-
-RWStructuredBuffer<Data> Datas : register(u0);
-RWStructuredBuffer<PointLight> PointLights : register(u1);
 
 static const uint3 kThreadNum = uint3(1024, 1, 1);
 
