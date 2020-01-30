@@ -27,7 +27,7 @@ public:
   void Push(U&& _Obj)
   {
     {
-      std::unique_lock Lock(Mutex_);
+      std::lock_guard Lock(Mutex_);
       Queue_.push(_Obj);
     }
 
@@ -55,7 +55,7 @@ public:
   bool Pop(T* _pData)
   {
     std::unique_lock Lock(Mutex_);
-    if (Queue_.empty() && !isFinish_)
+    while (Queue_.empty() && !isFinish_)
     {
       ConditionVariable_.wait(Lock);
     }
@@ -105,7 +105,7 @@ public:
 
   void Finish()noexcept
   {
-    std::unique_lock Lock(Mutex_);
+    std::lock_guard Lock(Mutex_);
     isFinish_ = true;
 
     ConditionVariable_.notify_one();
@@ -113,13 +113,13 @@ public:
 
   [[nodiscard]] vdl::uint Size()const noexcept
   {
-    std::unique_lock Lock(Mutex_);
+    std::lock_guard Lock(Mutex_);
     return Queue_.size();
   }
 
   [[nodiscard]] bool isEmpty()const noexcept
   {
-    std::unique_lock Lock(Mutex_);
+    std::lock_guard Lock(Mutex_);
     return Queue_.empty();
   }
 };
@@ -129,21 +129,24 @@ class ThreadPool
   using Func = std::function<void()>;
   std::vector<Queue<Func>> Queues_;
   std::vector<std::thread> Threads_;
+  std::vector<bool> useThreads_;
   const vdl::uint ThreadNum_;
 public:
   ThreadPool(vdl::uint _ThreadNum = std::thread::hardware_concurrency())
-    : Queues_(_ThreadNum), ThreadNum_(_ThreadNum)
+    : Queues_(_ThreadNum), useThreads_(_ThreadNum), ThreadNum_(_ThreadNum)
   {
     auto Work = [this](vdl::uint _Index)
     {
       while (true)
       {
+        useThreads_[_Index] = false;
+
         Func Task;
 
         //  タスクの取得を試みる
-        for (vdl::uint i = 0; i < ThreadNum_; ++i)
+        for (auto& Queue : Queues_)
         {
-          if (Queues_[(_Index + i) % ThreadNum_].TryPop(&Task))
+          if (Queue.TryPop(&Task))
           {
             break;
           }
@@ -156,6 +159,7 @@ public:
           break;
         }
 
+        useThreads_[_Index] = true;
         Task();
       }
     };
@@ -178,8 +182,19 @@ public:
     }
   }
 
+  void Enqueue(const Func& _Func)
+  {
+    for (vdl::uint i = 0;; ++i %= ThreadNum_)
+    {
+      if (!useThreads_[i] && Queues_[i].TryPush(_Func))
+      {
+        break;
+      }
+    }
+  }
+
   template<class F, class... Args>
-  [[nodiscard]] auto Enqueue(F&& _Func, Args&&... _Args)->std::future<std::invoke_result_t<F, Args...>>
+  [[nodiscard]] auto EnqueueWithAcquireResult(F&& _Func, Args&&... _Args)->std::future<std::invoke_result_t<F, Args...>>
   {
     using ResultType = std::invoke_result_t<F, Args...>;
     using TaskType = std::packaged_task<ResultType()>;
@@ -188,14 +203,7 @@ public:
     Func Func = [pTask] { (*pTask)(); };
     std::future<ResultType> Result = pTask->get_future();
 
-    //  TODO:線形検索をやめる
-    for (auto& Queue : Queues_)
-    {
-      if (Queue.TryPush(std::move(Func)))
-      {
-        break;
-      }
-    }
+    Enqueue(Func);
 
     return Result;
   }

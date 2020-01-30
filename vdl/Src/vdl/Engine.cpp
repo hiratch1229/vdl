@@ -40,20 +40,16 @@ Engine::Engine()
   pSystem_->Initialize();
   pWindow_->Initialize();
 
+  pDevice_->Initialize();
+  pDeviceContext_->Initialize();
+  pTextureManager_->Initialize();
+  pSwapChain_->Initialize();
+  pBufferManager_->Initialize();
+  pShaderManager_->Initialize();
+
   ThreadPool* ThreadPool = pSystem_->GetThreadPool();
 
-  std::future<void> DeviceAndManagers = ThreadPool->Enqueue([&]
-  {
-    pDevice_->Initialize();
-    pDeviceContext_->Initialize();
-    pTextureManager_->Initialize();
-    pSwapChain_->Initialize();
-    pBufferManager_->Initialize();
-    pShaderManager_->Initialize();
-  });
-  DeviceAndManagers.get();
-
-  std::future<void> InputsAndGraphics = ThreadPool->Enqueue([&]
+  std::future<void> InputsAndGraphics = ThreadPool->EnqueueWithAcquireResult([&]
   {
     pKeyboard_->Initialize();
     pMouse_->Initialize();
@@ -63,7 +59,7 @@ Engine::Engine()
     pComputer_->Initialize();
     pGUI_->Initialize();
   });
-  std::future<void> ManagersAndProfilers = ThreadPool->Enqueue([&]
+  std::future<void> ManagersAndProfilers = ThreadPool->EnqueueWithAcquireResult([&]
   {
     pSoundManager_->Initialize();
     pModelManager_->Initialize();

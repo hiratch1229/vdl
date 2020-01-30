@@ -2,6 +2,7 @@
 #include <vdl/Types.hpp>
 #include <vdl/Macro.hpp>
 
+#include <shared_mutex>
 #include <vector>
 
 template<class T>
@@ -9,9 +10,7 @@ class ReferenceCount
 {
   T* Ptr_;
   vdl::uint Count_ = 0;
-public:
-  void AddRef() { if (Ptr_) { ++Count_; } }
-  void Release() { if (Count_ > 0 && --Count_ == 0) { vdl::Macro::SafeDelete(Ptr_); } }
+  std::shared_mutex Mutex_;
 private:
   void Swap(ReferenceCount& _Other)
   {
@@ -46,7 +45,13 @@ public:
     }
   }
 
-  ~ReferenceCount() { Release(); }
+  ~ReferenceCount()
+  {
+    if (Count_ > 0 && --Count_ == 0)
+    {
+      vdl::Macro::SafeDelete(Ptr_);
+    }
+  }
 public:
   operator bool()const { return Count_; }
 
@@ -88,7 +93,31 @@ public:
     return *this;
   }
 public:
-  T* Get()const { return Ptr_; }
+  T* Get()
+  {
+    std::shared_lock Lock(Mutex_);
+    return Ptr_;
+  }
+
+  void AddRef()
+  {
+    std::lock_guard Lock(Mutex_);
+
+    if (Ptr_)
+    {
+      ++Count_;
+    }
+  }
+
+  void Release()
+  {
+    std::lock_guard Lock(Mutex_);
+
+    if (Count_ > 0 && --Count_ == 0)
+    {
+      vdl::Macro::SafeDelete(Ptr_);
+    }
+  }
 };
 
 template<class T>
@@ -97,8 +126,13 @@ class ReferenceCounts
   using Type = ReferenceCount<T>;
 private:
   std::vector<Type> ReferenceCounts_;
+  std::shared_mutex Mutex_;
 public:
-  Type& Get(vdl::ID _ID) { return ReferenceCounts_[_ID]; }
+  Type& Get(vdl::ID _ID)
+  {
+    std::shared_lock Lock(Mutex_);
+    return ReferenceCounts_[_ID];
+  }
 public:
   ReferenceCounts() = default;
 
@@ -108,6 +142,8 @@ public:
   {
     vdl::uint Index = 0;
     {
+      std::lock_guard Lock(Mutex_);
+
       const size_t Size = ReferenceCounts_.size();
       for (; Index < Size; ++Index)
       {
