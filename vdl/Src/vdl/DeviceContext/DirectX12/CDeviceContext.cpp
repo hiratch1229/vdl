@@ -543,6 +543,15 @@ void CDeviceContext::Initialize()
     {
       GraphicsFence.Initialize(pD3D12Device_);
     }
+
+    //  保存データの初期化
+    {
+      GraphicsReserveData& GraphicsReserveData = GetCurrentGraphicsReserveData();
+      GraphicsReserveData.ShaderResourceHeaps.resize(1);
+      GraphicsReserveData.SamplerHeaps.resize(1);
+      GraphicsReserveData.ConstantBufferHeaps.resize(1);
+      GraphicsReserveData.PipelineStates.resize(1);
+    }
   }
 
   //  コンピュート用のオブジェクトの作成
@@ -591,6 +600,16 @@ void CDeviceContext::Initialize()
     for (auto& ComputeFence : ComputeFences_)
     {
       ComputeFence.Initialize(pD3D12Device_);
+    }
+
+    //  保存データの初期化
+    {
+      ComputeReserveData& ComputeReserveData = GetCurrentComputeReserveData();
+      ComputeReserveData.ShaderResourceHeaps.resize(1);
+      ComputeReserveData.SamplerHeaps.resize(1);
+      ComputeReserveData.ConstantBufferHeaps.resize(1);
+      ComputeReserveData.UnorderedAccessHeaps.resize(1);
+      ComputeReserveData.PipelineStates.resize(1);
     }
   }
 }
@@ -1133,26 +1152,14 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
     {
       ComputeReserveData& NextComputeReserveData = GetCurrentComputeReserveData();
       NextComputeReserveData.Clear();
-      if (!CurrentComputeReserveData.ShaderResourceHeaps.empty())
-      {
-        NextComputeReserveData.ShaderResourceHeaps.resize(1);
-        NextComputeReserveData.ShaderResourceHeaps[0] = std::move(CurrentComputeReserveData.ShaderResourceHeaps.back());
-      }
-      if (!CurrentComputeReserveData.SamplerHeaps.empty())
-      {
-        NextComputeReserveData.SamplerHeaps.resize(1);
-        NextComputeReserveData.SamplerHeaps[0] = std::move(CurrentComputeReserveData.SamplerHeaps.back());
-      }
-      if (!CurrentComputeReserveData.ConstantBufferHeaps.empty())
-      {
-        NextComputeReserveData.ConstantBufferHeaps.resize(1);
-        NextComputeReserveData.ConstantBufferHeaps[0] = std::move(CurrentComputeReserveData.ConstantBufferHeaps.back());
-      }
-      if (!CurrentComputeReserveData.UnorderedAccessHeaps.empty())
-      {
-        NextComputeReserveData.UnorderedAccessHeaps.resize(1);
-        NextComputeReserveData.UnorderedAccessHeaps[0] = std::move(CurrentComputeReserveData.UnorderedAccessHeaps.back());
-      }
+      NextComputeReserveData.ShaderResourceHeaps.resize(1);
+      NextComputeReserveData.ShaderResourceHeaps[0] = std::move(CurrentComputeReserveData.ShaderResourceHeaps.back());
+      NextComputeReserveData.SamplerHeaps.resize(1);
+      NextComputeReserveData.SamplerHeaps[0] = std::move(CurrentComputeReserveData.SamplerHeaps.back());
+      NextComputeReserveData.ConstantBufferHeaps.resize(1);
+      NextComputeReserveData.ConstantBufferHeaps[0] = std::move(CurrentComputeReserveData.ConstantBufferHeaps.back());
+      NextComputeReserveData.UnorderedAccessHeaps.resize(1);
+      NextComputeReserveData.UnorderedAccessHeaps[0] = std::move(CurrentComputeReserveData.UnorderedAccessHeaps.back());
       NextComputeReserveData.PipelineStates = { std::move(CurrentComputeReserveData.PipelineStates.back()) };
     }
     ComputeStateChangeFlags_.Clear();
@@ -1193,31 +1200,14 @@ void CDeviceContext::Flush()
     GraphicsReserveData& NextGraphicsReserveData = GetCurrentGraphicsReserveData();
     {
       NextGraphicsReserveData.Clear();
-      if (!CurrentGraphicsReserveData.ShaderResourceHeaps.empty())
-      {
-        NextGraphicsReserveData.ShaderResourceHeaps.resize(1);
-        NextGraphicsReserveData.ShaderResourceHeaps[0] = std::move(CurrentGraphicsReserveData.ShaderResourceHeaps.back());
-      }
-      if (!CurrentGraphicsReserveData.SamplerHeaps.empty())
-      {
-        NextGraphicsReserveData.SamplerHeaps.resize(1);
-        NextGraphicsReserveData.SamplerHeaps[0] = std::move(CurrentGraphicsReserveData.SamplerHeaps.back());
-      }
-      if (!CurrentGraphicsReserveData.ConstantBufferHeaps.empty())
-      {
-        NextGraphicsReserveData.ConstantBufferHeaps.resize(1);
-        NextGraphicsReserveData.ConstantBufferHeaps[0] = std::move(CurrentGraphicsReserveData.ConstantBufferHeaps.back());
-      }
-      if (!CurrentGraphicsReserveData.UnorderedAccessHeaps.empty())
-      {
-        NextGraphicsReserveData.UnorderedAccessHeaps.resize(1);
-        NextGraphicsReserveData.UnorderedAccessHeaps[0] = std::move(CurrentGraphicsReserveData.UnorderedAccessHeaps.back());
-      }
-      if (!CurrentGraphicsReserveData.PipelineStates.empty())
-      {
-        NextGraphicsReserveData.PipelineStates.resize(1);
-        NextGraphicsReserveData.PipelineStates[0] = std::move(CurrentGraphicsReserveData.PipelineStates.back());
-      }
+      NextGraphicsReserveData.ShaderResourceHeaps.resize(1);
+      NextGraphicsReserveData.ShaderResourceHeaps[0] = std::move(CurrentGraphicsReserveData.ShaderResourceHeaps.back());
+      NextGraphicsReserveData.SamplerHeaps.resize(1);
+      NextGraphicsReserveData.SamplerHeaps[0] = std::move(CurrentGraphicsReserveData.SamplerHeaps.back());
+      NextGraphicsReserveData.ConstantBufferHeaps.resize(1);
+      NextGraphicsReserveData.ConstantBufferHeaps[0] = std::move(CurrentGraphicsReserveData.ConstantBufferHeaps.back());
+      NextGraphicsReserveData.PipelineStates.resize(1);
+      NextGraphicsReserveData.PipelineStates[0] = std::move(CurrentGraphicsReserveData.PipelineStates.back());
     }
 
     //  コマンドリストの初期設定  

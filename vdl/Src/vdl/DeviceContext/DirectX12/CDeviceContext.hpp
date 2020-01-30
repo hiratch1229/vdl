@@ -126,7 +126,6 @@ private:
     std::vector<DescriptorHeap> ShaderResourceHeaps;
     std::vector<DescriptorHeap> SamplerHeaps;
     std::vector<DescriptorHeap> ConstantBufferHeaps;
-    std::vector<DescriptorHeap> UnorderedAccessHeaps;
 
     std::unordered_map<vdl::ID, Texture> ClearTextures;
 
@@ -151,7 +150,6 @@ private:
       ShaderResourceHeaps.clear();
       SamplerHeaps.clear();
       ConstantBufferHeaps.clear();
-      UnorderedAccessHeaps.clear();
 
       ClearTextures.clear();
 

@@ -25,7 +25,7 @@
 namespace
 {
   constexpr const char* kShaderTargets[static_cast<vdl::uint>(ShaderType::eNum)] = { "vs_5_0", "hs_5_0", "ds_5_0", "gs_5_0", "ps_5_0", "cs_5_0" };
-  constexpr vdl::uint kCompileFlag = D3DCOMPILE_ENABLE_STRICTNESS;
+  constexpr vdl::uint kCompileFlag = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
   inline void ComplieShader(ID3DBlob** _ppCode, const char* _Target, const char* _FilePath, const char* _EntryPoint)
   {
