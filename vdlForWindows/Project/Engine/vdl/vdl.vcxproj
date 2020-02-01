@@ -103,6 +103,8 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\BufferManager\IBufferManager.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\Buffer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\IBuffer.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\ComputeCommandList\ComputeCommandList.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\RendererCommandList\RendererCommandList.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Computer\CComputer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Computer\IComputer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Constants\Constants.hpp" />
@@ -215,6 +217,7 @@
     <None Include="..\..\..\..\vdl\Shader\Option\GaussianBlur.hlsli" />
     <None Include="..\..\..\..\vdl\Shader\Option\Light.hlsli" />
     <None Include="..\..\..\..\vdl\Shader\Texture\Texture.hlsli" />
+    <None Include="..\..\..\..\vdl\Src\vdl\CommandList\RendererCommandList\RendererCommandList.inl" />
     <None Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.inl" />
   </ItemGroup>
   <ItemGroup>

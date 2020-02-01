@@ -21,7 +21,7 @@ namespace vdl
     constexpr Flags(DataType _Flags)noexcept
       : Mask_(_Flags) {}
   public:
-    operator DataType()const { return Mask_; }
+    constexpr operator DataType()const { return Mask_; }
   public:
     Flags& operator=(const Flags&) = default;
 

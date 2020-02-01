@@ -160,6 +160,15 @@
     <Filter Include="Src\ThreadPool">
       <UniqueIdentifier>{3c52a304-cfc4-4ec9-8d09-67b2d81a2196}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\CommandList">
+      <UniqueIdentifier>{70ae3d6d-9b41-46cf-8978-3e9f69ea8013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\CommandList\RendererCommandList">
+      <UniqueIdentifier>{5f69eb04-0891-474b-a70b-ce320074606a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\CommandList\ComputeCommandList">
+      <UniqueIdentifier>{4e2679e2-ed90-4c92-9412-fb3fca0af4a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Angle.hpp">
@@ -507,6 +516,12 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ThreadPool\ThreadPool.hpp">
       <Filter>Src\ThreadPool</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\RendererCommandList\RendererCommandList.hpp">
+      <Filter>Src\CommandList\RendererCommandList</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\ComputeCommandList\ComputeCommandList.hpp">
+      <Filter>Src\CommandList\ComputeCommandList</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Engine.cpp">
@@ -696,6 +711,9 @@
     </None>
     <None Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.inl">
       <Filter>Src\Renderer\RendererCommand</Filter>
+    </None>
+    <None Include="..\..\..\..\vdl\Src\vdl\CommandList\RendererCommandList\RendererCommandList.inl">
+      <Filter>Src\CommandList\RendererCommandList</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
