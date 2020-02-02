@@ -290,12 +290,13 @@ namespace
 
 void CDeviceContext::Initialize()
 {
+  CDevice* pDevice = Cast<CDevice>(Engine::Get<IDevice>());
+  pDevice_ = pDevice;
   pSwapChain_ = Cast<CSwapChain>(Engine::Get<ISwapChain>());
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
 
-  CDevice* pDevice = Cast<CDevice>(Engine::Get<IDevice>());
   pD3D11Device_ = pDevice->GetDevice();
   pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
 }
@@ -805,7 +806,8 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
     {
       if (!InstanceBuffer.isEmpty())
       {
-        Engine::Get<IDevice>()->WriteMemory(pBufferManager_->GetBuffer(InstanceBuffer.GetID()), _RendererCommandList.GetInstanceData(RendererCommand.second), _RendererCommandList.GetInstanceSize());
+        const auto& InstanceDatas = _RendererCommandList.GetInstanceDatas(RendererCommand.second);
+        pDevice_->WriteMemory(pBufferManager_->GetBuffer(InstanceBuffer.GetID()), InstanceDatas.data(), static_cast<vdl::uint>(InstanceDatas.size()));
       }
 
       const DrawData& DrawData = _RendererCommandList.GetDrawData(RendererCommand.second);
@@ -816,7 +818,8 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
     {
       if (!InstanceBuffer.isEmpty())
       {
-        Engine::Get<IDevice>()->WriteMemory(pBufferManager_->GetBuffer(InstanceBuffer.GetID()), _RendererCommandList.GetInstanceData(RendererCommand.second), _RendererCommandList.GetInstanceSize());
+        const auto& InstanceDatas = _RendererCommandList.GetInstanceDatas(RendererCommand.second);
+        pDevice_->WriteMemory(pBufferManager_->GetBuffer(InstanceBuffer.GetID()), InstanceDatas.data(), static_cast<vdl::uint>(InstanceDatas.size()));
       }
 
       const DrawIndexedData& DrawIndexedData = _RendererCommandList.GetDrawIndexedData(RendererCommand.second);

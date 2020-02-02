@@ -18,6 +18,7 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <any>
 
 enum class RendererCommandFlag : vdl::uint32_t
 {
@@ -92,6 +93,7 @@ class BaseRendererCommandList
   using ShaderResources = std::vector<vdl::ShaderResource>;
   using Samplers = std::vector<vdl::Sampler>;
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
+  using InstanceDatas = std::vector<vdl::uint8_t>;
 protected:
   static constexpr RendererCommandFlags kDrawFlag = RendererCommandFlag::eDraw;
   static constexpr RendererCommandFlags kDrawIndexedFlag = RendererCommandFlag::eDrawIndexed;
@@ -130,6 +132,11 @@ protected:
 protected:
   RendererCommands RendererCommands_;
   RendererCommandFlags RendererCommandFlags_;
+  std::vector<vdl::ID> DisplayObjectIDs_;
+  std::vector<InstanceDatas> Instances_;
+  std::vector<DrawData> DrawDatas_;
+  std::vector<DrawIndexedData> DrawIndexedDatas_;
+  std::unordered_map<vdl::ID, std::any> ReservedDisplayObjects_;
 
   InstanceBuffer InstanceBuffer_;
   std::vector<VertexBuffer> VertexBuffers_;
@@ -173,24 +180,25 @@ private:
   template<ShaderType Type> void SetShaderObjects();
 protected:
   void PushRendererCommand();
+protected:
+  void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
+    vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer);
 public:
   BaseRendererCommandList() = default;
 
   ~BaseRendererCommandList() = default;
 
-  virtual void Reset() = 0;
+  void Reset();
 
-  [[nodiscard]] virtual bool HasDrawCommand()const = 0;
+  [[nodiscard]] bool HasDrawCommand()const { return !DrawDatas_.empty() || !DrawIndexedDatas_.empty(); }
 
   [[nodiscard]] const RendererCommands& GetRendererCommands()const { return RendererCommands_; }
 
-  [[nodiscard]] virtual vdl::uint GetInstanceSize()const = 0;
+  [[nodiscard]] const InstanceDatas& GetInstanceDatas(vdl::uint _Index)const { return Instances_[_Index]; }
 
-  [[nodiscard]] virtual const void* GetInstanceData(vdl::uint _Index)const = 0;
+  [[nodiscard]] const DrawData& GetDrawData(vdl::uint _Index)const { return DrawDatas_[_Index]; }
 
-  [[nodiscard]] virtual const DrawData& GetDrawData(vdl::uint _Index)const = 0;
-
-  [[nodiscard]] virtual const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const = 0;
+  [[nodiscard]] const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const { return DrawIndexedDatas_[_Index]; }
 
   [[nodiscard]] const InstanceBuffer& GetInstanceBuffer()const { return InstanceBuffer_; }
 
@@ -297,134 +305,68 @@ public:
 template<class DisplayObject, class InstanceData>
 class RendererCommandList : public BaseRendererCommandList
 {
-  IModelManager* pModelManager_;
+  static constexpr vdl::uint kInstanceSize = static_cast<vdl::uint>(sizeof(InstanceData));
 private:
-  std::vector<vdl::ID> DisplayObjectIDs_;
-  std::vector<InstanceData> Instances_;
-  std::vector<DrawIndexedData> DrawIndexedDatas_;
-  std::unordered_map<vdl::ID, DisplayObject> ReservedDisplayObjects_;
+  IModelManager* pModelManager_;
 private:
   void SetVertexBuffer(const VertexBuffer&);
 
   void SetIndexBuffer(const IndexBuffer&);
-
-#pragma warning(disable:4172)
-  const DrawData& GetDrawData(vdl::uint)const override { assert(false); return {}; }
-#pragma warning(default:4172)
 public:
   RendererCommandList() = default;
 
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
     vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer);
 
-  void Reset()override;
-
   void SetDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData);
-
-  bool HasDrawCommand()const override { return !DrawIndexedDatas_.empty(); }
-
-  vdl::uint GetInstanceSize()const override { return static_cast<vdl::uint>(sizeof(InstanceData)); }
-
-  const void* GetInstanceData(vdl::uint _Index)const override { return &Instances_[_Index]; }
-
-  const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const override { return DrawIndexedDatas_[_Index]; }
 };
 
 //  テクスチャ用コマンドリスト
 template<class InstanceData>
 class RendererCommandList<vdl::Texture, InstanceData> : public BaseRendererCommandList
 {
-  std::vector<vdl::ID> DisplayObjectIDs_;
-  std::vector<InstanceData> Instances_;
-  std::vector<DrawData> DrawDatas_;
-  std::unordered_map<vdl::ID, vdl::Texture> ReservedTextures_;
+  static constexpr vdl::uint kInstanceSize = static_cast<vdl::uint>(sizeof(InstanceData));
 private:
   void SetVertexBuffer(const VertexBuffer&);
 
   void SetIndexBuffer(const IndexBuffer&);
-
-#pragma warning(disable:4172)
-  const DrawIndexedData& GetDrawIndexedData(vdl::uint)const override { assert(false); return {}; }
-#pragma warning(default:4172)
 public:
   RendererCommandList() = default;
 
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
     vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, VertexBuffer&& _VertexBuffer, InstanceBuffer&& _InstanceBuffer);
 
-  void Reset()override;
-
   void SetDrawData(const vdl::Texture& _Texture, InstanceData&& _InstanceData);
-
-  bool HasDrawCommand()const override { return !Instances_.empty(); }
-
-  vdl::uint GetInstanceSize()const override { return static_cast<vdl::uint>(sizeof(InstanceData)); }
-
-  const void* GetInstanceData(vdl::uint _Index)const override { return &Instances_[_Index]; }
-
-  const DrawData& GetDrawData(vdl::uint _Index)const override { return DrawDatas_[_Index]; }
 };
 
 //  GUI用コマンドリスト
 template<>
 class RendererCommandList<vdl::Texture, std::nullptr_t> : public BaseRendererCommandList
 {
-  std::vector<vdl::ID> DisplayObjectIDs_;
-  std::vector<DrawIndexedData> DrawIndexedDatas_;
-  std::unordered_map<vdl::ID, vdl::Texture> ReservedTextures_;
-private:
-  vdl::uint GetInstanceSize()const override { return 0; }
-
-  const void* GetInstanceData(vdl::uint)const override { return nullptr; }
-
-#pragma warning(disable:4172)
-  const DrawData& GetDrawData(vdl::uint)const override { assert(false); return {}; }
-#pragma warning(default:4172)
 public:
   RendererCommandList() = default;
 
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
     vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader);
 
-  void Reset()override;
-
   void SetDrawData(const vdl::Texture& _Texture, DrawIndexedData&& _DrawIndexedData);
-
-  bool HasDrawCommand()const override { return !DrawIndexedDatas_.empty(); }
-
-  const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const override { return DrawIndexedDatas_[_Index]; }
 };
 
 //  頂点バッファ&インスタンスバッファ無し用コマンドリスト
 template<>
 class RendererCommandList<std::nullptr_t, std::nullptr_t> : public BaseRendererCommandList
 {
-  std::vector<DrawData> DrawDatas_;
 private:
   void SetVertexBuffer(const VertexBuffer&);
 
   void SetIndexBuffer(const IndexBuffer&);
-
-  vdl::uint GetInstanceSize()const override { return 0; }
-
-  const void* GetInstanceData(vdl::uint)const override { return nullptr; }
-
-#pragma warning(disable:4172)
-  const DrawIndexedData& GetDrawIndexedData(vdl::uint)const override { assert(false); return {}; }
-#pragma warning(default:4172)
 public:
   RendererCommandList() = default;
 
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
     vdl::Sampler&& _Sampler);
 
-  void Reset()override;
-
   void SetDrawData(DrawData&& _DrawData);
-
-  bool HasDrawCommand()const override { return !DrawDatas_.empty(); }
-
-  const DrawData& GetDrawData(vdl::uint _Index)const override { return DrawDatas_[_Index]; }
 };
 
 #include "RendererCommandList.inl"

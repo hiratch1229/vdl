@@ -12,6 +12,7 @@
 
 #include <unordered_map>
 
+class IDevice;
 class CSwapChain;
 class ITextureManager;
 class IBufferManager;
@@ -22,6 +23,7 @@ class CDeviceContext : public IDeviceContext
   ID3D11Device* pD3D11Device_;
   ID3D11DeviceContext* pD3D11ImmediateContext_;
 private:
+  IDevice* pDevice_;
   CSwapChain* pSwapChain_;
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
