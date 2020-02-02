@@ -1,8 +1,10 @@
 #pragma once
 #include "IRenderer.hpp"
-#include "RendererCommand/RendererCommand.hpp"
+//#include "RendererCommand/RendererCommand.hpp"
+#include <vdl/CommandList/RendererCommandList/RendererCommandList.hpp>
 
 #include <vdl/Camera.hpp>
+#include <vdl/Model.hpp>
 
 #include <vdl/Buffer/Buffer.hpp>
 
@@ -34,22 +36,13 @@ private:
   IDevice* pDevice_;
   IDeviceContext* pDeviceContext_;
 private:
-  VertexBuffer TextureVertexBuffer_;
-  VertexBuffer SkyboxVertexBuffer_;
-  IndexBuffer SkyboxIndexBuffer_;
-  InstanceBuffer NoneInstanceBuffer_;
-  InstanceBuffer TextureInstanceBuffer_;
-  InstanceBuffer StaticMeshInstanceBuffer_;
-  InstanceBuffer SkinnedMeshInstanceBuffer_;
-  InstanceBuffer SkyboxInstanceBuffer_;
-private:
   std::unique_ptr<CameraData> pCameraData_;
 private:
   vdl::OutputManager OutputManager_;
-  RendererCommandList<Empty, vdl::uint> EmptyRendererCommandList_;
+  RendererCommandList<std::nullptr_t, std::nullptr_t> EmptyRendererCommandList_;
   RendererCommandList<vdl::Texture, vdl::Instance2D> TextureRendererCommandList_;
   RendererCommandList<vdl::StaticMesh, vdl::InstanceStaticMesh> StaticMeshRendererCommandList_;
-  RendererCommandList<vdl::SkinnedMesh, vdl::InstanceSkinnedMesh> SkinnedMeshRendererCommandList_;
+  //RendererCommandList<vdl::SkinnedMesh, vdl::InstanceSkinnedMesh> SkinnedMeshRendererCommandList_;
 public:
   CRenderer() = default;
 

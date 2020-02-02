@@ -11,7 +11,7 @@ namespace vdl
   public:
     Scissor() = default;
 
-    constexpr Scissor(int _LeftTopX,uint _LeftTopY, uint _Width, uint _Height)
+    constexpr Scissor(int _LeftTopX, int _LeftTopY, uint _Width, uint _Height)
       : LeftTop(_LeftTopX, _LeftTopY), Size(_Width, _Height) {}
 
     constexpr Scissor(const int2& _LeftTop, const uint2& _Size)

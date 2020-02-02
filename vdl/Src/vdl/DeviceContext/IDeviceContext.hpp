@@ -6,6 +6,8 @@
 #include <vdl/Platform/Platform.hpp>
 #include <vdl/Buffer/Buffer.hpp>
 
+class BaseRendererCommandList;
+
 class IDeviceContext
 {
 public:
@@ -14,7 +16,7 @@ public:
   IDeviceContext() = default;
 
   virtual ~IDeviceContext() = default;
-  
+
   [[nodiscard]] virtual PlatformFlags GetPlatform()const = 0;
 
   virtual void Initialize() = 0;
@@ -104,4 +106,6 @@ public:
   virtual void Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ) = 0;
 
   virtual void Flush() = 0;
+
+  virtual void Execute(const BaseRendererCommandList& _RendererCommandList) = 0;
 };

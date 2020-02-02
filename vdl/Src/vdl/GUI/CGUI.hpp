@@ -12,6 +12,7 @@
 #include <vdl/Variant.hpp>
 
 #include <vdl/Buffer/Buffer.hpp>
+#include <vdl/CommandList/RendererCommandList/RendererCommandList.hpp>
 
 #include <memory>
 
@@ -39,25 +40,15 @@ private:
   IMouse* pMouse_;
   IBufferManager* pBufferManager_;
 private:
-  vdl::VertexShader VertexShader_;
-  vdl::HullShader HullShader_;
-  vdl::DomainShader DomainShader_;
-  vdl::GeometryShader GeometryShader_;
-  vdl::PixelShader PixelShader_;
-  vdl::GraphicsStates GraphicsStates_;
   vdl::RenderTextures RenderTextures_;
   vdl::DepthStencilTexture DepthStencilTexture_;
-  //vdl::ShaderResource Font_;
-  vdl::Sampler Sampler_;
+  RendererCommandList<vdl::Texture, std::nullptr_t> RendererCommandList_;
   std::unique_ptr<vdl::ConstantBuffer<ConstantBufferData>> pConstantBuffer_;
-  vdl::Scissor Scissor_;
-  vdl::Viewport Viewport_;
 private:
   VertexBuffer VertexBuffer_;
   vdl::uint VertexBufferSize_ = 0;
   IndexBuffer IndexBuffer_;
   vdl::uint IndexBufferSize_ = 0;
-  InstanceBuffer InstanceBuffer_;
 public:
   CGUI() = default;
 

@@ -699,24 +699,19 @@ void CGUI::Initialize()
     }
   }
 
-  //  シェーダーの作成
+  //  コマンドリストの初期化
   {
-    VertexShader_ = vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kVertexShader)), vdl::InputLayoutType::eGUI);
-    PixelShader_ = vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kPixelShader)));
-  }
-
-  //  サンプラーの作成
-  {
-    Sampler_ = vdl::Sampler(vdl::AddressModeType::eWrap, vdl::AddressModeType::eWrap, vdl::AddressModeType::eWrap, vdl::FilterType::eMinMagMipLinear, 0, vdl::BorderColorType::eTransparent);
-  }
-
-  //  ステートの設定
-  {
-    GraphicsStates_.BlendState = vdl::BlendState(false, false, { true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd });
     vdl::DepthStencilOpState DepthStencilOpState(vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::ComparisonFuncType::eAlways);
-    GraphicsStates_.DepthStencilState = vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState);
-    GraphicsStates_.RasterizerState = vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, false, 0, true);
-    Viewport_ = { 0.0f, 0.0f };
+
+    RendererCommandList_.Initialize(vdl::InputLayoutType::eGUI, vdl::TopologyType::eTriangleList,
+      vdl::BlendState(false, false, { true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd }),
+      vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState),
+      vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, false, 0, true),
+      vdl::Sampler(vdl::AddressModeType::eWrap, vdl::AddressModeType::eWrap, vdl::AddressModeType::eWrap, vdl::FilterType::eMinMagMipLinear, 0, vdl::BorderColorType::eTransparent),
+      vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kVertexShader)), vdl::InputLayoutType::eGUI),
+      vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kPixelShader))));
+
+    RendererCommandList_.SetConstantBuffers<ShaderType::eVertexShader>(0, 1, &pConstantBuffer_->GetDetail());
   }
 }
 
@@ -735,6 +730,7 @@ void CGUI::Update()
 
   // Setup display size (every frame to accommodate for window resizing)
   io.DisplaySize = Cast(pWindow_->GetWindowSize());
+  RendererCommandList_.SetViewport({ 0.0f, 0.0f, io.DisplaySize.x, io.DisplaySize.y });
 
   // Setup time step
   io.DeltaTime = pSystem_->GetDeltaTime();
@@ -779,8 +775,6 @@ void CGUI::Update()
 
 void CGUI::Draw()
 {
-  //ImGui::ShowStyleEditor();
-
   ImGui::Render();
 
   ImDrawData* pDrawData = ImGui::GetDrawData();
@@ -798,11 +792,14 @@ void CGUI::Draw()
       VertexBufferSize_ < VertexSize)
     {
       VertexBuffer_ = VertexBuffer(VertexBufferSize_ = VertexSize);
+      RendererCommandList_.SetVertexBuffer(VertexBuffer_);
+
     }
     if (const vdl::uint IndexSize = static_cast<vdl::uint>(pDrawData->TotalIdxCount * sizeof(ImDrawIdx));
       IndexBufferSize_ < IndexSize)
     {
       IndexBuffer_ = IndexBuffer(IndexBufferSize_ = IndexSize, kIndexType);
+      RendererCommandList_.SetIndexBuffer(IndexBuffer_);
     }
   }
 
@@ -839,33 +836,7 @@ void CGUI::Draw()
     ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
   }
 
-  Viewport_.Size = { pDrawData->DisplaySize.x, pDrawData->DisplaySize.y };
-
-  pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eGUI);
-  pDeviceContext_->SetTopology(vdl::TopologyType::eTriangleList);
-  pDeviceContext_->SetVertexBuffer(VertexBuffer_);
-  pDeviceContext_->SetInstanceBuffer(InstanceBuffer_);
-  pDeviceContext_->SetIndexBuffer(IndexBuffer_);
-
-  pDeviceContext_->SetViewport(Viewport_);
   pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
-
-  pDeviceContext_->SetBlendState(GraphicsStates_.BlendState);
-  pDeviceContext_->SetDepthStencilState(GraphicsStates_.DepthStencilState);
-  pDeviceContext_->SetRasterizerState(GraphicsStates_.RasterizerState);
-
-  pDeviceContext_->VSSetShader(VertexShader_);
-  pDeviceContext_->VSSetConstantBuffers(0, 1, &pBufferManager_->CloneConstantBuffer(pConstantBuffer_->GetDetail()));
-
-  pDeviceContext_->HSSetShader(HullShader_);
-
-  pDeviceContext_->DSSetShader(DomainShader_);
-
-  pDeviceContext_->GSSetShader(GeometryShader_);
-
-  pDeviceContext_->PSSetShader(PixelShader_);
-  pDeviceContext_->PSSetSamplers(0, 1, &Sampler_);
-
   // Render command lists
   // (Because we merged all buffers into a single one, we maintain our own offset into them)
   int VertexOffset = 0;
@@ -890,24 +861,17 @@ void CGUI::Draw()
         ClipRect.y = vdl::Math::Max(ClipRect.y, 0.0f);
 
         // Apply scissor/clipping rectangle
-        {
-          Scissor_.LeftTop.x = static_cast<vdl::uint>(ClipRect.x);
-          Scissor_.LeftTop.y = static_cast<vdl::uint>(ClipRect.y);
-          Scissor_.Size.x = static_cast<vdl::uint>(ClipRect.z - ClipRect.x);
-          Scissor_.Size.y = static_cast<vdl::uint>(ClipRect.w - ClipRect.y);
-        }
-        pDeviceContext_->SetScissor(Scissor_);
-
-        pDeviceContext_->PSSetShaderResources(0, 1, &vdl::ShaderResource(Cmd.Texture));
+        RendererCommandList_.SetScissor({ static_cast<int>(ClipRect.x), static_cast<int>(ClipRect.y), static_cast<vdl::uint>(ClipRect.z - ClipRect.x), static_cast<vdl::uint>(ClipRect.w - ClipRect.y) });
 
         // Draw
-        pDeviceContext_->DrawIndexed(Cmd.ElemCount, 1, Cmd.IdxOffset + IndexOffset, Cmd.VtxOffset + VertexOffset, 0);
+        RendererCommandList_.SetDrawData(Cmd.Texture, { Cmd.ElemCount, 1, Cmd.IdxOffset + IndexOffset, Cmd.VtxOffset + VertexOffset, 0 });
       }
     }
 
     VertexOffset += pCmdList->VtxBuffer.Size;
     IndexOffset += pCmdList->IdxBuffer.Size;
   }
+  pDeviceContext_->Execute(RendererCommandList_);
 
-  pDeviceContext_->PSSetShaderResources(0, 1, &vdl::ShaderResource());
+  RendererCommandList_.Reset();
 }

@@ -21,37 +21,38 @@
 
 enum class RendererCommandFlag : vdl::uint32_t
 {
-  eDraw = 1 << 0,
-  eSetVertexBuffer = 1 << 1,
-  eSetInstanceBuffer = 1 << 2,
-  eSetIndexBuffer = 1 << 3,
-  eSetInputLayout = 1 << 4,
-  eSetTopology = 1 << 5,
-  eSetScissor = 1 << 6,
-  eSetViewport = 1 << 7,
-  eSetBlendState = 1 << 8,
-  eSetDepthStencilState = 1 << 9,
-  eSetRasterizerState = 1 << 10,
-  eSetVertexShader = 1 << 11,
-  eSetHullShader = 1 << 12,
-  eSetDomainShader = 1 << 13,
-  eSetGeometryShader = 1 << 14,
-  eSetPixelShader = 1 << 15,
-  eSetVertexStageShaderResource = 1 << 16,
-  eSetHullStageShaderResource = 1 << 17,
-  eSetDomainStageShaderResource = 1 << 18,
-  eSetGeometryStageShaderResource = 1 << 19,
-  eSetPixelStageShaderResource = 1 << 20,
-  eSetVertexStageSampler = 1 << 21,
-  eSetHullStageSampler = 1 << 22,
-  eSetDomainStageSampler = 1 << 23,
-  eSetGeometryStageSampler = 1 << 24,
-  eSetPixelStageSampler = 1 << 25,
-  eSetVertexStageConstantBuffer = 1 << 26,
-  eSetHullStageConstantBuffer = 1 << 27,
-  eSetDomainStageConstantBuffer = 1 << 28,
-  eSetGeometryStageConstantBuffer = 1 << 29,
-  eSetPixelStageConstantBuffer = 1 << 30,
+  eDraw = 1u << 0,
+  eDrawIndexed = 1u << 1,
+  eSetVertexBuffer = 1u << 2,
+  eSetInstanceBuffer = 1u << 3,
+  eSetIndexBuffer = 1u << 4,
+  eSetInputLayout = 1u << 5,
+  eSetTopology = 1u << 6,
+  eSetScissor = 1u << 7,
+  eSetViewport = 1u << 8,
+  eSetBlendState = 1u << 9,
+  eSetDepthStencilState = 1u << 10,
+  eSetRasterizerState = 1u << 11,
+  eSetVertexShader = 1u << 12,
+  eSetHullShader = 1u << 13,
+  eSetDomainShader = 1u << 14,
+  eSetGeometryShader = 1u << 15,
+  eSetPixelShader = 1u << 16,
+  eSetVertexStageShaderResource = 1u << 17,
+  eSetHullStageShaderResource = 1u << 18,
+  eSetDomainStageShaderResource = 1u << 19,
+  eSetGeometryStageShaderResource = 1u << 20,
+  eSetPixelStageShaderResource = 1u << 21,
+  eSetVertexStageSampler = 1u << 22,
+  eSetHullStageSampler = 1u << 23,
+  eSetDomainStageSampler = 1u << 24,
+  eSetGeometryStageSampler = 1u << 25,
+  eSetPixelStageSampler = 1u << 26,
+  eSetVertexStageConstantBuffer = 1u << 27,
+  eSetHullStageConstantBuffer = 1u << 28,
+  eSetDomainStageConstantBuffer = 1u << 29,
+  eSetGeometryStageConstantBuffer = 1u << 30,
+  eSetPixelStageConstantBuffer = 1u << 31,
 };
 using RendererCommandFlags = vdl::Flags<RendererCommandFlag, vdl::uint32_t>;
 
@@ -61,22 +62,39 @@ class IModelManager;
 struct DrawData
 {
   vdl::uint VertexCount;
+  vdl::uint InstanceCount;
+  vdl::uint FirstVertex;
+  vdl::uint FirstInstance;
+public:
+  DrawData() = default;
+
+  constexpr DrawData(vdl::uint _VertexCount, vdl::uint _InstanceCount, vdl::uint _FirstVertex, vdl::uint _FirstInstance)
+    : VertexCount(_VertexCount), InstanceCount(_InstanceCount), FirstVertex(_FirstVertex), FirstInstance(_FirstInstance) {}
 };
 struct DrawIndexedData
 {
-  vdl::uint FirstIndex;
   vdl::uint IndexCount;
+  vdl::uint InstanceCount;
+  vdl::uint FirstIndex;
+  vdl::uint VertexOffset;
+  vdl::uint FirstInstance;
+public:
+  DrawIndexedData() = default;
+
+  constexpr DrawIndexedData(vdl::uint _IndexCount, vdl::uint _InstanceCount, vdl::uint _FirstIndex, vdl::uint _VertexOffset, vdl::uint _FirstInstance)
+    : IndexCount(_IndexCount), InstanceCount(_InstanceCount), FirstIndex(_FirstIndex), VertexOffset(_VertexOffset), FirstInstance(_FirstInstance) {}
 };
 
 class BaseRendererCommandList
 {
-  using RendererCommandPair = std::pair<RendererCommandFlags, vdl::uint>;
+  using RendererCommandPair = std::pair<RendererCommandFlag, vdl::uint>;
   using RendererCommands = std::vector<RendererCommandPair>;
   using ShaderResources = std::vector<vdl::ShaderResource>;
   using Samplers = std::vector<vdl::Sampler>;
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
 protected:
   static constexpr RendererCommandFlags kDrawFlag = RendererCommandFlag::eDraw;
+  static constexpr RendererCommandFlags kDrawIndexedFlag = RendererCommandFlag::eDrawIndexed;
   static constexpr RendererCommandFlags kSetVertexBufferFlag = RendererCommandFlag::eSetVertexBuffer;
   static constexpr RendererCommandFlags kSetInstanceBufferFlag = RendererCommandFlag::eSetInstanceBuffer;
   static constexpr RendererCommandFlags kSetIndexBufferFlag = RendererCommandFlag::eSetIndexBuffer;
@@ -168,6 +186,8 @@ public:
 
   [[nodiscard]] virtual vdl::uint GetInstanceSize()const = 0;
 
+  [[nodiscard]] virtual const void* GetInstanceData(vdl::uint _Index)const = 0;
+
   [[nodiscard]] virtual const DrawData& GetDrawData(vdl::uint _Index)const = 0;
 
   [[nodiscard]] virtual const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const = 0;
@@ -234,9 +254,13 @@ public:
 
   template<ShaderType Type> [[nodiscard]] const ShaderResources& GetCurrentShaderResources()const { return CurrentShaderResources_[static_cast<vdl::uint>(Type)]; }
 
-  template<ShaderType Type> [[nodiscard]] const Samplers& GetCurrentSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(Type))]; }
+  template<ShaderType Type> [[nodiscard]] const Samplers& GetCurrentSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(Type)]; }
 
   template<ShaderType Type> [[nodiscard]] const ConstantBuffers& GetCurrentConstantBuffers()const { return CurrentConstantBuffers_[static_cast<vdl::uint>(Type)]; }
+
+  void SetVertexBuffer(const VertexBuffer& _VertexBuffer);
+
+  void SetIndexBuffer(const IndexBuffer& _IndexBuffer);
 
   void SetInputLayout(vdl::InputLayoutType _InputLayout);
 
@@ -269,6 +293,7 @@ public:
   template<ShaderType Type> void SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]);
 };
 
+//  メッシュ用コマンドリスト
 template<class DisplayObject, class InstanceData>
 class RendererCommandList : public BaseRendererCommandList
 {
@@ -278,11 +303,19 @@ private:
   std::vector<InstanceData> Instances_;
   std::vector<DrawIndexedData> DrawIndexedDatas_;
   std::unordered_map<vdl::ID, DisplayObject> ReservedDisplayObjects_;
+private:
+  void SetVertexBuffer(const VertexBuffer&);
+
+  void SetIndexBuffer(const IndexBuffer&);
+
+#pragma warning(disable:4172)
+  const DrawData& GetDrawData(vdl::uint)const override { assert(false); return {}; }
+#pragma warning(default:4172)
 public:
   RendererCommandList() = default;
 
-  void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
-    vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer);
+  void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
+    vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer);
 
   void Reset()override;
 
@@ -292,33 +325,12 @@ public:
 
   vdl::uint GetInstanceSize()const override { return static_cast<vdl::uint>(sizeof(InstanceData)); }
 
-  const DrawData& GetDrawData(vdl::uint _Index)const override { return {}; }
+  const void* GetInstanceData(vdl::uint _Index)const override { return &Instances_[_Index]; }
 
   const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const override { return DrawIndexedDatas_[_Index]; }
 };
 
-class RendererCommandList<std::nullptr_t, std::nullptr_t> : public BaseRendererCommandList
-{
-  std::vector<DrawData> DrawDatas_;
-public:
-  RendererCommandList() = default;
-
-  void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
-    vdl::Sampler&& _Sampler, InstanceBuffer&& _InstanceBuffer);
-
-  void Reset()override;
-
-  void SetDrawData(vdl::uint _VertexCount);
-
-  bool HasDrawCommand()const override { return !DrawDatas_.empty(); }
-
-  vdl::uint GetInstanceSize()const override { return 0; }
-
-  const DrawData& GetDrawData(vdl::uint _Index)const override { return DrawDatas_[_Index]; }
-
-  const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const override { return {}; }
-};
-
+//  テクスチャ用コマンドリスト
 template<class InstanceData>
 class RendererCommandList<vdl::Texture, InstanceData> : public BaseRendererCommandList
 {
@@ -326,6 +338,14 @@ class RendererCommandList<vdl::Texture, InstanceData> : public BaseRendererComma
   std::vector<InstanceData> Instances_;
   std::vector<DrawData> DrawDatas_;
   std::unordered_map<vdl::ID, vdl::Texture> ReservedTextures_;
+private:
+  void SetVertexBuffer(const VertexBuffer&);
+
+  void SetIndexBuffer(const IndexBuffer&);
+
+#pragma warning(disable:4172)
+  const DrawIndexedData& GetDrawIndexedData(vdl::uint)const override { assert(false); return {}; }
+#pragma warning(default:4172)
 public:
   RendererCommandList() = default;
 
@@ -340,9 +360,71 @@ public:
 
   vdl::uint GetInstanceSize()const override { return static_cast<vdl::uint>(sizeof(InstanceData)); }
 
-  const DrawData& GetDrawData(vdl::uint _Index)const override { return DrawDatas_[_Index]; }
+  const void* GetInstanceData(vdl::uint _Index)const override { return &Instances_[_Index]; }
 
-  const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const override { return {}; }
+  const DrawData& GetDrawData(vdl::uint _Index)const override { return DrawDatas_[_Index]; }
+};
+
+//  GUI用コマンドリスト
+template<>
+class RendererCommandList<vdl::Texture, std::nullptr_t> : public BaseRendererCommandList
+{
+  std::vector<vdl::ID> DisplayObjectIDs_;
+  std::vector<DrawIndexedData> DrawIndexedDatas_;
+  std::unordered_map<vdl::ID, vdl::Texture> ReservedTextures_;
+private:
+  vdl::uint GetInstanceSize()const override { return 0; }
+
+  const void* GetInstanceData(vdl::uint)const override { return nullptr; }
+
+#pragma warning(disable:4172)
+  const DrawData& GetDrawData(vdl::uint)const override { assert(false); return {}; }
+#pragma warning(default:4172)
+public:
+  RendererCommandList() = default;
+
+  void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
+    vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader);
+
+  void Reset()override;
+
+  void SetDrawData(const vdl::Texture& _Texture, DrawIndexedData&& _DrawIndexedData);
+
+  bool HasDrawCommand()const override { return !DrawIndexedDatas_.empty(); }
+
+  const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const override { return DrawIndexedDatas_[_Index]; }
+};
+
+//  頂点バッファ&インスタンスバッファ無し用コマンドリスト
+template<>
+class RendererCommandList<std::nullptr_t, std::nullptr_t> : public BaseRendererCommandList
+{
+  std::vector<DrawData> DrawDatas_;
+private:
+  void SetVertexBuffer(const VertexBuffer&);
+
+  void SetIndexBuffer(const IndexBuffer&);
+
+  vdl::uint GetInstanceSize()const override { return 0; }
+
+  const void* GetInstanceData(vdl::uint)const override { return nullptr; }
+
+#pragma warning(disable:4172)
+  const DrawIndexedData& GetDrawIndexedData(vdl::uint)const override { assert(false); return {}; }
+#pragma warning(default:4172)
+public:
+  RendererCommandList() = default;
+
+  void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
+    vdl::Sampler&& _Sampler);
+
+  void Reset()override;
+
+  void SetDrawData(DrawData&& _DrawData);
+
+  bool HasDrawCommand()const override { return !DrawDatas_.empty(); }
+
+  const DrawData& GetDrawData(vdl::uint _Index)const override { return DrawDatas_[_Index]; }
 };
 
 #include "RendererCommandList.inl"

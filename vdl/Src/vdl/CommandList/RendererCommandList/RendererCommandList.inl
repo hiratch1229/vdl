@@ -10,6 +10,16 @@ if (Current##StateName##_ == _##StateName)\
 \
 RendererCommandFlags_ |= kSet##StateName##Flag;\
 Current##StateName##_ = _##StateName;
+inline void BaseRendererCommandList::SetVertexBuffer(const VertexBuffer& _VertexBuffer)
+{
+  SetState(VertexBuffer)
+}
+
+inline void BaseRendererCommandList::SetIndexBuffer(const IndexBuffer& _IndexBuffer)
+{
+  SetState(IndexBuffer)
+}
+
 inline void BaseRendererCommandList::SetInputLayout(vdl::InputLayoutType _InputLayout)
 {
   SetState(InputLayout)
@@ -77,9 +87,9 @@ constexpr RendererCommandFlags kSet##StateName##Flag = kSetVertexStage##StateNam
 StateName##s& Current##StateName##s = Current##StateName##s_[static_cast<vdl::uint>(Type)];\
 \
 if (const vdl::uint RequiredSize = _StartSlot + _##StateName##Num;\
-Current##StateName##s_.size() < RequiredSize)\
+Current##StateName##s.size() < RequiredSize)\
 {\
-  Current##StateName##s_.resize(static_cast<size_t>(RequiredSize));\
+  Current##StateName##s.resize(static_cast<size_t>(RequiredSize));\
   RendererCommandFlags_ |= kSet##StateName##Flag;\
 }\
 \
@@ -116,7 +126,7 @@ inline void BaseRendererCommandList::SetConstantBuffers(vdl::uint _StartSlot, vd
 #undef SetShaderState
 
 template<ShaderType Type>
-void BaseRendererCommandList::UpdateAndSetConstantBuffer()
+inline void BaseRendererCommandList::UpdateAndSetConstantBuffer()
 {
   constexpr RendererCommandFlags kSetConstantBufferFlag = kSetVertexStageConstantBufferFlag << static_cast<vdl::uint>(Type);
 
@@ -171,7 +181,7 @@ void BaseRendererCommandList::UpdateAndSetConstantBuffer()
 
   if (RendererCommandFlags_ & kSetConstantBufferFlag)
   {
-    RendererCommands_.emplace_back(kSetConstantBufferFlag, static_cast<vdl::uint>(ConstantBuffers.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetConstantBufferFlag)), static_cast<vdl::uint>(ConstantBuffers.size()));
     PreviousConstantBuffers = CurrentConstantBuffers;
     ConstantBuffers.emplace_back(std::move(TempConstantBuffers));
     RendererCommandFlags_ &= ~kSetConstantBufferFlag;
@@ -179,7 +189,7 @@ void BaseRendererCommandList::UpdateAndSetConstantBuffer()
 }
 
 template<ShaderType Type>
-void BaseRendererCommandList::SetShaderObjects()
+inline void BaseRendererCommandList::SetShaderObjects()
 {
   //  SetShaderResource
   {
@@ -188,7 +198,7 @@ void BaseRendererCommandList::SetShaderObjects()
     {
       auto& ShaderResources = ShaderResources_[static_cast<vdl::uint>(Type)];
 
-      RendererCommands_.emplace_back(kSetShaderResourceFlag, static_cast<vdl::uint>(ShaderResources.size()));
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetShaderResourceFlag)), static_cast<vdl::uint>(ShaderResources.size()));
       ShaderResources.push_back(CurrentShaderResources_[static_cast<vdl::uint>(Type)]);
 
       RendererCommandFlags_ &= ~kSetShaderResourceFlag;
@@ -202,7 +212,7 @@ void BaseRendererCommandList::SetShaderObjects()
     {
       auto& Sampler = Samplers_[static_cast<vdl::uint>(Type)];
 
-      RendererCommands_.emplace_back(kSetSamplerFlag, static_cast<vdl::uint>(Sampler.size()));
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetSamplerFlag)), static_cast<vdl::uint>(Sampler.size()));
       Sampler.push_back(CurrentSamplers_[static_cast<vdl::uint>(Type)]);
 
       RendererCommandFlags_ &= ~kSetSamplerFlag;
@@ -212,11 +222,11 @@ void BaseRendererCommandList::SetShaderObjects()
   UpdateAndSetConstantBuffer<Type>();
 }
 
-void BaseRendererCommandList::PushRendererCommand()
+inline void BaseRendererCommandList::PushRendererCommand()
 {
   if (RendererCommandFlags_ & kSetInputLayoutFlag)
   {
-    RendererCommands_.emplace_back(kSetInputLayoutFlag, static_cast<vdl::uint>(InputLayouts_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetInputLayoutFlag)), static_cast<vdl::uint>(InputLayouts_.size()));
     InputLayouts_.push_back(CurrentInputLayout_);
 
     RendererCommandFlags_ &= ~kSetInputLayoutFlag;
@@ -224,7 +234,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetTopologyFlag)
   {
-    RendererCommands_.emplace_back(kSetTopologyFlag, static_cast<vdl::uint>(Topologys_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetTopologyFlag)), static_cast<vdl::uint>(Topologys_.size()));
     Topologys_.push_back(CurrentTopology_);
 
     RendererCommandFlags_ &= ~kSetTopologyFlag;
@@ -232,7 +242,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetScissorFlag)
   {
-    RendererCommands_.emplace_back(kSetScissorFlag, static_cast<vdl::uint>(Scissors_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetScissorFlag)), static_cast<vdl::uint>(Scissors_.size()));
     Scissors_.push_back(CurrentScissor_);
 
     RendererCommandFlags_ &= ~kSetScissorFlag;
@@ -240,7 +250,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetViewportFlag)
   {
-    RendererCommands_.emplace_back(kSetViewportFlag, static_cast<vdl::uint>(Viewports_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetViewportFlag)), static_cast<vdl::uint>(Viewports_.size()));
     Viewports_.push_back(CurrentViewport_);
 
     RendererCommandFlags_ &= ~kSetViewportFlag;
@@ -248,7 +258,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetBlendStateFlag)
   {
-    RendererCommands_.emplace_back(kSetBlendStateFlag, static_cast<vdl::uint>(BlendStates_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetBlendStateFlag)), static_cast<vdl::uint>(BlendStates_.size()));
     BlendStates_.push_back(CurrentBlendState_);
 
     RendererCommandFlags_ &= ~kSetBlendStateFlag;
@@ -256,7 +266,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetDepthStencilStateFlag)
   {
-    RendererCommands_.emplace_back(kSetDepthStencilStateFlag, static_cast<vdl::uint>(DepthStencilStates_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetDepthStencilStateFlag)), static_cast<vdl::uint>(DepthStencilStates_.size()));
     DepthStencilStates_.push_back(CurrentDepthStencilState_);
 
     RendererCommandFlags_ &= ~kSetDepthStencilStateFlag;
@@ -264,7 +274,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetRasterizerStateFlag)
   {
-    RendererCommands_.emplace_back(kSetRasterizerStateFlag, static_cast<vdl::uint>(RasterizerStates_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetRasterizerStateFlag)), static_cast<vdl::uint>(RasterizerStates_.size()));
     RasterizerStates_.push_back(CurrentRasterizerState_);
 
     RendererCommandFlags_ &= ~kSetRasterizerStateFlag;
@@ -272,7 +282,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetVertexShaderFlag)
   {
-    RendererCommands_.emplace_back(kSetVertexShaderFlag, static_cast<vdl::uint>(VertexShaders_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetVertexShaderFlag)), static_cast<vdl::uint>(VertexShaders_.size()));
     VertexShaders_.push_back(CurrentVertexShader_);
 
     RendererCommandFlags_ &= ~kSetVertexShaderFlag;
@@ -280,7 +290,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetHullShaderFlag)
   {
-    RendererCommands_.emplace_back(kSetHullShaderFlag, static_cast<vdl::uint>(HullShaders_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetHullShaderFlag)), static_cast<vdl::uint>(HullShaders_.size()));
     HullShaders_.push_back(CurrentHullShader_);
 
     RendererCommandFlags_ &= ~kSetHullShaderFlag;
@@ -288,7 +298,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetDomainShaderFlag)
   {
-    RendererCommands_.emplace_back(kSetDomainShaderFlag, static_cast<vdl::uint>(DomainShaders_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetDomainShaderFlag)), static_cast<vdl::uint>(DomainShaders_.size()));
     DomainShaders_.push_back(CurrentDomainShader_);
 
     RendererCommandFlags_ &= ~kSetDomainShaderFlag;
@@ -296,7 +306,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetGeometryShaderFlag)
   {
-    RendererCommands_.emplace_back(kSetGeometryShaderFlag, static_cast<vdl::uint>(GeometryShaders_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetGeometryShaderFlag)), static_cast<vdl::uint>(GeometryShaders_.size()));
     GeometryShaders_.push_back(CurrentGeometryShader_);
 
     RendererCommandFlags_ &= ~kSetGeometryShaderFlag;
@@ -304,7 +314,7 @@ void BaseRendererCommandList::PushRendererCommand()
 
   if (RendererCommandFlags_ & kSetPixelShaderFlag)
   {
-    RendererCommands_.emplace_back(kSetPixelShaderFlag, static_cast<vdl::uint>(PixelShaders_.size()));
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetPixelShaderFlag)), static_cast<vdl::uint>(PixelShaders_.size()));
     PixelShaders_.push_back(CurrentPixelShader_);
 
     RendererCommandFlags_ &= ~kSetPixelShaderFlag;
@@ -339,8 +349,8 @@ void BaseRendererCommandList::PushRendererCommand()
 //--------------------------------------------------
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
-  vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer)
+inline void RendererCommandList<DisplayObject, InstanceData>::Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
+  vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer)
 {
   pBufferManager_ = Engine::Get<IBufferManager>();
   pModelManager_ = Engine::Get<IModelManager>();
@@ -371,7 +381,7 @@ void RendererCommandList<DisplayObject, InstanceData>::Initialize(vdl::InputLayo
 }
 
 template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::Reset()
+inline void RendererCommandList<DisplayObject, InstanceData>::Reset()
 {
   RendererCommands_.clear();
   RendererCommandFlags_ = 0;
@@ -380,184 +390,11 @@ void RendererCommandList<DisplayObject, InstanceData>::Reset()
   DrawIndexedDatas_.clear();
   ReservedDisplayObjects_.clear();
 
+  CurrentVertexBuffer_ = VertexBuffer();
+  CurrentIndexBuffer_ = IndexBuffer();
   VertexBuffers_.clear();
   IndexBuffers_.clear();
-  RendererCommandFlags_ |= kSetIndexBufferFlag;
-
-  if (Topologys_.size() > 1)
-  {
-    Topologys_ = { std::move(Topologys_.back()) };
-  }
-  RendererCommandFlags_ |= kSetTopologyFlag;
-
-  if (Scissors_.size() > 1)
-  {
-    Scissors_ = { std::move(Scissors_.back()) };
-  }
-  RendererCommandFlags_ |= kSetScissorFlag;
-
-  if (Viewports_.size() > 1)
-  {
-    Viewports_ = { std::move(Viewports_.back()) };
-  }
-  RendererCommandFlags_ |= kSetViewportFlag;
-
-  if (BlendStates_.size() > 1)
-  {
-    BlendStates_ = { std::move(BlendStates_.back()) };
-  }
-  RendererCommandFlags_ |= kSetBlendStateFlag;
-
-  if (DepthStencilStates_.size() > 1)
-  {
-    DepthStencilStates_ = { std::move(DepthStencilStates_.back()) };
-  }
-  RendererCommandFlags_ |= kSetDepthStencilFlag;
-
-  if (RasterizerStates_.size() > 1)
-  {
-    RasterizerStates_ = { std::move(RasterizerStates_.back()) };
-  }
-  RendererCommandFlags_ |= kSetRasterizerStateFlag;
-
-  if (VertexShaders_.size() > 1)
-  {
-    VertexShaders_ = { std::move(VertexShaders_.back()) };
-  }
-  RendererCommandFlags_ |= kSetVertexShaderFlag;
-
-  if (HullShaders_.size() > 1)
-  {
-    HullShaders_ = { std::move(HullShaders_.back()) };
-  }
-  RendererCommandFlags_ |= kSetHullShaderFlag;
-
-  if (DomainShaders_.size() > 1)
-  {
-    DomainShaders_ = { std::move(DomainShaders_.back()) };
-  }
-  RendererCommandFlags_ |= kSetDomainShaderFlag;
-
-  if (GeometryShaders_.size() > 1)
-  {
-    GeometryShaders_ = { std::move(GeometryShaders_.back()) };
-  }
-  RendererCommandFlags_ |= kSetGeometryShaderFlag;
-
-  if (PixelShaders_.size() > 1)
-  {
-    PixelShaders_ = { std::move(PixelShaders_.back()) };
-  }
-  RendererCommandFlags_ |= kSetPixelShaderFlag;
-
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
-  {
-    auto& ShaderResources = ShaderResources_[ShaderTypeCount];
-
-    if (ShaderResources.size() > 1)
-    {
-      ShaderResources = { std::move(ShaderResources.back()) };
-    }
-    RendererCommandFlags_ |= kSetVertexStageShaderResourceFlag << ShaderTypeCount;
-  }
-
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
-  {
-    auto& Samplers = Samplers_[ShaderTypeCount];
-
-    if (Samplers.size() > 1)
-    {
-      Samplers = { std::move(Samplers.back()) };
-    }
-    RendererCommandFlags_ |= kSetVertexStageSamplerFlag << ShaderTypeCount;
-  }
-
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
-  {
-    auto& ConstantBuffers = ConstantBuffers_[ShaderTypeCount];
-
-    if (ConstantBuffers.size() > 1)
-    {
-      ConstantBuffers = { std::move(ConstantBuffers.back()) };
-    }
-    RendererCommandFlags_ |= kSetVertexStageConstantBufferFlag << ShaderTypeCount;
-  }
-}
-
-template<class DisplayObject, class InstanceData>
-void RendererCommandList<DisplayObject, InstanceData>::SetDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData)
-{
-  PushRendererCommand();
-
-  //  Draw
-  {
-    const vdl::ID DiplayObjectID = _DisplayObject.GetID();
-
-    const Mesh* pMesh = pModelManager_->GetMesh(DiplayObjectID);
-    if (CurrentVertexBuffer_ != pMesh->VertexBuffer)
-    {
-      RendererCommands_.emplace_back(kSetVertexBufferFlag, static_cast<vdl::uint>(VertexBuffers_.size()));
-      VertexBuffers_.push_back(CurrentVertexBuffer_ = pMesh->VertexBuffer);
-    }
-    if (CurrentIndexBuffer_ != pMesh->IndexBuffer)
-    {
-      RendererCommands_.emplace_back(kSetIndexBufferFlag, static_cast<vdl::uint>(IndexBuffers_.size()));
-      IndexBuffers_.push_back(CurrentIndexBuffer_ = pMesh->IndexBuffer);
-    }
-
-    if (ReservedDisplayObjects_.find(DiplayObjectID) == ReservedDisplayObjects_.end())
-    {
-      ReservedDisplayObjects_.insert(std::make_pair(DiplayObjectID, _DisplayObject));
-    }
-
-    RendererCommands_.emplace_back(kDrawFlag, static_cast<vdl::uint>(Instances_.size()));
-    DrawIndexedDatas_.emplace_back(pMesh->FirstIndex, pMesh->IndexCount);
-    DisplayObjectIDs_.push_back(DiplayObjectID);
-    Instances_.emplace_back(std::move(_InstanceData));
-  }
-}
-
-//--------------------------------------------------
-
-void RendererCommandList<std::nullptr_t, std::nullptr_t>::Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
-  vdl::Sampler&& _Sampler, InstanceBuffer&& _InstanceBuffer)
-{
-  pBufferManager_ = Engine::Get<IBufferManager>();
-
-  InstanceBuffer_ = std::move(_InstanceBuffer);
-  InputLayouts_.push_back(CurrentInputLayout_ = std::move(_InputLayout));
-  Topologys_.push_back(CurrentTopology_ = std::move(_Topology));
-  Scissors_.push_back(CurrentScissor_ = vdl::Scissor());
-  Viewports_.push_back(CurrentViewport_ = vdl::Viewport());
-  BlendStates_.push_back(CurrentBlendState_ = std::move(_BlendState));
-  DepthStencilStates_.push_back(CurrentDepthStencilState_ = std::move(_DepthStencilState));
-  RasterizerStates_.push_back(CurrentRasterizerState_ = std::move(_RasterizerState));
-  VertexShaders_.push_back(CurrentVertexShader_ = vdl::VertexShader());
-  PixelShaders_.push_back(CurrentPixelShader_ = vdl::PixelShader());
-  HullShaders_.push_back(CurrentHullShader_ = vdl::HullShader());
-  DomainShaders_.push_back(CurrentDomainShader_ = vdl::DomainShader());
-  GeometryShaders_.push_back(CurrentGeometryShader_ = vdl::GeometryShader());
-
-  for (auto& ShaderResources : ShaderResources_) { ShaderResources.resize(1); }
-  for (auto& Samplers : Samplers_) { Samplers.resize(1); }
-  for (auto& ConstantBuffers : ConstantBuffers_) { ConstantBuffers.resize(1); }
-
-  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0].resize(1);
-  CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)].resize(1);
-  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0][0] = CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0] = std::move(_Sampler);
-
-  Reset();
-}
-
-void RendererCommandList<std::nullptr_t, std::nullptr_t>::Reset()
-{
-  RendererCommands_.clear();
-  RendererCommandFlags_ = 0;
-  DrawDatas_.clear();
-
   RendererCommandFlags_ |= kSetInstanceBufferFlag;
-  VertexBuffers_.clear();
-  IndexBuffers_.clear();
 
   if (Topologys_.size() > 1)
   {
@@ -659,21 +496,53 @@ void RendererCommandList<std::nullptr_t, std::nullptr_t>::Reset()
   }
 }
 
-void RendererCommandList<std::nullptr_t, std::nullptr_t>::SetDrawData(vdl::uint _VertexCount)
+template<class DisplayObject, class InstanceData>
+inline void RendererCommandList<DisplayObject, InstanceData>::SetDrawData(const DisplayObject& _DisplayObject, InstanceData&& _InstanceData)
 {
+  const vdl::ID DiplayObjectID = _DisplayObject.GetID();
+
+  const Mesh* pMesh = pModelManager_->GetMesh(DiplayObjectID);
+  SetShaderResources<ShaderType::ePixelShader>(0, 1, &vdl::ShaderResource(pMesh->Material.Diffuse));
+  SetShaderResources<ShaderType::ePixelShader>(1, 1, &vdl::ShaderResource(pMesh->Material.NormalMap));
+
   PushRendererCommand();
 
   //  Draw
   {
-    RendererCommands_.emplace_back(kDrawFlag, static_cast<vdl::uint>(DrawDatas_.size()));
-    DrawDatas_.emplace_back(_VertexCount);
+    //  InstanceBufferÇÃê›íË
+    if (RendererCommandFlags_ & kSetInstanceBufferFlag)
+    {
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetInstanceBufferFlag)), 0);
+      RendererCommandFlags_ &= ~kSetInstanceBufferFlag;
+    }
+
+    if (CurrentVertexBuffer_ != pMesh->VertexBuffer)
+    {
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetVertexBufferFlag)), static_cast<vdl::uint>(VertexBuffers_.size()));
+      VertexBuffers_.push_back(CurrentVertexBuffer_ = pMesh->VertexBuffer);
+    }
+    if (CurrentIndexBuffer_ != pMesh->IndexBuffer)
+    {
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetIndexBufferFlag)), static_cast<vdl::uint>(IndexBuffers_.size()));
+      IndexBuffers_.push_back(CurrentIndexBuffer_ = pMesh->IndexBuffer);
+    }
+
+    if (ReservedDisplayObjects_.find(DiplayObjectID) == ReservedDisplayObjects_.end())
+    {
+      ReservedDisplayObjects_.insert(std::make_pair(DiplayObjectID, _DisplayObject));
+    }
+
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kDrawIndexedFlag)), static_cast<vdl::uint>(Instances_.size()));
+    DrawIndexedDatas_.emplace_back(pMesh->IndexCount, 1, pMesh->IndexStart, 0, 0);
+    DisplayObjectIDs_.push_back(DiplayObjectID);
+    Instances_.emplace_back(std::move(_InstanceData));
   }
 }
 
 //--------------------------------------------------
 
 template<class InstanceData>
-void RendererCommandList<vdl::Texture, InstanceData>::Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
+inline void RendererCommandList<vdl::Texture, InstanceData>::Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
   vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, VertexBuffer&& _VertexBuffer, InstanceBuffer&& _InstanceBuffer)
 {
   pBufferManager_ = Engine::Get<IBufferManager>();
@@ -705,20 +574,24 @@ void RendererCommandList<vdl::Texture, InstanceData>::Initialize(vdl::InputLayou
 }
 
 template<class InstanceData>
-void RendererCommandList<vdl::Texture, InstanceData>::Reset()
+inline void RendererCommandList<vdl::Texture, InstanceData>::Reset()
 {
   RendererCommands_.clear();
   RendererCommandFlags_ = 0;
   DisplayObjectIDs_.clear();
   Instances_.clear();
   DrawDatas_.clear();
-  ReservedDisplayObjects_.clear();
+  ReservedTextures_.clear();
 
   RendererCommandFlags_ |= kSetInstanceBufferFlag;
   VertexBuffers_.clear();
   RendererCommandFlags_ |= kSetVertexBufferFlag;
-  IndexBuffers_.clear();
-  RendererCommandFlags_ |= kSetIndexBufferFlag;
+
+  if (InputLayouts_.size() > 1)
+  {
+    InputLayouts_ = { std::move(InputLayouts_.back()) };
+  }
+  RendererCommandFlags_ |= kSetInputLayoutFlag;
 
   if (Topologys_.size() > 1)
   {
@@ -748,7 +621,7 @@ void RendererCommandList<vdl::Texture, InstanceData>::Reset()
   {
     DepthStencilStates_ = { std::move(DepthStencilStates_.back()) };
   }
-  RendererCommandFlags_ |= kSetDepthStencilFlag;
+  RendererCommandFlags_ |= kSetDepthStencilStateFlag;
 
   if (RasterizerStates_.size() > 1)
   {
@@ -821,29 +694,388 @@ void RendererCommandList<vdl::Texture, InstanceData>::Reset()
 }
 
 template<class InstanceData>
-void RendererCommandList<vdl::Texture, InstanceData>::SetDrawData(const vdl::Texture& _Texture, InstanceData&& _InstanceData)
+inline void RendererCommandList<vdl::Texture, InstanceData>::SetDrawData(const vdl::Texture& _Texture, InstanceData&& _InstanceData)
 {
+  SetShaderResources<ShaderType::ePixelShader>(0, 1, &vdl::ShaderResource(_Texture));
+
+  PushRendererCommand();
+
+  //  Draw
+  {
+    //  VertexBufferÇÃê›íË
+    if (RendererCommandFlags_ & kSetVertexBufferFlag)
+    {
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetVertexBufferFlag)), static_cast<vdl::uint>(VertexBuffers_.size()));
+      VertexBuffers_.push_back(CurrentVertexBuffer_);
+      RendererCommandFlags_ &= ~kSetVertexBufferFlag;
+    }
+    //  InstanceBufferÇÃê›íË
+    if (RendererCommandFlags_ & kSetInstanceBufferFlag)
+    {
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetInstanceBufferFlag)), 0);
+      RendererCommandFlags_ &= ~kSetInstanceBufferFlag;
+    }
+
+    const vdl::ID DiplayObjectID = _Texture.GetID();
+
+    if (ReservedTextures_.find(DiplayObjectID) == ReservedTextures_.end())
+    {
+      ReservedTextures_.insert(std::make_pair(DiplayObjectID, _Texture));
+    }
+
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kDrawFlag)), static_cast<vdl::uint>(Instances_.size()));
+    DrawDatas_.emplace_back(4, 1, 0, 0);
+    DisplayObjectIDs_.push_back(DiplayObjectID);
+    Instances_.emplace_back(std::move(_InstanceData));
+  }
+}
+
+//--------------------------------------------------
+
+inline void RendererCommandList<vdl::Texture, std::nullptr_t>::Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
+  vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader)
+{
+  pBufferManager_ = Engine::Get<IBufferManager>();
+
+  InputLayouts_.push_back(CurrentInputLayout_ = std::move(_InputLayout));
+  Topologys_.push_back(CurrentTopology_ = std::move(_Topology));
+  Scissors_.push_back(CurrentScissor_ = vdl::Scissor());
+  Viewports_.push_back(CurrentViewport_ = vdl::Viewport());
+  BlendStates_.push_back(CurrentBlendState_ = std::move(_BlendState));
+  DepthStencilStates_.push_back(CurrentDepthStencilState_ = std::move(_DepthStencilState));
+  RasterizerStates_.push_back(CurrentRasterizerState_ = std::move(_RasterizerState));
+  VertexShaders_.push_back(CurrentVertexShader_ = std::move(_VertexShader));
+  PixelShaders_.push_back(CurrentPixelShader_ = std::move(_PixelShader));
+  HullShaders_.push_back(CurrentHullShader_ = vdl::HullShader());
+  DomainShaders_.push_back(CurrentDomainShader_ = vdl::DomainShader());
+  GeometryShaders_.push_back(CurrentGeometryShader_ = vdl::GeometryShader());
+
+  for (auto& ShaderResources : ShaderResources_) { ShaderResources.resize(1); }
+  for (auto& Samplers : Samplers_) { Samplers.resize(1); }
+  for (auto& ConstantBuffers : ConstantBuffers_) { ConstantBuffers.resize(1); }
+
+  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0].resize(1);
+  CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)].resize(1);
+  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0][0] = CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0] = std::move(_Sampler);
+
+  Reset();
+}
+
+inline void RendererCommandList<vdl::Texture, std::nullptr_t>::Reset()
+{
+  RendererCommands_.clear();
+  RendererCommandFlags_ = 0;
+  DrawIndexedDatas_.clear();
+  ReservedTextures_.clear();
+
+  if (VertexBuffers_.size() > 1)
+  {
+    VertexBuffers_ = { std::move(VertexBuffers_.back()) };
+  }
+  RendererCommandFlags_ |= kSetVertexBufferFlag;
+
+  if (IndexBuffers_.size() > 1)
+  {
+    IndexBuffers_ = { std::move(IndexBuffers_.back()) };
+  }
+  RendererCommandFlags_ |= kSetIndexBufferFlag;
+
+  if (InputLayouts_.size() > 1)
+  {
+    InputLayouts_ = { std::move(InputLayouts_.back()) };
+  }
+  RendererCommandFlags_ |= kSetInputLayoutFlag;
+
+  if (Topologys_.size() > 1)
+  {
+    Topologys_ = { std::move(Topologys_.back()) };
+  }
+  RendererCommandFlags_ |= kSetTopologyFlag;
+
+  if (Scissors_.size() > 1)
+  {
+    Scissors_ = { std::move(Scissors_.back()) };
+  }
+  RendererCommandFlags_ |= kSetScissorFlag;
+
+  if (Viewports_.size() > 1)
+  {
+    Viewports_ = { std::move(Viewports_.back()) };
+  }
+  RendererCommandFlags_ |= kSetViewportFlag;
+
+  if (BlendStates_.size() > 1)
+  {
+    BlendStates_ = { std::move(BlendStates_.back()) };
+  }
+  RendererCommandFlags_ |= kSetBlendStateFlag;
+
+  if (DepthStencilStates_.size() > 1)
+  {
+    DepthStencilStates_ = { std::move(DepthStencilStates_.back()) };
+  }
+  RendererCommandFlags_ |= kSetDepthStencilStateFlag;
+
+  if (RasterizerStates_.size() > 1)
+  {
+    RasterizerStates_ = { std::move(RasterizerStates_.back()) };
+  }
+  RendererCommandFlags_ |= kSetRasterizerStateFlag;
+
+  if (VertexShaders_.size() > 1)
+  {
+    VertexShaders_ = { std::move(VertexShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetVertexShaderFlag;
+
+  if (HullShaders_.size() > 1)
+  {
+    HullShaders_ = { std::move(HullShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetHullShaderFlag;
+
+  if (DomainShaders_.size() > 1)
+  {
+    DomainShaders_ = { std::move(DomainShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetDomainShaderFlag;
+
+  if (GeometryShaders_.size() > 1)
+  {
+    GeometryShaders_ = { std::move(GeometryShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetGeometryShaderFlag;
+
+  if (PixelShaders_.size() > 1)
+  {
+    PixelShaders_ = { std::move(PixelShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetPixelShaderFlag;
+
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  {
+    auto& ShaderResources = ShaderResources_[ShaderTypeCount];
+
+    if (ShaderResources.size() > 1)
+    {
+      ShaderResources = { std::move(ShaderResources.back()) };
+    }
+    RendererCommandFlags_ |= kSetVertexStageShaderResourceFlag << ShaderTypeCount;
+  }
+
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  {
+    auto& Samplers = Samplers_[ShaderTypeCount];
+
+    if (Samplers.size() > 1)
+    {
+      Samplers = { std::move(Samplers.back()) };
+    }
+    RendererCommandFlags_ |= kSetVertexStageSamplerFlag << ShaderTypeCount;
+  }
+
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  {
+    auto& ConstantBuffers = ConstantBuffers_[ShaderTypeCount];
+
+    if (ConstantBuffers.size() > 1)
+    {
+      ConstantBuffers = { std::move(ConstantBuffers.back()) };
+    }
+    RendererCommandFlags_ |= kSetVertexStageConstantBufferFlag << ShaderTypeCount;
+  }
+}
+
+inline void RendererCommandList<vdl::Texture, std::nullptr_t>::SetDrawData(const vdl::Texture& _Texture, DrawIndexedData&& _DrawIndexedData)
+{
+  SetShaderResources<ShaderType::ePixelShader>(0, 1, &vdl::ShaderResource(_Texture));
+
   PushRendererCommand();
 
   //  Draw
   {
     if (RendererCommandFlags_ & kSetVertexBufferFlag)
     {
-      RendererCommands_.emplace_back(kSetVertexBufferFlag, static_cast<vdl::uint>(VertexBuffers_.size()));
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetVertexBufferFlag)), static_cast<vdl::uint>(VertexBuffers_.size()));
       VertexBuffers_.push_back(CurrentVertexBuffer_);
-      RendererCommandFlags_ &= | kSetVertexBufferFlag;
+
+      RendererCommandFlags_ &= ~kSetVertexBufferFlag;
     }
 
-    const vdl::ID DiplayObjectID = _DisplayObject.GetID();
-
-    if (ReservedDisplayObjects_.find(DiplayObjectID) == ReservedDisplayObjects_.end())
+    if (RendererCommandFlags_ & kSetIndexBufferFlag)
     {
-      ReservedDisplayObjects_.insert(std::make_pair(DiplayObjectID, _DisplayObject));
+      RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kSetIndexBufferFlag)), static_cast<vdl::uint>(IndexBuffers_.size()));
+      IndexBuffers_.push_back(CurrentIndexBuffer_);
+
+      RendererCommandFlags_ &= ~kSetTopologyFlag;
     }
 
-    RendererCommands_.emplace_back(kDrawFlag, static_cast<vdl::uint>(Instances_.size()));
-    DrawDatas_.emplace_back(4);
+    const vdl::ID DiplayObjectID = _Texture.GetID();
+
+    if (ReservedTextures_.find(DiplayObjectID) == ReservedTextures_.end())
+    {
+      ReservedTextures_.insert(std::make_pair(DiplayObjectID, _Texture));
+    }
     DisplayObjectIDs_.push_back(DiplayObjectID);
-    Instances_.emplace_back(std::move(_InstanceData));
+
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kDrawIndexedFlag)), static_cast<vdl::uint>(DrawIndexedDatas_.size()));
+    DrawIndexedDatas_.emplace_back(std::move(_DrawIndexedData));
+  }
+}
+
+//--------------------------------------------------
+
+inline void RendererCommandList<std::nullptr_t, std::nullptr_t>::Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
+  vdl::Sampler&& _Sampler)
+{
+  pBufferManager_ = Engine::Get<IBufferManager>();
+
+  InputLayouts_.push_back(CurrentInputLayout_ = std::move(_InputLayout));
+  Topologys_.push_back(CurrentTopology_ = std::move(_Topology));
+  Scissors_.push_back(CurrentScissor_ = vdl::Scissor());
+  Viewports_.push_back(CurrentViewport_ = vdl::Viewport());
+  BlendStates_.push_back(CurrentBlendState_ = std::move(_BlendState));
+  DepthStencilStates_.push_back(CurrentDepthStencilState_ = std::move(_DepthStencilState));
+  RasterizerStates_.push_back(CurrentRasterizerState_ = std::move(_RasterizerState));
+  VertexShaders_.push_back(CurrentVertexShader_ = vdl::VertexShader());
+  PixelShaders_.push_back(CurrentPixelShader_ = vdl::PixelShader());
+  HullShaders_.push_back(CurrentHullShader_ = vdl::HullShader());
+  DomainShaders_.push_back(CurrentDomainShader_ = vdl::DomainShader());
+  GeometryShaders_.push_back(CurrentGeometryShader_ = vdl::GeometryShader());
+
+  for (auto& ShaderResources : ShaderResources_) { ShaderResources.resize(1); }
+  for (auto& Samplers : Samplers_) { Samplers.resize(1); }
+  for (auto& ConstantBuffers : ConstantBuffers_) { ConstantBuffers.resize(1); }
+
+  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0].resize(1);
+  CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)].resize(1);
+  Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0][0] = CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0] = std::move(_Sampler);
+
+  Reset();
+}
+
+inline void RendererCommandList<std::nullptr_t, std::nullptr_t>::Reset()
+{
+  RendererCommands_.clear();
+  RendererCommandFlags_ = 0;
+  DrawDatas_.clear();
+
+  VertexBuffers_.clear();
+  IndexBuffers_.clear();
+
+  if (InputLayouts_.size() > 1)
+  {
+    InputLayouts_ = { std::move(InputLayouts_.back()) };
+  }
+  RendererCommandFlags_ |= kSetInputLayoutFlag;
+
+  if (Topologys_.size() > 1)
+  {
+    Topologys_ = { std::move(Topologys_.back()) };
+  }
+  RendererCommandFlags_ |= kSetTopologyFlag;
+
+  if (Scissors_.size() > 1)
+  {
+    Scissors_ = { std::move(Scissors_.back()) };
+  }
+  RendererCommandFlags_ |= kSetScissorFlag;
+
+  if (Viewports_.size() > 1)
+  {
+    Viewports_ = { std::move(Viewports_.back()) };
+  }
+  RendererCommandFlags_ |= kSetViewportFlag;
+
+  if (BlendStates_.size() > 1)
+  {
+    BlendStates_ = { std::move(BlendStates_.back()) };
+  }
+  RendererCommandFlags_ |= kSetBlendStateFlag;
+
+  if (DepthStencilStates_.size() > 1)
+  {
+    DepthStencilStates_ = { std::move(DepthStencilStates_.back()) };
+  }
+  RendererCommandFlags_ |= kSetDepthStencilStateFlag;
+
+  if (RasterizerStates_.size() > 1)
+  {
+    RasterizerStates_ = { std::move(RasterizerStates_.back()) };
+  }
+  RendererCommandFlags_ |= kSetRasterizerStateFlag;
+
+  if (VertexShaders_.size() > 1)
+  {
+    VertexShaders_ = { std::move(VertexShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetVertexShaderFlag;
+
+  if (HullShaders_.size() > 1)
+  {
+    HullShaders_ = { std::move(HullShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetHullShaderFlag;
+
+  if (DomainShaders_.size() > 1)
+  {
+    DomainShaders_ = { std::move(DomainShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetDomainShaderFlag;
+
+  if (GeometryShaders_.size() > 1)
+  {
+    GeometryShaders_ = { std::move(GeometryShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetGeometryShaderFlag;
+
+  if (PixelShaders_.size() > 1)
+  {
+    PixelShaders_ = { std::move(PixelShaders_.back()) };
+  }
+  RendererCommandFlags_ |= kSetPixelShaderFlag;
+
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  {
+    auto& ShaderResources = ShaderResources_[ShaderTypeCount];
+
+    if (ShaderResources.size() > 1)
+    {
+      ShaderResources = { std::move(ShaderResources.back()) };
+    }
+    RendererCommandFlags_ |= kSetVertexStageShaderResourceFlag << ShaderTypeCount;
+  }
+
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  {
+    auto& Samplers = Samplers_[ShaderTypeCount];
+
+    if (Samplers.size() > 1)
+    {
+      Samplers = { std::move(Samplers.back()) };
+    }
+    RendererCommandFlags_ |= kSetVertexStageSamplerFlag << ShaderTypeCount;
+  }
+
+  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  {
+    auto& ConstantBuffers = ConstantBuffers_[ShaderTypeCount];
+
+    if (ConstantBuffers.size() > 1)
+    {
+      ConstantBuffers = { std::move(ConstantBuffers.back()) };
+    }
+    RendererCommandFlags_ |= kSetVertexStageConstantBufferFlag << ShaderTypeCount;
+  }
+}
+
+inline void RendererCommandList<std::nullptr_t, std::nullptr_t>::SetDrawData(DrawData&& _DrawData)
+{
+  PushRendererCommand();
+
+  //  Draw
+  {
+    RendererCommands_.emplace_back(static_cast<RendererCommandFlag>(static_cast<vdl::uint>(kDrawFlag)), static_cast<vdl::uint>(DrawDatas_.size()));
+    DrawDatas_.emplace_back(std::move(_DrawData));
   }
 }

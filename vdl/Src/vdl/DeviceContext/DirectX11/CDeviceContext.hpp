@@ -140,4 +140,6 @@ public:
   void Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ)override;
 
   void Flush()override;
+
+  void Execute(const BaseRendererCommandList& _RendererCommandList)override;
 };

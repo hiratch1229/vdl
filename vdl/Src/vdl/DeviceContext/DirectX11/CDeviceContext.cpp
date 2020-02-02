@@ -6,6 +6,7 @@
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
+#include <vdl/CommandList/RendererCommandList/RendererCommandList.hpp>
 
 #include <vdl/Topology/DirectX/Topology.hpp>
 #include <vdl/Scissor/DirectX/Scissor.hpp>
@@ -790,6 +791,421 @@ void CDeviceContext::Flush()
   pD3D11ImmediateContext_->DSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
   pD3D11ImmediateContext_->GSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
   pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
+}
+
+void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList)
+{
+  InstanceBuffer InstanceBuffer;
+
+  for (auto& RendererCommand : _RendererCommandList.GetRendererCommands())
+  {
+    switch (RendererCommand.first)
+    {
+    case RendererCommandFlag::eDraw:
+    {
+      if (!InstanceBuffer.isEmpty())
+      {
+        Engine::Get<IDevice>()->WriteMemory(pBufferManager_->GetBuffer(InstanceBuffer.GetID()), _RendererCommandList.GetInstanceData(RendererCommand.second), _RendererCommandList.GetInstanceSize());
+      }
+
+      const DrawData& DrawData = _RendererCommandList.GetDrawData(RendererCommand.second);
+      pD3D11ImmediateContext_->DrawInstanced(DrawData.VertexCount, DrawData.InstanceCount, DrawData.FirstVertex, DrawData.FirstInstance);
+    }
+    break;
+    case RendererCommandFlag::eDrawIndexed:
+    {
+      if (!InstanceBuffer.isEmpty())
+      {
+        Engine::Get<IDevice>()->WriteMemory(pBufferManager_->GetBuffer(InstanceBuffer.GetID()), _RendererCommandList.GetInstanceData(RendererCommand.second), _RendererCommandList.GetInstanceSize());
+      }
+
+      const DrawIndexedData& DrawIndexedData = _RendererCommandList.GetDrawIndexedData(RendererCommand.second);
+      pD3D11ImmediateContext_->DrawIndexedInstanced(DrawIndexedData.IndexCount, DrawIndexedData.InstanceCount, DrawIndexedData.FirstIndex, DrawIndexedData.VertexOffset, DrawIndexedData.FirstInstance);
+    }
+    break;
+    case RendererCommandFlag::eSetVertexBuffer:
+    {
+      constexpr vdl::uint kOffset = 0;
+      const vdl::uint Stride = GetVertexBufferStride();
+      const CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(pBufferManager_->GetBuffer(_RendererCommandList.GetVertexBuffer(RendererCommand.second).GetID()));
+      pD3D11ImmediateContext_->IASetVertexBuffers(0, 1, pVertexBuffer->pBuffer.GetAddressOf(), &Stride, &kOffset);
+    }
+    break;
+    case RendererCommandFlag::eSetInstanceBuffer:
+    {
+      InstanceBuffer = _RendererCommandList.GetInstanceBuffer();
+
+      constexpr vdl::uint kOffset = 0;
+      const vdl::uint Stride = GetInstanceBufferStride();
+      const CInstanceBuffer* pInstanceBuffer = Cast<CInstanceBuffer>(pBufferManager_->GetBuffer(_RendererCommandList.GetInstanceBuffer().GetID()));
+      pD3D11ImmediateContext_->IASetVertexBuffers(1, 1, pInstanceBuffer->pBuffer.GetAddressOf(), &Stride, &kOffset);
+    }
+    break;
+    case RendererCommandFlag::eSetIndexBuffer:
+    {
+      constexpr vdl::uint kOffset = 0;
+      const CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(pBufferManager_->GetBuffer(_RendererCommandList.GetIndexBuffer(RendererCommand.second).GetID()));
+      pD3D11ImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), pIndexBuffer->IndexFormat, kOffset);
+    }
+    break;
+    case RendererCommandFlag::eSetInputLayout:
+    {
+      CurrentInputLayoutType_ = _RendererCommandList.GetInputLayout(RendererCommand.second);
+      pD3D11ImmediateContext_->IASetInputLayout(InputLayouts_[CurrentInputLayoutType_].Get());
+    }
+    break;
+    case RendererCommandFlag::eSetTopology:
+    {
+      pD3D11ImmediateContext_->IASetPrimitiveTopology(Cast(_RendererCommandList.GetTopology(RendererCommand.second)));
+    }
+    break;
+    case RendererCommandFlag::eSetScissor:
+    {
+      pD3D11ImmediateContext_->RSSetScissorRects(1, &Cast(_RendererCommandList.GetScissor(RendererCommand.second)));
+    }
+    break;
+    case RendererCommandFlag::eSetViewport:
+    {
+      pD3D11ImmediateContext_->RSSetViewports(1, &Cast(_RendererCommandList.GetViewport(RendererCommand.second)));
+    }
+    break;
+    case RendererCommandFlag::eSetBlendState:
+    {
+      pD3D11ImmediateContext_->OMSetBlendState(GetBlendState(_RendererCommandList.GetBlendState(RendererCommand.second)), nullptr, 0xFFFFFFFF);
+    }
+    break;
+    case RendererCommandFlag::eSetDepthStencilState:
+    {
+      const vdl::DepthStencilState& DepthStencilState = _RendererCommandList.GetDepthStencilState(RendererCommand.second);
+      pD3D11ImmediateContext_->OMSetDepthStencilState(GetDepthStencilState(DepthStencilState), DepthStencilState.StencilReference);
+    }
+    break;
+    case RendererCommandFlag::eSetRasterizerState:
+    {
+      pD3D11ImmediateContext_->RSSetState(GetRasterizerState(_RendererCommandList.GetRasterizerState(RendererCommand.second)));
+    }
+    break;
+    case RendererCommandFlag::eSetVertexShader:
+    {
+      ID3D11VertexShader* pVertexShader = nullptr;
+      {
+        const vdl::VertexShader& VertexShader = _RendererCommandList.GetVertexShader(RendererCommand.second);
+
+        if (!VertexShader.isEmpty())
+        {
+          pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(VertexShader.GetID()))->pVertexShader.Get();
+        }
+      }
+
+      pD3D11ImmediateContext_->VSSetShader(pVertexShader, nullptr, 0);
+    }
+    break;
+    case RendererCommandFlag::eSetHullShader:
+    {
+      ID3D11HullShader* pHullShader = nullptr;
+      {
+        const vdl::HullShader& HullShader = _RendererCommandList.GetHullShader(RendererCommand.second);
+
+        if (!HullShader.isEmpty())
+        {
+          pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(HullShader.GetID()))->pHullShader.Get();
+        }
+      }
+
+      pD3D11ImmediateContext_->HSSetShader(pHullShader, nullptr, 0);
+    }
+    break;
+    case RendererCommandFlag::eSetDomainShader:
+    {
+      ID3D11DomainShader* pDomainShader = nullptr;
+      {
+        const vdl::DomainShader& DomainShader = _RendererCommandList.GetDomainShader(RendererCommand.second);
+
+        if (!DomainShader.isEmpty())
+        {
+          pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(DomainShader.GetID()))->pDomainShader.Get();
+        }
+      }
+
+      pD3D11ImmediateContext_->DSSetShader(pDomainShader, nullptr, 0);
+    }
+    break;
+    case RendererCommandFlag::eSetGeometryShader:
+    {
+      ID3D11GeometryShader* pGeometryShader = nullptr;
+      {
+        const vdl::GeometryShader& GeometryShader = _RendererCommandList.GetGeometryShader(RendererCommand.second);
+
+        if (!GeometryShader.isEmpty())
+        {
+          pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(GeometryShader.GetID()))->pGeometryShader.Get();
+        }
+      }
+
+      pD3D11ImmediateContext_->GSSetShader(pGeometryShader, nullptr, 0);
+    }
+    break;
+    case RendererCommandFlag::eSetPixelShader:
+    {
+      ID3D11PixelShader* pPixelShader = nullptr;
+      {
+        const vdl::PixelShader& PixelShader = _RendererCommandList.GetPixelShader(RendererCommand.second);
+
+        if (!PixelShader.isEmpty())
+        {
+          pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(PixelShader.GetID()))->pPixelShader.Get();
+        }
+      }
+
+      pD3D11ImmediateContext_->PSSetShader(pPixelShader, nullptr, 0);
+    }
+    break;
+    case RendererCommandFlag::eSetVertexStageShaderResource:
+    {
+      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::eVertexShader>(RendererCommand.second);
+      const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
+
+      std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
+      {
+        for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResouceNum; ++ShaderResourceCount)
+        {
+          pShaderResources[ShaderResourceCount] = GetShaderResourceView(ShaderResources[ShaderResourceCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->VSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
+    }
+    break;
+    case RendererCommandFlag::eSetHullStageShaderResource:
+    {
+      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::eHullShader>(RendererCommand.second);
+      const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
+
+      std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
+      {
+        for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResouceNum; ++ShaderResourceCount)
+        {
+          pShaderResources[ShaderResourceCount] = GetShaderResourceView(ShaderResources[ShaderResourceCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->HSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
+    }
+    break;
+    case RendererCommandFlag::eSetDomainStageShaderResource:
+    {
+      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::eDomainShader>(RendererCommand.second);
+      const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
+
+      std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
+      {
+        for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResouceNum; ++ShaderResourceCount)
+        {
+          pShaderResources[ShaderResourceCount] = GetShaderResourceView(ShaderResources[ShaderResourceCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->DSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
+    }
+    break;
+    case RendererCommandFlag::eSetGeometryStageShaderResource:
+    {
+      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::eGeometryShader>(RendererCommand.second);
+      const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
+
+      std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
+      {
+        for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResouceNum; ++ShaderResourceCount)
+        {
+          pShaderResources[ShaderResourceCount] = GetShaderResourceView(ShaderResources[ShaderResourceCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->GSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
+    }
+    break;
+    case RendererCommandFlag::eSetPixelStageShaderResource:
+    {
+      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::ePixelShader>(RendererCommand.second);
+      const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
+
+      std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
+      {
+        for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResouceNum; ++ShaderResourceCount)
+        {
+          pShaderResources[ShaderResourceCount] = GetShaderResourceView(ShaderResources[ShaderResourceCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->PSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
+    }
+    break;
+    case RendererCommandFlag::eSetVertexStageSampler:
+    {
+      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::eVertexShader>(RendererCommand.second);
+      const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+
+      std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
+      {
+        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+        {
+          pSamplers[SamplerCount] = GetSamplerState(Samplers[SamplerCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->VSSetSamplers(0, SamplerNum, pSamplers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetHullStageSampler:
+    {
+      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::eHullShader>(RendererCommand.second);
+      const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+
+      std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
+      {
+        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+        {
+          pSamplers[SamplerCount] = GetSamplerState(Samplers[SamplerCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->HSSetSamplers(0, SamplerNum, pSamplers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetDomainStageSampler:
+    {
+      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::eDomainShader>(RendererCommand.second);
+      const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+
+      std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
+      {
+        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+        {
+          pSamplers[SamplerCount] = GetSamplerState(Samplers[SamplerCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->DSSetSamplers(0, SamplerNum, pSamplers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetGeometryStageSampler:
+    {
+      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::eGeometryShader>(RendererCommand.second);
+      const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+
+      std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
+      {
+        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+        {
+          pSamplers[SamplerCount] = GetSamplerState(Samplers[SamplerCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->GSSetSamplers(0, SamplerNum, pSamplers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetPixelStageSampler:
+    {
+      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::ePixelShader>(RendererCommand.second);
+      const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+
+      std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
+      {
+        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+        {
+          pSamplers[SamplerCount] = GetSamplerState(Samplers[SamplerCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->PSSetSamplers(0, SamplerNum, pSamplers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetVertexStageConstantBuffer:
+    {
+      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::eVertexShader>(RendererCommand.second);
+      const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+
+      std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
+      {
+        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+        {
+          pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(ConstantBuffers[ConstantBufferCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->VSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetHullStageConstantBuffer:
+    {
+      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::eHullShader>(RendererCommand.second);
+      const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+
+      std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
+      {
+        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+        {
+          pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(ConstantBuffers[ConstantBufferCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->HSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetDomainStageConstantBuffer:
+    {
+      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::eDomainShader>(RendererCommand.second);
+      const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+
+      std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
+      {
+        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+        {
+          pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(ConstantBuffers[ConstantBufferCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->DSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetGeometryStageConstantBuffer:
+    {
+      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::eGeometryShader>(RendererCommand.second);
+      const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+
+      std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
+      {
+        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+        {
+          pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(ConstantBuffers[ConstantBufferCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->GSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
+    }
+    break;
+    case RendererCommandFlag::eSetPixelStageConstantBuffer:
+    {
+      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::ePixelShader>(RendererCommand.second);
+      const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+
+      std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
+      {
+        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+        {
+          pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(ConstantBuffers[ConstantBufferCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->PSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
+    }
+    break;
+    default: assert(false);
+    }
+  }
+
+  ID3D11ShaderResourceView* pShaderResourceView = nullptr;
+  pD3D11ImmediateContext_->PSSetShaderResources(0, 1, &pShaderResourceView);
 }
 
 //--------------------------------------------------
