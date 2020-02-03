@@ -27,7 +27,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
     for (float x = -BlushRadius; x < BlushRadius; ++x)
     {
       const float2 Offset = float2(x, y);
-
       const int2 HeightMapTexcoord = (Texcoord + (Offset / kHeightMapSize)) * kHeightMapSize;
 
       if (HeightMapTexcoord.x <= 0 || HeightMapTexcoord.y <= 0 || (kHeightMapSize.x - 1) <= HeightMapTexcoord.x || (kHeightMapSize.y - 1) <= HeightMapTexcoord.y)

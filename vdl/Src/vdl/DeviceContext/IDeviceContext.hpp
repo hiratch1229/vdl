@@ -7,6 +7,7 @@
 #include <vdl/Buffer/Buffer.hpp>
 
 class BaseRendererCommandList;
+class ComputeCommandList;
 
 class IDeviceContext
 {
@@ -108,4 +109,6 @@ public:
   virtual void Flush() = 0;
 
   virtual void Execute(const BaseRendererCommandList& _RendererCommandList) = 0;
+
+  virtual void Execute(const ComputeCommandList& _ComputeCommandList) = 0;
 };

@@ -1,61 +1,16 @@
 #pragma once
 #include "IComputer.hpp"
+#include <vdl/CommandList/ComputeCommandList/ComputeCommandList.hpp>
 
-#include <vdl/Shader.hpp>
-#include <vdl/Texture.hpp>
-#include <vdl/Sampler.hpp>
-#include <vdl/ConstantBuffer.hpp>
-#include <vdl/UnorderedAccessBuffer.hpp>
-#include <vdl/Variant.hpp>
-
-#include <vdl/StateChangeFlags/StateChangeFlags.hpp>
-#include <vdl/Constants/Constants.hpp>
-
-#include <vector>
-
-class IDevice;
 class IDeviceContext;
-class IBufferManager;
 class IRenderer;
-
-enum class ComputerCommandType : vdl::uint8_t
-{
-  eSetShader,
-  eSetShaderResource,
-  eSetSampler,
-  eSetConstantBuffer,
-  eSetUnorderedAccessObject,
-
-  eNum
-};
-static_assert(static_cast<vdl::uint>(ComputerCommandType::eNum) <= sizeof(vdl::uint8_t) * 8);
 
 class CComputer : public IComputer
 {
-  using Samplers = std::vector<vdl::Sampler>;
-  using ShaderResources = std::vector<vdl::ShaderResource>;
-  using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
-  using UnorderedAccessObjects = std::vector<vdl::UnorderedAccessObject>;
-private:
-  IDevice* pDevice_;
   IDeviceContext* pDeviceContext_;
-  IBufferManager* pBufferManager_;
   IRenderer* pRenderer_;
 private:
-  StateChangeFlags<ComputerCommandType, vdl::uint8_t> StateChangeFlags_;
-
-  vdl::ComputeShader PreviousShader_;
-  ShaderResources PreviousShaderResources_;
-  Samplers PreviousSamplers_;
-  ConstantBuffers PreviousConstantBuffers_;
-  ConstantBuffers PreviousConstantBufferDatas_;
-  UnorderedAccessObjects PreviousUnorderedAccessObjects_;
-
-  vdl::ComputeShader CurrentShader_;
-  ShaderResources CurrentShaderResources_;
-  Samplers CurrentSamplers_;
-  ConstantBuffers CurrentConstantBuffers_;
-  UnorderedAccessObjects CurrentUnorderedAccessObjects_;
+  ComputeCommandList ComputeCommandList_;
 public:
   CComputer() = default;
 

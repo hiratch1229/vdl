@@ -32,8 +32,6 @@ cbuffer ConstantBuffer : register(b3)
 }
 
 static const float kFresnelReflectivity = 0.02f;
-//static const float kLuminaneThreshold = 0.5f;
-//static const float kExposure = 5.0f;
 
 float Fresnel(float f0, float f90, float3 l, float3 n)
 {

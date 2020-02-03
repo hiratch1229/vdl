@@ -7,6 +7,7 @@
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
 #include <vdl/CommandList/RendererCommandList/RendererCommandList.hpp>
+#include <vdl/CommandList/ComputeCommandList/ComputeCommandList.hpp>
 
 #include <vdl/Topology/DirectX/Topology.hpp>
 #include <vdl/Scissor/DirectX/Scissor.hpp>
@@ -785,13 +786,13 @@ void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, 
 
 void CDeviceContext::Flush()
 {
-  std::array<ID3D11ShaderResourceView*, Constants::kMaxShaderResourceNum> ShaderResources = {};
+  std::array<ID3D11ShaderResourceView*, Constants::kMaxShaderResourceNum> ShaderResourceViews = {};
 
-  pD3D11ImmediateContext_->VSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
-  pD3D11ImmediateContext_->HSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
-  pD3D11ImmediateContext_->DSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
-  pD3D11ImmediateContext_->GSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
-  pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResources.data());
+  pD3D11ImmediateContext_->VSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+  pD3D11ImmediateContext_->HSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+  pD3D11ImmediateContext_->DSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+  pD3D11ImmediateContext_->GSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+  pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
 }
 
 void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList)
@@ -892,9 +893,8 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
     {
       ID3D11VertexShader* pVertexShader = nullptr;
       {
-        const vdl::VertexShader& VertexShader = _RendererCommandList.GetVertexShader(RendererCommand.second);
-
-        if (!VertexShader.isEmpty())
+        if (const vdl::VertexShader& VertexShader = _RendererCommandList.GetVertexShader(RendererCommand.second);
+          !VertexShader.isEmpty())
         {
           pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(VertexShader.GetID()))->pVertexShader.Get();
         }
@@ -907,9 +907,8 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
     {
       ID3D11HullShader* pHullShader = nullptr;
       {
-        const vdl::HullShader& HullShader = _RendererCommandList.GetHullShader(RendererCommand.second);
-
-        if (!HullShader.isEmpty())
+        if (const vdl::HullShader& HullShader = _RendererCommandList.GetHullShader(RendererCommand.second);
+          !HullShader.isEmpty())
         {
           pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(HullShader.GetID()))->pHullShader.Get();
         }
@@ -922,9 +921,8 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
     {
       ID3D11DomainShader* pDomainShader = nullptr;
       {
-        const vdl::DomainShader& DomainShader = _RendererCommandList.GetDomainShader(RendererCommand.second);
-
-        if (!DomainShader.isEmpty())
+        if (const vdl::DomainShader& DomainShader = _RendererCommandList.GetDomainShader(RendererCommand.second);
+          !DomainShader.isEmpty())
         {
           pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(DomainShader.GetID()))->pDomainShader.Get();
         }
@@ -937,9 +935,8 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
     {
       ID3D11GeometryShader* pGeometryShader = nullptr;
       {
-        const vdl::GeometryShader& GeometryShader = _RendererCommandList.GetGeometryShader(RendererCommand.second);
-
-        if (!GeometryShader.isEmpty())
+        if (const vdl::GeometryShader& GeometryShader = _RendererCommandList.GetGeometryShader(RendererCommand.second);
+          !GeometryShader.isEmpty())
         {
           pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(GeometryShader.GetID()))->pGeometryShader.Get();
         }
@@ -952,9 +949,8 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
     {
       ID3D11PixelShader* pPixelShader = nullptr;
       {
-        const vdl::PixelShader& PixelShader = _RendererCommandList.GetPixelShader(RendererCommand.second);
-
-        if (!PixelShader.isEmpty())
+        if (const vdl::PixelShader& PixelShader = _RendererCommandList.GetPixelShader(RendererCommand.second);
+          !PixelShader.isEmpty())
         {
           pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(PixelShader.GetID()))->pPixelShader.Get();
         }
@@ -1209,6 +1205,111 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
 
   ID3D11ShaderResourceView* pShaderResourceView = nullptr;
   pD3D11ImmediateContext_->PSSetShaderResources(0, 1, &pShaderResourceView);
+}
+
+void CDeviceContext::Execute(const ComputeCommandList& _ComputeCommandList)
+{
+  //  CSSetShader
+  {
+    ID3D11ComputeShader* pComputeShader = nullptr;
+    {
+      if (const vdl::ComputeShader& ComputeShader = _ComputeCommandList.GetComputeShader();
+        !ComputeShader.isEmpty())
+      {
+        pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(ComputeShader.GetID()))->pComputeShader.Get();
+      }
+    }
+
+    pD3D11ImmediateContext_->CSSetShader(pComputeShader, nullptr, 0);
+  }
+
+  //  CSSetShaderResources
+  {
+    const auto& ShaderResources = _ComputeCommandList.GetShaderResources();
+    const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
+
+    std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
+    {
+      for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResouceNum; ++ShaderResourceCount)
+      {
+        pShaderResources[ShaderResourceCount] = GetShaderResourceView(ShaderResources[ShaderResourceCount]);
+      }
+    }
+
+    pD3D11ImmediateContext_->CSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
+  }
+
+  //  CSSetSamplers
+  {
+    const auto& Samplers = _ComputeCommandList.GetSamplers();
+    const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+
+    std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
+    {
+      for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+      {
+        pSamplers[SamplerCount] = GetSamplerState(Samplers[SamplerCount]);
+      }
+    }
+
+    pD3D11ImmediateContext_->CSSetSamplers(0, SamplerNum, pSamplers.data());
+  }
+
+  //  CSSetConstantBuffers
+  {
+    const auto& ConstantBuffers = _ComputeCommandList.GetConstantBuffers();
+    const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+
+    std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
+    {
+      for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+      {
+        pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(ConstantBuffers[ConstantBufferCount]);
+      }
+    }
+
+    pD3D11ImmediateContext_->CSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
+  }
+
+  //  CSSetUnorderedAccessViews
+  {
+    //  シェーダーリソースの全解除
+    {
+      std::vector<ID3D11ShaderResourceView*> pShaderResourceViews(Constants::kMaxShaderResourceNum);
+
+      pD3D11ImmediateContext_->VSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+      pD3D11ImmediateContext_->HSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+      pD3D11ImmediateContext_->DSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+      pD3D11ImmediateContext_->GSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+      pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, pShaderResourceViews.data());
+    }
+
+    const auto& UnorderedAccessObjects = _ComputeCommandList.GetUnorderedAccessObjects();
+    const vdl::uint UnorderedAccessObjectNum = static_cast<vdl::uint>(UnorderedAccessObjects.size());
+
+    std::vector<ID3D11UnorderedAccessView*> pUnorderedAccessBuffers(UnorderedAccessObjectNum);
+    {
+      for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
+      {
+        pUnorderedAccessBuffers[UnorderedAccessObjectCount] = GetUnorderedAccessView(UnorderedAccessObjects[UnorderedAccessObjectCount]);
+      }
+    }
+
+    pD3D11ImmediateContext_->CSSetUnorderedAccessViews(0, UnorderedAccessObjectNum, pUnorderedAccessBuffers.data(), nullptr);
+  }
+
+  //  Dispatch
+  {
+    const vdl::uint3& ThreadGroup = _ComputeCommandList.GetThreadGroup();
+
+    pD3D11ImmediateContext_->Dispatch(ThreadGroup.x, ThreadGroup.y, ThreadGroup.z);
+  }
+
+  std::array<ID3D11ShaderResourceView*, Constants::kMaxShaderResourceNum> ShaderResourceViews = {};
+  pD3D11ImmediateContext_->CSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+
+  std::array<ID3D11UnorderedAccessView*, Constants::kMaxUnorderedAccessObjectNum> UnorderedAccessViews = {};
+  pD3D11ImmediateContext_->CSSetUnorderedAccessViews(0, Constants::kMaxUnorderedAccessObjectNum, UnorderedAccessViews.data(), nullptr);
 }
 
 //--------------------------------------------------

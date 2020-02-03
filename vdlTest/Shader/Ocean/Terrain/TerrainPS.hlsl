@@ -27,7 +27,6 @@ PS_OUT_GBUFFER GBufferPass(PS_IN_COLOR In)
   Out.Normal = float4(normalize(mul(Normal * 2.0f - 1.0f, float3x3(In.Tangent, In.Binormal, In.Normal))), 1.0f);
 
   const float Height = HeightMap.Sample(Sampler, In.Texcoord).x;
-  //float Slope = (1.0f - Out.Normal.y) / 2.0f;
 
   In.Texcoord *= TerrainConstantData.TextureLoopNum;
     

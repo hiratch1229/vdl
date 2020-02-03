@@ -13,7 +13,6 @@
 
 #include <vdl/Buffer/Buffer.hpp>
 #include <vdl/Shader/IShader.hpp>
-#include <vdl/Constants/Constants.hpp>
 
 #include <array>
 #include <vector>
@@ -180,6 +179,7 @@ private:
   template<ShaderType Type> void SetShaderObjects();
 protected:
   void PushRendererCommand();
+  void Sort();
 protected:
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
     vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer);

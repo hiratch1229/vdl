@@ -686,6 +686,9 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\PlatformFactory.cpp">
       <Filter>Src\Platform</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CommandList\ComputeCommandList\ComputeCommandList.cpp">
+      <Filter>Src\CommandList\ComputeCommandList</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\vdl\Include\vdl\GUI.inl">

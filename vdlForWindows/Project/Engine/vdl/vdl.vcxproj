@@ -160,6 +160,7 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Camera\Camera.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Collision2D\Collision2D.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Collision3D\Collision3D.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\CommandList\ComputeCommandList\ComputeCommandList.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\CComputer.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\Computer.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Computer\ComputerFactory.cpp" />

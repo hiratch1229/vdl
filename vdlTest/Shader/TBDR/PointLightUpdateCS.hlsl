@@ -8,7 +8,7 @@ cbuffer ConstantBuffer : register(b0)
   float DeltaTime;
   float PointLightItensity;
   float PointLightRange;
-  float Padding;
+  float Unused;
 };
 
 static const uint3 kThreadNum = uint3(1024, 1, 1);

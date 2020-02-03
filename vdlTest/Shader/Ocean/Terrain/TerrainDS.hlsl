@@ -50,7 +50,6 @@ PS_IN_TEXCOORD Texcoord(ConstantData Input, float2 UV : SV_DomainLocation, const
   Out.Position = mul(CalcPosition(Out.Position, Normal, Out.Texcoord), CameraConstantData.ViewProjection);
 
   return Out;
-
 }
 
 [domain(DOMAIN)]

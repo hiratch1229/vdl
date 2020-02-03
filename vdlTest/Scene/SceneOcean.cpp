@@ -208,6 +208,10 @@ void SceneOcean::Initialize()
   {
     Renderer3D::SetHullStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
 
+    Sampler WrapSampler = Sampler::kDefault3D;
+    WrapSampler.AddressModeU = WrapSampler.AddressModeV = WrapSampler.AddressModeW = AddressModeType::eWrap;
+
+    Renderer3D::SetDomainStageSamplers(0, 1, &WrapSampler);
     Renderer3D::SetDomainStageShaderResources(0, 1, &TerrainHeightMap_);
     Renderer3D::SetDomainStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
     Renderer3D::SetDomainStageConstantBuffers(1, 1, &LightDataConstantBuffer_);

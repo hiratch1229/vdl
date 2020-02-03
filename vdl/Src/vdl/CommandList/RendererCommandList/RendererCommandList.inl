@@ -2,6 +2,8 @@
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ModelManager/IModelManager.hpp>
 
+#include <assert.h>
+
 inline void BaseRendererCommandList::Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
   vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer)
 {
@@ -182,75 +184,33 @@ if (Current##StateName##_ == _##StateName)\
 \
 RendererCommandFlags_ |= kSet##StateName##Flag;\
 Current##StateName##_ = _##StateName;
-inline void BaseRendererCommandList::SetVertexBuffer(const VertexBuffer& _VertexBuffer)
-{
-  SetState(VertexBuffer)
-}
+inline void BaseRendererCommandList::SetVertexBuffer(const VertexBuffer& _VertexBuffer) { SetState(VertexBuffer) }
 
-inline void BaseRendererCommandList::SetIndexBuffer(const IndexBuffer& _IndexBuffer)
-{
-  SetState(IndexBuffer)
-}
+inline void BaseRendererCommandList::SetIndexBuffer(const IndexBuffer& _IndexBuffer) { SetState(IndexBuffer) }
 
-inline void BaseRendererCommandList::SetInputLayout(vdl::InputLayoutType _InputLayout)
-{
-  SetState(InputLayout)
-}
+inline void BaseRendererCommandList::SetInputLayout(vdl::InputLayoutType _InputLayout) { SetState(InputLayout) }
 
-inline void BaseRendererCommandList::SetTopology(vdl::TopologyType _Topology)
-{
-  SetState(Topology)
-}
+inline void BaseRendererCommandList::SetTopology(vdl::TopologyType _Topology) { SetState(Topology) }
 
-inline void BaseRendererCommandList::SetScissor(const vdl::Scissor& _Scissor)
-{
-  SetState(Scissor)
-}
+inline void BaseRendererCommandList::SetScissor(const vdl::Scissor& _Scissor) { SetState(Scissor) }
 
-inline void BaseRendererCommandList::SetViewport(const vdl::Viewport& _Viewport)
-{
-  SetState(Viewport)
-}
+inline void BaseRendererCommandList::SetViewport(const vdl::Viewport& _Viewport) { SetState(Viewport) }
 
-inline void BaseRendererCommandList::SetBlendState(const vdl::BlendState& _BlendState)
-{
-  SetState(BlendState)
-}
+inline void BaseRendererCommandList::SetBlendState(const vdl::BlendState& _BlendState) { SetState(BlendState) }
 
-inline void BaseRendererCommandList::SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState)
-{
-  SetState(DepthStencilState)
-}
+inline void BaseRendererCommandList::SetDepthStencilState(const vdl::DepthStencilState& _DepthStencilState) { SetState(DepthStencilState) }
 
-inline void BaseRendererCommandList::SetRasterizerState(const vdl::RasterizerState& _RasterizerState)
-{
-  SetState(RasterizerState)
-}
+inline void BaseRendererCommandList::SetRasterizerState(const vdl::RasterizerState& _RasterizerState) { SetState(RasterizerState) }
 
-inline void BaseRendererCommandList::SetVertexShader(const vdl::VertexShader& _VertexShader)
-{
-  SetState(VertexShader)
-}
+inline void BaseRendererCommandList::SetVertexShader(const vdl::VertexShader& _VertexShader) { SetState(VertexShader) }
 
-inline void BaseRendererCommandList::SetHullShader(const vdl::HullShader& _HullShader)
-{
-  SetState(HullShader)
-}
+inline void BaseRendererCommandList::SetHullShader(const vdl::HullShader& _HullShader) { SetState(HullShader) }
 
-inline void BaseRendererCommandList::SetDomainShader(const vdl::DomainShader& _DomainShader)
-{
-  SetState(DomainShader)
-}
+inline void BaseRendererCommandList::SetDomainShader(const vdl::DomainShader& _DomainShader) { SetState(DomainShader) }
 
-inline void BaseRendererCommandList::SetGeometryShader(const vdl::GeometryShader& _GeometryShader)
-{
-  SetState(GeometryShader)
-}
+inline void BaseRendererCommandList::SetGeometryShader(const vdl::GeometryShader& _GeometryShader) { SetState(GeometryShader) }
 
-inline void BaseRendererCommandList::SetPixelShader(const vdl::PixelShader& _PixelShader)
-{
-  SetState(PixelShader)
-}
+inline void BaseRendererCommandList::SetPixelShader(const vdl::PixelShader& _PixelShader) { SetState(PixelShader) }
 #undef SetState
 
 #define SetShaderState(StateName)\
@@ -279,22 +239,13 @@ for (vdl::uint StateName##Count = 0; StateName##Count < _##StateName##Num; ++Sta
   Current##StateName = StateName;\
 }
 template<ShaderType Type>
-inline void BaseRendererCommandList::SetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[])
-{
-  SetShaderState(ShaderResource)
-}
+inline void BaseRendererCommandList::SetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[]) { SetShaderState(ShaderResource) }
 
 template<ShaderType Type>
-inline void BaseRendererCommandList::SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[])
-{
-  SetShaderState(Sampler)
-}
+inline void BaseRendererCommandList::SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[]) { SetShaderState(Sampler) }
 
 template<ShaderType Type>
-inline void BaseRendererCommandList::SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[])
-{
-  SetShaderState(ConstantBuffer)
-}
+inline void BaseRendererCommandList::SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[]) { SetShaderState(ConstantBuffer) }
 #undef SetShaderState
 
 template<ShaderType Type>
@@ -534,6 +485,99 @@ inline void BaseRendererCommandList::PushRendererCommand()
   }
 }
 
+inline void BaseRendererCommandList::Sort()
+{
+  //  ソートが不可能な時は終了
+  if (!CurrentDepthStencilState_.DepthEnable)
+  {
+    return;
+  }
+
+  //  2つのDrawが混じっているCommmandListは未対応
+  assert(DrawDatas_.empty() || DrawIndexedDatas_.empty());
+
+  using Iterator = RendererCommands::iterator;
+
+  Iterator StartDrawItr;
+  {
+    //  未ソートのDrawCommandの開始点を検索
+    Iterator EndDrawItr = RendererCommands_.end() - 1;
+    for (Iterator Itr = EndDrawItr, Start = RendererCommands_.begin(); Start <= Itr; --Itr)
+    {
+      //  DrawCommandでなくなるまで検索
+      if (Itr->first != RendererCommandFlag::eDraw && Itr->first != RendererCommandFlag::eDrawIndexed)
+      {
+        StartDrawItr = Itr + 1;
+        break;
+      }
+    }
+
+    //  参照するID順にソートする
+    std::sort(StartDrawItr, EndDrawItr,
+      [&](const RendererCommandPair& _Command0, const RendererCommandPair& _Command1)
+    {
+      return DisplayObjectIDs_[_Command0.second] < DisplayObjectIDs_[_Command1.second];
+    });
+  }
+
+  Iterator NextItr;
+  //  RendererCommandFlag::eDraw
+  if (!DrawDatas_.empty())
+  {
+    for (Iterator Itr = StartDrawItr; Itr < RendererCommands_.end() - 1;)
+    {
+      NextItr = Itr + 1;
+      //  違うオブジェクトのDrawCommandの場合は次へ
+      if (DisplayObjectIDs_[Itr->second] != DisplayObjectIDs_[NextItr->second])
+      {
+        ++Itr;
+        continue;
+      }
+
+      //  DrawCommandを1つに統合する(Instancing)
+      {
+        assert(DrawDatas_[Itr->second].FirstVertex == DrawDatas_[NextItr->second].FirstVertex
+          && DrawDatas_[Itr->second].VertexCount == DrawDatas_[NextItr->second].VertexCount);
+
+        DrawDatas_[Itr->second].InstanceCount += DrawDatas_[NextItr->second].InstanceCount;
+        DrawDatas_[NextItr->second].InstanceCount = 0;
+
+        Instances_[Itr->second].insert(Instances_[Itr->second].end(), Instances_[NextItr->second].cbegin(), Instances_[NextItr->second].cend());
+
+        Itr = RendererCommands_.erase(NextItr);
+      }
+    }
+  }
+  //  RendererCommandFlag::eDrawIndexed
+  else
+  {
+    for (Iterator Itr = StartDrawItr; Itr < RendererCommands_.end() - 1;)
+    {
+      NextItr = Itr + 1;
+      //  違うオブジェクトのDrawCommandの場合は次へ
+      if (DisplayObjectIDs_[Itr->second] != DisplayObjectIDs_[NextItr->second])
+      {
+        ++Itr;
+        continue;
+      }
+
+      //  DrawCommandを1つに統合する(Instancing)
+      {
+        assert(DrawIndexedDatas_[Itr->second].FirstIndex == DrawIndexedDatas_[NextItr->second].FirstIndex
+          && DrawIndexedDatas_[Itr->second].IndexCount == DrawIndexedDatas_[NextItr->second].IndexCount
+          && DrawIndexedDatas_[Itr->second].VertexOffset == DrawIndexedDatas_[NextItr->second].VertexOffset);
+
+        DrawIndexedDatas_[Itr->second].InstanceCount += DrawIndexedDatas_[NextItr->second].InstanceCount;
+        DrawIndexedDatas_[NextItr->second].InstanceCount = 0;
+
+        Instances_[Itr->second].insert(Instances_[Itr->second].end(), Instances_[NextItr->second].cbegin(), Instances_[NextItr->second].cend());
+
+        Itr = RendererCommands_.erase(NextItr);
+      }
+    }
+  }
+}
+
 //--------------------------------------------------
 
 template<class DisplayObject, class InstanceData>
@@ -576,6 +620,8 @@ inline void RendererCommandList<DisplayObject, InstanceData>::SetDrawData(const 
 
     auto& InstanceDatas = Instances_.emplace_back(kInstanceSize);
     ::memmove(InstanceDatas.data(), &_InstanceData, kInstanceSize);
+
+    Sort();
   }
 }
 
@@ -613,6 +659,8 @@ inline void RendererCommandList<vdl::Texture, InstanceData>::SetDrawData(const v
 
     auto& InstanceDatas = Instances_.emplace_back(kInstanceSize);
     ::memmove(InstanceDatas.data(), &_InstanceData, kInstanceSize);
+
+    Sort();
   }
 }
 
