@@ -1,6 +1,6 @@
 #pragma once
 #include "IRenderer.hpp"
-#include <vdl/CommandList/RendererCommandList/RendererCommandList.hpp>
+#include <vdl/CommandList/GraphicsCommandList/GraphicsCommandList.hpp>
 
 #include <vdl/Camera.hpp>
 #include <vdl/Model.hpp>
@@ -38,10 +38,10 @@ private:
   std::unique_ptr<CameraData> pCameraData_;
 private:
   vdl::OutputManager OutputManager_;
-  RendererCommandList<std::nullptr_t, std::nullptr_t> EmptyRendererCommandList_;
-  RendererCommandList<vdl::Texture, vdl::Instance2D> TextureRendererCommandList_;
-  RendererCommandList<vdl::StaticMesh, vdl::InstanceStaticMesh> StaticMeshRendererCommandList_;
-  //RendererCommandList<vdl::SkinnedMesh, vdl::InstanceSkinnedMesh> SkinnedMeshRendererCommandList_;
+  GraphicsCommandList<std::nullptr_t, std::nullptr_t> EmptyGraphicsCommandList_;
+  GraphicsCommandList<vdl::Texture, vdl::Instance2D> TextureGraphicsCommandList_;
+  GraphicsCommandList<vdl::StaticMesh, vdl::InstanceStaticMesh> StaticMeshGraphicsCommandList_;
+  //GraphicsCommandList<vdl::SkinnedMesh, vdl::InstanceSkinnedMesh> SkinnedMeshGraphicsCommandList_;
 public:
   CRenderer() = default;
 

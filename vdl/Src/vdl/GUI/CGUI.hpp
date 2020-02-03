@@ -12,7 +12,7 @@
 #include <vdl/Variant.hpp>
 
 #include <vdl/Buffer/Buffer.hpp>
-#include <vdl/CommandList/RendererCommandList/RendererCommandList.hpp>
+#include <vdl/CommandList/GraphicsCommandList/GraphicsCommandList.hpp>
 
 #include <memory>
 
@@ -42,7 +42,7 @@ private:
 private:
   vdl::RenderTextures RenderTextures_;
   vdl::DepthStencilTexture DepthStencilTexture_;
-  RendererCommandList<vdl::Texture, std::nullptr_t> RendererCommandList_;
+  GraphicsCommandList<vdl::Texture, std::nullptr_t> GraphicsCommandList_;
   std::unique_ptr<vdl::ConstantBuffer<ConstantBufferData>> pConstantBuffer_;
 private:
   VertexBuffer VertexBuffer_;

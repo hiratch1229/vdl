@@ -143,7 +143,7 @@ public:
 
   void Flush()override;
 
-  void Execute(const BaseRendererCommandList& _RendererCommandList)override;
+  void Execute(const BaseGraphicsCommandList& _GraphicsCommandList)override;
 
   void Execute(const ComputeCommandList& _ComputeCommandList)override;
 };

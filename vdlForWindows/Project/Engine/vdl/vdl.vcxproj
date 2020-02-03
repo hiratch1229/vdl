@@ -104,7 +104,7 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\Buffer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\IBuffer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\ComputeCommandList\ComputeCommandList.hpp" />
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\RendererCommandList\RendererCommandList.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\GraphicsCommandList\GraphicsCommandList.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Computer\CComputer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Computer\IComputer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Constants\Constants.hpp" />
@@ -136,7 +136,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ReferenceCount\ReferenceCount.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\CRenderer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\IRenderer.hpp" />
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\CShaderManager.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ShaderManager\IShaderManager.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\IShader.hpp" />
@@ -218,8 +217,7 @@
     <None Include="..\..\..\..\vdl\Shader\Option\GaussianBlur.hlsli" />
     <None Include="..\..\..\..\vdl\Shader\Option\Light.hlsli" />
     <None Include="..\..\..\..\vdl\Shader\Texture\Texture.hlsli" />
-    <None Include="..\..\..\..\vdl\Src\vdl\CommandList\RendererCommandList\RendererCommandList.inl" />
-    <None Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.inl" />
+    <None Include="..\..\..\..\vdl\Src\vdl\CommandList\GraphicsCommandList\GraphicsCommandList.inl" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\..\..\vdl\Shader\Mesh\MeshPS.hlsl">

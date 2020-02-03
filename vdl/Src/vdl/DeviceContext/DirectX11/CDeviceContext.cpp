@@ -6,7 +6,7 @@
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
-#include <vdl/CommandList/RendererCommandList/RendererCommandList.hpp>
+#include <vdl/CommandList/\GraphicsCommandList/GraphicsCommandList.hpp>
 #include <vdl/CommandList/ComputeCommandList/ComputeCommandList.hpp>
 
 #include <vdl/Topology/DirectX/Topology.hpp>
@@ -795,105 +795,105 @@ void CDeviceContext::Flush()
   pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
 }
 
-void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList)
+void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList)
 {
   InstanceBuffer InstanceBuffer;
 
-  for (auto& RendererCommand : _RendererCommandList.GetRendererCommands())
+  for (auto& GraphicsCommand : _GraphicsCommandList.GetGraphicsCommands())
   {
-    switch (RendererCommand.first)
+    switch (GraphicsCommand.first)
     {
-    case RendererCommandFlag::eDraw:
+    case GraphicsCommandFlag::eDraw:
     {
       if (!InstanceBuffer.isEmpty())
       {
-        const auto& InstanceDatas = _RendererCommandList.GetInstanceDatas(RendererCommand.second);
+        const auto& InstanceDatas = _GraphicsCommandList.GetInstanceDatas(GraphicsCommand.second);
         pDevice_->WriteMemory(pBufferManager_->GetBuffer(InstanceBuffer.GetID()), InstanceDatas.data(), static_cast<vdl::uint>(InstanceDatas.size()));
       }
 
-      const DrawData& DrawData = _RendererCommandList.GetDrawData(RendererCommand.second);
+      const DrawData& DrawData = _GraphicsCommandList.GetDrawData(GraphicsCommand.second);
       pD3D11ImmediateContext_->DrawInstanced(DrawData.VertexCount, DrawData.InstanceCount, DrawData.FirstVertex, DrawData.FirstInstance);
     }
     break;
-    case RendererCommandFlag::eDrawIndexed:
+    case GraphicsCommandFlag::eDrawIndexed:
     {
       if (!InstanceBuffer.isEmpty())
       {
-        const auto& InstanceDatas = _RendererCommandList.GetInstanceDatas(RendererCommand.second);
+        const auto& InstanceDatas = _GraphicsCommandList.GetInstanceDatas(GraphicsCommand.second);
         pDevice_->WriteMemory(pBufferManager_->GetBuffer(InstanceBuffer.GetID()), InstanceDatas.data(), static_cast<vdl::uint>(InstanceDatas.size()));
       }
 
-      const DrawIndexedData& DrawIndexedData = _RendererCommandList.GetDrawIndexedData(RendererCommand.second);
+      const DrawIndexedData& DrawIndexedData = _GraphicsCommandList.GetDrawIndexedData(GraphicsCommand.second);
       pD3D11ImmediateContext_->DrawIndexedInstanced(DrawIndexedData.IndexCount, DrawIndexedData.InstanceCount, DrawIndexedData.FirstIndex, DrawIndexedData.VertexOffset, DrawIndexedData.FirstInstance);
     }
     break;
-    case RendererCommandFlag::eSetVertexBuffer:
+    case GraphicsCommandFlag::eSetVertexBuffer:
     {
       constexpr vdl::uint kOffset = 0;
       const vdl::uint Stride = GetVertexBufferStride();
-      const CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(pBufferManager_->GetBuffer(_RendererCommandList.GetVertexBuffer(RendererCommand.second).GetID()));
+      const CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(pBufferManager_->GetBuffer(_GraphicsCommandList.GetVertexBuffer(GraphicsCommand.second).GetID()));
       pD3D11ImmediateContext_->IASetVertexBuffers(0, 1, pVertexBuffer->pBuffer.GetAddressOf(), &Stride, &kOffset);
     }
     break;
-    case RendererCommandFlag::eSetInstanceBuffer:
+    case GraphicsCommandFlag::eSetInstanceBuffer:
     {
-      InstanceBuffer = _RendererCommandList.GetInstanceBuffer();
+      InstanceBuffer = _GraphicsCommandList.GetInstanceBuffer();
 
       constexpr vdl::uint kOffset = 0;
       const vdl::uint Stride = GetInstanceBufferStride();
-      const CInstanceBuffer* pInstanceBuffer = Cast<CInstanceBuffer>(pBufferManager_->GetBuffer(_RendererCommandList.GetInstanceBuffer().GetID()));
+      const CInstanceBuffer* pInstanceBuffer = Cast<CInstanceBuffer>(pBufferManager_->GetBuffer(_GraphicsCommandList.GetInstanceBuffer().GetID()));
       pD3D11ImmediateContext_->IASetVertexBuffers(1, 1, pInstanceBuffer->pBuffer.GetAddressOf(), &Stride, &kOffset);
     }
     break;
-    case RendererCommandFlag::eSetIndexBuffer:
+    case GraphicsCommandFlag::eSetIndexBuffer:
     {
       constexpr vdl::uint kOffset = 0;
-      const CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(pBufferManager_->GetBuffer(_RendererCommandList.GetIndexBuffer(RendererCommand.second).GetID()));
+      const CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(pBufferManager_->GetBuffer(_GraphicsCommandList.GetIndexBuffer(GraphicsCommand.second).GetID()));
       pD3D11ImmediateContext_->IASetIndexBuffer(pIndexBuffer->pBuffer.Get(), pIndexBuffer->IndexFormat, kOffset);
     }
     break;
-    case RendererCommandFlag::eSetInputLayout:
+    case GraphicsCommandFlag::eSetInputLayout:
     {
-      CurrentInputLayoutType_ = _RendererCommandList.GetInputLayout(RendererCommand.second);
+      CurrentInputLayoutType_ = _GraphicsCommandList.GetInputLayout(GraphicsCommand.second);
       pD3D11ImmediateContext_->IASetInputLayout(InputLayouts_[CurrentInputLayoutType_].Get());
     }
     break;
-    case RendererCommandFlag::eSetTopology:
+    case GraphicsCommandFlag::eSetTopology:
     {
-      pD3D11ImmediateContext_->IASetPrimitiveTopology(Cast(_RendererCommandList.GetTopology(RendererCommand.second)));
+      pD3D11ImmediateContext_->IASetPrimitiveTopology(Cast(_GraphicsCommandList.GetTopology(GraphicsCommand.second)));
     }
     break;
-    case RendererCommandFlag::eSetScissor:
+    case GraphicsCommandFlag::eSetScissor:
     {
-      pD3D11ImmediateContext_->RSSetScissorRects(1, &Cast(_RendererCommandList.GetScissor(RendererCommand.second)));
+      pD3D11ImmediateContext_->RSSetScissorRects(1, &Cast(_GraphicsCommandList.GetScissor(GraphicsCommand.second)));
     }
     break;
-    case RendererCommandFlag::eSetViewport:
+    case GraphicsCommandFlag::eSetViewport:
     {
-      pD3D11ImmediateContext_->RSSetViewports(1, &Cast(_RendererCommandList.GetViewport(RendererCommand.second)));
+      pD3D11ImmediateContext_->RSSetViewports(1, &Cast(_GraphicsCommandList.GetViewport(GraphicsCommand.second)));
     }
     break;
-    case RendererCommandFlag::eSetBlendState:
+    case GraphicsCommandFlag::eSetBlendState:
     {
-      pD3D11ImmediateContext_->OMSetBlendState(GetBlendState(_RendererCommandList.GetBlendState(RendererCommand.second)), nullptr, 0xFFFFFFFF);
+      pD3D11ImmediateContext_->OMSetBlendState(GetBlendState(_GraphicsCommandList.GetBlendState(GraphicsCommand.second)), nullptr, 0xFFFFFFFF);
     }
     break;
-    case RendererCommandFlag::eSetDepthStencilState:
+    case GraphicsCommandFlag::eSetDepthStencilState:
     {
-      const vdl::DepthStencilState& DepthStencilState = _RendererCommandList.GetDepthStencilState(RendererCommand.second);
+      const vdl::DepthStencilState& DepthStencilState = _GraphicsCommandList.GetDepthStencilState(GraphicsCommand.second);
       pD3D11ImmediateContext_->OMSetDepthStencilState(GetDepthStencilState(DepthStencilState), DepthStencilState.StencilReference);
     }
     break;
-    case RendererCommandFlag::eSetRasterizerState:
+    case GraphicsCommandFlag::eSetRasterizerState:
     {
-      pD3D11ImmediateContext_->RSSetState(GetRasterizerState(_RendererCommandList.GetRasterizerState(RendererCommand.second)));
+      pD3D11ImmediateContext_->RSSetState(GetRasterizerState(_GraphicsCommandList.GetRasterizerState(GraphicsCommand.second)));
     }
     break;
-    case RendererCommandFlag::eSetVertexShader:
+    case GraphicsCommandFlag::eSetVertexShader:
     {
       ID3D11VertexShader* pVertexShader = nullptr;
       {
-        if (const vdl::VertexShader& VertexShader = _RendererCommandList.GetVertexShader(RendererCommand.second);
+        if (const vdl::VertexShader& VertexShader = _GraphicsCommandList.GetVertexShader(GraphicsCommand.second);
           !VertexShader.isEmpty())
         {
           pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(VertexShader.GetID()))->pVertexShader.Get();
@@ -903,11 +903,11 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->VSSetShader(pVertexShader, nullptr, 0);
     }
     break;
-    case RendererCommandFlag::eSetHullShader:
+    case GraphicsCommandFlag::eSetHullShader:
     {
       ID3D11HullShader* pHullShader = nullptr;
       {
-        if (const vdl::HullShader& HullShader = _RendererCommandList.GetHullShader(RendererCommand.second);
+        if (const vdl::HullShader& HullShader = _GraphicsCommandList.GetHullShader(GraphicsCommand.second);
           !HullShader.isEmpty())
         {
           pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(HullShader.GetID()))->pHullShader.Get();
@@ -917,11 +917,11 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->HSSetShader(pHullShader, nullptr, 0);
     }
     break;
-    case RendererCommandFlag::eSetDomainShader:
+    case GraphicsCommandFlag::eSetDomainShader:
     {
       ID3D11DomainShader* pDomainShader = nullptr;
       {
-        if (const vdl::DomainShader& DomainShader = _RendererCommandList.GetDomainShader(RendererCommand.second);
+        if (const vdl::DomainShader& DomainShader = _GraphicsCommandList.GetDomainShader(GraphicsCommand.second);
           !DomainShader.isEmpty())
         {
           pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(DomainShader.GetID()))->pDomainShader.Get();
@@ -931,11 +931,11 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->DSSetShader(pDomainShader, nullptr, 0);
     }
     break;
-    case RendererCommandFlag::eSetGeometryShader:
+    case GraphicsCommandFlag::eSetGeometryShader:
     {
       ID3D11GeometryShader* pGeometryShader = nullptr;
       {
-        if (const vdl::GeometryShader& GeometryShader = _RendererCommandList.GetGeometryShader(RendererCommand.second);
+        if (const vdl::GeometryShader& GeometryShader = _GraphicsCommandList.GetGeometryShader(GraphicsCommand.second);
           !GeometryShader.isEmpty())
         {
           pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(GeometryShader.GetID()))->pGeometryShader.Get();
@@ -945,11 +945,11 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->GSSetShader(pGeometryShader, nullptr, 0);
     }
     break;
-    case RendererCommandFlag::eSetPixelShader:
+    case GraphicsCommandFlag::eSetPixelShader:
     {
       ID3D11PixelShader* pPixelShader = nullptr;
       {
-        if (const vdl::PixelShader& PixelShader = _RendererCommandList.GetPixelShader(RendererCommand.second);
+        if (const vdl::PixelShader& PixelShader = _GraphicsCommandList.GetPixelShader(GraphicsCommand.second);
           !PixelShader.isEmpty())
         {
           pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(PixelShader.GetID()))->pPixelShader.Get();
@@ -959,9 +959,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->PSSetShader(pPixelShader, nullptr, 0);
     }
     break;
-    case RendererCommandFlag::eSetVertexStageShaderResource:
+    case GraphicsCommandFlag::eSetVertexStageShaderResource:
     {
-      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::eVertexShader>(RendererCommand.second);
+      const auto& ShaderResources = _GraphicsCommandList.GetShaderResources<ShaderType::eVertexShader>(GraphicsCommand.second);
       const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
 
       std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
@@ -975,9 +975,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->VSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
     }
     break;
-    case RendererCommandFlag::eSetHullStageShaderResource:
+    case GraphicsCommandFlag::eSetHullStageShaderResource:
     {
-      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::eHullShader>(RendererCommand.second);
+      const auto& ShaderResources = _GraphicsCommandList.GetShaderResources<ShaderType::eHullShader>(GraphicsCommand.second);
       const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
 
       std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
@@ -991,9 +991,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->HSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
     }
     break;
-    case RendererCommandFlag::eSetDomainStageShaderResource:
+    case GraphicsCommandFlag::eSetDomainStageShaderResource:
     {
-      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::eDomainShader>(RendererCommand.second);
+      const auto& ShaderResources = _GraphicsCommandList.GetShaderResources<ShaderType::eDomainShader>(GraphicsCommand.second);
       const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
 
       std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
@@ -1007,9 +1007,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->DSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
     }
     break;
-    case RendererCommandFlag::eSetGeometryStageShaderResource:
+    case GraphicsCommandFlag::eSetGeometryStageShaderResource:
     {
-      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::eGeometryShader>(RendererCommand.second);
+      const auto& ShaderResources = _GraphicsCommandList.GetShaderResources<ShaderType::eGeometryShader>(GraphicsCommand.second);
       const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
 
       std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
@@ -1023,9 +1023,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->GSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
     }
     break;
-    case RendererCommandFlag::eSetPixelStageShaderResource:
+    case GraphicsCommandFlag::eSetPixelStageShaderResource:
     {
-      const auto& ShaderResources = _RendererCommandList.GetShaderResources<ShaderType::ePixelShader>(RendererCommand.second);
+      const auto& ShaderResources = _GraphicsCommandList.GetShaderResources<ShaderType::ePixelShader>(GraphicsCommand.second);
       const vdl::uint ShaderResouceNum = static_cast<vdl::uint>(ShaderResources.size());
 
       std::vector<ID3D11ShaderResourceView*> pShaderResources(ShaderResouceNum);
@@ -1039,9 +1039,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->PSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
     }
     break;
-    case RendererCommandFlag::eSetVertexStageSampler:
+    case GraphicsCommandFlag::eSetVertexStageSampler:
     {
-      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::eVertexShader>(RendererCommand.second);
+      const auto& Samplers = _GraphicsCommandList.GetSamplers<ShaderType::eVertexShader>(GraphicsCommand.second);
       const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
 
       std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
@@ -1055,9 +1055,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->VSSetSamplers(0, SamplerNum, pSamplers.data());
     }
     break;
-    case RendererCommandFlag::eSetHullStageSampler:
+    case GraphicsCommandFlag::eSetHullStageSampler:
     {
-      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::eHullShader>(RendererCommand.second);
+      const auto& Samplers = _GraphicsCommandList.GetSamplers<ShaderType::eHullShader>(GraphicsCommand.second);
       const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
 
       std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
@@ -1071,9 +1071,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->HSSetSamplers(0, SamplerNum, pSamplers.data());
     }
     break;
-    case RendererCommandFlag::eSetDomainStageSampler:
+    case GraphicsCommandFlag::eSetDomainStageSampler:
     {
-      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::eDomainShader>(RendererCommand.second);
+      const auto& Samplers = _GraphicsCommandList.GetSamplers<ShaderType::eDomainShader>(GraphicsCommand.second);
       const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
 
       std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
@@ -1087,9 +1087,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->DSSetSamplers(0, SamplerNum, pSamplers.data());
     }
     break;
-    case RendererCommandFlag::eSetGeometryStageSampler:
+    case GraphicsCommandFlag::eSetGeometryStageSampler:
     {
-      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::eGeometryShader>(RendererCommand.second);
+      const auto& Samplers = _GraphicsCommandList.GetSamplers<ShaderType::eGeometryShader>(GraphicsCommand.second);
       const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
 
       std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
@@ -1103,9 +1103,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->GSSetSamplers(0, SamplerNum, pSamplers.data());
     }
     break;
-    case RendererCommandFlag::eSetPixelStageSampler:
+    case GraphicsCommandFlag::eSetPixelStageSampler:
     {
-      const auto& Samplers = _RendererCommandList.GetSamplers<ShaderType::ePixelShader>(RendererCommand.second);
+      const auto& Samplers = _GraphicsCommandList.GetSamplers<ShaderType::ePixelShader>(GraphicsCommand.second);
       const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
 
       std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
@@ -1119,9 +1119,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->PSSetSamplers(0, SamplerNum, pSamplers.data());
     }
     break;
-    case RendererCommandFlag::eSetVertexStageConstantBuffer:
+    case GraphicsCommandFlag::eSetVertexStageConstantBuffer:
     {
-      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::eVertexShader>(RendererCommand.second);
+      const auto& ConstantBuffers = _GraphicsCommandList.GetConstantBuffers<ShaderType::eVertexShader>(GraphicsCommand.second);
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
 
       std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
@@ -1135,9 +1135,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->VSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
     }
     break;
-    case RendererCommandFlag::eSetHullStageConstantBuffer:
+    case GraphicsCommandFlag::eSetHullStageConstantBuffer:
     {
-      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::eHullShader>(RendererCommand.second);
+      const auto& ConstantBuffers = _GraphicsCommandList.GetConstantBuffers<ShaderType::eHullShader>(GraphicsCommand.second);
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
 
       std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
@@ -1151,9 +1151,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->HSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
     }
     break;
-    case RendererCommandFlag::eSetDomainStageConstantBuffer:
+    case GraphicsCommandFlag::eSetDomainStageConstantBuffer:
     {
-      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::eDomainShader>(RendererCommand.second);
+      const auto& ConstantBuffers = _GraphicsCommandList.GetConstantBuffers<ShaderType::eDomainShader>(GraphicsCommand.second);
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
 
       std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
@@ -1167,9 +1167,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->DSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
     }
     break;
-    case RendererCommandFlag::eSetGeometryStageConstantBuffer:
+    case GraphicsCommandFlag::eSetGeometryStageConstantBuffer:
     {
-      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::eGeometryShader>(RendererCommand.second);
+      const auto& ConstantBuffers = _GraphicsCommandList.GetConstantBuffers<ShaderType::eGeometryShader>(GraphicsCommand.second);
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
 
       std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
@@ -1183,9 +1183,9 @@ void CDeviceContext::Execute(const BaseRendererCommandList& _RendererCommandList
       pD3D11ImmediateContext_->GSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
     }
     break;
-    case RendererCommandFlag::eSetPixelStageConstantBuffer:
+    case GraphicsCommandFlag::eSetPixelStageConstantBuffer:
     {
-      const auto& ConstantBuffers = _RendererCommandList.GetConstantBuffers<ShaderType::ePixelShader>(RendererCommand.second);
+      const auto& ConstantBuffers = _GraphicsCommandList.GetConstantBuffers<ShaderType::ePixelShader>(GraphicsCommand.second);
       const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
 
       std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);

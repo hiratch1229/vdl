@@ -703,7 +703,7 @@ void CGUI::Initialize()
   {
     vdl::DepthStencilOpState DepthStencilOpState(vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::StencilOpType::eKeep, vdl::ComparisonFuncType::eAlways);
 
-    RendererCommandList_.Initialize(vdl::InputLayoutType::eGUI, vdl::TopologyType::eTriangleList,
+    GraphicsCommandList_.Initialize(vdl::InputLayoutType::eGUI, vdl::TopologyType::eTriangleList,
       vdl::BlendState(false, false, { true, vdl::BlendType::eSrcAlpha, vdl::BlendType::eInvSrcAlpha, vdl::BlendOpType::eAdd, vdl::BlendType::eInvSrcAlpha, vdl::BlendType::eZero, vdl::BlendOpType::eAdd }),
       vdl::DepthStencilState(false, vdl::DepthWriteMaskType::eAll, vdl::ComparisonFuncType::eAlways, false, 0xFF, 0xFF, DepthStencilOpState, DepthStencilOpState),
       vdl::RasterizerState(vdl::FillModeType::eSolid, vdl::CullModeType::eNone, false, false, 0, true),
@@ -711,7 +711,7 @@ void CGUI::Initialize()
       vdl::VertexShader(kVertexShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kVertexShader)), vdl::InputLayoutType::eGUI),
       vdl::PixelShader(kPixelShader, static_cast<vdl::uint>(vdl::Macro::ArraySize(kPixelShader))));
 
-    RendererCommandList_.SetConstantBuffers<ShaderType::eVertexShader>(0, 1, &pConstantBuffer_->GetDetail());
+    GraphicsCommandList_.SetConstantBuffers<ShaderType::eVertexShader>(0, 1, &pConstantBuffer_->GetDetail());
   }
 }
 
@@ -730,7 +730,7 @@ void CGUI::Update()
 
   // Setup display size (every frame to accommodate for window resizing)
   io.DisplaySize = Cast(pWindow_->GetWindowSize());
-  RendererCommandList_.SetViewport({ 0.0f, 0.0f, io.DisplaySize.x, io.DisplaySize.y });
+  GraphicsCommandList_.SetViewport({ 0.0f, 0.0f, io.DisplaySize.x, io.DisplaySize.y });
 
   // Setup time step
   io.DeltaTime = pSystem_->GetDeltaTime();
@@ -792,14 +792,14 @@ void CGUI::Draw()
       VertexBufferSize_ < VertexSize)
     {
       VertexBuffer_ = VertexBuffer(VertexBufferSize_ = VertexSize);
-      RendererCommandList_.SetVertexBuffer(VertexBuffer_);
+      GraphicsCommandList_.SetVertexBuffer(VertexBuffer_);
 
     }
     if (const vdl::uint IndexSize = static_cast<vdl::uint>(pDrawData->TotalIdxCount * sizeof(ImDrawIdx));
       IndexBufferSize_ < IndexSize)
     {
       IndexBuffer_ = IndexBuffer(IndexBufferSize_ = IndexSize, kIndexType);
-      RendererCommandList_.SetIndexBuffer(IndexBuffer_);
+      GraphicsCommandList_.SetIndexBuffer(IndexBuffer_);
     }
   }
 
@@ -861,17 +861,17 @@ void CGUI::Draw()
         ClipRect.y = vdl::Math::Max(ClipRect.y, 0.0f);
 
         // Apply scissor/clipping rectangle
-        RendererCommandList_.SetScissor({ static_cast<int>(ClipRect.x), static_cast<int>(ClipRect.y), static_cast<vdl::uint>(ClipRect.z - ClipRect.x), static_cast<vdl::uint>(ClipRect.w - ClipRect.y) });
+        GraphicsCommandList_.SetScissor({ static_cast<int>(ClipRect.x), static_cast<int>(ClipRect.y), static_cast<vdl::uint>(ClipRect.z - ClipRect.x), static_cast<vdl::uint>(ClipRect.w - ClipRect.y) });
 
         // Draw
-        RendererCommandList_.SetDrawData(Cmd.Texture, { Cmd.ElemCount, 1, Cmd.IdxOffset + IndexOffset, Cmd.VtxOffset + VertexOffset, 0 });
+        GraphicsCommandList_.SetDrawData(Cmd.Texture, { Cmd.ElemCount, 1, Cmd.IdxOffset + IndexOffset, Cmd.VtxOffset + VertexOffset, 0 });
       }
     }
 
     VertexOffset += pCmdList->VtxBuffer.Size;
     IndexOffset += pCmdList->IdxBuffer.Size;
   }
-  pDeviceContext_->Execute(RendererCommandList_);
+  pDeviceContext_->Execute(GraphicsCommandList_);
 
-  RendererCommandList_.Reset();
+  GraphicsCommandList_.Reset();
 }

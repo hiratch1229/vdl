@@ -79,9 +79,6 @@
     <Filter Include="Src\BufferManager">
       <UniqueIdentifier>{21f5958c-6773-4923-94ab-41a3bbb95007}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Renderer\RendererCommand">
-      <UniqueIdentifier>{4fb7279a-721c-4d2b-ae4a-3d8fc9c76ae9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Model">
       <UniqueIdentifier>{f0a97c9e-6df9-4fec-8760-9528628b69ee}</UniqueIdentifier>
     </Filter>
@@ -163,11 +160,11 @@
     <Filter Include="Src\CommandList">
       <UniqueIdentifier>{70ae3d6d-9b41-46cf-8978-3e9f69ea8013}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\CommandList\RendererCommandList">
-      <UniqueIdentifier>{5f69eb04-0891-474b-a70b-ce320074606a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\CommandList\ComputeCommandList">
       <UniqueIdentifier>{4e2679e2-ed90-4c92-9412-fb3fca0af4a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\CommandList\GraphicsCommandList">
+      <UniqueIdentifier>{5f69eb04-0891-474b-a70b-ce320074606a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -453,9 +450,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\IRenderer.hpp">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.hpp">
-      <Filter>Src\Renderer\RendererCommand</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\IShader.hpp">
       <Filter>Src\Shader</Filter>
     </ClInclude>
@@ -516,11 +510,11 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\ThreadPool\ThreadPool.hpp">
       <Filter>Src\ThreadPool</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\RendererCommandList\RendererCommandList.hpp">
-      <Filter>Src\CommandList\RendererCommandList</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\ComputeCommandList\ComputeCommandList.hpp">
       <Filter>Src\CommandList\ComputeCommandList</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\GraphicsCommandList\GraphicsCommandList.hpp">
+      <Filter>Src\CommandList\GraphicsCommandList</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -712,11 +706,8 @@
     <None Include="..\..\..\..\vdl\Shader\Texture\Texture.hlsli">
       <Filter>Shader\Texture</Filter>
     </None>
-    <None Include="..\..\..\..\vdl\Src\vdl\Renderer\RendererCommand\RendererCommand.inl">
-      <Filter>Src\Renderer\RendererCommand</Filter>
-    </None>
-    <None Include="..\..\..\..\vdl\Src\vdl\CommandList\RendererCommandList\RendererCommandList.inl">
-      <Filter>Src\CommandList\RendererCommandList</Filter>
+    <None Include="..\..\..\..\vdl\Src\vdl\CommandList\GraphicsCommandList\GraphicsCommandList.inl">
+      <Filter>Src\CommandList\GraphicsCommandList</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

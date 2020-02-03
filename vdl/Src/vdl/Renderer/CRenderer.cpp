@@ -33,19 +33,19 @@ void CRenderer::Initialize()
 
   //  描画コマンドリストの初期化
   {
-    EmptyRendererCommandList_.Initialize(vdl::InputLayoutType::eNone, vdl::TopologyType::eDefaultNone, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D);
+    EmptyGraphicsCommandList_.Initialize(vdl::InputLayoutType::eNone, vdl::TopologyType::eDefaultNone, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D);
 
-    TextureRendererCommandList_.Initialize(vdl::InputLayoutType::eTexture, vdl::TopologyType::eDefaultTexture, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault2D, vdl::RasterizerState::kDefault2D, vdl::Sampler::kDefault2D,
+    TextureGraphicsCommandList_.Initialize(vdl::InputLayoutType::eTexture, vdl::TopologyType::eDefaultTexture, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault2D, vdl::RasterizerState::kDefault2D, vdl::Sampler::kDefault2D,
       vdl::VertexShader(Constants::kDefaultTextureShaderCode, Constants::kDefaultTextureShaderSize, vdl::InputLayoutType::eTexture, Constants::kDefaultShaderEntryPointVS),
       vdl::PixelShader(Constants::kDefaultTextureShaderCode, Constants::kDefaultTextureShaderSize, Constants::kDefaultShaderEntryPointPS),
       VertexBuffer(kRectangleVertices, static_cast<vdl::uint>(vdl::Macro::ArraySize(kRectangleVertices)) * sizeof(vdl::Vertex2D)), InstanceBuffer(sizeof(vdl::Instance2D) * Constants::kMaxTextureBatchNum));
 
-    StaticMeshRendererCommandList_.Initialize(vdl::InputLayoutType::eStaticMesh, vdl::TopologyType::eDefaultMesh, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
+    StaticMeshGraphicsCommandList_.Initialize(vdl::InputLayoutType::eStaticMesh, vdl::TopologyType::eDefaultMesh, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
       vdl::VertexShader(Constants::kDefaultStaticMeshShaderCode, Constants::kDefaultStaticMeshShaderSize, vdl::InputLayoutType::eStaticMesh, Constants::kDefaultShaderEntryPointVS),
       vdl::PixelShader(Constants::kDefaultStaticMeshShaderCode, Constants::kDefaultStaticMeshShaderSize, Constants::kDefaultShaderEntryPointPS),
       InstanceBuffer(sizeof(vdl::InstanceStaticMesh) * Constants::kMaxStaticMeshBatchNum));
 
-    //SkinnedMeshRendererCommandList_.Initialize(vdl::InputLayoutType::eStaticMesh, vdl::TopologyType::eDefaultMesh, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
+    //SkinnedMeshGraphicsCommandList_.Initialize(vdl::InputLayoutType::eStaticMesh, vdl::TopologyType::eDefaultMesh, vdl::BlendState::kDefault, vdl::DepthStencilState::kDefault3D, vdl::RasterizerState::kDefault3D, vdl::Sampler::kDefault3D,
     //  vdl::VertexShader(Constants::kDefaultSkinnedMeshShaderCode, Constants::kDefaultSkinnedMeshShaderSize, vdl::InputLayoutType::eSkinnedMesh, Constants::kDefaultShaderEntryPointVS),
     //  vdl::PixelShader(Constants::kDefaultSkinnedMeshShaderCode, Constants::kDefaultSkinnedMeshShaderSize, Constants::kDefaultShaderEntryPointPS),
     //  InstanceBuffer(sizeof(vdl::InstanceStaticMesh) * Constants::kMaxSkinnedMeshBatchNum));
@@ -59,7 +59,7 @@ vdl::Matrix CRenderer::GetView()const
 
 vdl::Matrix CRenderer::GetProjection()const
 {
-  return pCameraData_->Camera.Projection(StaticMeshRendererCommandList_.GetCurrentViewport().Size);
+  return pCameraData_->Camera.Projection(StaticMeshGraphicsCommandList_.GetCurrentViewport().Size);
 }
 
 void CRenderer::SetCamera(const vdl::Camera& _Camera)
@@ -84,16 +84,16 @@ void CRenderer::SetTopology(vdl::TopologyType _Topology, vdl::InputLayoutType _T
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetTopology(_Topology);
+    EmptyGraphicsCommandList_.SetTopology(_Topology);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetTopology(_Topology);
+    TextureGraphicsCommandList_.SetTopology(_Topology);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetTopology(_Topology);
+    StaticMeshGraphicsCommandList_.SetTopology(_Topology);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetTopology(_Topology);
+    //SkinnedMeshGraphicsCommandList_.SetTopology(_Topology);
     break;
   default: assert(false);
   }
@@ -104,16 +104,16 @@ void CRenderer::SetScissor(const vdl::Scissor& _Scissor, vdl::InputLayoutType _T
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetScissor(_Scissor);
+    EmptyGraphicsCommandList_.SetScissor(_Scissor);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetScissor(_Scissor);
+    TextureGraphicsCommandList_.SetScissor(_Scissor);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetScissor(_Scissor);
+    StaticMeshGraphicsCommandList_.SetScissor(_Scissor);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetScissor(_Scissor);
+    //SkinnedMeshGraphicsCommandList_.SetScissor(_Scissor);
     break;
   default: assert(false);
   }
@@ -124,16 +124,16 @@ void CRenderer::SetViewport(const vdl::Viewport& _Viewport, vdl::InputLayoutType
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetViewport(_Viewport);
+    EmptyGraphicsCommandList_.SetViewport(_Viewport);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetViewport(_Viewport);
+    TextureGraphicsCommandList_.SetViewport(_Viewport);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetViewport(_Viewport);
+    StaticMeshGraphicsCommandList_.SetViewport(_Viewport);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetViewport(_Viewport);
+    //SkinnedMeshGraphicsCommandList_.SetViewport(_Viewport);
     break;
   default: assert(false);
   }
@@ -144,16 +144,16 @@ void CRenderer::SetBlendState(const vdl::BlendState& _BlendState, vdl::InputLayo
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetBlendState(_BlendState);
+    EmptyGraphicsCommandList_.SetBlendState(_BlendState);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetBlendState(_BlendState);
+    TextureGraphicsCommandList_.SetBlendState(_BlendState);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetBlendState(_BlendState);
+    StaticMeshGraphicsCommandList_.SetBlendState(_BlendState);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetBlendState(_BlendState);
+    //SkinnedMeshGraphicsCommandList_.SetBlendState(_BlendState);
     break;
   default: assert(false);
   }
@@ -164,16 +164,16 @@ void CRenderer::SetDepthStencilState(const vdl::DepthStencilState& _DepthStencil
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetDepthStencilState(_DepthStencilState);
+    EmptyGraphicsCommandList_.SetDepthStencilState(_DepthStencilState);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetDepthStencilState(_DepthStencilState);
+    TextureGraphicsCommandList_.SetDepthStencilState(_DepthStencilState);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetDepthStencilState(_DepthStencilState);
+    StaticMeshGraphicsCommandList_.SetDepthStencilState(_DepthStencilState);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetDepthStencilState(_DepthStencilState);
+    //SkinnedMeshGraphicsCommandList_.SetDepthStencilState(_DepthStencilState);
     break;
   default: assert(false);
   }
@@ -184,16 +184,16 @@ void CRenderer::SetRasterizerState(const vdl::RasterizerState& _RasterizerState,
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetRasterizerState(_RasterizerState);
+    EmptyGraphicsCommandList_.SetRasterizerState(_RasterizerState);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetRasterizerState(_RasterizerState);
+    TextureGraphicsCommandList_.SetRasterizerState(_RasterizerState);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetRasterizerState(_RasterizerState);
+    StaticMeshGraphicsCommandList_.SetRasterizerState(_RasterizerState);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetRasterizerState(_RasterizerState);
+    //SkinnedMeshGraphicsCommandList_.SetRasterizerState(_RasterizerState);
     break;
   default: assert(false);
   }
@@ -204,16 +204,16 @@ void CRenderer::SetVertexShader(const vdl::VertexShader& _VertexShader, vdl::Inp
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetVertexShader(_VertexShader);
+    EmptyGraphicsCommandList_.SetVertexShader(_VertexShader);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetVertexShader(_VertexShader);
+    TextureGraphicsCommandList_.SetVertexShader(_VertexShader);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetVertexShader(_VertexShader);
+    StaticMeshGraphicsCommandList_.SetVertexShader(_VertexShader);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetVertexShader(_VertexShader);
+    //SkinnedMeshGraphicsCommandList_.SetVertexShader(_VertexShader);
     break;
   default: assert(false);
   }
@@ -224,16 +224,16 @@ void CRenderer::SetHullShader(const vdl::HullShader& _HullShader, vdl::InputLayo
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetHullShader(_HullShader);
+    EmptyGraphicsCommandList_.SetHullShader(_HullShader);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetHullShader(_HullShader);
+    TextureGraphicsCommandList_.SetHullShader(_HullShader);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetHullShader(_HullShader);
+    StaticMeshGraphicsCommandList_.SetHullShader(_HullShader);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetHullShader(_HullShader);
+    //SkinnedMeshGraphicsCommandList_.SetHullShader(_HullShader);
     break;
   default: assert(false);
   }
@@ -244,16 +244,16 @@ void CRenderer::SetDomainShader(const vdl::DomainShader& _DomainShader, vdl::Inp
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetDomainShader(_DomainShader);
+    EmptyGraphicsCommandList_.SetDomainShader(_DomainShader);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetDomainShader(_DomainShader);
+    TextureGraphicsCommandList_.SetDomainShader(_DomainShader);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetDomainShader(_DomainShader);
+    StaticMeshGraphicsCommandList_.SetDomainShader(_DomainShader);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetDomainShader(_DomainShader);
+    //SkinnedMeshGraphicsCommandList_.SetDomainShader(_DomainShader);
     break;
   default: assert(false);
   }
@@ -264,16 +264,16 @@ void CRenderer::SetGeometryShader(const vdl::GeometryShader& _GeometryShader, vd
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetGeometryShader(_GeometryShader);
+    EmptyGraphicsCommandList_.SetGeometryShader(_GeometryShader);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetGeometryShader(_GeometryShader);
+    TextureGraphicsCommandList_.SetGeometryShader(_GeometryShader);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetGeometryShader(_GeometryShader);
+    StaticMeshGraphicsCommandList_.SetGeometryShader(_GeometryShader);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetGeometryShader(_GeometryShader);
+    //SkinnedMeshGraphicsCommandList_.SetGeometryShader(_GeometryShader);
     break;
   default: assert(false);
   }
@@ -284,16 +284,16 @@ void CRenderer::SetPixelShader(const vdl::PixelShader& _PixelShader, vdl::InputL
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    EmptyRendererCommandList_.SetPixelShader(_PixelShader);
+    EmptyGraphicsCommandList_.SetPixelShader(_PixelShader);
     break;
   case vdl::InputLayoutType::eTexture:
-    TextureRendererCommandList_.SetPixelShader(_PixelShader);
+    TextureGraphicsCommandList_.SetPixelShader(_PixelShader);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    StaticMeshRendererCommandList_.SetPixelShader(_PixelShader);
+    StaticMeshGraphicsCommandList_.SetPixelShader(_PixelShader);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SkinnedMeshRendererCommandList_.SetPixelShader(_PixelShader);
+    //SkinnedMeshGraphicsCommandList_.SetPixelShader(_PixelShader);
     break;
   default: assert(false);
   }
@@ -301,24 +301,24 @@ void CRenderer::SetPixelShader(const vdl::PixelShader& _PixelShader, vdl::InputL
 
 void CRenderer::SetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResourceNum, const vdl::ShaderResource _ShaderResources[], ShaderType _Stage, vdl::InputLayoutType _Type)
 {
-  auto SetShaderResources = [&](auto* _pRendererCommandList)->void
+  auto SetShaderResources = [&](auto* _pGraphicsCommandList)->void
   {
     switch (_Stage)
     {
     case ShaderType::eVertexShader:
-      _pRendererCommandList->SetShaderResources<ShaderType::eVertexShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
+      _pGraphicsCommandList->SetShaderResources<ShaderType::eVertexShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
       break;
     case ShaderType::eHullShader:
-      _pRendererCommandList->SetShaderResources<ShaderType::eHullShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
+      _pGraphicsCommandList->SetShaderResources<ShaderType::eHullShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
       break;
     case ShaderType::eDomainShader:
-      _pRendererCommandList->SetShaderResources<ShaderType::eDomainShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
+      _pGraphicsCommandList->SetShaderResources<ShaderType::eDomainShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
       break;
     case ShaderType::eGeometryShader:
-      _pRendererCommandList->SetShaderResources<ShaderType::eGeometryShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
+      _pGraphicsCommandList->SetShaderResources<ShaderType::eGeometryShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
       break;
     case ShaderType::ePixelShader:
-      _pRendererCommandList->SetShaderResources<ShaderType::ePixelShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
+      _pGraphicsCommandList->SetShaderResources<ShaderType::ePixelShader>(_StartSlot, _ShaderResourceNum, _ShaderResources);
       break;
     default: assert(false);
     }
@@ -327,16 +327,16 @@ void CRenderer::SetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResour
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    SetShaderResources(&EmptyRendererCommandList_);
+    SetShaderResources(&EmptyGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eTexture:
-    SetShaderResources(&TextureRendererCommandList_);
+    SetShaderResources(&TextureGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    SetShaderResources(&StaticMeshRendererCommandList_);
+    SetShaderResources(&StaticMeshGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SetShaderResources(&SkinnedMeshRendererCommandList_);
+    //SetShaderResources(&SkinnedMeshGraphicsCommandList_);
     break;
   default: assert(false);
   }
@@ -344,24 +344,24 @@ void CRenderer::SetShaderResources(vdl::uint _StartSlot, vdl::uint _ShaderResour
 
 void CRenderer::SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const vdl::Sampler _Samplers[], ShaderType _Stage, vdl::InputLayoutType _Type)
 {
-  auto SetSamplers = [&](auto* _pRendererCommandList)->void
+  auto SetSamplers = [&](auto* _pGraphicsCommandList)->void
   {
     switch (_Stage)
     {
     case ShaderType::eVertexShader:
-      _pRendererCommandList->SetSamplers<ShaderType::eVertexShader>(_StartSlot, _SamplerNum, _Samplers);
+      _pGraphicsCommandList->SetSamplers<ShaderType::eVertexShader>(_StartSlot, _SamplerNum, _Samplers);
       break;
     case ShaderType::eHullShader:
-      _pRendererCommandList->SetSamplers<ShaderType::eHullShader>(_StartSlot, _SamplerNum, _Samplers);
+      _pGraphicsCommandList->SetSamplers<ShaderType::eHullShader>(_StartSlot, _SamplerNum, _Samplers);
       break;
     case ShaderType::eDomainShader:
-      _pRendererCommandList->SetSamplers<ShaderType::eDomainShader>(_StartSlot, _SamplerNum, _Samplers);
+      _pGraphicsCommandList->SetSamplers<ShaderType::eDomainShader>(_StartSlot, _SamplerNum, _Samplers);
       break;
     case ShaderType::eGeometryShader:
-      _pRendererCommandList->SetSamplers<ShaderType::eGeometryShader>(_StartSlot, _SamplerNum, _Samplers);
+      _pGraphicsCommandList->SetSamplers<ShaderType::eGeometryShader>(_StartSlot, _SamplerNum, _Samplers);
       break;
     case ShaderType::ePixelShader:
-      _pRendererCommandList->SetSamplers<ShaderType::ePixelShader>(_StartSlot, _SamplerNum, _Samplers);
+      _pGraphicsCommandList->SetSamplers<ShaderType::ePixelShader>(_StartSlot, _SamplerNum, _Samplers);
       break;
     default: assert(false);
     }
@@ -370,16 +370,16 @@ void CRenderer::SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const v
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    SetSamplers(&EmptyRendererCommandList_);
+    SetSamplers(&EmptyGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eTexture:
-    SetSamplers(&TextureRendererCommandList_);
+    SetSamplers(&TextureGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    SetSamplers(&StaticMeshRendererCommandList_);
+    SetSamplers(&StaticMeshGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SetSamplers(&SkinnedMeshRendererCommandList_);
+    //SetSamplers(&SkinnedMeshGraphicsCommandList_);
     break;
   default: assert(false);
   }
@@ -387,24 +387,24 @@ void CRenderer::SetSamplers(vdl::uint _StartSlot, vdl::uint _SamplerNum, const v
 
 void CRenderer::SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBufferNum, const vdl::Detail::ConstantBufferData _ConstantBuffers[], ShaderType _Stage, vdl::InputLayoutType _Type)
 {
-  auto SetConstantBuffers = [&](auto* _pRendererCommandList)->void
+  auto SetConstantBuffers = [&](auto* _pGraphicsCommandList)->void
   {
     switch (_Stage)
     {
     case ShaderType::eVertexShader:
-      _pRendererCommandList->SetConstantBuffers<ShaderType::eVertexShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
+      _pGraphicsCommandList->SetConstantBuffers<ShaderType::eVertexShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
       break;
     case ShaderType::eHullShader:
-      _pRendererCommandList->SetConstantBuffers<ShaderType::eHullShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
+      _pGraphicsCommandList->SetConstantBuffers<ShaderType::eHullShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
       break;
     case ShaderType::eDomainShader:
-      _pRendererCommandList->SetConstantBuffers<ShaderType::eDomainShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
+      _pGraphicsCommandList->SetConstantBuffers<ShaderType::eDomainShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
       break;
     case ShaderType::eGeometryShader:
-      _pRendererCommandList->SetConstantBuffers<ShaderType::eGeometryShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
+      _pGraphicsCommandList->SetConstantBuffers<ShaderType::eGeometryShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
       break;
     case ShaderType::ePixelShader:
-      _pRendererCommandList->SetConstantBuffers<ShaderType::ePixelShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
+      _pGraphicsCommandList->SetConstantBuffers<ShaderType::ePixelShader>(_StartSlot, _ConstantBufferNum, _ConstantBuffers);
       break;
     default: assert(false);
     }
@@ -413,16 +413,16 @@ void CRenderer::SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBuff
   switch (_Type)
   {
   case vdl::InputLayoutType::eNone:
-    SetConstantBuffers(&EmptyRendererCommandList_);
+    SetConstantBuffers(&EmptyGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eTexture:
-    SetConstantBuffers(&TextureRendererCommandList_);
+    SetConstantBuffers(&TextureGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eStaticMesh:
-    SetConstantBuffers(&StaticMeshRendererCommandList_);
+    SetConstantBuffers(&StaticMeshGraphicsCommandList_);
     break;
   case vdl::InputLayoutType::eSkinnedMesh:
-    //SetConstantBuffers(&SkinnedMeshRendererCommandList_);
+    //SetConstantBuffers(&SkinnedMeshGraphicsCommandList_);
     break;
   default: assert(false);
   }
@@ -430,7 +430,7 @@ void CRenderer::SetConstantBuffers(vdl::uint _StartSlot, vdl::uint _ConstantBuff
 
 void CRenderer::Draw(vdl::uint _VertexCount)
 {
-  EmptyRendererCommandList_.SetDrawData({ _VertexCount, 1, 0, 1 });
+  EmptyGraphicsCommandList_.SetDrawData({ _VertexCount, 1, 0, 1 });
 }
 
 void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftTop, const vdl::float2& _DestSize, const vdl::float2& _SrcLeftPos, const vdl::float2& _SrcSize, const vdl::Radian& _Angle, const vdl::Color4F& _Color)
@@ -443,7 +443,7 @@ void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftT
 
   vdl::Instance2D Instance;
   {
-    const vdl::Viewport& CurrentViewport = TextureRendererCommandList_.GetCurrentViewport();
+    const vdl::Viewport& CurrentViewport = TextureGraphicsCommandList_.GetCurrentViewport();
 
     Instance.NDCTransform = (vdl::Matrix::Scale({ _DestSize, 0.0f }) * vdl::Matrix::RotateZ(_Angle) * vdl::Matrix::Translate({ _DestLeftTop + _DestSize * 0.5f, 0.0f })
       * vdl::Matrix::Scale({ 2.0f / CurrentViewport.Size.x, -2.0f / CurrentViewport.Size.y, 1.0f }) * vdl::Matrix::Translate({ -1.0f, 1.0f, 0.0f }))
@@ -459,7 +459,7 @@ void CRenderer::Draw(const vdl::Texture& _Texture, const vdl::float2& _DestLeftT
 
     Instance.Color = _Color;
   }
-  TextureRendererCommandList_.SetDrawData(_Texture, std::move(Instance));
+  TextureGraphicsCommandList_.SetDrawData(_Texture, std::move(Instance));
 }
 
 void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _World, const vdl::Color4F& _Color)
@@ -474,7 +474,7 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
   {
     pCameraData_->isChange = false;
     pCameraData_->ConstantBuffer.GetData().ViewProjection = GetView() * GetProjection();
-    StaticMeshRendererCommandList_.SetConstantBuffers<ShaderType::eVertexShader>(0, 1, &pCameraData_->ConstantBuffer.GetDetail());
+    StaticMeshGraphicsCommandList_.SetConstantBuffers<ShaderType::eVertexShader>(0, 1, &pCameraData_->ConstantBuffer.GetDetail());
   }
 
   vdl::InstanceStaticMesh Instance;
@@ -482,7 +482,7 @@ void CRenderer::Draw(const vdl::StaticMesh& _StaticMesh, const vdl::Matrix& _Wor
     Instance.World = _StaticMesh.GetGlobalTransform() * _World;
     Instance.Color = _Color;
   }
-  StaticMeshRendererCommandList_.SetDrawData(_StaticMesh, std::move(Instance));
+  StaticMeshGraphicsCommandList_.SetDrawData(_StaticMesh, std::move(Instance));
 }
 
 void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _World, const vdl::MotionBlendDatas& _MotionBlendDatas, const vdl::Color4F& _Color)
@@ -497,7 +497,7 @@ void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _W
   //{
   //  //pCameraData_->isChange = false;
   //  pCameraData_->ConstantBuffer.GetData().ViewProjection = GetView() * GetProjection();
-  //  SkinnedMeshRendererCommandList_.SetConstantBuffers<ShaderType::eVertexShader>(0, 1, &pCameraData_->ConstantBuffer.GetDetail());
+  //  SkinnedMeshGraphicsCommandList_.SetConstantBuffers<ShaderType::eVertexShader>(0, 1, &pCameraData_->ConstantBuffer.GetDetail());
   //}
   //
   //vdl::InstanceSkinnedMesh Instance;
@@ -505,7 +505,7 @@ void CRenderer::Draw(const vdl::SkinnedMesh& _SkinnedMesh, const vdl::Matrix& _W
   //  Instance.World = _World * _SkinnedMesh.GetGlobalTransform();
   //  Instance.Color = _Color;
   //}
-  //SkinnedMeshRendererCommandList_.SetDrawData(_SkinnedMesh, std::move(Instance));
+  //SkinnedMeshGraphicsCommandList_.SetDrawData(_SkinnedMesh, std::move(Instance));
 }
 
 void CRenderer::Clear(const vdl::RenderTexture& _RenderTexture, const vdl::Color4F& _ClearColor)
@@ -531,10 +531,10 @@ void CRenderer::Clear(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture
 
 void CRenderer::Flush()
 {
-  const bool HasEmptyDrawCommand = EmptyRendererCommandList_.HasDrawCommand();
-  const bool HasTextureDrawCommand = TextureRendererCommandList_.HasDrawCommand();
-  const bool HasStaticMeshDrawCommand = StaticMeshRendererCommandList_.HasDrawCommand();
-  //const bool HasSkinnedMeshDrawCommand = SkinnedMeshRendererCommandList_.HasDrawCommand();
+  const bool HasEmptyDrawCommand = EmptyGraphicsCommandList_.HasDrawCommand();
+  const bool HasTextureDrawCommand = TextureGraphicsCommandList_.HasDrawCommand();
+  const bool HasStaticMeshDrawCommand = StaticMeshGraphicsCommandList_.HasDrawCommand();
+  //const bool HasSkinnedMeshDrawCommand = SkinnedMeshGraphicsCommandList_.HasDrawCommand();
 
   pDeviceContext_->SetRenderTextures(OutputManager_.RenderTextures, OutputManager_.DepthStencilTexture);
 
@@ -544,45 +544,45 @@ void CRenderer::Flush()
     //{
     //  if (HasEmptyDrawCommand)
     //  {
-    //    EmptyRendererCommandList_.Adjust();
+    //    EmptyGraphicsCommandList_.Adjust();
     //  }
     //  if (HasTextureDrawCommand)
     //  {
-    //    TextureRendererCommandList_.Adjust();
+    //    TextureGraphicsCommandList_.Adjust();
     //  }
     //  if (HasStaticMeshDrawCommand)
     //  {
-    //    StaticMeshRendererCommandList_.Adjust();
+    //    StaticMeshGraphicsCommandList_.Adjust();
     //  }
     //  //if (HasSkinnedMeshDrawCommand)
     //  //{
-    //  //  SkinnedMeshRendererCommandList_.Adjust();
+    //  //  SkinnedMeshGraphicsCommandList_.Adjust();
     //  //}
     //}
 
     if (HasStaticMeshDrawCommand)
     {
       pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eStaticMesh);
-      pDeviceContext_->Execute(StaticMeshRendererCommandList_);
-      StaticMeshRendererCommandList_.Reset();
+      pDeviceContext_->Execute(StaticMeshGraphicsCommandList_);
+      StaticMeshGraphicsCommandList_.Reset();
     }
     //if (HasSkinnedMeshDrawCommand)
     //{
     //  pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eSkinnedMesh);
-    //  SkinnedMeshRendererCommandList_.Flush(pDeviceContext_, SkinnedMeshInstanceBuffer_);
-    //  SkinnedMeshRendererCommandList_.Reset();
+    //  SkinnedMeshGraphicsCommandList_.Flush(pDeviceContext_, SkinnedMeshInstanceBuffer_);
+    //  SkinnedMeshGraphicsCommandList_.Reset();
     //}
     if (HasEmptyDrawCommand)
     {
       pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eNone);
-      pDeviceContext_->Execute(EmptyRendererCommandList_);
-      EmptyRendererCommandList_.Reset();
+      pDeviceContext_->Execute(EmptyGraphicsCommandList_);
+      EmptyGraphicsCommandList_.Reset();
     }
     if (HasTextureDrawCommand)
     {
       pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eTexture);
-      pDeviceContext_->Execute(TextureRendererCommandList_);
-      TextureRendererCommandList_.Reset();
+      pDeviceContext_->Execute(TextureGraphicsCommandList_);
+      TextureGraphicsCommandList_.Reset();
     }
 
     pDeviceContext_->Flush();

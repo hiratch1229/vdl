@@ -19,7 +19,7 @@
 #include <unordered_map>
 #include <any>
 
-enum class RendererCommandFlag : vdl::uint32_t
+enum class GraphicsCommandFlag : vdl::uint32_t
 {
   eDraw = 1u << 0,
   eDrawIndexed = 1u << 1,
@@ -54,7 +54,7 @@ enum class RendererCommandFlag : vdl::uint32_t
   eSetGeometryStageConstantBuffer = 1u << 30,
   eSetPixelStageConstantBuffer = 1u << 31,
 };
-using RendererCommandFlags = vdl::Flags<RendererCommandFlag, vdl::uint32_t>;
+using GraphicsCommandFlags = vdl::Flags<GraphicsCommandFlag, vdl::uint32_t>;
 
 class IBufferManager;
 class IModelManager;
@@ -85,52 +85,52 @@ public:
     : IndexCount(_IndexCount), InstanceCount(_InstanceCount), FirstIndex(_FirstIndex), VertexOffset(_VertexOffset), FirstInstance(_FirstInstance) {}
 };
 
-class BaseRendererCommandList
+class BaseGraphicsCommandList
 {
-  using RendererCommandPair = std::pair<RendererCommandFlag, vdl::uint>;
-  using RendererCommands = std::vector<RendererCommandPair>;
+  using GraphicsCommandPair = std::pair<GraphicsCommandFlag, vdl::uint>;
+  using GraphicsCommands = std::vector<GraphicsCommandPair>;
   using ShaderResources = std::vector<vdl::ShaderResource>;
   using Samplers = std::vector<vdl::Sampler>;
   using ConstantBuffers = std::vector<vdl::Detail::ConstantBufferData>;
   using InstanceDatas = std::vector<vdl::uint8_t>;
 protected:
-  static constexpr RendererCommandFlags kDrawFlag = RendererCommandFlag::eDraw;
-  static constexpr RendererCommandFlags kDrawIndexedFlag = RendererCommandFlag::eDrawIndexed;
-  static constexpr RendererCommandFlags kSetVertexBufferFlag = RendererCommandFlag::eSetVertexBuffer;
-  static constexpr RendererCommandFlags kSetInstanceBufferFlag = RendererCommandFlag::eSetInstanceBuffer;
-  static constexpr RendererCommandFlags kSetIndexBufferFlag = RendererCommandFlag::eSetIndexBuffer;
-  static constexpr RendererCommandFlags kSetInputLayoutFlag = RendererCommandFlag::eSetInputLayout;
-  static constexpr RendererCommandFlags kSetTopologyFlag = RendererCommandFlag::eSetTopology;
-  static constexpr RendererCommandFlags kSetScissorFlag = RendererCommandFlag::eSetScissor;
-  static constexpr RendererCommandFlags kSetViewportFlag = RendererCommandFlag::eSetViewport;
-  static constexpr RendererCommandFlags kSetBlendStateFlag = RendererCommandFlag::eSetBlendState;
-  static constexpr RendererCommandFlags kSetDepthStencilStateFlag = RendererCommandFlag::eSetDepthStencilState;
-  static constexpr RendererCommandFlags kSetRasterizerStateFlag = RendererCommandFlag::eSetRasterizerState;
-  static constexpr RendererCommandFlags kSetVertexShaderFlag = RendererCommandFlag::eSetVertexShader;
-  static constexpr RendererCommandFlags kSetHullShaderFlag = RendererCommandFlag::eSetHullShader;
-  static constexpr RendererCommandFlags kSetDomainShaderFlag = RendererCommandFlag::eSetDomainShader;
-  static constexpr RendererCommandFlags kSetGeometryShaderFlag = RendererCommandFlag::eSetGeometryShader;
-  static constexpr RendererCommandFlags kSetPixelShaderFlag = RendererCommandFlag::eSetPixelShader;
-  static constexpr RendererCommandFlags kSetVertexStageShaderResourceFlag = RendererCommandFlag::eSetVertexStageShaderResource;
-  static constexpr RendererCommandFlags kSetHullStageShaderResourceFlag = RendererCommandFlag::eSetHullStageShaderResource;
-  static constexpr RendererCommandFlags kSetDomainStageShaderResourceFlag = RendererCommandFlag::eSetDomainStageShaderResource;
-  static constexpr RendererCommandFlags kSetGeometryStageShaderResourceFlag = RendererCommandFlag::eSetGeometryStageShaderResource;
-  static constexpr RendererCommandFlags kSetPixelStageShaderResourceFlag = RendererCommandFlag::eSetPixelStageShaderResource;
-  static constexpr RendererCommandFlags kSetVertexStageSamplerFlag = RendererCommandFlag::eSetVertexStageSampler;
-  static constexpr RendererCommandFlags kSetHullStageSamplerFlag = RendererCommandFlag::eSetHullStageSampler;
-  static constexpr RendererCommandFlags kSetDomainStageSamplerFlag = RendererCommandFlag::eSetDomainStageSampler;
-  static constexpr RendererCommandFlags kSetGeometryStageSamplerFlag = RendererCommandFlag::eSetGeometryStageSampler;
-  static constexpr RendererCommandFlags kSetPixelStageSamplerFlag = RendererCommandFlag::eSetPixelStageSampler;
-  static constexpr RendererCommandFlags kSetVertexStageConstantBufferFlag = RendererCommandFlag::eSetVertexStageConstantBuffer;
-  static constexpr RendererCommandFlags kSetHullStageConstantBufferFlag = RendererCommandFlag::eSetHullStageConstantBuffer;
-  static constexpr RendererCommandFlags kSetDomainStageConstantBufferFlag = RendererCommandFlag::eSetDomainStageConstantBuffer;
-  static constexpr RendererCommandFlags kSetGeometryStageConstantBufferFlag = RendererCommandFlag::eSetGeometryStageConstantBuffer;
-  static constexpr RendererCommandFlags kSetPixelStageConstantBufferFlag = RendererCommandFlag::eSetPixelStageConstantBuffer;
+  static constexpr GraphicsCommandFlags kDrawFlag = GraphicsCommandFlag::eDraw;
+  static constexpr GraphicsCommandFlags kDrawIndexedFlag = GraphicsCommandFlag::eDrawIndexed;
+  static constexpr GraphicsCommandFlags kSetVertexBufferFlag = GraphicsCommandFlag::eSetVertexBuffer;
+  static constexpr GraphicsCommandFlags kSetInstanceBufferFlag = GraphicsCommandFlag::eSetInstanceBuffer;
+  static constexpr GraphicsCommandFlags kSetIndexBufferFlag = GraphicsCommandFlag::eSetIndexBuffer;
+  static constexpr GraphicsCommandFlags kSetInputLayoutFlag = GraphicsCommandFlag::eSetInputLayout;
+  static constexpr GraphicsCommandFlags kSetTopologyFlag = GraphicsCommandFlag::eSetTopology;
+  static constexpr GraphicsCommandFlags kSetScissorFlag = GraphicsCommandFlag::eSetScissor;
+  static constexpr GraphicsCommandFlags kSetViewportFlag = GraphicsCommandFlag::eSetViewport;
+  static constexpr GraphicsCommandFlags kSetBlendStateFlag = GraphicsCommandFlag::eSetBlendState;
+  static constexpr GraphicsCommandFlags kSetDepthStencilStateFlag = GraphicsCommandFlag::eSetDepthStencilState;
+  static constexpr GraphicsCommandFlags kSetRasterizerStateFlag = GraphicsCommandFlag::eSetRasterizerState;
+  static constexpr GraphicsCommandFlags kSetVertexShaderFlag = GraphicsCommandFlag::eSetVertexShader;
+  static constexpr GraphicsCommandFlags kSetHullShaderFlag = GraphicsCommandFlag::eSetHullShader;
+  static constexpr GraphicsCommandFlags kSetDomainShaderFlag = GraphicsCommandFlag::eSetDomainShader;
+  static constexpr GraphicsCommandFlags kSetGeometryShaderFlag = GraphicsCommandFlag::eSetGeometryShader;
+  static constexpr GraphicsCommandFlags kSetPixelShaderFlag = GraphicsCommandFlag::eSetPixelShader;
+  static constexpr GraphicsCommandFlags kSetVertexStageShaderResourceFlag = GraphicsCommandFlag::eSetVertexStageShaderResource;
+  static constexpr GraphicsCommandFlags kSetHullStageShaderResourceFlag = GraphicsCommandFlag::eSetHullStageShaderResource;
+  static constexpr GraphicsCommandFlags kSetDomainStageShaderResourceFlag = GraphicsCommandFlag::eSetDomainStageShaderResource;
+  static constexpr GraphicsCommandFlags kSetGeometryStageShaderResourceFlag = GraphicsCommandFlag::eSetGeometryStageShaderResource;
+  static constexpr GraphicsCommandFlags kSetPixelStageShaderResourceFlag = GraphicsCommandFlag::eSetPixelStageShaderResource;
+  static constexpr GraphicsCommandFlags kSetVertexStageSamplerFlag = GraphicsCommandFlag::eSetVertexStageSampler;
+  static constexpr GraphicsCommandFlags kSetHullStageSamplerFlag = GraphicsCommandFlag::eSetHullStageSampler;
+  static constexpr GraphicsCommandFlags kSetDomainStageSamplerFlag = GraphicsCommandFlag::eSetDomainStageSampler;
+  static constexpr GraphicsCommandFlags kSetGeometryStageSamplerFlag = GraphicsCommandFlag::eSetGeometryStageSampler;
+  static constexpr GraphicsCommandFlags kSetPixelStageSamplerFlag = GraphicsCommandFlag::eSetPixelStageSampler;
+  static constexpr GraphicsCommandFlags kSetVertexStageConstantBufferFlag = GraphicsCommandFlag::eSetVertexStageConstantBuffer;
+  static constexpr GraphicsCommandFlags kSetHullStageConstantBufferFlag = GraphicsCommandFlag::eSetHullStageConstantBuffer;
+  static constexpr GraphicsCommandFlags kSetDomainStageConstantBufferFlag = GraphicsCommandFlag::eSetDomainStageConstantBuffer;
+  static constexpr GraphicsCommandFlags kSetGeometryStageConstantBufferFlag = GraphicsCommandFlag::eSetGeometryStageConstantBuffer;
+  static constexpr GraphicsCommandFlags kSetPixelStageConstantBufferFlag = GraphicsCommandFlag::eSetPixelStageConstantBuffer;
 protected:
   IBufferManager* pBufferManager_;
 protected:
-  RendererCommands RendererCommands_;
-  RendererCommandFlags RendererCommandFlags_;
+  GraphicsCommands GraphicsCommands_;
+  GraphicsCommandFlags GraphicsCommandFlags_;
   std::vector<vdl::ID> DisplayObjectIDs_;
   std::vector<InstanceDatas> Instances_;
   std::vector<DrawData> DrawDatas_;
@@ -178,21 +178,21 @@ private:
   template<ShaderType Type> void UpdateAndSetConstantBuffer();
   template<ShaderType Type> void SetShaderObjects();
 protected:
-  void PushRendererCommand();
+  void PushGraphicsCommand();
   void Sort();
 protected:
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
     vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer);
 public:
-  BaseRendererCommandList() = default;
+  BaseGraphicsCommandList() = default;
 
-  ~BaseRendererCommandList() = default;
+  ~BaseGraphicsCommandList() = default;
 
   void Reset();
 
   [[nodiscard]] bool HasDrawCommand()const { return !DrawDatas_.empty() || !DrawIndexedDatas_.empty(); }
 
-  [[nodiscard]] const RendererCommands& GetRendererCommands()const { return RendererCommands_; }
+  [[nodiscard]] const GraphicsCommands& GetGraphicsCommands()const { return GraphicsCommands_; }
 
   [[nodiscard]] const InstanceDatas& GetInstanceDatas(vdl::uint _Index)const { return Instances_[_Index]; }
 
@@ -303,7 +303,7 @@ public:
 
 //  メッシュ用コマンドリスト
 template<class DisplayObject, class InstanceData>
-class RendererCommandList : public BaseRendererCommandList
+class GraphicsCommandList : public BaseGraphicsCommandList
 {
   static constexpr vdl::uint kInstanceSize = static_cast<vdl::uint>(sizeof(InstanceData));
 private:
@@ -313,7 +313,7 @@ private:
 
   void SetIndexBuffer(const IndexBuffer&);
 public:
-  RendererCommandList() = default;
+  GraphicsCommandList() = default;
 
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
     vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer);
@@ -323,7 +323,7 @@ public:
 
 //  テクスチャ用コマンドリスト
 template<class InstanceData>
-class RendererCommandList<vdl::Texture, InstanceData> : public BaseRendererCommandList
+class GraphicsCommandList<vdl::Texture, InstanceData> : public BaseGraphicsCommandList
 {
   static constexpr vdl::uint kInstanceSize = static_cast<vdl::uint>(sizeof(InstanceData));
 private:
@@ -331,7 +331,7 @@ private:
 
   void SetIndexBuffer(const IndexBuffer&);
 public:
-  RendererCommandList() = default;
+  GraphicsCommandList() = default;
 
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
     vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, VertexBuffer&& _VertexBuffer, InstanceBuffer&& _InstanceBuffer);
@@ -341,10 +341,10 @@ public:
 
 //  GUI用コマンドリスト
 template<>
-class RendererCommandList<vdl::Texture, std::nullptr_t> : public BaseRendererCommandList
+class GraphicsCommandList<vdl::Texture, std::nullptr_t> : public BaseGraphicsCommandList
 {
 public:
-  RendererCommandList() = default;
+  GraphicsCommandList() = default;
 
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState,
     vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader);
@@ -354,14 +354,14 @@ public:
 
 //  頂点バッファ&インスタンスバッファ無し用コマンドリスト
 template<>
-class RendererCommandList<std::nullptr_t, std::nullptr_t> : public BaseRendererCommandList
+class GraphicsCommandList<std::nullptr_t, std::nullptr_t> : public BaseGraphicsCommandList
 {
 private:
   void SetVertexBuffer(const VertexBuffer&);
 
   void SetIndexBuffer(const IndexBuffer&);
 public:
-  RendererCommandList() = default;
+  GraphicsCommandList() = default;
 
   void Initialize(vdl::InputLayoutType _InputLayout, vdl::TopologyType _Topology, vdl::BlendState&& _BlendState, vdl::DepthStencilState&& _DepthStencilState, vdl::RasterizerState&& _RasterizerState,
     vdl::Sampler&& _Sampler);
@@ -369,4 +369,4 @@ public:
   void SetDrawData(DrawData&& _DrawData);
 };
 
-#include "RendererCommandList.inl"
+#include "GraphicsCommandList.inl"
