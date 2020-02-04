@@ -1,4 +1,5 @@
 #include <vdl/Engine.hpp>
+#include <vdl/System/ISystem.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ModelManager/IModelManager.hpp>
 
@@ -8,6 +9,7 @@ inline void BaseGraphicsCommandList::Initialize(vdl::InputLayoutType _InputLayou
   vdl::RasterizerState&& _RasterizerState, vdl::Sampler&& _Sampler, vdl::VertexShader&& _VertexShader, vdl::PixelShader&& _PixelShader, InstanceBuffer&& _InstanceBuffer)
 {
   pBufferManager_ = Engine::Get<IBufferManager>();
+  pThreadPool_ = Engine::Get<ISystem>()->GetThreadPool();
 
   InstanceBuffer_ = std::move(_InstanceBuffer);
   InputLayouts_.push_back(CurrentInputLayout_ = std::move(_InputLayout));
@@ -31,152 +33,297 @@ inline void BaseGraphicsCommandList::Initialize(vdl::InputLayoutType _InputLayou
   CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)].resize(1);
   Samplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0][0] = CurrentSamplers_[static_cast<vdl::uint>(ShaderType::ePixelShader)][0] = std::move(_Sampler);
 
+  ResetFunc_ = [&]()
+  {
+    {
+      std::lock_guard Lock(Mutex_);
+      GraphicsCommandFlags_ = 0xFFFFFFFF;
+
+      //  インスタンスバッファが存在していないならフラグを外す
+      if (InstanceBuffer_.isEmpty())
+      {
+        GraphicsCommandFlags_ &= ~kSetInstanceBufferFlag;
+      }
+
+      //  頂点バッファが存在していないならフラグを外す
+      if (CurrentVertexBuffer_.isEmpty())
+      {
+        GraphicsCommandFlags_ &= ~kSetVertexBufferFlag;
+      }
+
+      //  インデックスバッファが存在していないならフラグを外す
+      if (CurrentIndexBuffer_.isEmpty())
+      {
+        GraphicsCommandFlags_ &= ~kSetIndexBufferFlag;
+      }
+    }
+
+    std::lock_guard ResetLock(ResetMutex_);
+
+    GraphicsCommands_.clear();
+    DisplayObjectIDs_.clear();
+    Instances_.clear();
+    DrawDatas_.clear();
+    DrawIndexedDatas_.clear();
+    ReservedDisplayObjects_.clear();
+
+    if (VertexBuffers_.size() > 1)
+    {
+      VertexBuffers_ = { std::move(VertexBuffers_.back()) };
+    }
+
+    if (IndexBuffers_.size() > 1)
+    {
+      IndexBuffers_ = { std::move(IndexBuffers_.back()) };
+    }
+
+    if (InputLayouts_.size() > 1)
+    {
+      InputLayouts_ = { std::move(InputLayouts_.back()) };
+    }
+
+    if (Topologys_.size() > 1)
+    {
+      Topologys_ = { std::move(Topologys_.back()) };
+    }
+
+    if (Scissors_.size() > 1)
+    {
+      Scissors_ = { std::move(Scissors_.back()) };
+    }
+
+    if (Viewports_.size() > 1)
+    {
+      Viewports_ = { std::move(Viewports_.back()) };
+    }
+
+    if (BlendStates_.size() > 1)
+    {
+      BlendStates_ = { std::move(BlendStates_.back()) };
+    }
+
+    if (DepthStencilStates_.size() > 1)
+    {
+      DepthStencilStates_ = { std::move(DepthStencilStates_.back()) };
+    }
+
+    if (RasterizerStates_.size() > 1)
+    {
+      RasterizerStates_ = { std::move(RasterizerStates_.back()) };
+    }
+
+    if (VertexShaders_.size() > 1)
+    {
+      VertexShaders_ = { std::move(VertexShaders_.back()) };
+    }
+
+    if (HullShaders_.size() > 1)
+    {
+      HullShaders_ = { std::move(HullShaders_.back()) };
+    }
+
+    if (DomainShaders_.size() > 1)
+    {
+      DomainShaders_ = { std::move(DomainShaders_.back()) };
+    }
+
+    if (GeometryShaders_.size() > 1)
+    {
+      GeometryShaders_ = { std::move(GeometryShaders_.back()) };
+    }
+
+    if (PixelShaders_.size() > 1)
+    {
+      PixelShaders_ = { std::move(PixelShaders_.back()) };
+    }
+
+    for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+    {
+      auto& ShaderResources = ShaderResources_[ShaderTypeCount];
+
+      if (ShaderResources.size() > 1)
+      {
+        ShaderResources = { std::move(ShaderResources.back()) };
+      }
+    }
+
+    for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+    {
+      auto& Samplers = Samplers_[ShaderTypeCount];
+
+      if (Samplers.size() > 1)
+      {
+        Samplers = { std::move(Samplers.back()) };
+      }
+    }
+
+    for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+    {
+      auto& ConstantBuffers = ConstantBuffers_[ShaderTypeCount];
+
+      if (ConstantBuffers.size() > 1)
+      {
+        ConstantBuffers = { std::move(ConstantBuffers.back()) };
+      }
+    }
+
+    isReady_ = true;
+    ConditionVariable_.notify_one();
+  };
+
   Reset();
 }
 
 inline void BaseGraphicsCommandList::Reset()
 {
-  GraphicsCommands_.clear();
-  GraphicsCommandFlags_ = 0;
-  DisplayObjectIDs_.clear();
-  Instances_.clear();
-  DrawDatas_.clear();
-  DrawIndexedDatas_.clear();
-  ReservedDisplayObjects_.clear();
+  isReady_ = false;
 
-  //  インスタンスバッファが存在しているならフラグを立てる
-  if (!InstanceBuffer_.isEmpty())
-  {
-    GraphicsCommandFlags_ |= kSetInstanceBufferFlag;
-  }
+  pThreadPool_->Enqueue(ResetFunc_);
+  //ResetFunc_();
 
-  if (VertexBuffers_.size() > 1)
-  {
-    VertexBuffers_ = { std::move(VertexBuffers_.back()) };
-  }
-  //  頂点バッファが存在しているならフラグを立てる
-  if (!CurrentVertexBuffer_.isEmpty())
-  {
-    GraphicsCommandFlags_ |= kSetVertexBufferFlag;
-  }
-
-  if (IndexBuffers_.size() > 1)
-  {
-    IndexBuffers_ = { std::move(IndexBuffers_.back()) };
-  }
-  //  インデックスバッファが存在しているならフラグを立てる
-  if (!CurrentIndexBuffer_.isEmpty())
-  {
-    GraphicsCommandFlags_ |= kSetIndexBufferFlag;
-  }
-
-  if (InputLayouts_.size() > 1)
-  {
-    InputLayouts_ = { std::move(InputLayouts_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetInputLayoutFlag;
-
-  if (Topologys_.size() > 1)
-  {
-    Topologys_ = { std::move(Topologys_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetTopologyFlag;
-
-  if (Scissors_.size() > 1)
-  {
-    Scissors_ = { std::move(Scissors_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetScissorFlag;
-
-  if (Viewports_.size() > 1)
-  {
-    Viewports_ = { std::move(Viewports_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetViewportFlag;
-
-  if (BlendStates_.size() > 1)
-  {
-    BlendStates_ = { std::move(BlendStates_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetBlendStateFlag;
-
-  if (DepthStencilStates_.size() > 1)
-  {
-    DepthStencilStates_ = { std::move(DepthStencilStates_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetDepthStencilStateFlag;
-
-  if (RasterizerStates_.size() > 1)
-  {
-    RasterizerStates_ = { std::move(RasterizerStates_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetRasterizerStateFlag;
-
-  if (VertexShaders_.size() > 1)
-  {
-    VertexShaders_ = { std::move(VertexShaders_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetVertexShaderFlag;
-
-  if (HullShaders_.size() > 1)
-  {
-    HullShaders_ = { std::move(HullShaders_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetHullShaderFlag;
-
-  if (DomainShaders_.size() > 1)
-  {
-    DomainShaders_ = { std::move(DomainShaders_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetDomainShaderFlag;
-
-  if (GeometryShaders_.size() > 1)
-  {
-    GeometryShaders_ = { std::move(GeometryShaders_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetGeometryShaderFlag;
-
-  if (PixelShaders_.size() > 1)
-  {
-    PixelShaders_ = { std::move(PixelShaders_.back()) };
-  }
-  GraphicsCommandFlags_ |= kSetPixelShaderFlag;
-
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
-  {
-    auto& ShaderResources = ShaderResources_[ShaderTypeCount];
-
-    if (ShaderResources.size() > 1)
-    {
-      ShaderResources = { std::move(ShaderResources.back()) };
-    }
-    GraphicsCommandFlags_ |= kSetVertexStageShaderResourceFlag << ShaderTypeCount;
-  }
-
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
-  {
-    auto& Samplers = Samplers_[ShaderTypeCount];
-
-    if (Samplers.size() > 1)
-    {
-      Samplers = { std::move(Samplers.back()) };
-    }
-    GraphicsCommandFlags_ |= kSetVertexStageSamplerFlag << ShaderTypeCount;
-  }
-
-  for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
-  {
-    auto& ConstantBuffers = ConstantBuffers_[ShaderTypeCount];
-
-    if (ConstantBuffers.size() > 1)
-    {
-      ConstantBuffers = { std::move(ConstantBuffers.back()) };
-    }
-    GraphicsCommandFlags_ |= kSetVertexStageConstantBufferFlag << ShaderTypeCount;
-  }
+  //GraphicsCommands_.clear();
+  //GraphicsCommandFlags_ = 0;
+  //DisplayObjectIDs_.clear();
+  //Instances_.clear();
+  //DrawDatas_.clear();
+  //DrawIndexedDatas_.clear();
+  //ReservedDisplayObjects_.clear();
+  //
+  ////  インスタンスバッファが存在しているならフラグを立てる
+  //if (!InstanceBuffer_.isEmpty())
+  //{
+  //  GraphicsCommandFlags_ |= kSetInstanceBufferFlag;
+  //}
+  //
+  //if (VertexBuffers_.size() > 1)
+  //{
+  //  VertexBuffers_ = { std::move(VertexBuffers_.back()) };
+  //}
+  ////  頂点バッファが存在しているならフラグを立てる
+  //if (!CurrentVertexBuffer_.isEmpty())
+  //{
+  //  GraphicsCommandFlags_ |= kSetVertexBufferFlag;
+  //}
+  //
+  //if (IndexBuffers_.size() > 1)
+  //{
+  //  IndexBuffers_ = { std::move(IndexBuffers_.back()) };
+  //}
+  ////  インデックスバッファが存在しているならフラグを立てる
+  //if (!CurrentIndexBuffer_.isEmpty())
+  //{
+  //  GraphicsCommandFlags_ |= kSetIndexBufferFlag;
+  //}
+  //
+  //if (InputLayouts_.size() > 1)
+  //{
+  //  InputLayouts_ = { std::move(InputLayouts_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetInputLayoutFlag;
+  //
+  //if (Topologys_.size() > 1)
+  //{
+  //  Topologys_ = { std::move(Topologys_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetTopologyFlag;
+  //
+  //if (Scissors_.size() > 1)
+  //{
+  //  Scissors_ = { std::move(Scissors_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetScissorFlag;
+  //
+  //if (Viewports_.size() > 1)
+  //{
+  //  Viewports_ = { std::move(Viewports_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetViewportFlag;
+  //
+  //if (BlendStates_.size() > 1)
+  //{
+  //  BlendStates_ = { std::move(BlendStates_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetBlendStateFlag;
+  //
+  //if (DepthStencilStates_.size() > 1)
+  //{
+  //  DepthStencilStates_ = { std::move(DepthStencilStates_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetDepthStencilStateFlag;
+  //
+  //if (RasterizerStates_.size() > 1)
+  //{
+  //  RasterizerStates_ = { std::move(RasterizerStates_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetRasterizerStateFlag;
+  //
+  //if (VertexShaders_.size() > 1)
+  //{
+  //  VertexShaders_ = { std::move(VertexShaders_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetVertexShaderFlag;
+  //
+  //if (HullShaders_.size() > 1)
+  //{
+  //  HullShaders_ = { std::move(HullShaders_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetHullShaderFlag;
+  //
+  //if (DomainShaders_.size() > 1)
+  //{
+  //  DomainShaders_ = { std::move(DomainShaders_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetDomainShaderFlag;
+  //
+  //if (GeometryShaders_.size() > 1)
+  //{
+  //  GeometryShaders_ = { std::move(GeometryShaders_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetGeometryShaderFlag;
+  //
+  //if (PixelShaders_.size() > 1)
+  //{
+  //  PixelShaders_ = { std::move(PixelShaders_.back()) };
+  //}
+  //GraphicsCommandFlags_ |= kSetPixelShaderFlag;
+  //
+  //for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  //{
+  //  auto& ShaderResources = ShaderResources_[ShaderTypeCount];
+  //
+  //  if (ShaderResources.size() > 1)
+  //  {
+  //    ShaderResources = { std::move(ShaderResources.back()) };
+  //  }
+  //  GraphicsCommandFlags_ |= kSetVertexStageShaderResourceFlag << ShaderTypeCount;
+  //}
+  //
+  //for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  //{
+  //  auto& Samplers = Samplers_[ShaderTypeCount];
+  //
+  //  if (Samplers.size() > 1)
+  //  {
+  //    Samplers = { std::move(Samplers.back()) };
+  //  }
+  //  GraphicsCommandFlags_ |= kSetVertexStageSamplerFlag << ShaderTypeCount;
+  //}
+  //
+  //for (vdl::uint ShaderTypeCount = 0; ShaderTypeCount < kGraphicsShaderStageNum; ++ShaderTypeCount)
+  //{
+  //  auto& ConstantBuffers = ConstantBuffers_[ShaderTypeCount];
+  //
+  //  if (ConstantBuffers.size() > 1)
+  //  {
+  //    ConstantBuffers = { std::move(ConstantBuffers.back()) };
+  //  }
+  //  GraphicsCommandFlags_ |= kSetVertexStageConstantBufferFlag << ShaderTypeCount;
+  //}
 }
 
 #define SetState(StateName)\
+std::lock_guard Lock(Mutex_);\
+\
 if (Current##StateName##_ == _##StateName)\
 {\
   return;\
@@ -214,6 +361,8 @@ inline void BaseGraphicsCommandList::SetPixelShader(const vdl::PixelShader& _Pix
 #undef SetState
 
 #define SetShaderState(StateName)\
+std::lock_guard Lock(Mutex_);\
+\
 constexpr GraphicsCommandFlags kSet##StateName##Flag = kSetVertexStage##StateName##Flag << static_cast<vdl::uint>(Type);\
 \
 StateName##s& Current##StateName##s = Current##StateName##s_[static_cast<vdl::uint>(Type)];\
@@ -495,7 +644,7 @@ inline void BaseGraphicsCommandList::Sort()
 {
   //  インスタンシングが無効なリストのソートは不要
   assert(!Instances_.empty());
-  
+
   //  ソートが不可能な時は終了
   if (!CurrentDepthStencilState_.DepthEnable)
   {
@@ -613,6 +762,11 @@ inline void GraphicsCommandList<DisplayObject, InstanceData>::SetDrawData(const 
     BaseGraphicsCommandList::SetShaderResources<ShaderType::ePixelShader>(0, 2, ShaderResources);
   }
 
+  std::unique_lock ResetLock(ResetMutex_);
+  ConditionVariable_.wait(ResetLock, [&] { return isReady_; });
+
+  std::lock_guard Lock(Mutex_);
+
   //  現在のステートのコマンドを発行
   BaseGraphicsCommandList::PushGraphicsCommand();
 
@@ -650,6 +804,11 @@ inline void GraphicsCommandList<vdl::Texture, InstanceData>::SetDrawData(const v
   //  必要ステートの設定
   BaseGraphicsCommandList::SetShaderResources<ShaderType::ePixelShader>(0, 1, &vdl::ShaderResource(_Texture));
 
+  std::unique_lock ResetLock(ResetMutex_);
+  ConditionVariable_.wait(ResetLock, [&] { return isReady_; });
+
+  std::lock_guard Lock(Mutex_);
+
   //  現在のステートのコマンドを発行
   BaseGraphicsCommandList::PushGraphicsCommand();
 
@@ -686,6 +845,11 @@ inline void GraphicsCommandList<vdl::Texture, std::nullptr_t>::SetDrawData(const
   //  必要ステートの設定
   BaseGraphicsCommandList::SetShaderResources<ShaderType::ePixelShader>(0, 1, &vdl::ShaderResource(_Texture));
 
+  std::unique_lock ResetLock(ResetMutex_);
+  ConditionVariable_.wait(ResetLock, [&] { return isReady_; });
+
+  std::lock_guard Lock(Mutex_);
+
   //  現在のステートのコマンドを発行
   BaseGraphicsCommandList::PushGraphicsCommand();
 
@@ -714,6 +878,11 @@ inline void GraphicsCommandList<std::nullptr_t, std::nullptr_t>::Initialize(vdl:
 
 inline void GraphicsCommandList<std::nullptr_t, std::nullptr_t>::SetDrawData(DrawData&& _DrawData)
 {
+  std::unique_lock ResetLock(ResetMutex_);
+  ConditionVariable_.wait(ResetLock, [&] { return isReady_; });
+
+  std::lock_guard Lock(Mutex_);
+
   //  現在のステートのコマンドを発行
   BaseGraphicsCommandList::PushGraphicsCommand();
 

@@ -18,6 +18,9 @@
 #include <vector>
 #include <unordered_map>
 #include <any>
+#include <functional>
+#include <shared_mutex>
+#include <condition_variable>
 
 enum class GraphicsCommandFlag : vdl::uint32_t
 {
@@ -58,6 +61,7 @@ using GraphicsCommandFlags = vdl::Flags<GraphicsCommandFlag, vdl::uint32_t>;
 
 class IBufferManager;
 class IModelManager;
+class ThreadPool;
 
 struct DrawData
 {
@@ -128,6 +132,13 @@ protected:
   static constexpr GraphicsCommandFlags kSetPixelStageConstantBufferFlag = GraphicsCommandFlag::eSetPixelStageConstantBuffer;
 protected:
   IBufferManager* pBufferManager_;
+  ThreadPool* pThreadPool_;
+protected:
+  mutable std::shared_mutex ResetMutex_;
+  mutable std::shared_mutex Mutex_;
+  bool isReady_ = false;
+  std::condition_variable_any ConditionVariable_;
+  std::function<void()> ResetFunc_;
 protected:
   GraphicsCommands GraphicsCommands_;
   GraphicsCommandFlags GraphicsCommandFlags_;
@@ -190,81 +201,239 @@ public:
 
   void Reset();
 
-  [[nodiscard]] bool HasDrawCommand()const { return !DrawDatas_.empty() || !DrawIndexedDatas_.empty(); }
+  [[nodiscard]] bool HasDrawCommand()const
+  {
+    std::scoped_lock Lock(ResetMutex_, Mutex_);
+    return isReady_ && (!DrawDatas_.empty() || !DrawIndexedDatas_.empty());
+  }
 
-  [[nodiscard]] const GraphicsCommands& GetGraphicsCommands()const { return GraphicsCommands_; }
+  [[nodiscard]] const GraphicsCommands& GetGraphicsCommands()const
+  {
+    std::scoped_lock Lock(ResetMutex_, Mutex_);
+    return GraphicsCommands_;
+  }
 
-  [[nodiscard]] const InstanceDatas& GetInstanceDatas(vdl::uint _Index)const { return Instances_[_Index]; }
+  [[nodiscard]] const InstanceDatas& GetInstanceDatas(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return Instances_[_Index];
+  }
 
-  [[nodiscard]] const DrawData& GetDrawData(vdl::uint _Index)const { return DrawDatas_[_Index]; }
+  [[nodiscard]] const DrawData& GetDrawData(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return DrawDatas_[_Index];
+  }
 
-  [[nodiscard]] const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const { return DrawIndexedDatas_[_Index]; }
+  [[nodiscard]] const DrawIndexedData& GetDrawIndexedData(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return DrawIndexedDatas_[_Index];
+  }
 
-  [[nodiscard]] const InstanceBuffer& GetInstanceBuffer()const { return InstanceBuffer_; }
+  [[nodiscard]] const InstanceBuffer& GetInstanceBuffer()const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return InstanceBuffer_;
+  }
 
-  [[nodiscard]] const VertexBuffer& GetVertexBuffer(vdl::uint _Index)const { return VertexBuffers_[_Index]; }
+  [[nodiscard]] const VertexBuffer& GetVertexBuffer(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return VertexBuffers_[_Index];
+  }
 
-  [[nodiscard]] const IndexBuffer& GetIndexBuffer(vdl::uint _Index)const { return IndexBuffers_[_Index]; }
+  [[nodiscard]] const IndexBuffer& GetIndexBuffer(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return IndexBuffers_[_Index];
+  }
 
-  [[nodiscard]] const vdl::InputLayoutType& GetInputLayout(vdl::uint _Index)const { return InputLayouts_[_Index]; }
+  [[nodiscard]] const vdl::InputLayoutType& GetInputLayout(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return InputLayouts_[_Index];
+  }
 
-  [[nodiscard]] const vdl::TopologyType& GetTopology(vdl::uint _Index)const { return Topologys_[_Index]; }
+  [[nodiscard]] const vdl::TopologyType& GetTopology(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return Topologys_[_Index];
+  }
 
-  [[nodiscard]] const vdl::Scissor& GetScissor(vdl::uint _Index)const { return Scissors_[_Index]; }
+  [[nodiscard]] const vdl::Scissor& GetScissor(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return Scissors_[_Index];
+  }
 
-  [[nodiscard]] const vdl::Viewport& GetViewport(vdl::uint _Index)const { return Viewports_[_Index]; }
+  [[nodiscard]] const vdl::Viewport& GetViewport(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return Viewports_[_Index];
+  }
 
-  [[nodiscard]] const vdl::BlendState& GetBlendState(vdl::uint _Index)const { return BlendStates_[_Index]; }
+  [[nodiscard]] const vdl::BlendState& GetBlendState(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return BlendStates_[_Index];
+  }
 
-  [[nodiscard]] const vdl::DepthStencilState& GetDepthStencilState(vdl::uint _Index)const { return DepthStencilStates_[_Index]; }
+  [[nodiscard]] const vdl::DepthStencilState& GetDepthStencilState(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return DepthStencilStates_[_Index];
+  }
 
-  [[nodiscard]] const vdl::RasterizerState& GetRasterizerState(vdl::uint _Index)const { return RasterizerStates_[_Index]; }
+  [[nodiscard]] const vdl::RasterizerState& GetRasterizerState(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return RasterizerStates_[_Index];
+  }
 
-  [[nodiscard]] const vdl::VertexShader& GetVertexShader(vdl::uint _Index)const { return VertexShaders_[_Index]; }
+  [[nodiscard]] const vdl::VertexShader& GetVertexShader(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return VertexShaders_[_Index];
+  }
 
-  [[nodiscard]] const vdl::HullShader& GetHullShader(vdl::uint _Index)const { return HullShaders_[_Index]; }
+  [[nodiscard]] const vdl::HullShader& GetHullShader(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return HullShaders_[_Index];
+  }
 
-  [[nodiscard]] const vdl::DomainShader& GetDomainShader(vdl::uint _Index)const { return DomainShaders_[_Index]; }
+  [[nodiscard]] const vdl::DomainShader& GetDomainShader(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return DomainShaders_[_Index];
+  }
 
-  [[nodiscard]] const vdl::GeometryShader& GetGeometryShader(vdl::uint _Index)const { return GeometryShaders_[_Index]; }
+  [[nodiscard]] const vdl::GeometryShader& GetGeometryShader(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return GeometryShaders_[_Index];
+  }
 
-  [[nodiscard]] const vdl::PixelShader& GetPixelShader(vdl::uint _Index)const { return PixelShaders_[_Index]; }
+  [[nodiscard]] const vdl::PixelShader& GetPixelShader(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return PixelShaders_[_Index];
+  }
 
-  template<ShaderType Type> [[nodiscard]] const ShaderResources& GetShaderResources(vdl::uint _Index)const { return ShaderResources_[static_cast<vdl::uint>(Type)][_Index]; }
+  template<ShaderType Type>
+  [[nodiscard]] const ShaderResources& GetShaderResources(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return ShaderResources_[static_cast<vdl::uint>(Type)][_Index];
+  }
 
-  template<ShaderType Type> [[nodiscard]] const Samplers& GetSamplers(vdl::uint _Index)const { return Samplers_[static_cast<vdl::uint>(Type)][_Index]; }
+  template<ShaderType Type>
+  [[nodiscard]] const Samplers& GetSamplers(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return Samplers_[static_cast<vdl::uint>(Type)][_Index];
+  }
 
-  template<ShaderType Type> [[nodiscard]] const ConstantBuffers& GetConstantBuffers(vdl::uint _Index)const { return ConstantBuffers_[static_cast<vdl::uint>(Type)][_Index]; }
+  template<ShaderType Type>
+  [[nodiscard]] const ConstantBuffers& GetConstantBuffers(vdl::uint _Index)const
+  {
+    std::shared_lock Lock(ResetMutex_);
+    return ConstantBuffers_[static_cast<vdl::uint>(Type)][_Index];
+  }
 
-  [[nodiscard]] const vdl::InputLayoutType& GetCurrentInputLayout()const { return CurrentInputLayout_; }
+  [[nodiscard]] const vdl::InputLayoutType& GetCurrentInputLayout()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentInputLayout_;
+  }
 
-  [[nodiscard]] const vdl::TopologyType& GetCurrentTopology()const { return CurrentTopology_; }
+  [[nodiscard]] const vdl::TopologyType& GetCurrentTopology()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentTopology_;
+  }
 
-  [[nodiscard]] const vdl::Scissor& GetCurrentScissor()const { return CurrentScissor_; }
+  [[nodiscard]] const vdl::Scissor& GetCurrentScissor()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentScissor_;
+  }
 
-  [[nodiscard]] const vdl::Viewport& GetCurrentViewport()const { return CurrentViewport_; }
+  [[nodiscard]] const vdl::Viewport& GetCurrentViewport()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentViewport_;
+  }
 
-  [[nodiscard]] const vdl::BlendState& GetCurrentBlendState()const { return CurrentBlendState_; }
+  [[nodiscard]] const vdl::BlendState& GetCurrentBlendState()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentBlendState_;
+  }
 
-  [[nodiscard]] const vdl::DepthStencilState& GetCurrentDepthStencilState()const { return CurrentDepthStencilState_; }
+  [[nodiscard]] const vdl::DepthStencilState& GetCurrentDepthStencilState()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentDepthStencilState_;
+  }
 
-  [[nodiscard]] const vdl::RasterizerState& GetCurrentRasterizerState()const { return CurrentRasterizerState_; }
+  [[nodiscard]] const vdl::RasterizerState& GetCurrentRasterizerState()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentRasterizerState_;
+  }
 
-  [[nodiscard]] const vdl::VertexShader& GetCurrentVertexShader()const { return CurrentVertexShader_; }
+  [[nodiscard]] const vdl::VertexShader& GetCurrentVertexShader()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentVertexShader_;
+  }
 
-  [[nodiscard]] const vdl::HullShader& GetCurrentHullShader()const { return CurrentHullShader_; }
+  [[nodiscard]] const vdl::HullShader& GetCurrentHullShader()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentHullShader_;
+  }
 
-  [[nodiscard]] const vdl::DomainShader& GetCurrentDomainShader()const { return CurrentDomainShader_; }
+  [[nodiscard]] const vdl::DomainShader& GetCurrentDomainShader()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentDomainShader_;
+  }
 
-  [[nodiscard]] const vdl::GeometryShader& GetCurrentGeometryShader()const { return CurrentGeometryShader_; }
+  [[nodiscard]] const vdl::GeometryShader& GetCurrentGeometryShader()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentGeometryShader_;
+  }
 
-  [[nodiscard]] const vdl::PixelShader& GetCurrentPixelShader()const { return CurrentPixelShader_; }
+  [[nodiscard]] const vdl::PixelShader& GetCurrentPixelShader()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentPixelShader_;
+  }
 
-  template<ShaderType Type> [[nodiscard]] const ShaderResources& GetCurrentShaderResources()const { return CurrentShaderResources_[static_cast<vdl::uint>(Type)]; }
+  template<ShaderType Type>
+  [[nodiscard]] const ShaderResources& GetCurrentShaderResources()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentShaderResources_[static_cast<vdl::uint>(Type)];
+  }
 
-  template<ShaderType Type> [[nodiscard]] const Samplers& GetCurrentSamplers()const { return CurrentSamplers_[static_cast<vdl::uint>(Type)]; }
+  template<ShaderType Type>
+  [[nodiscard]] const Samplers& GetCurrentSamplers()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentSamplers_[static_cast<vdl::uint>(Type)];
+  }
 
-  template<ShaderType Type> [[nodiscard]] const ConstantBuffers& GetCurrentConstantBuffers()const { return CurrentConstantBuffers_[static_cast<vdl::uint>(Type)]; }
+  template<ShaderType Type>
+  [[nodiscard]] const ConstantBuffers& GetCurrentConstantBuffers()const
+  {
+    std::shared_lock Lock(Mutex_);
+    return CurrentConstantBuffers_[static_cast<vdl::uint>(Type)];
+  }
 
   void SetVertexBuffer(const VertexBuffer& _VertexBuffer);
 
