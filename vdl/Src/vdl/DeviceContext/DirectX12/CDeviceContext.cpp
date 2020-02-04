@@ -887,7 +887,7 @@ void CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTexture
   }
 
   GetCurrentGraphicsReserveData().OutputManagers.emplace_back(std::move(OutputManager));
-  isChangePipelineState_ = true;
+  isChangeGraphicsPipelineState_ = true;
 }
 
 void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::Color4F& _ClearColor)
@@ -1365,6 +1365,35 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
   bool ScissorEnable = true;
   vdl::Viewport Viewport;
 
+  //  DrawCommandの前処理
+  auto PreDrawCommand = [&](vdl::uint _Index)
+  {
+    if (isChangeGraphicsPipelineState_)
+    {
+      Microsoft::WRL::ComPtr<ID3D12PipelineState>& pPipelineState = CurrentGraphicsReserveData.PipelineStates.emplace_back();
+      hr = pD3D12Device_->CreateGraphicsPipelineState(&GraphicsPipelineStateDesc_, IID_PPV_ARGS(pPipelineState.GetAddressOf()));
+      ERROR_CHECK(hr);
+
+      CurrentGraphicsCommandList->SetPipelineState(pPipelineState.Get());
+
+      isChangeGraphicsPipelineState_ = false;
+    }
+
+    if (pInstanceBuffer)
+    {
+      const auto& InstanceDatas = _GraphicsCommandList.GetInstanceDatas(_Index);
+      pDevice_->WriteMemory(pInstanceBuffer, InstanceDatas.data(), static_cast<vdl::uint>(InstanceDatas.size()));
+
+      D3D12_VERTEX_BUFFER_VIEW BufferView;
+      {
+        BufferView.BufferLocation = pInstanceBuffer->BufferData.pResource->GetGPUVirtualAddress() + pInstanceBuffer->PreviousOffset;
+        BufferView.SizeInBytes = pInstanceBuffer->Offset - pInstanceBuffer->PreviousOffset;
+        BufferView.StrideInBytes = GetInstanceBufferStride();
+      }
+      CurrentGraphicsCommandList->IASetVertexBuffers(1, 1, &BufferView);
+    }
+  };
+
   //  コマンドの書き込み
   for (auto& GraphicsCommand : _GraphicsCommandList.GetGraphicsCommands())
   {
@@ -1372,30 +1401,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
     {
     case GraphicsCommandFlag::eDraw:
     {
-      if (isChangePipelineState_)
-      {
-        Microsoft::WRL::ComPtr<ID3D12PipelineState>& pPipelineState = CurrentGraphicsReserveData.PipelineStates.emplace_back();
-        hr = pD3D12Device_->CreateGraphicsPipelineState(&GraphicsPipelineStateDesc_, IID_PPV_ARGS(pPipelineState.GetAddressOf()));
-        ERROR_CHECK(hr);
-
-        CurrentGraphicsCommandList->SetPipelineState(pPipelineState.Get());
-
-        isChangePipelineState_ = false;
-      }
-
-      if (pInstanceBuffer)
-      {
-        const auto& InstanceDatas = _GraphicsCommandList.GetInstanceDatas(GraphicsCommand.second);
-        pDevice_->WriteMemory(pInstanceBuffer, InstanceDatas.data(), static_cast<vdl::uint>(InstanceDatas.size()));
-
-        D3D12_VERTEX_BUFFER_VIEW BufferView;
-        {
-          BufferView.BufferLocation = pInstanceBuffer->BufferData.pResource->GetGPUVirtualAddress() + pInstanceBuffer->PreviousOffset;
-          BufferView.SizeInBytes = pInstanceBuffer->Offset - pInstanceBuffer->PreviousOffset;
-          BufferView.StrideInBytes = GetInstanceBufferStride();
-        }
-        CurrentGraphicsCommandList->IASetVertexBuffers(1, 1, &BufferView);
-      }
+      PreDrawCommand(GraphicsCommand.second);
 
       const DrawData& DrawData = _GraphicsCommandList.GetDrawData(GraphicsCommand.second);
       CurrentGraphicsCommandList->DrawInstanced(DrawData.VertexCount, DrawData.InstanceCount, DrawData.FirstVertex, DrawData.FirstInstance);
@@ -1403,31 +1409,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
     break;
     case GraphicsCommandFlag::eDrawIndexed:
     {
-      if (isChangePipelineState_)
-      {
-        Microsoft::WRL::ComPtr<ID3D12PipelineState> pPipelineState;
-        hr = pD3D12Device_->CreateGraphicsPipelineState(&GraphicsPipelineStateDesc_, IID_PPV_ARGS(pPipelineState.GetAddressOf()));
-        ERROR_CHECK(hr);
-
-        CurrentGraphicsCommandList->SetPipelineState(pPipelineState.Get());
-        CurrentGraphicsReserveData.PipelineStates.emplace_back(std::move(pPipelineState));
-
-        isChangePipelineState_ = false;
-      }
-
-      if (pInstanceBuffer)
-      {
-        const auto& InstanceDatas = _GraphicsCommandList.GetInstanceDatas(GraphicsCommand.second);
-        pDevice_->WriteMemory(pInstanceBuffer, InstanceDatas.data(), static_cast<vdl::uint>(InstanceDatas.size()));
-
-        D3D12_VERTEX_BUFFER_VIEW BufferView;
-        {
-          BufferView.BufferLocation = pInstanceBuffer->BufferData.pResource->GetGPUVirtualAddress() + pInstanceBuffer->PreviousOffset;
-          BufferView.SizeInBytes = pInstanceBuffer->Offset - pInstanceBuffer->PreviousOffset;
-          BufferView.StrideInBytes = GetInstanceBufferStride();
-        }
-        CurrentGraphicsCommandList->IASetVertexBuffers(1, 1, &BufferView);
-      }
+      PreDrawCommand(GraphicsCommand.second);
 
       const DrawIndexedData& DrawIndexedData = _GraphicsCommandList.GetDrawIndexedData(GraphicsCommand.second);
       CurrentGraphicsCommandList->DrawIndexedInstanced(DrawIndexedData.IndexCount, DrawIndexedData.InstanceCount, DrawIndexedData.FirstIndex, DrawIndexedData.VertexOffset, DrawIndexedData.FirstInstance);
@@ -1459,7 +1441,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
       CurrentInputLayoutType_ = _GraphicsCommandList.GetInputLayout(GraphicsCommand.second);
       const std::vector<D3D12_INPUT_ELEMENT_DESC>& InputLayout = InputLayouts_[CurrentInputLayoutType_];
       GraphicsPipelineStateDesc_.InputLayout = { InputLayout.data(),static_cast<vdl::uint>(InputLayout.size()) };
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetTopology:
@@ -1468,7 +1450,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
       GraphicsPipelineStateDesc_.PrimitiveTopologyType = GetTopologyType(Toplogy);
       CurrentGraphicsCommandList->IASetPrimitiveTopology(Cast(Toplogy));
 
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetScissor:
@@ -1487,13 +1469,13 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
     case GraphicsCommandFlag::eSetBlendState:
     {
       GraphicsPipelineStateDesc_.BlendState = GetBlendDesc(_GraphicsCommandList.GetBlendState(GraphicsCommand.second));
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetDepthStencilState:
     {
       GraphicsPipelineStateDesc_.DepthStencilState = GetDepthStecilDesc(_GraphicsCommandList.GetDepthStencilState(GraphicsCommand.second));
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetRasterizerState:
@@ -1502,7 +1484,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
       ScissorEnable = RasterizerState.ScissorEnable;
 
       GraphicsPipelineStateDesc_.RasterizerState = GetRasterizerDesc(RasterizerState);
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetVertexShader:
@@ -1517,7 +1499,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
       }
 
       GraphicsPipelineStateDesc_.VS = std::move(ShaderBytecode);
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetHullShader:
@@ -1532,7 +1514,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
       }
 
       GraphicsPipelineStateDesc_.HS = std::move(ShaderBytecode);
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetDomainShader:
@@ -1547,7 +1529,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
       }
 
       GraphicsPipelineStateDesc_.DS = std::move(ShaderBytecode);
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetGeometryShader:
@@ -1562,7 +1544,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
       }
 
       GraphicsPipelineStateDesc_.GS = std::move(ShaderBytecode);
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetPixelShader:
@@ -1577,7 +1559,7 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
       }
 
       GraphicsPipelineStateDesc_.PS = std::move(ShaderBytecode);
-      isChangePipelineState_ = true;
+      isChangeGraphicsPipelineState_ = true;
     }
     break;
     case GraphicsCommandFlag::eSetVertexStageShaderResource:

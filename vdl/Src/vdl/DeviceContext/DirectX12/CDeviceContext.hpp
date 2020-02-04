@@ -124,7 +124,7 @@ private:
   Microsoft::WRL::ComPtr<ID3D12RootSignature> pGraphicsRootSignature_;
   std::array<CommandList, Constants::kGraphicsCommandBufferNum> GraphicsCommandLists_;
   vdl::uint GraphicsCommandBufferIndex_ = 0;
-  bool isChangePipelineState_ = true;
+  bool isChangeGraphicsPipelineState_ = true;
   D3D12_GRAPHICS_PIPELINE_STATE_DESC GraphicsPipelineStateDesc_;
   std::array<Fence, Constants::kGraphicsCommandBufferNum> GraphicsFences_;
   std::array<BaseGraphicsCommandList, Constants::kGraphicsCommandBufferNum> GraphicsCommandListDatas_;

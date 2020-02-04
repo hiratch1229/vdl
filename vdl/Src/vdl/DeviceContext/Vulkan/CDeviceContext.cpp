@@ -421,13 +421,14 @@ namespace
 
 void CDeviceContext::Initialize()
 {
-  pSwapChain_ = static_cast<CSwapChain*>(Engine::Get<ISwapChain>());
+  pDevice_ = Engine::Get<IDevice>();
+  pSwapChain_ = Cast<CSwapChain>(Engine::Get<ISwapChain>());
 
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
 
-  CDevice* pDevice = static_cast<CDevice*>(Engine::Get<IDevice>());
+  CDevice* pDevice = Cast<CDevice>(pDevice_);
   VkDevice_ = pDevice->GetDevice();
   GraphicsQueue_ = pDevice->GetGraphicsQueue();
   ComputeQueue_ = pDevice->GetComputeQueue();
@@ -845,6 +846,18 @@ void CDeviceContext::Initialize()
         assert(ComputeSyncState.Semaphore);
       }
     }
+
+    //  保存データの初期化
+    {
+      ComputeReserveData& ComputeReserveData = GetCurrentComputeReserveData();
+      ComputeReserveData.Pipelines.resize(1);
+      ComputeReserveData.TextureDescriptorSets.resize(1);
+      ComputeReserveData.BufferDescriptorSets.resize(1);
+      ComputeReserveData.SamplerDescriptorSets.resize(1);
+      ComputeReserveData.ConstantBufferDescriptorSets.resize(1);
+      ComputeReserveData.UnorderedAccessTextureDescriptorSets.resize(1);
+      ComputeReserveData.UnorderedAccessBufferDescriptorSets.resize(1);
+    }
   }
 
   //  パイプラインレイアウトの作成
@@ -870,28 +883,37 @@ void CDeviceContext::Initialize()
     PipelineLayout_ = VkDevice_.createPipelineLayoutUnique(PipelineLayoutCreateInfo);
     assert(PipelineLayout_);
   }
+
+  //  グラフィックス用パイプラインステートの設定
+  {
+    DynamicStates_[0] = vk::DynamicState::eViewport;
+    DynamicStates_[1] = vk::DynamicState::eScissor;
+    PipelineDynamicStateInfo_.dynamicStateCount = static_cast<vdl::uint>(DynamicStates_.size());
+    PipelineDynamicStateInfo_.pDynamicStates = DynamicStates_.data();
+    PipelineColorBlendStateInfo_.logicOpEnable = false;
+    PipelineColorBlendStateInfo_.logicOp = vk::LogicOp::eNoOp;
+    PipelineColorBlendStateInfo_.pAttachments = PipelineColorBlendAttachmentStates_.data();
+    PipelineColorBlendStateInfo_.blendConstants[0] = 1.0f;
+    PipelineColorBlendStateInfo_.blendConstants[1] = 1.0f;
+    PipelineColorBlendStateInfo_.blendConstants[2] = 1.0f;
+    PipelineColorBlendStateInfo_.blendConstants[3] = 1.0f;
+    PipelineViewportStateInfo_.viewportCount = 1;
+    PipelineViewportStateInfo_.pViewports = nullptr;
+    PipelineViewportStateInfo_.scissorCount = 1;
+    PipelineViewportStateInfo_.pScissors = nullptr;
+
+    GraphicsPipelineInfo_.pViewportState = &PipelineViewportStateInfo_;
+    GraphicsPipelineInfo_.pColorBlendState = &PipelineColorBlendStateInfo_;
+    GraphicsPipelineInfo_.pDynamicState = &PipelineDynamicStateInfo_;
+    GraphicsPipelineInfo_.layout = PipelineLayout_.get();
+    GraphicsPipelineInfo_.subpass = 0;
+  }
 }
 
 #pragma region GraphicsPipeline
-#define SetGraphicsState(GraphicsCommandType, StateName)\
-GraphicsStateChangeFlags_.Set(GraphicsCommandType);\
-\
-CurrentGraphicsState_.StateName = _##StateName;
+#define SetGraphicsState(GraphicsCommandType, StateName)
 
-#define SetGraphicsShaderStates(GraphicsCommandType, ShaderType, ShaderState)\
-ShaderState##s& Current##ShaderState##s = CurrentGraphicsState_.ShaderState##s[static_cast<vdl::uint>(ShaderType)];\
-\
-if (const vdl::uint RequiredSize = _StartSlot + _##ShaderState##Num;\
-  Current##ShaderState##s.size() < RequiredSize)\
-{\
-  Current##ShaderState##s.resize(static_cast<size_t>(RequiredSize));\
-}\
-GraphicsStateChangeFlags_.Set(GraphicsCommandType);\
-\
-for (vdl::uint ShaderState##Count = 0; ShaderState##Count < _##ShaderState##Num; ++ShaderState##Count)\
-{\
-  Current##ShaderState##s[_StartSlot + ShaderState##Count] = _##ShaderState##s[ShaderState##Count];\
-}
+#define SetGraphicsShaderStates(GraphicsCommandType, ShaderType, ShaderState)
 
 void CDeviceContext::SetVertexBuffer(const VertexBuffer& _VertexBuffer)
 {
@@ -926,19 +948,6 @@ void CDeviceContext::SetScissor(const vdl::Scissor& _Scissor)
 void CDeviceContext::SetViewport(const vdl::Viewport& _Viewport)
 {
   SetGraphicsState(GraphicsCommandType::eSetViewport, Viewport)
-}
-
-void CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)
-{
-  vdl::OutputManager OutputManager = { _RenderTextures, _DepthStenilTexture };
-
-  std::vector<vdl::OutputManager>& OutputManagers = GraphicsReserveDatas_[GraphicsCommandBufferIndex_].OutputManagers;
-
-  if (OutputManagers.empty() || OutputManagers.back() != OutputManager)
-  {
-    OutputManagers.emplace_back(std::move(OutputManager));
-    GraphicsStateChangeFlags_.Set(GraphicsCommandType::eSetRenderTextures);
-  }
 }
 
 void CDeviceContext::SetBlendState(const vdl::BlendState& _BlendState)
@@ -1061,26 +1070,9 @@ void CDeviceContext::PSSetConstantBuffers(vdl::uint _StartSlot, vdl::uint _Const
 #pragma endregion
 
 #pragma region ComputePipeline
-#define SetComputeState(ComputeCommandType, StateName)\
-ComputeStateChangeFlags_.Set(ComputeCommandType);\
-\
-CurrentComputeState_.StateName = _##StateName;
+#define SetComputeState(ComputeCommandType, StateName)
 
-#define SetComputeShaderStates(ComputeCommandType, ShaderState)\
-ComputeStateChangeFlags_.Set(ComputeCommandType);\
-\
-ShaderState##s& Current##ShaderState##s = CurrentComputeState_.ShaderState##s;\
-\
-if (const vdl::uint RequiredSize = _StartSlot + _##ShaderState##Num;\
-  Current##ShaderState##s.size() < RequiredSize)\
-{\
-  Current##ShaderState##s.resize(static_cast<size_t>(RequiredSize));\
-}\
-\
-for (vdl::uint ShaderState##Count = 0; ShaderState##Count < _##ShaderState##Num; ++ShaderState##Count)\
-{\
-  Current##ShaderState##s[_StartSlot + ShaderState##Count] = _##ShaderState##s[ShaderState##Count];\
-}
+#define SetComputeShaderStates(ComputeCommandType, ShaderState)
 
 void CDeviceContext::CSSetShader(const vdl::ComputeShader& _ComputeShader)
 {
@@ -1109,6 +1101,14 @@ void CDeviceContext::CSSetUnorderedAccessObjects(vdl::uint _StartSlot, vdl::uint
 
 #undef SetComputeState
 #pragma endregion
+
+void CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStenilTexture)
+{
+  vdl::OutputManager OutputManager = { _RenderTextures, _DepthStenilTexture };
+
+  GetCurrentGraphicsReserveData().OutputManagers.emplace_back(std::move(OutputManager));
+  isChangeGraphicsPipelineState_ = true;
+}
 
 void CDeviceContext::ClearRenderTexture(const vdl::RenderTexture& _RenderTexture, const vdl::Color4F& _ClearColor)
 {
@@ -1219,483 +1219,483 @@ void CDeviceContext::DrawIndexed(vdl::uint _IndexCount, vdl::uint _InstanceCount
 
 void CDeviceContext::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::uint _ThreadGroupZ)
 {
-  ComputeReserveData& CurrentReserveData = ComputeReserveDatas_[ComputeCommandBufferIndex_];
-
-  const vk::CommandBuffer& CurrentComputeCommandBuffer = GetCurrentComputeCommandBuffer();
-  CurrentComputeCommandBuffer.reset(vk::CommandBufferResetFlags());
-  CurrentComputeCommandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
-
-  BeginGraphicsCommandBuffer();
-  const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
-
-  //  シェーダーリソースのバインド
-  {
-    const ShaderResources& ShaderResources = CurrentComputeState_.ShaderResources;
-
-    std::vector<DescriptorImageData> TextureDatas;
-    std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
-
-    //  データの読み込み
-    {
-      const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(ShaderResources.size());
-      for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
-      {
-        const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
-
-        ITexture* pTexture = nullptr;
-        {
-          if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
-          {
-            if (!pShaderResource->isEmpty())
-            {
-              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
-            }
-          }
-          else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
-          {
-            if (!pShaderResource->isEmpty())
-            {
-              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
-            }
-          }
-        }
-
-        //  Texture
-        if (pTexture)
-        {
-          constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-
-          DescriptorImageData& ImageData = TextureDatas.emplace_back();
-          {
-            ImageData.Descriptor = GetTextureDescriptor(pTexture, CurrentGraphicsCommandBuffer);
-            ImageData.Bind = ShaderResourceCount;
-          }
-        }
-        //  UnorderedAccessBuffer
-        else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
-        {
-          if (pShaderResource->isEmpty())
-          {
-            continue;
-          }
-
-          DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
-          {
-            BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pShaderResource);
-            BufferData.Bind = ShaderResourceCount;
-          }
-        }
-      }
-    }
-
-    bool isEmpty = true;
-
-    if (!TextureDatas.empty())
-    {
-      constexpr DescriptorType kDescriptorType = DescriptorType::eTexture;
-
-      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-      {
-        DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
-        DescriptorSetAllocateInfo.descriptorSetCount = 1;
-        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
-      }
-
-      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-      assert(DescriptorSet);
-
-      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-      {
-        for (auto& TextureData : TextureDatas)
-        {
-          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-          {
-            WriteDescriptorSet.dstSet = DescriptorSet.get();
-            WriteDescriptorSet.dstBinding = TextureData.Bind;
-            WriteDescriptorSet.dstArrayElement = 0;
-            WriteDescriptorSet.descriptorCount = 1;
-            WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-            WriteDescriptorSet.pImageInfo = &TextureData.Descriptor;
-          }
-        }
-      }
-
-      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
-
-      CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-
-      isEmpty = false;
-    }
-
-    if (!UnorderedAccessBufferDatas.empty())
-    {
-      constexpr DescriptorType kDescriptorType = DescriptorType::eBuffer;
-
-      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-      {
-        DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
-        DescriptorSetAllocateInfo.descriptorSetCount = 1;
-        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
-      }
-
-      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-      assert(DescriptorSet);
-
-      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-      {
-        for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
-        {
-          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-          {
-            WriteDescriptorSet.dstSet = DescriptorSet.get();
-            WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
-            WriteDescriptorSet.dstArrayElement = 0;
-            WriteDescriptorSet.descriptorCount = 1;
-            WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-            WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
-          }
-        }
-      }
-
-      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
-
-      CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-
-      isEmpty = false;
-    }
-
-    if (!isEmpty)
-    {
-      CurrentReserveData.ShaderResources = CurrentComputeState_.ShaderResources;
-    }
-  }
-
-  //  サンプラーのバインド
-  {
-    const Samplers& Samplers = CurrentComputeState_.Samplers;
-
-    std::vector<DescriptorImageData> SamplerDatas;
-
-    //  データの読み込み
-    {
-      const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
-      for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
-      {
-        DescriptorImageData& ImageData = SamplerDatas.emplace_back();
-        {
-          ImageData.Descriptor = GetSamplerDescriptor(Samplers[SamplerCount]);
-          ImageData.Bind = SamplerCount;
-        }
-      }
-    }
-
-    if (!SamplerDatas.empty())
-    {
-      constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
-
-      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-      {
-        DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
-        DescriptorSetAllocateInfo.descriptorSetCount = 1;
-        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
-      }
-
-      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-
-      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-      {
-        for (auto& SamplerData : SamplerDatas)
-        {
-          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-          {
-            WriteDescriptorSet.dstSet = DescriptorSet.get();
-            WriteDescriptorSet.dstBinding = SamplerData.Bind;
-            WriteDescriptorSet.dstArrayElement = 0;
-            WriteDescriptorSet.descriptorCount = 1;
-            WriteDescriptorSet.descriptorType = Cast(DescriptorType::eSampler);
-            WriteDescriptorSet.pImageInfo = &SamplerData.Descriptor;
-          }
-        }
-      }
-
-      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
-
-      CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-    }
-  }
-
-  //  定数バッファのバインド
-  {
-    const ConstantBuffers& ConstantBuffers = CurrentComputeState_.ConstantBuffers;
-
-    std::vector<DescriptorBufferData> ConstantBufferDatas;
-
-    //  データの読み込み
-    {
-      const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
-      for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
-      {
-        const vdl::Detail::ConstantBufferData& ConstantBuffer = ConstantBuffers[ConstantBufferCount];
-        if (ConstantBuffer.isEmpty())
-        {
-          continue;
-        }
-
-        DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
-        {
-          BufferData.Descriptor = GetConstantBufferDescriptor(ConstantBuffer);
-          BufferData.Bind = ConstantBufferCount;
-        }
-      }
-    }
-
-    if (!ConstantBufferDatas.empty())
-    {
-      constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
-
-      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-      {
-        DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
-        DescriptorSetAllocateInfo.descriptorSetCount = 1;
-        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
-      }
-
-      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-
-      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-      {
-        for (auto& ConstantBufferData : ConstantBufferDatas)
-        {
-          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-          {
-            WriteDescriptorSet.dstSet = DescriptorSet.get();
-            WriteDescriptorSet.dstBinding = ConstantBufferData.Bind;
-            WriteDescriptorSet.dstArrayElement = 0;
-            WriteDescriptorSet.descriptorCount = 1;
-            WriteDescriptorSet.descriptorType = Cast(DescriptorType::eConstantBuffer);
-            WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Descriptor;
-          }
-        }
-      }
-
-      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
-
-      CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-
-      CurrentReserveData.ConstantBuffers = ConstantBuffers;
-    }
-  }
-
-  //  順不同アクセスオブジェクトのバインド
-  {
-    const UnorderedAccessObjects& UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
-
-    std::vector<DescriptorImageData> UnorderedAccessTextureDatas;
-    std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
-
-    //  データの読み込み
-    {
-      const vdl::uint UnorderedAccessObjectNum = static_cast<vdl::uint>(UnorderedAccessObjects.size());
-      for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
-      {
-        const vdl::UnorderedAccessObject& UnorderedAccessObject = UnorderedAccessObjects[UnorderedAccessObjectCount];
-
-        //  UnorderedAccessTexture
-        if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = UnorderedAccessObject.GetIf<vdl::UnorderedAccessTexture>())
-        {
-          if (pUnorderedAccessObject->isEmpty())
-          {
-            continue;
-          }
-
-          DescriptorImageData& ImageData = UnorderedAccessTextureDatas.emplace_back();
-          {
-            ImageData.Descriptor = GetUnorderedAccessTextureDescriptor(*pUnorderedAccessObject, CurrentGraphicsCommandBuffer);
-            ImageData.Bind = UnorderedAccessObjectCount;
-          }
-        }
-        //  UnorderedAccessBuffer
-        else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessBuffer = UnorderedAccessObject.GetIf<vdl::Detail::UnorderedAccessBufferData>())
-        {
-          if (pUnorderedAccessBuffer->isEmpty())
-          {
-            continue;
-          }
-
-          DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
-          {
-            BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pUnorderedAccessBuffer);
-            BufferData.Bind = UnorderedAccessObjectCount;
-          }
-        }
-      }
-    }
-
-    bool isEmpty = true;
-
-    if (!UnorderedAccessTextureDatas.empty())
-    {
-      constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessTexture;
-
-      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-      {
-        DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
-        DescriptorSetAllocateInfo.descriptorSetCount = 1;
-        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
-      }
-
-      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-      assert(DescriptorSet);
-
-      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-      {
-        for (auto& UnorderedAccessTextureData : UnorderedAccessTextureDatas)
-        {
-          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-          {
-            WriteDescriptorSet.dstSet = DescriptorSet.get();
-            WriteDescriptorSet.dstBinding = UnorderedAccessTextureData.Bind;
-            WriteDescriptorSet.dstArrayElement = 0;
-            WriteDescriptorSet.descriptorCount = 1;
-            WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-            WriteDescriptorSet.pImageInfo = &UnorderedAccessTextureData.Descriptor;
-          }
-        }
-      }
-
-      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
-
-      CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-
-      isEmpty = false;
-    }
-
-    if (!UnorderedAccessBufferDatas.empty())
-    {
-      constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessBuffer;
-
-      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-      {
-        DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
-        DescriptorSetAllocateInfo.descriptorSetCount = 1;
-        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
-      }
-
-      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-      assert(DescriptorSet);
-
-      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-      {
-        for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
-        {
-          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-          {
-            WriteDescriptorSet.dstSet = DescriptorSet.get();
-            WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
-            WriteDescriptorSet.dstArrayElement = 0;
-            WriteDescriptorSet.descriptorCount = 1;
-            WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-            WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
-          }
-        }
-      }
-
-      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
-
-      CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-
-      isEmpty = false;
-    }
-
-    if (!isEmpty)
-    {
-      CurrentReserveData.UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
-    }
-  }
-
-  Flush();
-
-  //  パイプラインのバインド
-  {
-    assert(!CurrentComputeState_.ComputeShader.isEmpty());
-    const CComputeShader* pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(CurrentComputeState_.ComputeShader.GetID()));
-
-    vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
-    {
-      PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eCompute;
-      PipelineShaderStageInfo.module = pComputeShader->ShaderData.Module.get();
-      PipelineShaderStageInfo.pName = pComputeShader->ShaderData.EntryPoint;
-    }
-
-    vk::ComputePipelineCreateInfo ComputePipelineInfo;
-    {
-      ComputePipelineInfo.flags = (LastComputePipeline_ == VK_NULL_HANDLE ? vk::PipelineCreateFlagBits::eAllowDerivatives : vk::PipelineCreateFlagBits::eAllowDerivatives | vk::PipelineCreateFlagBits::eDerivative);
-      ComputePipelineInfo.stage = PipelineShaderStageInfo;
-      ComputePipelineInfo.layout = PipelineLayout_.get();
-      ComputePipelineInfo.basePipelineHandle = LastComputePipeline_;
-      ComputePipelineInfo.basePipelineIndex = (LastComputePipeline_ == VK_NULL_HANDLE ? 0 : -1);
-    }
-
-    CurrentReserveData.Pipeline = VkDevice_.createComputePipelineUnique(ComputePipelineCache_.get(), ComputePipelineInfo);
-    assert(CurrentReserveData.Pipeline);
-
-    LastComputePipeline_ = CurrentReserveData.Pipeline.get();
-    CurrentComputeCommandBuffer.bindPipeline(vk::PipelineBindPoint::eCompute, LastComputePipeline_);
-  }
-
-  CurrentComputeCommandBuffer.dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
-
-  CurrentComputeCommandBuffer.end();
-
-  std::vector<vk::Semaphore> WaitSemaphores;
-  {
-    if (LastSemaphore_)
-    {
-      WaitSemaphores.push_back(LastSemaphore_);
-    }
-    if (const vk::Semaphore PresentSemaphore = pSwapChain_->GetSemaphore())
-    {
-      WaitSemaphores.push_back(PresentSemaphore);
-    }
-  }
-
-  const vdl::uint WaitSemaphoreNum = static_cast<vdl::uint>(WaitSemaphores.size());
-  std::vector<vk::PipelineStageFlags> PipelineStageFlags(WaitSemaphoreNum, vk::PipelineStageFlagBits::eBottomOfPipe);
-
-  const vk::Semaphore& CurrentSemaphore = GetCurrentComputeSemaphore();
-
-  vk::SubmitInfo SubmitInfo;
-  {
-    SubmitInfo.waitSemaphoreCount = WaitSemaphoreNum;
-    SubmitInfo.pWaitSemaphores = WaitSemaphores.data();
-    SubmitInfo.pWaitDstStageMask = PipelineStageFlags.data();
-    SubmitInfo.commandBufferCount = 1;
-    SubmitInfo.pCommandBuffers = &CurrentComputeCommandBuffer;
-    SubmitInfo.signalSemaphoreCount = 1;
-    SubmitInfo.pSignalSemaphores = &CurrentSemaphore;
-  }
-
-  ComputeQueue_.submit(SubmitInfo, GetCurrentComputeFence());
-
-  LastSemaphore_ = CurrentSemaphore;
-
-  ++ComputeCommandBufferIndex_ %= Constants::kComputeCommandBufferNum;
-  WaitFence(GetCurrentComputeFence());
-
-  ComputeReserveDatas_[ComputeCommandBufferIndex_].Clear();
-  ComputeStateChangeFlags_.Clear();
+  //ComputeReserveData& CurrentReserveData = ComputeReserveDatas_[ComputeCommandBufferIndex_];
+
+  //const vk::CommandBuffer& CurrentComputeCommandBuffer = GetCurrentComputeCommandBuffer();
+  //CurrentComputeCommandBuffer.reset(vk::CommandBufferResetFlags());
+  //CurrentComputeCommandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+
+  //BeginGraphicsCommandBuffer();
+  //const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
+
+  ////  シェーダーリソースのバインド
+  //{
+  //  const ShaderResources& ShaderResources = CurrentComputeState_.ShaderResources;
+
+  //  std::vector<DescriptorImageData> TextureDatas;
+  //  std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
+
+  //  //  データの読み込み
+  //  {
+  //    const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(ShaderResources.size());
+  //    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
+  //    {
+  //      const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
+
+  //      ITexture* pTexture = nullptr;
+  //      {
+  //        if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
+  //        {
+  //          if (!pShaderResource->isEmpty())
+  //          {
+  //            pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+  //          }
+  //        }
+  //        else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
+  //        {
+  //          if (!pShaderResource->isEmpty())
+  //          {
+  //            pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+  //          }
+  //        }
+  //      }
+
+  //      //  Texture
+  //      if (pTexture)
+  //      {
+  //        constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+  //        DescriptorImageData& ImageData = TextureDatas.emplace_back();
+  //        {
+  //          ImageData.Descriptor = GetTextureDescriptor(pTexture, CurrentGraphicsCommandBuffer);
+  //          ImageData.Bind = ShaderResourceCount;
+  //        }
+  //      }
+  //      //  UnorderedAccessBuffer
+  //      else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
+  //      {
+  //        if (pShaderResource->isEmpty())
+  //        {
+  //          continue;
+  //        }
+
+  //        DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+  //        {
+  //          BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pShaderResource);
+  //          BufferData.Bind = ShaderResourceCount;
+  //        }
+  //      }
+  //    }
+  //  }
+
+  //  bool isEmpty = true;
+
+  //  if (!TextureDatas.empty())
+  //  {
+  //    constexpr DescriptorType kDescriptorType = DescriptorType::eTexture;
+
+  //    vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //    {
+  //      DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+  //      DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //      DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+  //    }
+
+  //    vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+  //    assert(DescriptorSet);
+
+  //    std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //    {
+  //      for (auto& TextureData : TextureDatas)
+  //      {
+  //        vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //        {
+  //          WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //          WriteDescriptorSet.dstBinding = TextureData.Bind;
+  //          WriteDescriptorSet.dstArrayElement = 0;
+  //          WriteDescriptorSet.descriptorCount = 1;
+  //          WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+  //          WriteDescriptorSet.pImageInfo = &TextureData.Descriptor;
+  //        }
+  //      }
+  //    }
+
+  //    VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //    CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+  //    CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+
+  //    isEmpty = false;
+  //  }
+
+  //  if (!UnorderedAccessBufferDatas.empty())
+  //  {
+  //    constexpr DescriptorType kDescriptorType = DescriptorType::eBuffer;
+
+  //    vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //    {
+  //      DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+  //      DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //      DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+  //    }
+
+  //    vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+  //    assert(DescriptorSet);
+
+  //    std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //    {
+  //      for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
+  //      {
+  //        vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //        {
+  //          WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //          WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
+  //          WriteDescriptorSet.dstArrayElement = 0;
+  //          WriteDescriptorSet.descriptorCount = 1;
+  //          WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+  //          WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
+  //        }
+  //      }
+  //    }
+
+  //    VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //    CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+  //    CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+
+  //    isEmpty = false;
+  //  }
+
+  //  if (!isEmpty)
+  //  {
+  //    CurrentReserveData.ShaderResources = CurrentComputeState_.ShaderResources;
+  //  }
+  //}
+
+  ////  サンプラーのバインド
+  //{
+  //  const Samplers& Samplers = CurrentComputeState_.Samplers;
+
+  //  std::vector<DescriptorImageData> SamplerDatas;
+
+  //  //  データの読み込み
+  //  {
+  //    const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+  //    for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+  //    {
+  //      DescriptorImageData& ImageData = SamplerDatas.emplace_back();
+  //      {
+  //        ImageData.Descriptor = GetSamplerDescriptor(Samplers[SamplerCount]);
+  //        ImageData.Bind = SamplerCount;
+  //      }
+  //    }
+  //  }
+
+  //  if (!SamplerDatas.empty())
+  //  {
+  //    constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
+
+  //    vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //    {
+  //      DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+  //      DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //      DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+  //    }
+
+  //    vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+  //    std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //    {
+  //      for (auto& SamplerData : SamplerDatas)
+  //      {
+  //        vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //        {
+  //          WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //          WriteDescriptorSet.dstBinding = SamplerData.Bind;
+  //          WriteDescriptorSet.dstArrayElement = 0;
+  //          WriteDescriptorSet.descriptorCount = 1;
+  //          WriteDescriptorSet.descriptorType = Cast(DescriptorType::eSampler);
+  //          WriteDescriptorSet.pImageInfo = &SamplerData.Descriptor;
+  //        }
+  //      }
+  //    }
+
+  //    VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //    CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+  //    CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+  //  }
+  //}
+
+  ////  定数バッファのバインド
+  //{
+  //  const ConstantBuffers& ConstantBuffers = CurrentComputeState_.ConstantBuffers;
+
+  //  std::vector<DescriptorBufferData> ConstantBufferDatas;
+
+  //  //  データの読み込み
+  //  {
+  //    const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+  //    for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+  //    {
+  //      const vdl::Detail::ConstantBufferData& ConstantBuffer = ConstantBuffers[ConstantBufferCount];
+  //      if (ConstantBuffer.isEmpty())
+  //      {
+  //        continue;
+  //      }
+
+  //      DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
+  //      {
+  //        BufferData.Descriptor = GetConstantBufferDescriptor(ConstantBuffer);
+  //        BufferData.Bind = ConstantBufferCount;
+  //      }
+  //    }
+  //  }
+
+  //  if (!ConstantBufferDatas.empty())
+  //  {
+  //    constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
+
+  //    vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //    {
+  //      DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+  //      DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //      DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+  //    }
+
+  //    vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+  //    std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //    {
+  //      for (auto& ConstantBufferData : ConstantBufferDatas)
+  //      {
+  //        vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //        {
+  //          WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //          WriteDescriptorSet.dstBinding = ConstantBufferData.Bind;
+  //          WriteDescriptorSet.dstArrayElement = 0;
+  //          WriteDescriptorSet.descriptorCount = 1;
+  //          WriteDescriptorSet.descriptorType = Cast(DescriptorType::eConstantBuffer);
+  //          WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Descriptor;
+  //        }
+  //      }
+  //    }
+
+  //    VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //    CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+  //    CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+
+  //    CurrentReserveData.ConstantBuffers = ConstantBuffers;
+  //  }
+  //}
+
+  ////  順不同アクセスオブジェクトのバインド
+  //{
+  //  const UnorderedAccessObjects& UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
+
+  //  std::vector<DescriptorImageData> UnorderedAccessTextureDatas;
+  //  std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
+
+  //  //  データの読み込み
+  //  {
+  //    const vdl::uint UnorderedAccessObjectNum = static_cast<vdl::uint>(UnorderedAccessObjects.size());
+  //    for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
+  //    {
+  //      const vdl::UnorderedAccessObject& UnorderedAccessObject = UnorderedAccessObjects[UnorderedAccessObjectCount];
+
+  //      //  UnorderedAccessTexture
+  //      if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = UnorderedAccessObject.GetIf<vdl::UnorderedAccessTexture>())
+  //      {
+  //        if (pUnorderedAccessObject->isEmpty())
+  //        {
+  //          continue;
+  //        }
+
+  //        DescriptorImageData& ImageData = UnorderedAccessTextureDatas.emplace_back();
+  //        {
+  //          ImageData.Descriptor = GetUnorderedAccessTextureDescriptor(*pUnorderedAccessObject, CurrentGraphicsCommandBuffer);
+  //          ImageData.Bind = UnorderedAccessObjectCount;
+  //        }
+  //      }
+  //      //  UnorderedAccessBuffer
+  //      else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessBuffer = UnorderedAccessObject.GetIf<vdl::Detail::UnorderedAccessBufferData>())
+  //      {
+  //        if (pUnorderedAccessBuffer->isEmpty())
+  //        {
+  //          continue;
+  //        }
+
+  //        DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+  //        {
+  //          BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pUnorderedAccessBuffer);
+  //          BufferData.Bind = UnorderedAccessObjectCount;
+  //        }
+  //      }
+  //    }
+  //  }
+
+  //  bool isEmpty = true;
+
+  //  if (!UnorderedAccessTextureDatas.empty())
+  //  {
+  //    constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessTexture;
+
+  //    vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //    {
+  //      DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+  //      DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //      DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+  //    }
+
+  //    vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+  //    assert(DescriptorSet);
+
+  //    std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //    {
+  //      for (auto& UnorderedAccessTextureData : UnorderedAccessTextureDatas)
+  //      {
+  //        vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //        {
+  //          WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //          WriteDescriptorSet.dstBinding = UnorderedAccessTextureData.Bind;
+  //          WriteDescriptorSet.dstArrayElement = 0;
+  //          WriteDescriptorSet.descriptorCount = 1;
+  //          WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+  //          WriteDescriptorSet.pImageInfo = &UnorderedAccessTextureData.Descriptor;
+  //        }
+  //      }
+  //    }
+
+  //    VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //    CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+  //    CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+
+  //    isEmpty = false;
+  //  }
+
+  //  if (!UnorderedAccessBufferDatas.empty())
+  //  {
+  //    constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessBuffer;
+
+  //    vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //    {
+  //      DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+  //      DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //      DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+  //    }
+
+  //    vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+  //    assert(DescriptorSet);
+
+  //    std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //    {
+  //      for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
+  //      {
+  //        vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //        {
+  //          WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //          WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
+  //          WriteDescriptorSet.dstArrayElement = 0;
+  //          WriteDescriptorSet.descriptorCount = 1;
+  //          WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+  //          WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
+  //        }
+  //      }
+  //    }
+
+  //    VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //    CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+  //    CurrentReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+
+  //    isEmpty = false;
+  //  }
+
+  //  if (!isEmpty)
+  //  {
+  //    CurrentReserveData.UnorderedAccessObjects = CurrentComputeState_.UnorderedAccessObjects;
+  //  }
+  //}
+
+  //Flush();
+
+  ////  パイプラインのバインド
+  //{
+  //  assert(!CurrentComputeState_.ComputeShader.isEmpty());
+  //  const CComputeShader* pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(CurrentComputeState_.ComputeShader.GetID()));
+
+  //  vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
+  //  {
+  //    PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eCompute;
+  //    PipelineShaderStageInfo.module = pComputeShader->ShaderData.Module.get();
+  //    PipelineShaderStageInfo.pName = pComputeShader->ShaderData.EntryPoint;
+  //  }
+
+  //  vk::ComputePipelineCreateInfo ComputePipelineInfo;
+  //  {
+  //    ComputePipelineInfo.flags = (LastComputePipeline_ == VK_NULL_HANDLE ? vk::PipelineCreateFlagBits::eAllowDerivatives : vk::PipelineCreateFlagBits::eAllowDerivatives | vk::PipelineCreateFlagBits::eDerivative);
+  //    ComputePipelineInfo.stage = PipelineShaderStageInfo;
+  //    ComputePipelineInfo.layout = PipelineLayout_.get();
+  //    ComputePipelineInfo.basePipelineHandle = LastComputePipeline_;
+  //    ComputePipelineInfo.basePipelineIndex = (LastComputePipeline_ == VK_NULL_HANDLE ? 0 : -1);
+  //  }
+
+  //  CurrentReserveData.Pipeline = VkDevice_.createComputePipelineUnique(ComputePipelineCache_.get(), ComputePipelineInfo);
+  //  assert(CurrentReserveData.Pipeline);
+
+  //  LastComputePipeline_ = CurrentReserveData.Pipeline.get();
+  //  CurrentComputeCommandBuffer.bindPipeline(vk::PipelineBindPoint::eCompute, LastComputePipeline_);
+  //}
+
+  //CurrentComputeCommandBuffer.dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
+
+  //CurrentComputeCommandBuffer.end();
+
+  //std::vector<vk::Semaphore> WaitSemaphores;
+  //{
+  //  if (LastSemaphore_)
+  //  {
+  //    WaitSemaphores.push_back(LastSemaphore_);
+  //  }
+  //  if (const vk::Semaphore PresentSemaphore = pSwapChain_->GetSemaphore())
+  //  {
+  //    WaitSemaphores.push_back(PresentSemaphore);
+  //  }
+  //}
+
+  //const vdl::uint WaitSemaphoreNum = static_cast<vdl::uint>(WaitSemaphores.size());
+  //std::vector<vk::PipelineStageFlags> PipelineStageFlags(WaitSemaphoreNum, vk::PipelineStageFlagBits::eBottomOfPipe);
+
+  //const vk::Semaphore& CurrentSemaphore = GetCurrentComputeSemaphore();
+
+  //vk::SubmitInfo SubmitInfo;
+  //{
+  //  SubmitInfo.waitSemaphoreCount = WaitSemaphoreNum;
+  //  SubmitInfo.pWaitSemaphores = WaitSemaphores.data();
+  //  SubmitInfo.pWaitDstStageMask = PipelineStageFlags.data();
+  //  SubmitInfo.commandBufferCount = 1;
+  //  SubmitInfo.pCommandBuffers = &CurrentComputeCommandBuffer;
+  //  SubmitInfo.signalSemaphoreCount = 1;
+  //  SubmitInfo.pSignalSemaphores = &CurrentSemaphore;
+  //}
+
+  //ComputeQueue_.submit(SubmitInfo, GetCurrentComputeFence());
+
+  //LastSemaphore_ = CurrentSemaphore;
+
+  //++ComputeCommandBufferIndex_ %= Constants::kComputeCommandBufferNum;
+  //WaitFence(GetCurrentComputeFence());
+
+  //ComputeReserveDatas_[ComputeCommandBufferIndex_].Clear();
+  //ComputeStateChangeFlags_.Clear();
 }
 
 void CDeviceContext::Flush()
@@ -1756,6 +1756,1327 @@ void CDeviceContext::Flush()
   GraphicsReserveDatas_[GraphicsCommandBufferIndex_].Pipelines[0] = std::move(GraphicsReserveDatas_[CurrentGraphicsCommandBufferIndex].Pipelines.back());
 
   GraphicsCommandBufferState_ = CommandBufferState::eIdle;
+}
+
+void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList)
+{
+  //  データを保有する事でリファレンスカウントの維持
+  GraphicsCommandListDatas_[GraphicsCommandBufferIndex_] = _GraphicsCommandList;
+
+  BeginGraphicsCommandBuffer();
+
+  const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
+  GraphicsReserveData& CurrentGraphicsReserveData = GetCurrentGraphicsReserveData();
+
+  //  TODO:C++20で書き換え
+  auto BindShaderResources = [&](const ShaderResources& _ShaderResources, ShaderType _Type)->void
+  {
+    const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(_ShaderResources.size());
+    if (ShaderResourceNum == 0)
+    {
+      return;
+    }
+
+    std::vector<DescriptorImageData> TextureDatas;
+    std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
+
+    //  データの読み込み
+    {
+      for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
+      {
+        const vdl::ShaderResource& ShaderResource = _ShaderResources[ShaderResourceCount];
+
+        ITexture* pTexture = nullptr;
+        {
+          if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
+          {
+            if (!pShaderResource->isEmpty())
+            {
+              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+            }
+          }
+          else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
+          {
+            if (!pShaderResource->isEmpty())
+            {
+              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+            }
+          }
+        }
+
+        //  Texture
+        if (pTexture)
+        {
+          DescriptorImageData& ImageData = TextureDatas.emplace_back();
+          {
+            ImageData.Descriptor = GetTextureDescriptor(pTexture, CurrentGraphicsCommandBuffer);
+            ImageData.Bind = ShaderResourceCount;
+          }
+        }
+        //  UnorderedAccessBuffer
+        else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
+        {
+          if (pShaderResource->isEmpty())
+          {
+            DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+            {
+              BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pShaderResource);
+              BufferData.Bind = ShaderResourceCount;
+            }
+          }
+        }
+      }
+    }
+
+    if (!TextureDatas.empty())
+    {
+      constexpr DescriptorType kDescriptorType = DescriptorType::eTexture;
+
+      const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
+
+      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+      {
+        DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+        DescriptorSetAllocateInfo.descriptorSetCount = 1;
+        DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+      }
+
+      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+      assert(DescriptorSet);
+
+      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+      {
+        for (auto& TextureData : TextureDatas)
+        {
+          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+          {
+            WriteDescriptorSet.dstSet = DescriptorSet.get();
+            WriteDescriptorSet.dstBinding = TextureData.Bind;
+            WriteDescriptorSet.dstArrayElement = 0;
+            WriteDescriptorSet.descriptorCount = 1;
+            WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+            WriteDescriptorSet.pImageInfo = &TextureData.Descriptor;
+          }
+        }
+      }
+
+      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+      CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+      CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+    }
+
+    if (!UnorderedAccessBufferDatas.empty())
+    {
+      constexpr DescriptorType kDescriptorType = DescriptorType::eBuffer;
+
+      const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
+
+      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+      {
+        DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+        DescriptorSetAllocateInfo.descriptorSetCount = 1;
+        DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+      }
+
+      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+      assert(DescriptorSet);
+
+      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+      {
+        for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
+        {
+          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+          {
+            WriteDescriptorSet.dstSet = DescriptorSet.get();
+            WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
+            WriteDescriptorSet.dstArrayElement = 0;
+            WriteDescriptorSet.descriptorCount = 1;
+            WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+            WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
+          }
+        }
+      }
+
+      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+      CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+      CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+    }
+  };
+
+  //  TODO:C++20で書き換え
+  auto BindSamplers = [&](const Samplers& _Samplers, ShaderType _Type)->void
+  {
+    const vdl::uint SamplerNum = static_cast<vdl::uint>(_Samplers.size());
+    if (SamplerNum == 0)
+    {
+      return;
+    }
+
+    std::vector<DescriptorImageData> SamplerDatas;
+
+    //  データの読み込み
+    {
+      for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+      {
+        DescriptorImageData& ImageData = SamplerDatas.emplace_back();
+        {
+          ImageData.Descriptor = GetSamplerDescriptor(_Samplers[SamplerCount]);
+          ImageData.Bind = SamplerCount;
+        }
+      }
+    }
+
+    if (SamplerDatas.empty())
+    {
+      return;
+    }
+
+    constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
+
+    const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
+
+    vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+    {
+      DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+      DescriptorSetAllocateInfo.descriptorSetCount = 1;
+      DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+    }
+
+    vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+    std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+    {
+      for (auto& SamplerData : SamplerDatas)
+      {
+        vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+        {
+          WriteDescriptorSet.dstSet = DescriptorSet.get();
+          WriteDescriptorSet.dstBinding = SamplerData.Bind;
+          WriteDescriptorSet.dstArrayElement = 0;
+          WriteDescriptorSet.descriptorCount = 1;
+          WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+          WriteDescriptorSet.pImageInfo = &SamplerData.Descriptor;
+        }
+      }
+    }
+
+    VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+    CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+    CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+  };
+
+  //  TODO:C++20で書き換え
+  auto BindConstantBuffers = [&](const ConstantBuffers& _ConstantBuffers, ShaderType _Type)
+  {
+    const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(_ConstantBuffers.size());
+    if (ConstantBufferNum == 0)
+    {
+      return;
+    }
+
+    std::vector<DescriptorBufferData> ConstantBufferDatas;
+
+    //  データの読み込み
+    {
+      for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+      {
+        const vdl::Detail::ConstantBufferData& ConstantBuffer = _ConstantBuffers[ConstantBufferCount];
+        if (ConstantBuffer.isEmpty())
+        {
+          continue;
+        }
+
+        DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
+        {
+          BufferData.Descriptor = GetConstantBufferDescriptor(ConstantBuffer);
+          BufferData.Bind = ConstantBufferCount;
+        }
+      }
+    }
+
+    if (ConstantBufferDatas.empty())
+    {
+      return;
+    }
+
+    constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
+
+    const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
+
+    vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+    {
+      DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+      DescriptorSetAllocateInfo.descriptorSetCount = 1;
+      DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+    }
+
+    vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+    std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+    {
+      for (auto& ConstantBufferData : ConstantBufferDatas)
+      {
+        vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+        {
+          WriteDescriptorSet.dstSet = DescriptorSet.get();
+          WriteDescriptorSet.dstBinding = ConstantBufferData.Bind;
+          WriteDescriptorSet.dstArrayElement = 0;
+          WriteDescriptorSet.descriptorCount = 1;
+          WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+          WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Descriptor;
+        }
+      }
+    }
+
+    VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+    CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+    CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+  };
+
+  CInstanceBuffer* pInstanceBuffer = nullptr;
+  bool ScissorEnable = true;
+  vdl::Viewport Viewport;
+  std::vector<vk::PipelineShaderStageCreateInfo> PipelineShaderStageInfos;
+
+  //  PipelineShaderStageInfosに存在しているか確認
+  auto FindShader = [&](vk::ShaderStageFlagBits _ShaderStage)
+  {
+    const vdl::uint ShaderStageNum = static_cast<vdl::uint>(PipelineShaderStageInfos.size());
+
+    for (vdl::uint i = 0; i < ShaderStageNum; ++i)
+    {
+      if (PipelineShaderStageInfos[i].stage == _ShaderStage)
+      {
+        return i;
+      }
+    }
+
+    return ShaderStageNum;
+  };
+
+  //  DrawCommandの前処理
+  auto PreDrawCommand = [&](vdl::uint _Index)
+  {
+    BeginRenderPassGraphicsCommandBuffer();
+
+    if (isChangeGraphicsPipelineState_)
+    {
+      std::vector<vk::UniquePipeline>& CurrentGraphicsPipelines = CurrentGraphicsReserveData.Pipelines;
+      const vk::Pipeline& PreviousPipeline = CurrentGraphicsPipelines.back().get();
+      GraphicsPipelineInfo_.stageCount = static_cast<vdl::uint>(PipelineShaderStageInfos.size());
+      GraphicsPipelineInfo_.pStages = PipelineShaderStageInfos.data();
+      GraphicsPipelineInfo_.flags = (PreviousPipeline == VK_NULL_HANDLE ? vk::PipelineCreateFlagBits::eAllowDerivatives : vk::PipelineCreateFlagBits::eAllowDerivatives | vk::PipelineCreateFlagBits::eDerivative);
+      GraphicsPipelineInfo_.basePipelineHandle = PreviousPipeline;
+      GraphicsPipelineInfo_.basePipelineIndex = (PreviousPipeline == VK_NULL_HANDLE ? 0 : -1);
+
+      vk::UniquePipeline Pipeline = VkDevice_.createGraphicsPipelineUnique(GraphicsPipelineCache_.get(), GraphicsPipelineInfo_);
+      assert(Pipeline);
+
+      CurrentGraphicsCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, Pipeline.get());
+
+      CurrentGraphicsPipelines.emplace_back(std::move(Pipeline));
+
+      isChangeGraphicsPipelineState_ = false;
+    }
+
+    if (pInstanceBuffer)
+    {
+      const auto& InstanceDatas = _GraphicsCommandList.GetInstanceDatas(_Index);
+      pDevice_->WriteMemory(pInstanceBuffer, InstanceDatas.data(), static_cast<vdl::uint>(InstanceDatas.size()));
+
+      CurrentGraphicsCommandBuffer.bindVertexBuffers(1, pInstanceBuffer->BufferData.Buffer.get(), pInstanceBuffer->PreviousOffset);
+    }
+  };
+
+  //  コマンドの書き込み
+  for (auto& GraphicsCommand : _GraphicsCommandList.GetGraphicsCommands())
+  {
+    switch (GraphicsCommand.first)
+    {
+    case GraphicsCommandFlag::eDraw:
+    {
+      PreDrawCommand(GraphicsCommand.second);
+
+      const DrawData& DrawData = _GraphicsCommandList.GetDrawData(GraphicsCommand.second);
+      CurrentGraphicsCommandBuffer.draw(DrawData.VertexCount, DrawData.InstanceCount, DrawData.FirstVertex, DrawData.FirstInstance);
+    }
+    break;
+    case GraphicsCommandFlag::eDrawIndexed:
+    {
+      PreDrawCommand(GraphicsCommand.second);
+
+      const DrawIndexedData& DrawIndexedData = _GraphicsCommandList.GetDrawIndexedData(GraphicsCommand.second);
+      CurrentGraphicsCommandBuffer.drawIndexed(DrawIndexedData.IndexCount, DrawIndexedData.InstanceCount, DrawIndexedData.FirstIndex, DrawIndexedData.VertexOffset, DrawIndexedData.FirstInstance);
+    }
+    break;
+    case GraphicsCommandFlag::eSetVertexBuffer:
+    {
+      const CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(pBufferManager_->GetBuffer(_GraphicsCommandList.GetVertexBuffer(GraphicsCommand.second).GetID()));
+
+      constexpr vk::DeviceSize kOffset = 0;
+      CurrentGraphicsCommandBuffer.bindVertexBuffers(0, pVertexBuffer->BufferData.Buffer.get(), kOffset);
+    }
+    break;
+    case GraphicsCommandFlag::eSetInstanceBuffer:
+    {
+      pInstanceBuffer = Cast<CInstanceBuffer>(pBufferManager_->GetBuffer(_GraphicsCommandList.GetInstanceBuffer().GetID()));
+    }
+    break;
+    case GraphicsCommandFlag::eSetIndexBuffer:
+    {
+      const CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(pBufferManager_->GetBuffer(_GraphicsCommandList.GetIndexBuffer(GraphicsCommand.second).GetID()));
+
+      constexpr vk::DeviceSize kOffset = 0;
+      CurrentGraphicsCommandBuffer.bindIndexBuffer(pIndexBuffer->BufferData.Buffer.get(), kOffset, pIndexBuffer->IndexType);
+    }
+    break;
+    case GraphicsCommandFlag::eSetInputLayout:
+    {
+      const vdl::InputLayoutType& InputLayoutType = _GraphicsCommandList.GetInputLayout(GraphicsCommand.second);
+      if (PipelineVertexInputStateInfos_.find(InputLayoutType) == PipelineVertexInputStateInfos_.cend())
+      {
+        vk::PipelineVertexInputStateCreateInfo PipelineVertexInputStateInfo;
+        {
+          const InputLayout& InputLayout = InputLayouts_[InputLayoutType];
+
+          PipelineVertexInputStateInfo.vertexBindingDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputBindingDescriptions.size());
+          PipelineVertexInputStateInfo.pVertexBindingDescriptions = InputLayout.VertexInputBindingDescriptions.data();
+          PipelineVertexInputStateInfo.vertexAttributeDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputAttributeDescriptions.size());
+          PipelineVertexInputStateInfo.pVertexAttributeDescriptions = InputLayout.VertexInputAttributeDescriptions.data();
+        }
+
+        PipelineVertexInputStateInfos_.insert(std::make_pair(InputLayoutType, std::move(PipelineVertexInputStateInfo)));
+      }
+
+      GraphicsPipelineInfo_.pVertexInputState = &PipelineVertexInputStateInfos_[InputLayoutType];
+      isChangeGraphicsPipelineState_ = true;
+    }
+    break;
+    case GraphicsCommandFlag::eSetTopology:
+    {
+      const vdl::TopologyType& TopologyType = _GraphicsCommandList.GetTopology(GraphicsCommand.second);
+      if (Topologys_.find(TopologyType) == Topologys_.cend())
+      {
+        Topology Toplogy;
+        {
+          Toplogy.PipelineInputAssemblyStateInfo.topology = Cast(TopologyType);
+          Toplogy.PipelineInputAssemblyStateInfo.primitiveRestartEnable = false;
+          Toplogy.PipelineTessellationStateInfo.patchControlPoints = GetPatchControlPoints(TopologyType);
+        }
+
+        Topologys_.insert(std::make_pair(TopologyType, std::move(Toplogy)));
+      }
+
+      GraphicsPipelineInfo_.pInputAssemblyState = &Topologys_[TopologyType].PipelineInputAssemblyStateInfo;
+      GraphicsPipelineInfo_.pTessellationState = &Topologys_[TopologyType].PipelineTessellationStateInfo;
+      isChangeGraphicsPipelineState_ = true;
+    }
+    break;
+    case GraphicsCommandFlag::eSetScissor:
+    {
+      CurrentGraphicsCommandBuffer.setScissor(0, Cast(ScissorEnable ? _GraphicsCommandList.GetScissor(GraphicsCommand.second)
+        : vdl::Scissor(Viewport.LeftTop, Viewport.Size)));
+    }
+    break;
+    case GraphicsCommandFlag::eSetViewport:
+    {
+      Viewport = _GraphicsCommandList.GetViewport(GraphicsCommand.second);
+
+      CurrentGraphicsCommandBuffer.setViewport(0, Cast(Viewport));
+    }
+    break;
+    case GraphicsCommandFlag::eSetBlendState:
+    {
+      const vdl::BlendState& BlendState = _GraphicsCommandList.GetBlendState(GraphicsCommand.second);
+      if (PipelineColorBlendStateInfo_.attachmentCount)
+      {
+        if (BlendState.IndependentBlendEnable)
+        {
+          for (vdl::uint i = 0; i < PipelineColorBlendStateInfo_.attachmentCount; ++i)
+          {
+            PipelineColorBlendAttachmentStates_[i] = GetPipelineColorBlendAttachmentState(BlendState.RenderTexture[i]);
+          }
+        }
+        else
+        {
+          PipelineColorBlendAttachmentStates_[0] = GetPipelineColorBlendAttachmentState(BlendState.RenderTexture[0]);
+          for (vdl::uint i = 1; i < PipelineColorBlendStateInfo_.attachmentCount; ++i)
+          {
+            PipelineColorBlendAttachmentStates_[i] = GetPipelineColorBlendAttachmentState(BlendState.RenderTexture[i]);
+          }
+        }
+      }
+      GraphicsPipelineInfo_.pMultisampleState = &GetMultisampleStateInfo(BlendState.AlphaToCoverageEnable);
+      isChangeGraphicsPipelineState_ = true;
+    }
+    break;
+    case GraphicsCommandFlag::eSetDepthStencilState:
+    {
+      GraphicsPipelineInfo_.pDepthStencilState = &GetPipelineDepthStencilStateInfo(_GraphicsCommandList.GetDepthStencilState(GraphicsCommand.second));
+      isChangeGraphicsPipelineState_ = true;
+    }
+    break;
+    case GraphicsCommandFlag::eSetRasterizerState:
+    {
+      const vdl::RasterizerState& RasterizerState = _GraphicsCommandList.GetRasterizerState(GraphicsCommand.second);
+      ScissorEnable = RasterizerState.ScissorEnable;
+
+      GraphicsPipelineInfo_.pRasterizationState = &GetPipelineRasterizationStateInfo(RasterizerState);
+      isChangeGraphicsPipelineState_ = true;
+    }
+    break;
+    case GraphicsCommandFlag::eSetVertexShader:
+    {
+      constexpr vk::ShaderStageFlagBits kShaderStage = vk::ShaderStageFlagBits::eVertex;
+
+      if (const vdl::VertexShader& VertexShader = _GraphicsCommandList.GetVertexShader(GraphicsCommand.second);
+        !VertexShader.isEmpty())
+      {
+        const CVertexShader* pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(VertexShader.GetID()));
+
+        //  既に存在しているので上書き
+        if (const vdl::uint PipelineShaderStageCount = FindShader(kShaderStage);
+          PipelineShaderStageCount < PipelineShaderStageInfos.size())
+        {
+          PipelineShaderStageInfos[PipelineShaderStageCount].module = pVertexShader->ShaderData.Module.get();
+          PipelineShaderStageInfos[PipelineShaderStageCount].pName = pVertexShader->ShaderData.EntryPoint;
+        }
+        //  新規追加
+        else
+        {
+          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+          {
+            PipelineShaderStageInfo.stage = kShaderStage;
+            PipelineShaderStageInfo.module = pVertexShader->ShaderData.Module.get();
+            PipelineShaderStageInfo.pName = pVertexShader->ShaderData.EntryPoint;
+          }
+        }
+
+        isChangeGraphicsPipelineState_ = true;
+      }
+      else
+      {
+        //  データが存在してれば削除
+        for (auto Itr = PipelineShaderStageInfos.begin(), End = PipelineShaderStageInfos.end(); Itr != End; ++Itr)
+        {
+          if (Itr->stage == kShaderStage)
+          {
+            Itr = PipelineShaderStageInfos.erase(Itr);
+            isChangeGraphicsPipelineState_ = true;
+            break;
+          }
+        }
+      }
+    }
+    break;
+    case GraphicsCommandFlag::eSetHullShader:
+    {
+      constexpr vk::ShaderStageFlagBits kShaderStage = vk::ShaderStageFlagBits::eTessellationControl;
+
+      if (const vdl::HullShader& HullShader = _GraphicsCommandList.GetHullShader(GraphicsCommand.second);
+        !HullShader.isEmpty())
+      {
+        const CHullShader* pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(HullShader.GetID()));
+
+        //  既に存在しているので上書き
+        if (const vdl::uint PipelineShaderStageCount = FindShader(kShaderStage);
+          PipelineShaderStageCount < PipelineShaderStageInfos.size())
+        {
+          PipelineShaderStageInfos[PipelineShaderStageCount].module = pHullShader->ShaderData.Module.get();
+          PipelineShaderStageInfos[PipelineShaderStageCount].pName = pHullShader->ShaderData.EntryPoint;
+        }
+        //  新規追加
+        else
+        {
+          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+          {
+            PipelineShaderStageInfo.stage = kShaderStage;
+            PipelineShaderStageInfo.module = pHullShader->ShaderData.Module.get();
+            PipelineShaderStageInfo.pName = pHullShader->ShaderData.EntryPoint;
+          }
+        }
+
+        isChangeGraphicsPipelineState_ = true;
+      }
+      //  データが存在してれば削除
+      else
+      {
+        for (auto Itr = PipelineShaderStageInfos.begin(), End = PipelineShaderStageInfos.end(); Itr != End; ++Itr)
+        {
+          if (Itr->stage == kShaderStage)
+          {
+            Itr = PipelineShaderStageInfos.erase(Itr);
+            isChangeGraphicsPipelineState_ = true;
+            break;
+          }
+        }
+      }
+    }
+    break;
+    case GraphicsCommandFlag::eSetDomainShader:
+    {
+      constexpr vk::ShaderStageFlagBits kShaderStage = vk::ShaderStageFlagBits::eTessellationEvaluation;
+
+      if (const vdl::DomainShader& DomainShader = _GraphicsCommandList.GetDomainShader(GraphicsCommand.second);
+        !DomainShader.isEmpty())
+      {
+        const CDomainShader* pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(DomainShader.GetID()));
+
+        //  既に存在しているので上書き
+        if (const vdl::uint PipelineShaderStageCount = FindShader(kShaderStage);
+          PipelineShaderStageCount < PipelineShaderStageInfos.size())
+        {
+          PipelineShaderStageInfos[PipelineShaderStageCount].module = pDomainShader->ShaderData.Module.get();
+          PipelineShaderStageInfos[PipelineShaderStageCount].pName = pDomainShader->ShaderData.EntryPoint;
+        }
+        //  新規追加
+        else
+        {
+          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+          {
+            PipelineShaderStageInfo.stage = kShaderStage;
+            PipelineShaderStageInfo.module = pDomainShader->ShaderData.Module.get();
+            PipelineShaderStageInfo.pName = pDomainShader->ShaderData.EntryPoint;
+          }
+        }
+
+        isChangeGraphicsPipelineState_ = true;
+      }
+      //  データが存在してれば削除
+      else
+      {
+        for (auto Itr = PipelineShaderStageInfos.begin(), End = PipelineShaderStageInfos.end(); Itr != End; ++Itr)
+        {
+          if (Itr->stage == kShaderStage)
+          {
+            Itr = PipelineShaderStageInfos.erase(Itr);
+            isChangeGraphicsPipelineState_ = true;
+            break;
+          }
+        }
+      }
+    }
+    break;
+    case GraphicsCommandFlag::eSetGeometryShader:
+    {
+      constexpr vk::ShaderStageFlagBits kShaderStage = vk::ShaderStageFlagBits::eGeometry;
+
+      if (const vdl::GeometryShader& GeometryShader = _GraphicsCommandList.GetGeometryShader(GraphicsCommand.second);
+        !GeometryShader.isEmpty())
+      {
+        const CGeometryShader* pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(GeometryShader.GetID()));
+
+        //  既に存在しているので上書き
+        if (const vdl::uint PipelineShaderStageCount = FindShader(kShaderStage);
+          PipelineShaderStageCount < PipelineShaderStageInfos.size())
+        {
+          PipelineShaderStageInfos[PipelineShaderStageCount].module = pGeometryShader->ShaderData.Module.get();
+          PipelineShaderStageInfos[PipelineShaderStageCount].pName = pGeometryShader->ShaderData.EntryPoint;
+        }
+        //  新規追加
+        else
+        {
+          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+          {
+            PipelineShaderStageInfo.stage = kShaderStage;
+            PipelineShaderStageInfo.module = pGeometryShader->ShaderData.Module.get();
+            PipelineShaderStageInfo.pName = pGeometryShader->ShaderData.EntryPoint;
+          }
+        }
+
+        isChangeGraphicsPipelineState_ = true;
+      }
+      //  データが存在してれば削除
+      else
+      {
+        for (auto Itr = PipelineShaderStageInfos.begin(), End = PipelineShaderStageInfos.end(); Itr != End; ++Itr)
+        {
+          if (Itr->stage == kShaderStage)
+          {
+            Itr = PipelineShaderStageInfos.erase(Itr);
+            isChangeGraphicsPipelineState_ = true;
+            break;
+          }
+        }
+      }
+    }
+    break;
+    case GraphicsCommandFlag::eSetPixelShader:
+    {
+      constexpr vk::ShaderStageFlagBits kShaderStage = vk::ShaderStageFlagBits::eFragment;
+
+      if (const vdl::PixelShader& PixelShader = _GraphicsCommandList.GetPixelShader(GraphicsCommand.second);
+        !PixelShader.isEmpty())
+      {
+        const CPixelShader* pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(PixelShader.GetID()));
+
+        //  既に存在しているので上書き
+        if (const vdl::uint PipelineShaderStageCount = FindShader(kShaderStage);
+          PipelineShaderStageCount < PipelineShaderStageInfos.size())
+        {
+          PipelineShaderStageInfos[PipelineShaderStageCount].module = pPixelShader->ShaderData.Module.get();
+          PipelineShaderStageInfos[PipelineShaderStageCount].pName = pPixelShader->ShaderData.EntryPoint;
+        }
+        //  新規追加
+        else
+        {
+          vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+          {
+            PipelineShaderStageInfo.stage = kShaderStage;
+            PipelineShaderStageInfo.module = pPixelShader->ShaderData.Module.get();
+            PipelineShaderStageInfo.pName = pPixelShader->ShaderData.EntryPoint;
+          }
+        }
+
+        isChangeGraphicsPipelineState_ = true;
+      }
+      //  データが存在してれば削除
+      else
+      {
+        for (auto Itr = PipelineShaderStageInfos.begin(), End = PipelineShaderStageInfos.end(); Itr != End; ++Itr)
+        {
+          if (Itr->stage == kShaderStage)
+          {
+            Itr = PipelineShaderStageInfos.erase(Itr);
+            isChangeGraphicsPipelineState_ = true;
+            break;
+          }
+        }
+      }
+    }
+    break;
+    case GraphicsCommandFlag::eSetVertexStageShaderResource:
+    {
+      BindShaderResources(_GraphicsCommandList.GetShaderResources<ShaderType::eVertexShader>(GraphicsCommand.second), ShaderType::eVertexShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetHullStageShaderResource:
+    {
+      BindShaderResources(_GraphicsCommandList.GetShaderResources<ShaderType::eHullShader>(GraphicsCommand.second), ShaderType::eHullShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetDomainStageShaderResource:
+    {
+      BindShaderResources(_GraphicsCommandList.GetShaderResources<ShaderType::eDomainShader>(GraphicsCommand.second), ShaderType::eDomainShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetGeometryStageShaderResource:
+    {
+      BindShaderResources(_GraphicsCommandList.GetShaderResources<ShaderType::eGeometryShader>(GraphicsCommand.second), ShaderType::eGeometryShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetPixelStageShaderResource:
+    {
+      BindShaderResources(_GraphicsCommandList.GetShaderResources<ShaderType::ePixelShader>(GraphicsCommand.second), ShaderType::ePixelShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetVertexStageSampler:
+    {
+      BindSamplers(_GraphicsCommandList.GetSamplers<ShaderType::eVertexShader>(GraphicsCommand.second), ShaderType::eVertexShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetHullStageSampler:
+    {
+      BindSamplers(_GraphicsCommandList.GetSamplers<ShaderType::eHullShader>(GraphicsCommand.second), ShaderType::eHullShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetDomainStageSampler:
+    {
+      BindSamplers(_GraphicsCommandList.GetSamplers<ShaderType::eDomainShader>(GraphicsCommand.second), ShaderType::eDomainShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetGeometryStageSampler:
+    {
+      BindSamplers(_GraphicsCommandList.GetSamplers<ShaderType::eGeometryShader>(GraphicsCommand.second), ShaderType::eGeometryShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetPixelStageSampler:
+    {
+      BindSamplers(_GraphicsCommandList.GetSamplers<ShaderType::ePixelShader>(GraphicsCommand.second), ShaderType::ePixelShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetVertexStageConstantBuffer:
+    {
+      BindConstantBuffers(_GraphicsCommandList.GetConstantBuffers<ShaderType::eVertexShader>(GraphicsCommand.second), ShaderType::eVertexShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetHullStageConstantBuffer:
+    {
+      BindConstantBuffers(_GraphicsCommandList.GetConstantBuffers<ShaderType::eHullShader>(GraphicsCommand.second), ShaderType::eHullShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetDomainStageConstantBuffer:
+    {
+      BindConstantBuffers(_GraphicsCommandList.GetConstantBuffers<ShaderType::eDomainShader>(GraphicsCommand.second), ShaderType::eDomainShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetGeometryStageConstantBuffer:
+    {
+      BindConstantBuffers(_GraphicsCommandList.GetConstantBuffers<ShaderType::eGeometryShader>(GraphicsCommand.second), ShaderType::eGeometryShader);
+    }
+    break;
+    case GraphicsCommandFlag::eSetPixelStageConstantBuffer:
+    {
+      BindConstantBuffers(_GraphicsCommandList.GetConstantBuffers<ShaderType::ePixelShader>(GraphicsCommand.second), ShaderType::ePixelShader);
+    }
+    break;
+    default: assert(false);
+    }
+  }
+}
+
+void CDeviceContext::Execute(const ComputeCommandList& _ComputeCommandList)
+{
+  //  データを保有する事でリファレンスカウントの維持
+  ComputeCommandListDatas_[ComputeCommandBufferIndex_] = _ComputeCommandList;
+
+  ComputeReserveData& CurrentComputeReserveData = GetCurrentComputeReserveData();
+
+  //  コマンドリストの初期設定
+  const vk::CommandBuffer& CurrentComputeCommandBuffer = GetCurrentComputeCommandBuffer();
+  {
+    CurrentComputeCommandBuffer.reset(vk::CommandBufferResetFlags());
+    CurrentComputeCommandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+  }
+
+  BeginGraphicsCommandBuffer();
+  const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
+
+  //  コマンドの発行
+  for (auto& ComputeCommand : _ComputeCommandList.GetComputeCommands())
+  {
+    switch (ComputeCommand)
+    {
+    case ComputeCommandFlag::eSetShader:
+    {
+      assert(!_ComputeCommandList.GetComputeShader().isEmpty());
+      const CComputeShader* pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(_ComputeCommandList.GetComputeShader().GetID()));
+
+      vk::PipelineShaderStageCreateInfo PipelineShaderStageInfo;
+      {
+        PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eCompute;
+        PipelineShaderStageInfo.module = pComputeShader->ShaderData.Module.get();
+        PipelineShaderStageInfo.pName = pComputeShader->ShaderData.EntryPoint;
+      }
+
+      vk::ComputePipelineCreateInfo ComputePipelineInfo;
+      {
+        ComputePipelineInfo.flags = (LastComputePipeline_ == VK_NULL_HANDLE ? vk::PipelineCreateFlagBits::eAllowDerivatives : vk::PipelineCreateFlagBits::eAllowDerivatives | vk::PipelineCreateFlagBits::eDerivative);
+        ComputePipelineInfo.stage = PipelineShaderStageInfo;
+        ComputePipelineInfo.layout = PipelineLayout_.get();
+        ComputePipelineInfo.basePipelineHandle = LastComputePipeline_;
+        ComputePipelineInfo.basePipelineIndex = (LastComputePipeline_ == VK_NULL_HANDLE ? 0 : -1);
+      }
+
+      vk::UniquePipeline Pipeline = VkDevice_.createComputePipelineUnique(ComputePipelineCache_.get(), ComputePipelineInfo);
+      assert(Pipeline);
+
+      LastComputePipeline_ = Pipeline.get();
+      CurrentComputeReserveData.Pipelines.emplace_back(std::move(Pipeline));
+    }
+    break;
+    case ComputeCommandFlag::eSetSampler:
+    {
+      const Samplers& Samplers = _ComputeCommandList.GetSamplers();
+      const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+
+      if (SamplerNum == 0)
+      {
+        continue;
+      }
+
+      //  データの読み込み
+      std::vector<DescriptorImageData> SamplerDatas;
+      {
+        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+        {
+          DescriptorImageData& ImageData = SamplerDatas.emplace_back();
+          {
+            ImageData.Descriptor = GetSamplerDescriptor(Samplers[SamplerCount]);
+            ImageData.Bind = SamplerCount;
+          }
+        }
+      }
+
+      if (SamplerDatas.empty())
+      {
+        continue;
+      }
+
+      constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
+
+      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+      {
+        DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+        DescriptorSetAllocateInfo.descriptorSetCount = 1;
+        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+      }
+
+      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+      {
+        for (auto& SamplerData : SamplerDatas)
+        {
+          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+          {
+            WriteDescriptorSet.dstSet = DescriptorSet.get();
+            WriteDescriptorSet.dstBinding = SamplerData.Bind;
+            WriteDescriptorSet.dstArrayElement = 0;
+            WriteDescriptorSet.descriptorCount = 1;
+            WriteDescriptorSet.descriptorType = Cast(DescriptorType::eSampler);
+            WriteDescriptorSet.pImageInfo = &SamplerData.Descriptor;
+          }
+        }
+      }
+
+      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+      CurrentComputeReserveData.SamplerDescriptorSets.emplace_back(std::move(DescriptorSet));
+    }
+    break;
+    case ComputeCommandFlag::eSetConstantBuffer:
+    {
+      const ConstantBuffers& ConstantBuffers = _ComputeCommandList.GetConstantBuffers();
+      const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+
+      if (ConstantBufferNum == 0)
+      {
+        continue;
+      }
+
+      //  データの読み込み
+      std::vector<DescriptorBufferData> ConstantBufferDatas;
+      {
+        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+        {
+          const vdl::Detail::ConstantBufferData& ConstantBuffer = ConstantBuffers[ConstantBufferCount];
+          if (ConstantBuffer.isEmpty())
+          {
+            continue;
+          }
+
+          DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
+          {
+            BufferData.Descriptor = GetConstantBufferDescriptor(ConstantBuffer);
+            BufferData.Bind = ConstantBufferCount;
+          }
+        }
+      }
+
+      if (ConstantBufferDatas.empty())
+      {
+        continue;
+      }
+
+      constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
+
+      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+      {
+        DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+        DescriptorSetAllocateInfo.descriptorSetCount = 1;
+        DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+      }
+
+      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+      {
+        for (auto& ConstantBufferData : ConstantBufferDatas)
+        {
+          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+          {
+            WriteDescriptorSet.dstSet = DescriptorSet.get();
+            WriteDescriptorSet.dstBinding = ConstantBufferData.Bind;
+            WriteDescriptorSet.dstArrayElement = 0;
+            WriteDescriptorSet.descriptorCount = 1;
+            WriteDescriptorSet.descriptorType = Cast(DescriptorType::eConstantBuffer);
+            WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Descriptor;
+          }
+        }
+      }
+
+      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+      CurrentComputeReserveData.ConstantBufferDescriptorSets.emplace_back(std::move(DescriptorSet));
+    }
+    break;
+    default:
+      break;
+    }
+  }
+
+  //  ShaderResouce,UnorderedAccessObjectのImageLayoutの変更とDescriptorの設定
+  //  TODO:コマンドのみで動くようにする
+  {
+    //  SetShaderResource
+    {
+      const ShaderResources& ShaderResources = _ComputeCommandList.GetShaderResources();
+      const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(ShaderResources.size());
+
+      if (ShaderResourceNum)
+      {
+        std::vector<DescriptorImageData> TextureDatas;
+        std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
+
+        //  データの読み込み
+        {
+          for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
+          {
+            const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
+
+            ITexture* pTexture = nullptr;
+            {
+              if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
+              {
+                if (!pShaderResource->isEmpty())
+                {
+                  pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+                }
+              }
+              else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
+              {
+                if (!pShaderResource->isEmpty())
+                {
+                  pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+                }
+              }
+            }
+
+            //  Texture
+            if (pTexture)
+            {
+              constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+              DescriptorImageData& ImageData = TextureDatas.emplace_back();
+              {
+                ImageData.Descriptor = GetTextureDescriptor(pTexture, CurrentGraphicsCommandBuffer);
+                ImageData.Bind = ShaderResourceCount;
+              }
+            }
+            //  UnorderedAccessBuffer
+            else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
+            {
+              if (pShaderResource->isEmpty())
+              {
+                continue;
+              }
+
+              DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+              {
+                BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pShaderResource);
+                BufferData.Bind = ShaderResourceCount;
+              }
+            }
+          }
+        }
+
+        if (!TextureDatas.empty())
+        {
+          constexpr DescriptorType kDescriptorType = DescriptorType::eTexture;
+
+          vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+          {
+            DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+            DescriptorSetAllocateInfo.descriptorSetCount = 1;
+            DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+          }
+
+          vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+          assert(DescriptorSet);
+
+          std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+          {
+            for (auto& TextureData : TextureDatas)
+            {
+              vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+              {
+                WriteDescriptorSet.dstSet = DescriptorSet.get();
+                WriteDescriptorSet.dstBinding = TextureData.Bind;
+                WriteDescriptorSet.dstArrayElement = 0;
+                WriteDescriptorSet.descriptorCount = 1;
+                WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+                WriteDescriptorSet.pImageInfo = &TextureData.Descriptor;
+              }
+            }
+          }
+
+          VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+          CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+          CurrentComputeReserveData.TextureDescriptorSets.emplace_back(std::move(DescriptorSet));
+        }
+
+        if (!UnorderedAccessBufferDatas.empty())
+        {
+          constexpr DescriptorType kDescriptorType = DescriptorType::eBuffer;
+
+          vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+          {
+            DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+            DescriptorSetAllocateInfo.descriptorSetCount = 1;
+            DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+          }
+
+          vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+          assert(DescriptorSet);
+
+          std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+          {
+            for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
+            {
+              vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+              {
+                WriteDescriptorSet.dstSet = DescriptorSet.get();
+                WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
+                WriteDescriptorSet.dstArrayElement = 0;
+                WriteDescriptorSet.descriptorCount = 1;
+                WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+                WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
+              }
+            }
+          }
+
+          VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+          CurrentComputeReserveData.BufferDescriptorSets.emplace_back(std::move(DescriptorSet));
+        }
+      }
+    }
+
+    //  SetUnorderedAccessObject
+    {
+      const UnorderedAccessObjects& UnorderedAccessObjects = _ComputeCommandList.GetUnorderedAccessObjects();
+      const vdl::uint UnorderedAccessObjectNum = static_cast<vdl::uint>(UnorderedAccessObjects.size());
+
+      if (UnorderedAccessObjectNum)
+      {
+        std::vector<DescriptorImageData> UnorderedAccessTextureDatas;
+        std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
+
+        //  データの読み込み
+        {
+          for (vdl::uint UnorderedAccessObjectCount = 0; UnorderedAccessObjectCount < UnorderedAccessObjectNum; ++UnorderedAccessObjectCount)
+          {
+            const vdl::UnorderedAccessObject& UnorderedAccessObject = UnorderedAccessObjects[UnorderedAccessObjectCount];
+
+            //  UnorderedAccessTexture
+            if (const vdl::UnorderedAccessTexture* pUnorderedAccessObject = UnorderedAccessObject.GetIf<vdl::UnorderedAccessTexture>())
+            {
+              if (pUnorderedAccessObject->isEmpty())
+              {
+                continue;
+              }
+
+              DescriptorImageData& ImageData = UnorderedAccessTextureDatas.emplace_back();
+              {
+                ImageData.Descriptor = GetUnorderedAccessTextureDescriptor(*pUnorderedAccessObject, CurrentGraphicsCommandBuffer);
+                ImageData.Bind = UnorderedAccessObjectCount;
+              }
+            }
+            //  UnorderedAccessBuffer
+            else if (const vdl::Detail::UnorderedAccessBufferData* pUnorderedAccessBuffer = UnorderedAccessObject.GetIf<vdl::Detail::UnorderedAccessBufferData>())
+            {
+              if (pUnorderedAccessBuffer->isEmpty())
+              {
+                continue;
+              }
+
+              DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+              {
+                BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pUnorderedAccessBuffer);
+                BufferData.Bind = UnorderedAccessObjectCount;
+              }
+            }
+          }
+        }
+
+        if (!UnorderedAccessTextureDatas.empty())
+        {
+          constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessTexture;
+
+          vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+          {
+            DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+            DescriptorSetAllocateInfo.descriptorSetCount = 1;
+            DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+          }
+
+          vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+          assert(DescriptorSet);
+
+          std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+          {
+            for (auto& UnorderedAccessTextureData : UnorderedAccessTextureDatas)
+            {
+              vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+              {
+                WriteDescriptorSet.dstSet = DescriptorSet.get();
+                WriteDescriptorSet.dstBinding = UnorderedAccessTextureData.Bind;
+                WriteDescriptorSet.dstArrayElement = 0;
+                WriteDescriptorSet.descriptorCount = 1;
+                WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+                WriteDescriptorSet.pImageInfo = &UnorderedAccessTextureData.Descriptor;
+              }
+            }
+          }
+
+          VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+          CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+          CurrentComputeReserveData.UnorderedAccessTextureDescriptorSets.emplace_back(std::move(DescriptorSet));
+        }
+
+        if (!UnorderedAccessBufferDatas.empty())
+        {
+          constexpr DescriptorType kDescriptorType = DescriptorType::eUnorderedAccessBuffer;
+
+          vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+          {
+            DescriptorSetAllocateInfo.descriptorPool = ComputeDescriptorPool_.get();
+            DescriptorSetAllocateInfo.descriptorSetCount = 1;
+            DescriptorSetAllocateInfo.pSetLayouts = &ComputeDescriptorLayouts_[static_cast<vdl::uint>(kDescriptorType)].get();
+          }
+
+          vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+          assert(DescriptorSet);
+
+          std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+          {
+            for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
+            {
+              vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+              {
+                WriteDescriptorSet.dstSet = DescriptorSet.get();
+                WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
+                WriteDescriptorSet.dstArrayElement = 0;
+                WriteDescriptorSet.descriptorCount = 1;
+                WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+                WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
+              }
+            }
+          }
+
+          VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+          CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, kDescriptorType), DescriptorSet.get(), nullptr);
+
+          CurrentComputeReserveData.UnorderedAccessBufferDescriptorSets.emplace_back(std::move(DescriptorSet));
+        }
+      }
+    }
+  }
+
+  Flush();
+
+  //  SetPipeline
+  CurrentComputeCommandBuffer.bindPipeline(vk::PipelineBindPoint::eCompute, LastComputePipeline_);
+
+  //  SetDescriptor
+  {
+    if (const vk::UniqueDescriptorSet& DescriptorSet = CurrentComputeReserveData.TextureDescriptorSets.back())
+    {
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, DescriptorType::eTexture), DescriptorSet.get(), nullptr);
+    }
+
+    if (const vk::UniqueDescriptorSet& DescriptorSet = CurrentComputeReserveData.BufferDescriptorSets.back())
+    {
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, DescriptorType::eBuffer), DescriptorSet.get(), nullptr);
+    }
+
+    if (const vk::UniqueDescriptorSet& DescriptorSet = CurrentComputeReserveData.SamplerDescriptorSets.back())
+    {
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, DescriptorType::eSampler), DescriptorSet.get(), nullptr);
+    }
+
+    if (const vk::UniqueDescriptorSet& DescriptorSet = CurrentComputeReserveData.ConstantBufferDescriptorSets.back())
+    {
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, DescriptorType::eConstantBuffer), DescriptorSet.get(), nullptr);
+    }
+
+    if (const vk::UniqueDescriptorSet& DescriptorSet = CurrentComputeReserveData.UnorderedAccessBufferDescriptorSets.back())
+    {
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, DescriptorType::eUnorderedAccessBuffer), DescriptorSet.get(), nullptr);
+    }
+
+    if (const vk::UniqueDescriptorSet& DescriptorSet = CurrentComputeReserveData.UnorderedAccessTextureDescriptorSets.back())
+    {
+      CurrentComputeCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, PipelineLayout_.get(), GetDescriptorLayoutOffset(ShaderType::eComputeShader, DescriptorType::eUnorderedAccessTexture), DescriptorSet.get(), nullptr);
+    }
+  }
+
+  const vdl::uint3& ThreadGroup = _ComputeCommandList.GetThreadGroup();
+  CurrentComputeCommandBuffer.dispatch(ThreadGroup.x, ThreadGroup.y, ThreadGroup.z);
+  CurrentComputeCommandBuffer.end();
+
+  std::vector<vk::Semaphore> WaitSemaphores;
+  {
+    if (LastSemaphore_)
+    {
+      WaitSemaphores.push_back(LastSemaphore_);
+    }
+    if (const vk::Semaphore PresentSemaphore = pSwapChain_->GetSemaphore())
+    {
+      WaitSemaphores.push_back(PresentSemaphore);
+    }
+  }
+
+  const vdl::uint WaitSemaphoreNum = static_cast<vdl::uint>(WaitSemaphores.size());
+  std::vector<vk::PipelineStageFlags> PipelineStageFlags(WaitSemaphoreNum, vk::PipelineStageFlagBits::eBottomOfPipe);
+
+  const vk::Semaphore& CurrentSemaphore = GetCurrentComputeSemaphore();
+
+  vk::SubmitInfo SubmitInfo;
+  {
+    SubmitInfo.waitSemaphoreCount = WaitSemaphoreNum;
+    SubmitInfo.pWaitSemaphores = WaitSemaphores.data();
+    SubmitInfo.pWaitDstStageMask = PipelineStageFlags.data();
+    SubmitInfo.commandBufferCount = 1;
+    SubmitInfo.pCommandBuffers = &CurrentComputeCommandBuffer;
+    SubmitInfo.signalSemaphoreCount = 1;
+    SubmitInfo.pSignalSemaphores = &CurrentSemaphore;
+  }
+
+  ComputeQueue_.submit(SubmitInfo, GetCurrentComputeFence());
+
+  LastSemaphore_ = CurrentSemaphore;
+
+  ++ComputeCommandBufferIndex_ %= Constants::kComputeCommandBufferNum;
+  WaitFence(GetCurrentComputeFence());
+
+  //  最終データの引き継ぎ
+  {
+    ComputeReserveData& NextComputeReserveData = GetCurrentComputeReserveData();
+    NextComputeReserveData.Clear();
+    NextComputeReserveData.Pipelines.resize(1);
+    NextComputeReserveData.Pipelines[0] = std::move(CurrentComputeReserveData.Pipelines.back());
+    NextComputeReserveData.TextureDescriptorSets.resize(1);
+    NextComputeReserveData.TextureDescriptorSets[0] = std::move(CurrentComputeReserveData.TextureDescriptorSets.back());
+    NextComputeReserveData.BufferDescriptorSets.resize(1);
+    NextComputeReserveData.BufferDescriptorSets[0] = std::move(CurrentComputeReserveData.BufferDescriptorSets.back());
+    NextComputeReserveData.SamplerDescriptorSets.resize(1);
+    NextComputeReserveData.SamplerDescriptorSets[0] = std::move(CurrentComputeReserveData.SamplerDescriptorSets.back());
+    NextComputeReserveData.ConstantBufferDescriptorSets.resize(1);
+    NextComputeReserveData.ConstantBufferDescriptorSets[0] = std::move(CurrentComputeReserveData.ConstantBufferDescriptorSets.back());
+    NextComputeReserveData.UnorderedAccessTextureDescriptorSets.resize(1);
+    NextComputeReserveData.UnorderedAccessTextureDescriptorSets[0] = std::move(CurrentComputeReserveData.UnorderedAccessTextureDescriptorSets.back());
+    NextComputeReserveData.UnorderedAccessBufferDescriptorSets.resize(1);
+    NextComputeReserveData.UnorderedAccessBufferDescriptorSets[0] = std::move(CurrentComputeReserveData.UnorderedAccessBufferDescriptorSets.back());
+  }
 }
 
 //--------------------------------------------------
@@ -1891,7 +3212,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
           }
         }
 
-        GraphicsColorAttachmentCount_ = AttachmentCount;
+        PipelineColorBlendStateInfo_.attachmentCount = AttachmentCount;
 
         //  デプスステンシルバッファの設定
         if (!CurrentOutputManager.DepthStencilTexture.isEmpty())
@@ -1924,9 +3245,9 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
       vk::SubpassDescription SubpassDescription;
       {
         SubpassDescription.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
-        SubpassDescription.colorAttachmentCount = GraphicsColorAttachmentCount_;
+        SubpassDescription.colorAttachmentCount = PipelineColorBlendStateInfo_.attachmentCount;
         SubpassDescription.pColorAttachments = AttachmentReferences.data();
-        SubpassDescription.pDepthStencilAttachment = (GraphicsColorAttachmentCount_ == AttachmentCount ? nullptr : &AttachmentReferences[GraphicsColorAttachmentCount_]);
+        SubpassDescription.pDepthStencilAttachment = (PipelineColorBlendStateInfo_.attachmentCount == AttachmentCount ? nullptr : &AttachmentReferences[PipelineColorBlendStateInfo_.attachmentCount]);
       }
 
       vk::RenderPassCreateInfo RenderPassInfo;
@@ -1958,11 +3279,10 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
       RenderPassData.Framebuffer = VkDevice_.createFramebufferUnique(FramebufferInfo);
       assert(RenderPassData.Framebuffer);
     }
+    GraphicsPipelineInfo_.renderPass = RenderPassData.RenderPass.get();
 
     CurrentGraphicsCommandBuffer.beginRenderPass({ RenderPassData.RenderPass.get(), RenderPassData.Framebuffer.get(),
       { { 0, 0 }, { FrameBufferSize.x, FrameBufferSize.y } } }, vk::SubpassContents::eInline);
-
-    GraphicsStateChangeFlags_.Cancel(GraphicsCommandType::eSetRenderTextures);
   }
 
   GraphicsCommandBufferState_ = CommandBufferState::eBeginRenderPass;
@@ -1970,728 +3290,728 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
 
 void CDeviceContext::PreprocessingDraw()
 {
-  //  画像レイアウトの変更
-  {
-    auto ChangeImageLayout = [&](ShaderType _Type)->void
-    {
-      const ShaderResources& ShaderResources = CurrentGraphicsState_.ShaderResources[static_cast<vdl::uint>(_Type)];
-
-      const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(ShaderResources.size());
-      for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
-      {
-        const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
-
-        ITexture* pTexture = nullptr;
-        {
-          if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
-          {
-            if (!pShaderResource->isEmpty())
-            {
-              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
-            }
-          }
-          else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
-          {
-            if (!pShaderResource->isEmpty())
-            {
-              pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
-            }
-          }
-        }
-
-        if (pTexture)
-        {
-          constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-
-          switch (pTexture->GetType())
-          {
-          case TextureType::eDepthStencilTexture:
-            assert(false);
-          case TextureType::eDepthTexture:
-          {
-            CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
-
-            if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
-            {
-              BeginGraphicsCommandBuffer();
-              pDepthTexture->pParent->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pDepthTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
-            }
-          }
-          break;
-          case TextureType::eStencilTexture:
-          {
-            CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
-
-            if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
-            {
-              BeginGraphicsCommandBuffer();
-              pStencilTexture->pParent->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pStencilTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
-            }
-          }
-          break;
-          default:
-          {
-            CTexture* pColorTexture = Cast<CTexture>(pTexture);
-
-            if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
-            {
-              BeginGraphicsCommandBuffer();
-              pColorTexture->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-            }
-          }
-          break;
-          }
-        }
-      }
-    };
-
-    if (!CurrentGraphicsState_.VertexShader.isEmpty())
-    {
-      ChangeImageLayout(ShaderType::eVertexShader);
-    }
-    if (!CurrentGraphicsState_.HullShader.isEmpty())
-    {
-      ChangeImageLayout(ShaderType::eHullShader);
-    }
-    if (!CurrentGraphicsState_.DomainShader.isEmpty())
-    {
-      ChangeImageLayout(ShaderType::eDomainShader);
-    }
-    if (!CurrentGraphicsState_.GeometryShader.isEmpty())
-    {
-      ChangeImageLayout(ShaderType::eGeometryShader);
-    }
-    if (!CurrentGraphicsState_.PixelShader.isEmpty())
-    {
-      ChangeImageLayout(ShaderType::ePixelShader);
-    }
-  }
-
-  BeginRenderPassGraphicsCommandBuffer();
-
-  const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
-
-  //  シザーが無効の時に強制的に設定する
-  if (!CurrentGraphicsState_.RasterizerState.ScissorEnable)
-  {
-    GraphicsStateChangeFlags_.Set(GraphicsCommandType::eSetScissor);
-  }
-
-  if (GraphicsStateChangeFlags_.isEmpty())
-  {
-    return;
-  }
-
-  GraphicsReserveData& CurrentGraphicsReserveData = GraphicsReserveDatas_[GraphicsCommandBufferIndex_];
-
-  //  SetPipeline
-  for (auto& GraphicsPipelineStateCommand : kGraphicsPipelineStateCommands)
-  {
-    if (!GraphicsStateChangeFlags_.Has(GraphicsPipelineStateCommand))
-    {
-      continue;
-    }
-
-    std::vector<vk::PipelineShaderStageCreateInfo> PipelineShaderStageInfos;
-    {
-      if (!CurrentGraphicsState_.VertexShader.isEmpty())
-      {
-        const CVertexShader* pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID()));
-
-        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-        {
-          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
-          PipelineShaderStageInfo.module = pVertexShader->ShaderData.Module.get();
-          PipelineShaderStageInfo.pName = pVertexShader->ShaderData.EntryPoint;
-        }
-
-        CurrentGraphicsReserveData.VertexShaders.push_back(CurrentGraphicsState_.VertexShader);
-      }
-
-      if (!CurrentGraphicsState_.HullShader.isEmpty())
-      {
-        const CHullShader* pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID()));
-
-        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-        {
-          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eTessellationControl;
-          PipelineShaderStageInfo.module = pHullShader->ShaderData.Module.get();
-          PipelineShaderStageInfo.pName = pHullShader->ShaderData.EntryPoint;
-        }
-
-        CurrentGraphicsReserveData.HullShaders.push_back(CurrentGraphicsState_.HullShader);
-      }
-
-      if (!CurrentGraphicsState_.DomainShader.isEmpty())
-      {
-        const CDomainShader* pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID()));
-
-        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-        {
-          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eTessellationEvaluation;
-          PipelineShaderStageInfo.module = pDomainShader->ShaderData.Module.get();
-          PipelineShaderStageInfo.pName = pDomainShader->ShaderData.EntryPoint;
-        }
-
-        CurrentGraphicsReserveData.DomainShaders.push_back(CurrentGraphicsState_.DomainShader);
-      }
-
-      if (!CurrentGraphicsState_.GeometryShader.isEmpty())
-      {
-        const CGeometryShader* pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID()));
-
-        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-        {
-          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eGeometry;
-          PipelineShaderStageInfo.module = pGeometryShader->ShaderData.Module.get();
-          PipelineShaderStageInfo.pName = pGeometryShader->ShaderData.EntryPoint;
-        }
-
-        CurrentGraphicsReserveData.GeometryShaders.push_back(CurrentGraphicsState_.GeometryShader);
-      }
-
-      if (!CurrentGraphicsState_.PixelShader.isEmpty())
-      {
-        const CPixelShader* pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID()));
-
-        vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
-        {
-          PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eFragment;
-          PipelineShaderStageInfo.module = pPixelShader->ShaderData.Module.get();
-          PipelineShaderStageInfo.pName = pPixelShader->ShaderData.EntryPoint;
-        }
-
-        CurrentGraphicsReserveData.PixelShaders.push_back(CurrentGraphicsState_.PixelShader);
-      }
-    }
-
-    vk::PipelineVertexInputStateCreateInfo PipelineVertexInputStateInfo;
-    {
-      const InputLayout& InputLayout = InputLayouts_[CurrentGraphicsState_.InputLayout];
-
-      PipelineVertexInputStateInfo.vertexBindingDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputBindingDescriptions.size());
-      PipelineVertexInputStateInfo.pVertexBindingDescriptions = InputLayout.VertexInputBindingDescriptions.data();
-      PipelineVertexInputStateInfo.vertexAttributeDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputAttributeDescriptions.size());
-      PipelineVertexInputStateInfo.pVertexAttributeDescriptions = InputLayout.VertexInputAttributeDescriptions.data();
-    }
-
-    vk::PipelineInputAssemblyStateCreateInfo PipelineInputAssemblyStateInfo;
-    {
-      PipelineInputAssemblyStateInfo.topology = Cast(CurrentGraphicsState_.Topology);
-      PipelineInputAssemblyStateInfo.primitiveRestartEnable = false;
-    }
-
-    vk::PipelineTessellationStateCreateInfo PipelineTessellationStateInfo;
-    {
-      PipelineTessellationStateInfo.patchControlPoints = GetPatchControlPoints(CurrentGraphicsState_.Topology);
-    }
-
-    vk::PipelineViewportStateCreateInfo PipelineViewportStateInfo;
-    {
-      PipelineViewportStateInfo.viewportCount = 1;
-      PipelineViewportStateInfo.pViewports = nullptr;
-      PipelineViewportStateInfo.scissorCount = 1;
-      PipelineViewportStateInfo.pScissors = nullptr;
-    }
-
-    const vk::PipelineRasterizationStateCreateInfo& PipelineRasterizationStateInfo = GetPipelineRasterizationStateInfo(CurrentGraphicsState_.RasterizerState);
-
-    const vk::PipelineDepthStencilStateCreateInfo& PipelineDepthStencilStateInfo = GetPipelineDepthStencilStateInfo(CurrentGraphicsState_.DepthStencilState);
-
-    std::vector<vk::PipelineColorBlendAttachmentState> PipelineColorBlendAttachmentStates;
-    if (GraphicsColorAttachmentCount_)
-    {
-      assert(GraphicsColorAttachmentCount_ <= Constants::kMaxRenderTextureNum);
-
-      PipelineColorBlendAttachmentStates.resize(GraphicsColorAttachmentCount_);
-      if (CurrentGraphicsState_.BlendState.IndependentBlendEnable)
-      {
-        for (vdl::uint i = 0; i < GraphicsColorAttachmentCount_; ++i)
-        {
-          PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
-        }
-      }
-      else
-      {
-        PipelineColorBlendAttachmentStates[0] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[0]);
-        for (vdl::uint i = 1; i < GraphicsColorAttachmentCount_; ++i)
-        {
-          PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
-        }
-      }
-    }
-
-    const vk::PipelineMultisampleStateCreateInfo& PipelineMultisampleStateInfo = GetMultisampleStateInfo(CurrentGraphicsState_.BlendState.AlphaToCoverageEnable);
-
-    vk::PipelineColorBlendStateCreateInfo PipelineColorBlendStateInfo;
-    {
-      PipelineColorBlendStateInfo.logicOpEnable = false;
-      PipelineColorBlendStateInfo.logicOp = vk::LogicOp::eNoOp;
-      PipelineColorBlendStateInfo.attachmentCount = GraphicsColorAttachmentCount_;
-      PipelineColorBlendStateInfo.pAttachments = PipelineColorBlendAttachmentStates.data();
-      PipelineColorBlendStateInfo.blendConstants[0] = 1.0f;
-      PipelineColorBlendStateInfo.blendConstants[1] = 1.0f;
-      PipelineColorBlendStateInfo.blendConstants[2] = 1.0f;
-      PipelineColorBlendStateInfo.blendConstants[3] = 1.0f;
-    }
-
-    std::array<vk::DynamicState, 2> DynamicStates;
-    {
-      DynamicStates[0] = vk::DynamicState::eViewport;
-      DynamicStates[1] = vk::DynamicState::eScissor;
-    }
-
-    vk::PipelineDynamicStateCreateInfo PipelineDynamicStateInfo;
-    {
-      PipelineDynamicStateInfo.dynamicStateCount = static_cast<vdl::uint>(DynamicStates.size());
-      PipelineDynamicStateInfo.pDynamicStates = DynamicStates.data();
-    }
-
-    //  パイプラインの作成
-    {
-      std::vector<vk::UniquePipeline>& CurrentGraphicsPipelines = CurrentGraphicsReserveData.Pipelines;
-      const vk::Pipeline& PreviousPipeline = CurrentGraphicsPipelines.back().get();
-
-      vk::GraphicsPipelineCreateInfo GraphicsPipelineInfo;
-      {
-        GraphicsPipelineInfo.flags = (PreviousPipeline == VK_NULL_HANDLE ? vk::PipelineCreateFlagBits::eAllowDerivatives : vk::PipelineCreateFlagBits::eAllowDerivatives | vk::PipelineCreateFlagBits::eDerivative);
-        GraphicsPipelineInfo.stageCount = static_cast<vdl::uint>(PipelineShaderStageInfos.size());
-        GraphicsPipelineInfo.pStages = PipelineShaderStageInfos.data();
-        GraphicsPipelineInfo.pVertexInputState = &PipelineVertexInputStateInfo;
-        GraphicsPipelineInfo.pInputAssemblyState = &PipelineInputAssemblyStateInfo;
-        GraphicsPipelineInfo.pTessellationState = &PipelineTessellationStateInfo;
-        GraphicsPipelineInfo.pViewportState = &PipelineViewportStateInfo;
-        GraphicsPipelineInfo.pRasterizationState = &PipelineRasterizationStateInfo;
-        GraphicsPipelineInfo.pMultisampleState = &PipelineMultisampleStateInfo;
-        GraphicsPipelineInfo.pDepthStencilState = &PipelineDepthStencilStateInfo;
-        GraphicsPipelineInfo.pColorBlendState = &PipelineColorBlendStateInfo;
-        GraphicsPipelineInfo.pDynamicState = &PipelineDynamicStateInfo;
-        GraphicsPipelineInfo.layout = PipelineLayout_.get();
-        GraphicsPipelineInfo.renderPass = CurrentGraphicsReserveData.RenderPassDatas.back().RenderPass.get();
-        GraphicsPipelineInfo.subpass = 0;
-        GraphicsPipelineInfo.basePipelineHandle = PreviousPipeline;
-        GraphicsPipelineInfo.basePipelineIndex = (PreviousPipeline == VK_NULL_HANDLE ? 0 : -1);
-      }
-
-      vk::UniquePipeline Pipeline = VkDevice_.createGraphicsPipelineUnique(GraphicsPipelineCache_.get(), GraphicsPipelineInfo);
-      assert(Pipeline);
-
-      CurrentGraphicsCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, Pipeline.get());
-
-      CurrentGraphicsPipelines.emplace_back(std::move(Pipeline));
-    }
-
-    break;
-  }
-
-  //  SetDescriptor
-  {
-    //  SetShaderResource
-    {
-      auto BindShaderResources = [&](ShaderType _Type)->void
-      {
-        const ShaderResources& ShaderResources = CurrentGraphicsState_.ShaderResources[static_cast<vdl::uint>(_Type)];
-
-        std::vector<DescriptorImageData> TextureDatas;
-        std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
-
-        //  データの読み込み
-        {
-          const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(ShaderResources.size());
-          for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
-          {
-            const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
-
-            ITexture* pTexture = nullptr;
-            {
-              if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
-              {
-                if (!pShaderResource->isEmpty())
-                {
-                  pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
-                }
-              }
-              else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
-              {
-                if (!pShaderResource->isEmpty())
-                {
-                  pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
-                }
-              }
-            }
-
-            //  Texture
-            if (pTexture)
-            {
-              constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-
-              DescriptorImageData& ImageData = TextureDatas.emplace_back();
-              {
-                ImageData.Descriptor = GetTextureDescriptor(pTexture, CurrentGraphicsCommandBuffer);
-                ImageData.Bind = ShaderResourceCount;
-              }
-            }
-            //  UnorderedAccessBuffer
-            else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
-            {
-              if (pShaderResource->isEmpty())
-              {
-                DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
-                {
-                  BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pShaderResource);
-                  BufferData.Bind = ShaderResourceCount;
-                }
-              }
-            }
-          }
-        }
-
-        bool isEmpty = true;
-
-        if (!TextureDatas.empty())
-        {
-          constexpr DescriptorType kDescriptorType = DescriptorType::eTexture;
-
-          const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
-
-          vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-          {
-            DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
-            DescriptorSetAllocateInfo.descriptorSetCount = 1;
-            DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
-          }
-
-          vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-          assert(DescriptorSet);
-
-          std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-          {
-            for (auto& TextureData : TextureDatas)
-            {
-              vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-              {
-                WriteDescriptorSet.dstSet = DescriptorSet.get();
-                WriteDescriptorSet.dstBinding = TextureData.Bind;
-                WriteDescriptorSet.dstArrayElement = 0;
-                WriteDescriptorSet.descriptorCount = 1;
-                WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-                WriteDescriptorSet.pImageInfo = &TextureData.Descriptor;
-              }
-            }
-          }
-
-          VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-          CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
-
-          CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-
-          isEmpty = false;
-        }
-
-        if (!UnorderedAccessBufferDatas.empty())
-        {
-          constexpr DescriptorType kDescriptorType = DescriptorType::eBuffer;
-
-          const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
-
-          vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-          {
-            DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
-            DescriptorSetAllocateInfo.descriptorSetCount = 1;
-            DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
-          }
-
-          vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-          assert(DescriptorSet);
-
-          std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-          {
-            for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
-            {
-              vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-              {
-                WriteDescriptorSet.dstSet = DescriptorSet.get();
-                WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
-                WriteDescriptorSet.dstArrayElement = 0;
-                WriteDescriptorSet.descriptorCount = 1;
-                WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-                WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
-              }
-            }
-          }
-
-          VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-          CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
-
-          CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-
-          isEmpty = false;
-        }
-
-        if (!isEmpty)
-        {
-          CurrentGraphicsReserveData.ShaderResources.push_back(ShaderResources);
-        }
-      };
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageShaderResource))
-      {
-        BindShaderResources(ShaderType::eVertexShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageShaderResource))
-      {
-        BindShaderResources(ShaderType::eHullShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageShaderResource))
-      {
-        BindShaderResources(ShaderType::eDomainShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageShaderResource))
-      {
-        BindShaderResources(ShaderType::eGeometryShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageShaderResource))
-      {
-        BindShaderResources(ShaderType::ePixelShader);
-      }
-    }
-
-    //  SetSampler
-    {
-      auto BindSamplers = [&](ShaderType _Type)->void
-      {
-        const Samplers& Samplers = CurrentGraphicsState_.Samplers[static_cast<vdl::uint>(_Type)];
-
-        std::vector<DescriptorImageData> SamplerDatas;
-
-        //  データの読み込み
-        {
-          const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
-          for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
-          {
-            DescriptorImageData& ImageData = SamplerDatas.emplace_back();
-            {
-              ImageData.Descriptor = GetSamplerDescriptor(Samplers[SamplerCount]);
-              ImageData.Bind = SamplerCount;
-            }
-          }
-        }
-
-        if (SamplerDatas.empty())
-        {
-          return;
-        }
-
-        constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
-
-        const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
-
-        vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-        {
-          DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
-          DescriptorSetAllocateInfo.descriptorSetCount = 1;
-          DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
-        }
-
-        vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-
-        std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-        {
-          for (auto& SamplerData : SamplerDatas)
-          {
-            vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-            {
-              WriteDescriptorSet.dstSet = DescriptorSet.get();
-              WriteDescriptorSet.dstBinding = SamplerData.Bind;
-              WriteDescriptorSet.dstArrayElement = 0;
-              WriteDescriptorSet.descriptorCount = 1;
-              WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-              WriteDescriptorSet.pImageInfo = &SamplerData.Descriptor;
-            }
-          }
-        }
-
-        VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-        CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
-
-        CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-      };
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageSampler))
-      {
-        BindSamplers(ShaderType::eVertexShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageSampler))
-      {
-        BindSamplers(ShaderType::eHullShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageSampler))
-      {
-        BindSamplers(ShaderType::eDomainShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageSampler))
-      {
-        BindSamplers(ShaderType::eGeometryShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageSampler))
-      {
-        BindSamplers(ShaderType::ePixelShader);
-      }
-    }
-
-    //  SetConstantBuffer
-    {
-      auto BindConstantBuffers = [&](ShaderType _Type)
-      {
-        const ConstantBuffers& ConstantBuffers = CurrentGraphicsState_.ConstantBuffers[static_cast<vdl::uint>(_Type)];
-
-        std::vector<DescriptorBufferData> ConstantBufferDatas;
-
-        //  データの読み込み
-        {
-          const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
-          for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
-          {
-            const vdl::Detail::ConstantBufferData& ConstantBuffer = ConstantBuffers[ConstantBufferCount];
-            if (ConstantBuffer.isEmpty())
-            {
-              continue;
-            }
-
-            DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
-            {
-              BufferData.Descriptor = GetConstantBufferDescriptor(ConstantBuffer);
-              BufferData.Bind = ConstantBufferCount;
-            }
-          }
-        }
-
-        if (ConstantBufferDatas.empty())
-        {
-          return;
-        }
-
-        constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
-
-        const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
-
-        vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
-        {
-          DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
-          DescriptorSetAllocateInfo.descriptorSetCount = 1;
-          DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
-        }
-
-        vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
-
-        std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
-        {
-          for (auto& ConstantBufferData : ConstantBufferDatas)
-          {
-            vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
-            {
-              WriteDescriptorSet.dstSet = DescriptorSet.get();
-              WriteDescriptorSet.dstBinding = ConstantBufferData.Bind;
-              WriteDescriptorSet.dstArrayElement = 0;
-              WriteDescriptorSet.descriptorCount = 1;
-              WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
-              WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Descriptor;
-            }
-          }
-        }
-
-        VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
-
-        CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
-
-        CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
-
-        CurrentGraphicsReserveData.ConstantBuffers.push_back(ConstantBuffers);
-      };
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageConstantBuffer))
-      {
-        BindConstantBuffers(ShaderType::eVertexShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageConstantBuffer))
-      {
-        BindConstantBuffers(ShaderType::eHullShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageConstantBuffer))
-      {
-        BindConstantBuffers(ShaderType::eDomainShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageConstantBuffer))
-      {
-        BindConstantBuffers(ShaderType::eGeometryShader);
-      }
-
-      if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageConstantBuffer))
-      {
-        BindConstantBuffers(ShaderType::ePixelShader);
-      }
-    }
-  }
-
-  if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexBuffer) && !CurrentGraphicsState_.VertexBuffer.isEmpty())
-  {
-    const CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.VertexBuffer.GetID()));
-
-    constexpr vk::DeviceSize kOffset = 0;
-    CurrentGraphicsCommandBuffer.bindVertexBuffers(0, pVertexBuffer->BufferData.Buffer.get(), kOffset);
-
-    CurrentGraphicsReserveData.VertexBuffers.push_back(CurrentGraphicsState_.VertexBuffer);
-  }
-
-  if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetInstanceBuffer) && !CurrentGraphicsState_.InstanceBuffer.isEmpty())
-  {
-    const CInstanceBuffer* pInstanceBuffer = Cast<CInstanceBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.InstanceBuffer.GetID()));
-
-    CurrentGraphicsCommandBuffer.bindVertexBuffers(1, pInstanceBuffer->BufferData.Buffer.get(), pInstanceBuffer->PreviousOffset);
-
-    CurrentGraphicsReserveData.InstanceBuffers.push_back(CurrentGraphicsState_.InstanceBuffer);
-  }
-
-  if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetIndexBuffer) && !CurrentGraphicsState_.IndexBuffer.isEmpty())
-  {
-    const CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.IndexBuffer.GetID()));
-
-    constexpr vk::DeviceSize kOffset = 0;
-    CurrentGraphicsCommandBuffer.bindIndexBuffer(pIndexBuffer->BufferData.Buffer.get(), kOffset, pIndexBuffer->IndexType);
-
-    CurrentGraphicsReserveData.IndexBuffers.push_back(CurrentGraphicsState_.IndexBuffer);
-  }
-
-  if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetScissor))
-  {
-    CurrentGraphicsCommandBuffer.setScissor(0,
-      Cast(CurrentGraphicsState_.RasterizerState.ScissorEnable ? CurrentGraphicsState_.Scissor
-        : vdl::Scissor(CurrentGraphicsState_.Viewport.LeftTop, CurrentGraphicsState_.Viewport.Size)));
-  }
-
-  if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetViewport))
-  {
-    CurrentGraphicsCommandBuffer.setViewport(0, Cast(CurrentGraphicsState_.Viewport));
-  }
-
-  GraphicsStateChangeFlags_.Clear();
+  ////  画像レイアウトの変更
+  //{
+  //  auto ChangeImageLayout = [&](ShaderType _Type)->void
+  //  {
+  //    const ShaderResources& ShaderResources = CurrentGraphicsState_.ShaderResources[static_cast<vdl::uint>(_Type)];
+
+  //    const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(ShaderResources.size());
+  //    for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
+  //    {
+  //      const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
+
+  //      ITexture* pTexture = nullptr;
+  //      {
+  //        if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
+  //        {
+  //          if (!pShaderResource->isEmpty())
+  //          {
+  //            pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+  //          }
+  //        }
+  //        else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
+  //        {
+  //          if (!pShaderResource->isEmpty())
+  //          {
+  //            pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+  //          }
+  //        }
+  //      }
+
+  //      if (pTexture)
+  //      {
+  //        constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+  //        switch (pTexture->GetType())
+  //        {
+  //        case TextureType::eDepthStencilTexture:
+  //          assert(false);
+  //        case TextureType::eDepthTexture:
+  //        {
+  //          CDepthTexture* pDepthTexture = Cast<CDepthTexture>(pTexture);
+
+  //          if (pDepthTexture->pParent->TextureData.CurrentLayout != kImageLayout)
+  //          {
+  //            BeginGraphicsCommandBuffer();
+  //            pDepthTexture->pParent->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pDepthTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
+  //          }
+  //        }
+  //        break;
+  //        case TextureType::eStencilTexture:
+  //        {
+  //          CStencilTexture* pStencilTexture = Cast<CStencilTexture>(pTexture);
+
+  //          if (pStencilTexture->pParent->TextureData.CurrentLayout != kImageLayout)
+  //          {
+  //            BeginGraphicsCommandBuffer();
+  //            pStencilTexture->pParent->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { pStencilTexture->pParent->ImageAspectFlag, 0, 1, 0, 1 });
+  //          }
+  //        }
+  //        break;
+  //        default:
+  //        {
+  //          CTexture* pColorTexture = Cast<CTexture>(pTexture);
+
+  //          if (pColorTexture->TextureData.CurrentLayout != kImageLayout)
+  //          {
+  //            BeginGraphicsCommandBuffer();
+  //            pColorTexture->TextureData.SetImageLayout(GetCurrentGraphicsCommandBuffer(), kImageLayout, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+  //          }
+  //        }
+  //        break;
+  //        }
+  //      }
+  //    }
+  //  };
+
+  //  if (!CurrentGraphicsState_.VertexShader.isEmpty())
+  //  {
+  //    ChangeImageLayout(ShaderType::eVertexShader);
+  //  }
+  //  if (!CurrentGraphicsState_.HullShader.isEmpty())
+  //  {
+  //    ChangeImageLayout(ShaderType::eHullShader);
+  //  }
+  //  if (!CurrentGraphicsState_.DomainShader.isEmpty())
+  //  {
+  //    ChangeImageLayout(ShaderType::eDomainShader);
+  //  }
+  //  if (!CurrentGraphicsState_.GeometryShader.isEmpty())
+  //  {
+  //    ChangeImageLayout(ShaderType::eGeometryShader);
+  //  }
+  //  if (!CurrentGraphicsState_.PixelShader.isEmpty())
+  //  {
+  //    ChangeImageLayout(ShaderType::ePixelShader);
+  //  }
+  //}
+
+  //BeginRenderPassGraphicsCommandBuffer();
+
+  //const vk::CommandBuffer& CurrentGraphicsCommandBuffer = GetCurrentGraphicsCommandBuffer();
+
+  ////  シザーが無効の時に強制的に設定する
+  //if (!CurrentGraphicsState_.RasterizerState.ScissorEnable)
+  //{
+  //  GraphicsStateChangeFlags_.Set(GraphicsCommandType::eSetScissor);
+  //}
+
+  //if (GraphicsStateChangeFlags_.isEmpty())
+  //{
+  //  return;
+  //}
+
+  //GraphicsReserveData& CurrentGraphicsReserveData = GraphicsReserveDatas_[GraphicsCommandBufferIndex_];
+
+  ////  SetPipeline
+  //for (auto& GraphicsPipelineStateCommand : kGraphicsPipelineStateCommands)
+  //{
+  //  if (!GraphicsStateChangeFlags_.Has(GraphicsPipelineStateCommand))
+  //  {
+  //    continue;
+  //  }
+
+  //  std::vector<vk::PipelineShaderStageCreateInfo> PipelineShaderStageInfos;
+  //  {
+  //    if (!CurrentGraphicsState_.VertexShader.isEmpty())
+  //    {
+  //      const CVertexShader* pVertexShader = Cast<CVertexShader>(pShaderManager_->GetShader(CurrentGraphicsState_.VertexShader.GetID()));
+
+  //      vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+  //      {
+  //        PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
+  //        PipelineShaderStageInfo.module = pVertexShader->ShaderData.Module.get();
+  //        PipelineShaderStageInfo.pName = pVertexShader->ShaderData.EntryPoint;
+  //      }
+
+  //      CurrentGraphicsReserveData.VertexShaders.push_back(CurrentGraphicsState_.VertexShader);
+  //    }
+
+  //    if (!CurrentGraphicsState_.HullShader.isEmpty())
+  //    {
+  //      const CHullShader* pHullShader = Cast<CHullShader>(pShaderManager_->GetShader(CurrentGraphicsState_.HullShader.GetID()));
+
+  //      vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+  //      {
+  //        PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eTessellationControl;
+  //        PipelineShaderStageInfo.module = pHullShader->ShaderData.Module.get();
+  //        PipelineShaderStageInfo.pName = pHullShader->ShaderData.EntryPoint;
+  //      }
+
+  //      CurrentGraphicsReserveData.HullShaders.push_back(CurrentGraphicsState_.HullShader);
+  //    }
+
+  //    if (!CurrentGraphicsState_.DomainShader.isEmpty())
+  //    {
+  //      const CDomainShader* pDomainShader = Cast<CDomainShader>(pShaderManager_->GetShader(CurrentGraphicsState_.DomainShader.GetID()));
+
+  //      vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+  //      {
+  //        PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eTessellationEvaluation;
+  //        PipelineShaderStageInfo.module = pDomainShader->ShaderData.Module.get();
+  //        PipelineShaderStageInfo.pName = pDomainShader->ShaderData.EntryPoint;
+  //      }
+
+  //      CurrentGraphicsReserveData.DomainShaders.push_back(CurrentGraphicsState_.DomainShader);
+  //    }
+
+  //    if (!CurrentGraphicsState_.GeometryShader.isEmpty())
+  //    {
+  //      const CGeometryShader* pGeometryShader = Cast<CGeometryShader>(pShaderManager_->GetShader(CurrentGraphicsState_.GeometryShader.GetID()));
+
+  //      vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+  //      {
+  //        PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eGeometry;
+  //        PipelineShaderStageInfo.module = pGeometryShader->ShaderData.Module.get();
+  //        PipelineShaderStageInfo.pName = pGeometryShader->ShaderData.EntryPoint;
+  //      }
+
+  //      CurrentGraphicsReserveData.GeometryShaders.push_back(CurrentGraphicsState_.GeometryShader);
+  //    }
+
+  //    if (!CurrentGraphicsState_.PixelShader.isEmpty())
+  //    {
+  //      const CPixelShader* pPixelShader = Cast<CPixelShader>(pShaderManager_->GetShader(CurrentGraphicsState_.PixelShader.GetID()));
+
+  //      vk::PipelineShaderStageCreateInfo& PipelineShaderStageInfo = PipelineShaderStageInfos.emplace_back();
+  //      {
+  //        PipelineShaderStageInfo.stage = vk::ShaderStageFlagBits::eFragment;
+  //        PipelineShaderStageInfo.module = pPixelShader->ShaderData.Module.get();
+  //        PipelineShaderStageInfo.pName = pPixelShader->ShaderData.EntryPoint;
+  //      }
+
+  //      CurrentGraphicsReserveData.PixelShaders.push_back(CurrentGraphicsState_.PixelShader);
+  //    }
+  //  }
+
+  //  vk::PipelineVertexInputStateCreateInfo PipelineVertexInputStateInfo;
+  //  {
+  //    const InputLayout& InputLayout = InputLayouts_[CurrentGraphicsState_.InputLayout];
+
+  //    PipelineVertexInputStateInfo.vertexBindingDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputBindingDescriptions.size());
+  //    PipelineVertexInputStateInfo.pVertexBindingDescriptions = InputLayout.VertexInputBindingDescriptions.data();
+  //    PipelineVertexInputStateInfo.vertexAttributeDescriptionCount = static_cast<vdl::uint>(InputLayout.VertexInputAttributeDescriptions.size());
+  //    PipelineVertexInputStateInfo.pVertexAttributeDescriptions = InputLayout.VertexInputAttributeDescriptions.data();
+  //  }
+
+  //  vk::PipelineInputAssemblyStateCreateInfo PipelineInputAssemblyStateInfo;
+  //  {
+  //    PipelineInputAssemblyStateInfo.topology = Cast(CurrentGraphicsState_.Topology);
+  //    PipelineInputAssemblyStateInfo.primitiveRestartEnable = false;
+  //  }
+
+  //  vk::PipelineTessellationStateCreateInfo PipelineTessellationStateInfo;
+  //  {
+  //    PipelineTessellationStateInfo.patchControlPoints = GetPatchControlPoints(CurrentGraphicsState_.Topology);
+  //  }
+
+  //  vk::PipelineViewportStateCreateInfo PipelineViewportStateInfo;
+  //  {
+  //    PipelineViewportStateInfo.viewportCount = 1;
+  //    PipelineViewportStateInfo.pViewports = nullptr;
+  //    PipelineViewportStateInfo.scissorCount = 1;
+  //    PipelineViewportStateInfo.pScissors = nullptr;
+  //  }
+
+  //  const vk::PipelineRasterizationStateCreateInfo& PipelineRasterizationStateInfo = GetPipelineRasterizationStateInfo(CurrentGraphicsState_.RasterizerState);
+
+  //  const vk::PipelineDepthStencilStateCreateInfo& PipelineDepthStencilStateInfo = GetPipelineDepthStencilStateInfo(CurrentGraphicsState_.DepthStencilState);
+
+  //  std::vector<vk::PipelineColorBlendAttachmentState> PipelineColorBlendAttachmentStates;
+  //  if (GraphicsColorAttachmentCount_)
+  //  {
+  //    assert(GraphicsColorAttachmentCount_ <= Constants::kMaxRenderTextureNum);
+
+  //    PipelineColorBlendAttachmentStates.resize(GraphicsColorAttachmentCount_);
+  //    if (CurrentGraphicsState_.BlendState.IndependentBlendEnable)
+  //    {
+  //      for (vdl::uint i = 0; i < GraphicsColorAttachmentCount_; ++i)
+  //      {
+  //        PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
+  //      }
+  //    }
+  //    else
+  //    {
+  //      PipelineColorBlendAttachmentStates[0] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[0]);
+  //      for (vdl::uint i = 1; i < GraphicsColorAttachmentCount_; ++i)
+  //      {
+  //        PipelineColorBlendAttachmentStates[i] = GetPipelineColorBlendAttachmentState(CurrentGraphicsState_.BlendState.RenderTexture[i]);
+  //      }
+  //    }
+  //  }
+
+  //  const vk::PipelineMultisampleStateCreateInfo& PipelineMultisampleStateInfo = GetMultisampleStateInfo(CurrentGraphicsState_.BlendState.AlphaToCoverageEnable);
+
+  //  vk::PipelineColorBlendStateCreateInfo PipelineColorBlendStateInfo;
+  //  {
+  //    PipelineColorBlendStateInfo.logicOpEnable = false;
+  //    PipelineColorBlendStateInfo.logicOp = vk::LogicOp::eNoOp;
+  //    PipelineColorBlendStateInfo.attachmentCount = GraphicsColorAttachmentCount_;
+  //    PipelineColorBlendStateInfo.pAttachments = PipelineColorBlendAttachmentStates.data();
+  //    PipelineColorBlendStateInfo.blendConstants[0] = 1.0f;
+  //    PipelineColorBlendStateInfo.blendConstants[1] = 1.0f;
+  //    PipelineColorBlendStateInfo.blendConstants[2] = 1.0f;
+  //    PipelineColorBlendStateInfo.blendConstants[3] = 1.0f;
+  //  }
+
+  //  std::array<vk::DynamicState, 2> DynamicStates;
+  //  {
+  //    DynamicStates[0] = vk::DynamicState::eViewport;
+  //    DynamicStates[1] = vk::DynamicState::eScissor;
+  //  }
+
+  //  vk::PipelineDynamicStateCreateInfo PipelineDynamicStateInfo;
+  //  {
+  //    PipelineDynamicStateInfo.dynamicStateCount = static_cast<vdl::uint>(DynamicStates.size());
+  //    PipelineDynamicStateInfo.pDynamicStates = DynamicStates.data();
+  //  }
+
+  //  //  パイプラインの作成
+  //  {
+  //    std::vector<vk::UniquePipeline>& CurrentGraphicsPipelines = CurrentGraphicsReserveData.Pipelines;
+  //    const vk::Pipeline& PreviousPipeline = CurrentGraphicsPipelines.back().get();
+
+  //    vk::GraphicsPipelineCreateInfo GraphicsPipelineInfo;
+  //    {
+  //      GraphicsPipelineInfo.flags = (PreviousPipeline == VK_NULL_HANDLE ? vk::PipelineCreateFlagBits::eAllowDerivatives : vk::PipelineCreateFlagBits::eAllowDerivatives | vk::PipelineCreateFlagBits::eDerivative);
+  //      GraphicsPipelineInfo.stageCount = static_cast<vdl::uint>(PipelineShaderStageInfos.size());
+  //      GraphicsPipelineInfo.pStages = PipelineShaderStageInfos.data();
+  //      GraphicsPipelineInfo.pVertexInputState = &PipelineVertexInputStateInfo;
+  //      GraphicsPipelineInfo.pInputAssemblyState = &PipelineInputAssemblyStateInfo;
+  //      GraphicsPipelineInfo.pTessellationState = &PipelineTessellationStateInfo;
+  //      GraphicsPipelineInfo.pViewportState = &PipelineViewportStateInfo;
+  //      GraphicsPipelineInfo.pRasterizationState = &PipelineRasterizationStateInfo;
+  //      GraphicsPipelineInfo.pMultisampleState = &PipelineMultisampleStateInfo;
+  //      GraphicsPipelineInfo.pDepthStencilState = &PipelineDepthStencilStateInfo;
+  //      GraphicsPipelineInfo.pColorBlendState = &PipelineColorBlendStateInfo;
+  //      GraphicsPipelineInfo.pDynamicState = &PipelineDynamicStateInfo;
+  //      GraphicsPipelineInfo.layout = PipelineLayout_.get();
+  //      GraphicsPipelineInfo.renderPass = CurrentGraphicsReserveData.RenderPassDatas.back().RenderPass.get();
+  //      GraphicsPipelineInfo.subpass = 0;
+  //      GraphicsPipelineInfo.basePipelineHandle = PreviousPipeline;
+  //      GraphicsPipelineInfo.basePipelineIndex = (PreviousPipeline == VK_NULL_HANDLE ? 0 : -1);
+  //    }
+
+  //    vk::UniquePipeline Pipeline = VkDevice_.createGraphicsPipelineUnique(GraphicsPipelineCache_.get(), GraphicsPipelineInfo);
+  //    assert(Pipeline);
+
+  //    CurrentGraphicsCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, Pipeline.get());
+
+  //    CurrentGraphicsPipelines.emplace_back(std::move(Pipeline));
+  //  }
+
+  //  break;
+  //}
+
+  ////  SetDescriptor
+  //{
+  //  //  SetShaderResource
+  //  {
+  //    auto BindShaderResources = [&](ShaderType _Type)->void
+  //    {
+  //      const ShaderResources& ShaderResources = CurrentGraphicsState_.ShaderResources[static_cast<vdl::uint>(_Type)];
+
+  //      std::vector<DescriptorImageData> TextureDatas;
+  //      std::vector<DescriptorBufferData> UnorderedAccessBufferDatas;
+
+  //      //  データの読み込み
+  //      {
+  //        const vdl::uint ShaderResourceNum = static_cast<vdl::uint>(ShaderResources.size());
+  //        for (vdl::uint ShaderResourceCount = 0; ShaderResourceCount < ShaderResourceNum; ++ShaderResourceCount)
+  //        {
+  //          const vdl::ShaderResource& ShaderResource = ShaderResources[ShaderResourceCount];
+
+  //          ITexture* pTexture = nullptr;
+  //          {
+  //            if (const vdl::Texture* pShaderResource = ShaderResource.GetIf<vdl::Texture>())
+  //            {
+  //              if (!pShaderResource->isEmpty())
+  //              {
+  //                pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+  //              }
+  //            }
+  //            else if (const vdl::CubeTexture* pShaderResource = ShaderResource.GetIf<vdl::CubeTexture>())
+  //            {
+  //              if (!pShaderResource->isEmpty())
+  //              {
+  //                pTexture = pTextureManager_->GetTexture(pShaderResource->GetID());
+  //              }
+  //            }
+  //          }
+
+  //          //  Texture
+  //          if (pTexture)
+  //          {
+  //            constexpr vk::ImageLayout kImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+  //            DescriptorImageData& ImageData = TextureDatas.emplace_back();
+  //            {
+  //              ImageData.Descriptor = GetTextureDescriptor(pTexture, CurrentGraphicsCommandBuffer);
+  //              ImageData.Bind = ShaderResourceCount;
+  //            }
+  //          }
+  //          //  UnorderedAccessBuffer
+  //          else if (const vdl::Detail::UnorderedAccessBufferData* pShaderResource = ShaderResource.GetIf<vdl::Detail::UnorderedAccessBufferData>())
+  //          {
+  //            if (pShaderResource->isEmpty())
+  //            {
+  //              DescriptorBufferData& BufferData = UnorderedAccessBufferDatas.emplace_back();
+  //              {
+  //                BufferData.Descriptor = GetUnorderedAccessBufferDescriptor(*pShaderResource);
+  //                BufferData.Bind = ShaderResourceCount;
+  //              }
+  //            }
+  //          }
+  //        }
+  //      }
+
+  //      bool isEmpty = true;
+
+  //      if (!TextureDatas.empty())
+  //      {
+  //        constexpr DescriptorType kDescriptorType = DescriptorType::eTexture;
+
+  //        const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
+
+  //        vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //        {
+  //          DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+  //          DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //          DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+  //        }
+
+  //        vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+  //        assert(DescriptorSet);
+
+  //        std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //        {
+  //          for (auto& TextureData : TextureDatas)
+  //          {
+  //            vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //            {
+  //              WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //              WriteDescriptorSet.dstBinding = TextureData.Bind;
+  //              WriteDescriptorSet.dstArrayElement = 0;
+  //              WriteDescriptorSet.descriptorCount = 1;
+  //              WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+  //              WriteDescriptorSet.pImageInfo = &TextureData.Descriptor;
+  //            }
+  //          }
+  //        }
+
+  //        VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //        CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+  //        CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+
+  //        isEmpty = false;
+  //      }
+
+  //      if (!UnorderedAccessBufferDatas.empty())
+  //      {
+  //        constexpr DescriptorType kDescriptorType = DescriptorType::eBuffer;
+
+  //        const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
+
+  //        vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //        {
+  //          DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+  //          DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //          DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+  //        }
+
+  //        vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+  //        assert(DescriptorSet);
+
+  //        std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //        {
+  //          for (auto& UnorderedAccessBufferData : UnorderedAccessBufferDatas)
+  //          {
+  //            vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //            {
+  //              WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //              WriteDescriptorSet.dstBinding = UnorderedAccessBufferData.Bind;
+  //              WriteDescriptorSet.dstArrayElement = 0;
+  //              WriteDescriptorSet.descriptorCount = 1;
+  //              WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+  //              WriteDescriptorSet.pBufferInfo = &UnorderedAccessBufferData.Descriptor;
+  //            }
+  //          }
+  //        }
+
+  //        VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //        CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+  //        CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+
+  //        isEmpty = false;
+  //      }
+
+  //      if (!isEmpty)
+  //      {
+  //        CurrentGraphicsReserveData.ShaderResources.push_back(ShaderResources);
+  //      }
+  //    };
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageShaderResource))
+  //    {
+  //      BindShaderResources(ShaderType::eVertexShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageShaderResource))
+  //    {
+  //      BindShaderResources(ShaderType::eHullShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageShaderResource))
+  //    {
+  //      BindShaderResources(ShaderType::eDomainShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageShaderResource))
+  //    {
+  //      BindShaderResources(ShaderType::eGeometryShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageShaderResource))
+  //    {
+  //      BindShaderResources(ShaderType::ePixelShader);
+  //    }
+  //  }
+
+  //  //  SetSampler
+  //  {
+  //    auto BindSamplers = [&](ShaderType _Type)->void
+  //    {
+  //      const Samplers& Samplers = CurrentGraphicsState_.Samplers[static_cast<vdl::uint>(_Type)];
+
+  //      std::vector<DescriptorImageData> SamplerDatas;
+
+  //      //  データの読み込み
+  //      {
+  //        const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+  //        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+  //        {
+  //          DescriptorImageData& ImageData = SamplerDatas.emplace_back();
+  //          {
+  //            ImageData.Descriptor = GetSamplerDescriptor(Samplers[SamplerCount]);
+  //            ImageData.Bind = SamplerCount;
+  //          }
+  //        }
+  //      }
+
+  //      if (SamplerDatas.empty())
+  //      {
+  //        return;
+  //      }
+
+  //      constexpr DescriptorType kDescriptorType = DescriptorType::eSampler;
+
+  //      const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
+
+  //      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //      {
+  //        DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+  //        DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //        DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+  //      }
+
+  //      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+  //      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //      {
+  //        for (auto& SamplerData : SamplerDatas)
+  //        {
+  //          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //          {
+  //            WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //            WriteDescriptorSet.dstBinding = SamplerData.Bind;
+  //            WriteDescriptorSet.dstArrayElement = 0;
+  //            WriteDescriptorSet.descriptorCount = 1;
+  //            WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+  //            WriteDescriptorSet.pImageInfo = &SamplerData.Descriptor;
+  //          }
+  //        }
+  //      }
+
+  //      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //      CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+  //      CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+  //    };
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageSampler))
+  //    {
+  //      BindSamplers(ShaderType::eVertexShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageSampler))
+  //    {
+  //      BindSamplers(ShaderType::eHullShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageSampler))
+  //    {
+  //      BindSamplers(ShaderType::eDomainShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageSampler))
+  //    {
+  //      BindSamplers(ShaderType::eGeometryShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageSampler))
+  //    {
+  //      BindSamplers(ShaderType::ePixelShader);
+  //    }
+  //  }
+
+  //  //  SetConstantBuffer
+  //  {
+  //    auto BindConstantBuffers = [&](ShaderType _Type)
+  //    {
+  //      const ConstantBuffers& ConstantBuffers = CurrentGraphicsState_.ConstantBuffers[static_cast<vdl::uint>(_Type)];
+
+  //      std::vector<DescriptorBufferData> ConstantBufferDatas;
+
+  //      //  データの読み込み
+  //      {
+  //        const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+  //        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+  //        {
+  //          const vdl::Detail::ConstantBufferData& ConstantBuffer = ConstantBuffers[ConstantBufferCount];
+  //          if (ConstantBuffer.isEmpty())
+  //          {
+  //            continue;
+  //          }
+
+  //          DescriptorBufferData& BufferData = ConstantBufferDatas.emplace_back();
+  //          {
+  //            BufferData.Descriptor = GetConstantBufferDescriptor(ConstantBuffer);
+  //            BufferData.Bind = ConstantBufferCount;
+  //          }
+  //        }
+  //      }
+
+  //      if (ConstantBufferDatas.empty())
+  //      {
+  //        return;
+  //      }
+
+  //      constexpr DescriptorType kDescriptorType = DescriptorType::eConstantBuffer;
+
+  //      const vdl::uint DescriptorLayoutIndex = GetDescriptorLayoutOffset(_Type, kDescriptorType);
+
+  //      vk::DescriptorSetAllocateInfo DescriptorSetAllocateInfo;
+  //      {
+  //        DescriptorSetAllocateInfo.descriptorPool = GraphicsDescriptorPool_.get();
+  //        DescriptorSetAllocateInfo.descriptorSetCount = 1;
+  //        DescriptorSetAllocateInfo.pSetLayouts = &GraphicsDescriptorLayouts_[DescriptorLayoutIndex].get();
+  //      }
+
+  //      vk::UniqueDescriptorSet DescriptorSet = std::move(VkDevice_.allocateDescriptorSetsUnique(DescriptorSetAllocateInfo).front());
+
+  //      std::vector<vk::WriteDescriptorSet> WriteDescriptorSets;
+  //      {
+  //        for (auto& ConstantBufferData : ConstantBufferDatas)
+  //        {
+  //          vk::WriteDescriptorSet& WriteDescriptorSet = WriteDescriptorSets.emplace_back();
+  //          {
+  //            WriteDescriptorSet.dstSet = DescriptorSet.get();
+  //            WriteDescriptorSet.dstBinding = ConstantBufferData.Bind;
+  //            WriteDescriptorSet.dstArrayElement = 0;
+  //            WriteDescriptorSet.descriptorCount = 1;
+  //            WriteDescriptorSet.descriptorType = Cast(kDescriptorType);
+  //            WriteDescriptorSet.pBufferInfo = &ConstantBufferData.Descriptor;
+  //          }
+  //        }
+  //      }
+
+  //      VkDevice_.updateDescriptorSets(WriteDescriptorSets, nullptr);
+
+  //      CurrentGraphicsCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, PipelineLayout_.get(), DescriptorLayoutIndex, DescriptorSet.get(), nullptr);
+
+  //      CurrentGraphicsReserveData.DescriptorSets.emplace_back(std::move(DescriptorSet));
+
+  //      CurrentGraphicsReserveData.ConstantBuffers.push_back(ConstantBuffers);
+  //    };
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexStageConstantBuffer))
+  //    {
+  //      BindConstantBuffers(ShaderType::eVertexShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetHullStageConstantBuffer))
+  //    {
+  //      BindConstantBuffers(ShaderType::eHullShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetDomainStageConstantBuffer))
+  //    {
+  //      BindConstantBuffers(ShaderType::eDomainShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetGeometryStageConstantBuffer))
+  //    {
+  //      BindConstantBuffers(ShaderType::eGeometryShader);
+  //    }
+
+  //    if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetPixelStageConstantBuffer))
+  //    {
+  //      BindConstantBuffers(ShaderType::ePixelShader);
+  //    }
+  //  }
+  //}
+
+  //if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetVertexBuffer) && !CurrentGraphicsState_.VertexBuffer.isEmpty())
+  //{
+  //  const CVertexBuffer* pVertexBuffer = Cast<CVertexBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.VertexBuffer.GetID()));
+
+  //  constexpr vk::DeviceSize kOffset = 0;
+  //  CurrentGraphicsCommandBuffer.bindVertexBuffers(0, pVertexBuffer->BufferData.Buffer.get(), kOffset);
+
+  //  CurrentGraphicsReserveData.VertexBuffers.push_back(CurrentGraphicsState_.VertexBuffer);
+  //}
+
+  //if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetInstanceBuffer) && !CurrentGraphicsState_.InstanceBuffer.isEmpty())
+  //{
+  //  const CInstanceBuffer* pInstanceBuffer = Cast<CInstanceBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.InstanceBuffer.GetID()));
+
+  //  CurrentGraphicsCommandBuffer.bindVertexBuffers(1, pInstanceBuffer->BufferData.Buffer.get(), pInstanceBuffer->PreviousOffset);
+
+  //  CurrentGraphicsReserveData.InstanceBuffers.push_back(CurrentGraphicsState_.InstanceBuffer);
+  //}
+
+  //if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetIndexBuffer) && !CurrentGraphicsState_.IndexBuffer.isEmpty())
+  //{
+  //  const CIndexBuffer* pIndexBuffer = Cast<CIndexBuffer>(pBufferManager_->GetBuffer(CurrentGraphicsState_.IndexBuffer.GetID()));
+
+  //  constexpr vk::DeviceSize kOffset = 0;
+  //  CurrentGraphicsCommandBuffer.bindIndexBuffer(pIndexBuffer->BufferData.Buffer.get(), kOffset, pIndexBuffer->IndexType);
+
+  //  CurrentGraphicsReserveData.IndexBuffers.push_back(CurrentGraphicsState_.IndexBuffer);
+  //}
+
+  //if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetScissor))
+  //{
+  //  CurrentGraphicsCommandBuffer.setScissor(0,
+  //    Cast(CurrentGraphicsState_.RasterizerState.ScissorEnable ? CurrentGraphicsState_.Scissor
+  //      : vdl::Scissor(CurrentGraphicsState_.Viewport.LeftTop, CurrentGraphicsState_.Viewport.Size)));
+  //}
+
+  //if (GraphicsStateChangeFlags_.Has(GraphicsCommandType::eSetViewport))
+  //{
+  //  CurrentGraphicsCommandBuffer.setViewport(0, Cast(CurrentGraphicsState_.Viewport));
+  //}
+
+  //GraphicsStateChangeFlags_.Clear();
 }
 
-void CDeviceContext::WaitFence(const vk::Fence& _Fence)
+void CDeviceContext::WaitFence(const vk::Fence & _Fence)
 {
   //  Fenceが有効な間は完了まで待つ
   while (_Fence)
@@ -2706,7 +4026,7 @@ void CDeviceContext::WaitFence(const vk::Fence& _Fence)
 
 //--------------------------------------------------
 
-CRenderTexture* CDeviceContext::GetVkRenderTexture(const vdl::RenderTexture& _RenderTexture)
+CRenderTexture* CDeviceContext::GetVkRenderTexture(const vdl::RenderTexture & _RenderTexture)
 {
   assert(!_RenderTexture.isEmpty());
 
@@ -2714,7 +4034,7 @@ CRenderTexture* CDeviceContext::GetVkRenderTexture(const vdl::RenderTexture& _Re
   return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? pSwapChain_->GetVkRenderTexture() : Cast<CRenderTexture>(pTexture));
 }
 
-const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState& _RasterizerState)
+const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState & _RasterizerState)
 {
   if (RasterizerStates_.find(_RasterizerState) == RasterizerStates_.end())
   {
@@ -2738,7 +4058,7 @@ const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRaste
   return RasterizerStates_.at(_RasterizerState);
 }
 
-const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState& _DepthStencilState)
+const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState & _DepthStencilState)
 {
   if (DepthStencilStates_.find(_DepthStencilState) == DepthStencilStates_.end())
   {
@@ -2763,7 +4083,7 @@ const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthS
   return DepthStencilStates_.at(_DepthStencilState);
 }
 
-const vk::PipelineColorBlendAttachmentState& CDeviceContext::GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState& _RenderTextureBlendState)
+const vk::PipelineColorBlendAttachmentState& CDeviceContext::GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState & _RenderTextureBlendState)
 {
   if (RenderTextureBlendStates_.find(_RenderTextureBlendState) == RenderTextureBlendStates_.end())
   {
@@ -2806,7 +4126,7 @@ const vk::PipelineMultisampleStateCreateInfo& CDeviceContext::GetMultisampleStat
   return MultisampleStates_.at(_AlphaToCoverageEnable);
 }
 
-const vk::DescriptorImageInfo& CDeviceContext::GetTextureDescriptor(ITexture* _pTexture, const vk::CommandBuffer& _CommandBuffer)
+const vk::DescriptorImageInfo& CDeviceContext::GetTextureDescriptor(ITexture * _pTexture, const vk::CommandBuffer & _CommandBuffer)
 {
   assert(_pTexture);
 
@@ -2852,7 +4172,7 @@ const vk::DescriptorImageInfo& CDeviceContext::GetTextureDescriptor(ITexture* _p
   }
 }
 
-const vk::DescriptorImageInfo& CDeviceContext::GetSamplerDescriptor(const vdl::Sampler& _Sampler)
+const vk::DescriptorImageInfo& CDeviceContext::GetSamplerDescriptor(const vdl::Sampler & _Sampler)
 {
   if (Samplers_.find(_Sampler) == Samplers_.end())
   {
@@ -2889,7 +4209,7 @@ const vk::DescriptorImageInfo& CDeviceContext::GetSamplerDescriptor(const vdl::S
   return Samplers_.at(_Sampler).Descriptor;
 }
 
-const vk::DescriptorBufferInfo& CDeviceContext::GetConstantBufferDescriptor(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
+const vk::DescriptorBufferInfo& CDeviceContext::GetConstantBufferDescriptor(const vdl::Detail::ConstantBufferData & _ConstantBuffer)
 {
   assert(!_ConstantBuffer.isEmpty());
 
@@ -2898,7 +4218,7 @@ const vk::DescriptorBufferInfo& CDeviceContext::GetConstantBufferDescriptor(cons
   return pConstantBuffer->Descriptor;
 }
 
-const vk::DescriptorImageInfo& CDeviceContext::GetUnorderedAccessTextureDescriptor(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vk::CommandBuffer& _CommandBuffer)
+const vk::DescriptorImageInfo& CDeviceContext::GetUnorderedAccessTextureDescriptor(const vdl::UnorderedAccessTexture & _UnorderedAccessTexture, const vk::CommandBuffer & _CommandBuffer)
 {
   assert(!_UnorderedAccessTexture.isEmpty());
 
@@ -2914,7 +4234,7 @@ const vk::DescriptorImageInfo& CDeviceContext::GetUnorderedAccessTextureDescript
   return pTexture->Descriptor;
 }
 
-const vk::DescriptorBufferInfo& CDeviceContext::GetUnorderedAccessBufferDescriptor(const vdl::Detail::UnorderedAccessBufferData& _UnorderedAccessBuffer)
+const vk::DescriptorBufferInfo& CDeviceContext::GetUnorderedAccessBufferDescriptor(const vdl::Detail::UnorderedAccessBufferData & _UnorderedAccessBuffer)
 {
   assert(!_UnorderedAccessBuffer.isEmpty());
 
