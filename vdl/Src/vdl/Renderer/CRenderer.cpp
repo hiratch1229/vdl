@@ -562,25 +562,21 @@ void CRenderer::Flush()
 
     if (HasStaticMeshDrawCommand)
     {
-      pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eStaticMesh);
       pDeviceContext_->Execute(StaticMeshGraphicsCommandList_);
       StaticMeshGraphicsCommandList_.Reset();
     }
     //if (HasSkinnedMeshDrawCommand)
     //{
-    //  pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eSkinnedMesh);
     //  SkinnedMeshGraphicsCommandList_.Flush(pDeviceContext_, SkinnedMeshInstanceBuffer_);
     //  SkinnedMeshGraphicsCommandList_.Reset();
     //}
     if (HasEmptyDrawCommand)
     {
-      pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eNone);
       pDeviceContext_->Execute(EmptyGraphicsCommandList_);
       EmptyGraphicsCommandList_.Reset();
     }
     if (HasTextureDrawCommand)
     {
-      pDeviceContext_->SetInputLayout(vdl::InputLayoutType::eTexture);
       pDeviceContext_->Execute(TextureGraphicsCommandList_);
       TextureGraphicsCommandList_.Reset();
     }

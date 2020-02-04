@@ -44,10 +44,10 @@ inline void BaseGraphicsCommandList::Reset()
   DrawIndexedDatas_.clear();
   ReservedDisplayObjects_.clear();
 
-  //  インスタンスバッファが存在しているならコマンドに書き込んでおく
+  //  インスタンスバッファが存在しているならフラグを立てる
   if (!InstanceBuffer_.isEmpty())
   {
-    GraphicsCommands_.emplace_back(static_cast<GraphicsCommandFlag>(static_cast<vdl::uint>(kSetInstanceBufferFlag)), 0);
+    GraphicsCommandFlags_ |= kSetInstanceBufferFlag;
   }
 
   if (VertexBuffers_.size() > 1)
@@ -361,6 +361,12 @@ inline void BaseGraphicsCommandList::PushGraphicsCommand()
     VertexBuffers_.push_back(CurrentVertexBuffer_);
 
     GraphicsCommandFlags_ &= ~kSetVertexBufferFlag;
+  }
+
+  if (GraphicsCommandFlags_ & kSetInstanceBufferFlag)
+  {
+    GraphicsCommands_.emplace_back(static_cast<GraphicsCommandFlag>(static_cast<vdl::uint>(kSetInstanceBufferFlag)), 0);
+    GraphicsCommandFlags_ &= ~kSetInstanceBufferFlag;
   }
 
   if (GraphicsCommandFlags_ & kSetIndexBufferFlag)
