@@ -1209,18 +1209,59 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
 
 void CDeviceContext::Execute(const ComputeCommandList& _ComputeCommandList)
 {
-  //  CSSetShader
+  for (auto& ComputeCommand : _ComputeCommandList.GetComputeCommands())
   {
-    ID3D11ComputeShader* pComputeShader = nullptr;
+    switch (ComputeCommand)
     {
-      if (const vdl::ComputeShader& ComputeShader = _ComputeCommandList.GetComputeShader();
-        !ComputeShader.isEmpty())
+    case ComputeCommandFlag::eSetShader:
+    {
+      ID3D11ComputeShader* pComputeShader = nullptr;
       {
-        pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(ComputeShader.GetID()))->pComputeShader.Get();
+        if (const vdl::ComputeShader& ComputeShader = _ComputeCommandList.GetComputeShader();
+          !ComputeShader.isEmpty())
+        {
+          pComputeShader = Cast<CComputeShader>(pShaderManager_->GetShader(ComputeShader.GetID()))->pComputeShader.Get();
+        }
       }
-    }
 
-    pD3D11ImmediateContext_->CSSetShader(pComputeShader, nullptr, 0);
+      pD3D11ImmediateContext_->CSSetShader(pComputeShader, nullptr, 0);
+    }
+    break;
+    case ComputeCommandFlag::eSetSampler:
+    {
+      const auto& Samplers = _ComputeCommandList.GetSamplers();
+      const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
+
+      std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
+      {
+        for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
+        {
+          pSamplers[SamplerCount] = GetSamplerState(Samplers[SamplerCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->CSSetSamplers(0, SamplerNum, pSamplers.data());
+    }
+    break;
+    case ComputeCommandFlag::eSetConstantBuffer:
+    {
+      const auto& ConstantBuffers = _ComputeCommandList.GetConstantBuffers();
+      const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
+
+      std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
+      {
+        for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
+        {
+          pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(ConstantBuffers[ConstantBufferCount]);
+        }
+      }
+
+      pD3D11ImmediateContext_->CSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
+    }
+    break;
+    default:
+      break;
+    }
   }
 
   //  CSSetShaderResources
@@ -1237,38 +1278,6 @@ void CDeviceContext::Execute(const ComputeCommandList& _ComputeCommandList)
     }
 
     pD3D11ImmediateContext_->CSSetShaderResources(0, ShaderResouceNum, pShaderResources.data());
-  }
-
-  //  CSSetSamplers
-  {
-    const auto& Samplers = _ComputeCommandList.GetSamplers();
-    const vdl::uint SamplerNum = static_cast<vdl::uint>(Samplers.size());
-
-    std::vector<ID3D11SamplerState*> pSamplers(SamplerNum);
-    {
-      for (vdl::uint SamplerCount = 0; SamplerCount < SamplerNum; ++SamplerCount)
-      {
-        pSamplers[SamplerCount] = GetSamplerState(Samplers[SamplerCount]);
-      }
-    }
-
-    pD3D11ImmediateContext_->CSSetSamplers(0, SamplerNum, pSamplers.data());
-  }
-
-  //  CSSetConstantBuffers
-  {
-    const auto& ConstantBuffers = _ComputeCommandList.GetConstantBuffers();
-    const vdl::uint ConstantBufferNum = static_cast<vdl::uint>(ConstantBuffers.size());
-
-    std::vector<ID3D11Buffer*> pConstantBuffers(ConstantBufferNum);
-    {
-      for (vdl::uint ConstantBufferCount = 0; ConstantBufferCount < ConstantBufferNum; ++ConstantBufferCount)
-      {
-        pConstantBuffers[ConstantBufferCount] = GetConstantBuffer(ConstantBuffers[ConstantBufferCount]);
-      }
-    }
-
-    pD3D11ImmediateContext_->CSSetConstantBuffers(0, ConstantBufferNum, pConstantBuffers.data());
   }
 
   //  CSSetUnorderedAccessViews

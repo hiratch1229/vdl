@@ -46,4 +46,6 @@ void CComputer::Dispatch(vdl::uint _ThreadGroupX, vdl::uint _ThreadGroupY, vdl::
   ComputeCommandList_.Dispatch(_ThreadGroupX, _ThreadGroupY, _ThreadGroupZ);
 
   pDeviceContext_->Execute(ComputeCommandList_);
+
+  ComputeCommandList_.Reset();
 }

@@ -1,14 +1,14 @@
 #pragma once
 #include "../IDeviceContext.hpp"
 
-#include <vdl/pch/DirectX11/pch.hpp>
-
 #include <vdl/InputLayout.hpp>
 #include <vdl/GraphicsStates.hpp>
 #include <vdl/Texture.hpp>
 #include <vdl/Sampler.hpp>
 #include <vdl/Hash.hpp>
 #include <vdl/Variant.hpp>
+
+#include <vdl/pch/DirectX11/pch.hpp>
 
 #include <unordered_map>
 

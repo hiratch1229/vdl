@@ -219,7 +219,7 @@ constexpr GraphicsCommandFlags kSet##StateName##Flag = kSetVertexStage##StateNam
 StateName##s& Current##StateName##s = Current##StateName##s_[static_cast<vdl::uint>(Type)];\
 \
 if (const vdl::uint RequiredSize = _StartSlot + _##StateName##Num;\
-Current##StateName##s.size() < RequiredSize)\
+  Current##StateName##s.size() < RequiredSize)\
 {\
   Current##StateName##s.resize(static_cast<size_t>(RequiredSize));\
   GraphicsCommandFlags_ |= kSet##StateName##Flag;\
@@ -379,22 +379,6 @@ inline void BaseGraphicsCommandList::PushGraphicsCommand()
     GraphicsCommandFlags_ &= ~kSetTopologyFlag;
   }
 
-  if (GraphicsCommandFlags_ & kSetScissorFlag)
-  {
-    GraphicsCommands_.emplace_back(static_cast<GraphicsCommandFlag>(static_cast<vdl::uint>(kSetScissorFlag)), static_cast<vdl::uint>(Scissors_.size()));
-    Scissors_.push_back(CurrentScissor_);
-
-    GraphicsCommandFlags_ &= ~kSetScissorFlag;
-  }
-
-  if (GraphicsCommandFlags_ & kSetViewportFlag)
-  {
-    GraphicsCommands_.emplace_back(static_cast<GraphicsCommandFlag>(static_cast<vdl::uint>(kSetViewportFlag)), static_cast<vdl::uint>(Viewports_.size()));
-    Viewports_.push_back(CurrentViewport_);
-
-    GraphicsCommandFlags_ &= ~kSetViewportFlag;
-  }
-
   if (GraphicsCommandFlags_ & kSetBlendStateFlag)
   {
     GraphicsCommands_.emplace_back(static_cast<GraphicsCommandFlag>(static_cast<vdl::uint>(kSetBlendStateFlag)), static_cast<vdl::uint>(BlendStates_.size()));
@@ -417,6 +401,22 @@ inline void BaseGraphicsCommandList::PushGraphicsCommand()
     RasterizerStates_.push_back(CurrentRasterizerState_);
 
     GraphicsCommandFlags_ &= ~kSetRasterizerStateFlag;
+  }
+
+  if (GraphicsCommandFlags_ & kSetViewportFlag)
+  {
+    GraphicsCommands_.emplace_back(static_cast<GraphicsCommandFlag>(static_cast<vdl::uint>(kSetViewportFlag)), static_cast<vdl::uint>(Viewports_.size()));
+    Viewports_.push_back(CurrentViewport_);
+
+    GraphicsCommandFlags_ &= ~kSetViewportFlag;
+  }
+
+  if (GraphicsCommandFlags_ & kSetScissorFlag)
+  {
+    GraphicsCommands_.emplace_back(static_cast<GraphicsCommandFlag>(static_cast<vdl::uint>(kSetScissorFlag)), static_cast<vdl::uint>(Scissors_.size()));
+    Scissors_.push_back(CurrentScissor_);
+
+    GraphicsCommandFlags_ &= ~kSetScissorFlag;
   }
 
   if (GraphicsCommandFlags_ & kSetVertexShaderFlag)
