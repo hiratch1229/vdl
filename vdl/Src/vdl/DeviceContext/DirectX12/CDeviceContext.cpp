@@ -1467,7 +1467,7 @@ void CDeviceContext::Present()
 
 //--------------------------------------------------
 
-CRenderTexture* CDeviceContext::GetD3D12RenderTexture(const vdl::RenderTexture & _RenderTexture)
+CRenderTexture* CDeviceContext::GetD3D12RenderTexture(const vdl::RenderTexture& _RenderTexture)
 {
   assert(!_RenderTexture.isEmpty());
 
@@ -1475,7 +1475,7 @@ CRenderTexture* CDeviceContext::GetD3D12RenderTexture(const vdl::RenderTexture &
   return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? pSwapChain_->GetD3D12RenderTexture() : Cast<CRenderTexture>(pTexture));
 }
 
-const D3D12_BLEND_DESC& CDeviceContext::GetBlendDesc(const vdl::BlendState & _BlendState)
+const D3D12_BLEND_DESC& CDeviceContext::GetBlendDesc(const vdl::BlendState& _BlendState)
 {
   if (BlendStates_.find(_BlendState) == BlendStates_.end())
   {
@@ -1509,7 +1509,7 @@ const D3D12_BLEND_DESC& CDeviceContext::GetBlendDesc(const vdl::BlendState & _Bl
   return BlendStates_.at(_BlendState);
 }
 
-const D3D12_DEPTH_STENCIL_DESC& CDeviceContext::GetDepthStecilDesc(const vdl::DepthStencilState & _DepthStencilState)
+const D3D12_DEPTH_STENCIL_DESC& CDeviceContext::GetDepthStecilDesc(const vdl::DepthStencilState& _DepthStencilState)
 {
   if (DepthStencilStates_.find(_DepthStencilState) == DepthStencilStates_.end())
   {
@@ -1537,7 +1537,7 @@ const D3D12_DEPTH_STENCIL_DESC& CDeviceContext::GetDepthStecilDesc(const vdl::De
   return DepthStencilStates_.at(_DepthStencilState);
 }
 
-const D3D12_RASTERIZER_DESC& CDeviceContext::GetRasterizerDesc(const vdl::RasterizerState & _RasterizerState)
+const D3D12_RASTERIZER_DESC& CDeviceContext::GetRasterizerDesc(const vdl::RasterizerState& _RasterizerState)
 {
   if (RasterizerStates_.find(_RasterizerState) == RasterizerStates_.end())
   {
@@ -1562,7 +1562,7 @@ const D3D12_RASTERIZER_DESC& CDeviceContext::GetRasterizerDesc(const vdl::Raster
   return RasterizerStates_.at(_RasterizerState);
 }
 
-const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetShaderResourceCPUHandle(const vdl::ShaderResource & _ShaderResource, CommandList * _pCommandList)
+const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetShaderResourceCPUHandle(const vdl::ShaderResource& _ShaderResource, CommandList* _pCommandList)
 {
   constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
@@ -1639,7 +1639,7 @@ const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetShaderResourceCPUHandle(co
   return DefaultViewCPUHandle_;
 }
 
-const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetSamplerCPUHandle(const vdl::Sampler & _Sampler)
+const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetSamplerCPUHandle(const vdl::Sampler& _Sampler)
 {
   if (Samplers_.find(_Sampler) == Samplers_.end())
   {
@@ -1667,7 +1667,7 @@ const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetSamplerCPUHandle(const vdl
   return Samplers_.at(_Sampler).CPUHandle;
 }
 
-const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetConstantBufferCPUHandle(const vdl::Detail::ConstantBufferData & _ConstantBuffer)
+const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetConstantBufferCPUHandle(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
   if (!_ConstantBuffer.isEmpty())
   {
@@ -1677,7 +1677,7 @@ const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetConstantBufferCPUHandle(co
   return DefaultViewCPUHandle_;
 }
 
-const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetUnorderedAccessObjectCPUHandle(const vdl::UnorderedAccessObject & _UnorderedAccessObject, CommandList * _pCommandList)
+const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetUnorderedAccessObjectCPUHandle(const vdl::UnorderedAccessObject& _UnorderedAccessObject, CommandList* _pCommandList)
 {
   constexpr D3D12_RESOURCE_STATES kResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 

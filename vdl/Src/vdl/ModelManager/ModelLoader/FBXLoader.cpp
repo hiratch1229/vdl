@@ -1,46 +1,10 @@
 #include "FBXLoader.hpp"
 
-#include <ThirdParty/OpenFBX/ofbx.h>
+#ifdef USING_FBX_SDK
 #include <vdl/TextureManager/TextureLoader/TextureLoader.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 #include <vdl/Misc/Misc.hpp>
-
-//bool FBXLoader::CheckSupportFormat(const std::string& _FileFormat)
-//{
-//  return _FileFormat == "fbx";
-//}
-//
-////--------------------------------------------------
-//
-//ModelData FBXLoader::Load(const char* _FilePath)const
-//{
-//  const std::string FileFormat = GetFileFormat(_FilePath);
-//  _ASSERT_EXPR_A(CheckSupportFormat(FileFormat), (FileFormat + "は対応していません。").c_str());
-//
-//  //  シーンのロード
-//  ofbx::IScene* pScene;
-//  {
-//    std::ifstream IStream(_FilePath, std::ios::in | std::ios::binary);
-//    assert(IStream);
-//    IStream.seekg(0, std::fstream::end);
-//    const size_t FileSize = static_cast<size_t>(IStream.tellg());
-//    IStream.seekg(0, std::fstream::beg);
-//
-//    std::vector<ofbx::u8> Content(FileSize);
-//    IStream.read(reinterpret_cast<char*>(Content.data()), FileSize);
-//
-//    pScene = ofbx::load(Content.data(), static_cast<int>(FileSize), static_cast<ofbx::u64>(ofbx::LoadFlags::TRIANGULATE));
-//    _ASSERT_EXPR_A(pScene, (std::string(_FilePath) + "は対応していません。").c_str());
-//  }
-//
-//  ModelData ModelData;
-//  {
-//
-//  }
-//
-//  return ModelData;
-//}
 
 namespace
 {
@@ -155,11 +119,11 @@ ModelData FBXLoader::Load(const char* _FilePath)const
 
   //  マテリアルのロード
   std::unordered_map<const char*, vdl::uint> MaterialMap;
+  const vdl::uint MaterialNum = pScene->GetMaterialCount();
   {
     const TextureLoader TextureLoader;
     const std::string Directory = std::filesystem::path(_FilePath).remove_filename().string();
 
-    const vdl::uint MaterialNum = pScene->GetMaterialCount();
     ModelData.Materials.resize(MaterialNum + 1/*マテリアルを持ってないオブジェクト用*/);
     for (vdl::uint MaterialCount = 0; MaterialCount < MaterialNum; ++MaterialCount)
     {
@@ -207,9 +171,6 @@ ModelData FBXLoader::Load(const char* _FilePath)const
       //FetchMaterialProperty(&Material.Bump, fbxsdk::FbxSurfaceMaterial::sBump, fbxsdk::FbxSurfaceMaterial::sBumpFactor);
     }
   }
-
-  TextureLoader TextureLoader;
-  const std::string Directory = std::filesystem::path(_FilePath).remove_filename().string();
 
   const int MeshNum = pScene->GetSrcObjectCount<fbxsdk::FbxMesh>();
   for (int MeshCount = 0; MeshCount < MeshNum; ++MeshCount)
@@ -271,61 +232,6 @@ ModelData FBXLoader::Load(const char* _FilePath)const
           Size = Constants::kMaxBoneInfluence;
         }
       }
-    }
-
-    const vdl::uint MaterialNum = pNode->GetMaterialCount();
-    //  マテリアルのロード
-    {
-      Materials Materials;
-
-      Materials.resize(MaterialNum > 0 ? MaterialNum : 1);
-
-      for (vdl::uint MaterialCount = 0; MaterialCount < MaterialNum; ++MaterialCount)
-      {
-        Material& Material = Materials[MaterialCount];
-
-        const fbxsdk::FbxSurfaceMaterial* pSurfaceMaterial = pNode->GetMaterial(MaterialCount);
-        auto FetchMaterialProperty = [&](vdl::CompressionImage* _pCompressionImage, const char* _PropertyName, const char* _FactorName)->bool
-        {
-          const fbxsdk::FbxProperty Property = pSurfaceMaterial->FindProperty(_PropertyName);
-          const fbxsdk::FbxProperty Factor = pSurfaceMaterial->FindProperty(_FactorName);
-
-          if (!Property.IsValid())
-          {
-            return false;
-          }
-
-          const vdl::uint TextureNum = Property.GetSrcObjectCount<fbxsdk::FbxFileTexture>();
-
-          if (TextureNum > 0)
-          {
-            if (fbxsdk::FbxFileTexture * pFileTexture = Property.GetSrcObject<fbxsdk::FbxFileTexture>())
-            {
-              const std::string FileName = (FileFormat == "fbx" ? Directory + pFileTexture->GetRelativeFileName() : pFileTexture->GetFileName());
-              (*_pCompressionImage) = TextureLoader.LoadFromFile(FileName.c_str());
-            }
-          }
-
-          return true;
-        };
-
-        if (FetchMaterialProperty(&Material.Diffuse, fbxsdk::FbxSurfaceMaterial::sDiffuse, fbxsdk::FbxSurfaceMaterial::sDiffuseFactor))
-        {
-          const fbxsdk::FbxDouble3 Color = pSurfaceMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuse).Get<fbxsdk::FbxDouble3>();
-          const double f = pSurfaceMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuseFactor).Get<fbxsdk::FbxDouble>();
-
-          Material.MaterialColor.Red = static_cast<float>(Color[0] * f);
-          Material.MaterialColor.Green = static_cast<float>(Color[1] * f);
-          Material.MaterialColor.Blue = static_cast<float>(Color[2] * f);
-          Material.MaterialColor.Alpha = 1.0f;
-        }
-        //FetchMaterialProperty(&Material.Ambient, fbxsdk::FbxSurfaceMaterial::sAmbient, fbxsdk::FbxSurfaceMaterial::sAmbientFactor);
-        FetchMaterialProperty(&Material.Specular, fbxsdk::FbxSurfaceMaterial::sSpecular, fbxsdk::FbxSurfaceMaterial::sSpecularFactor);
-        FetchMaterialProperty(&Material.NormalMap, fbxsdk::FbxSurfaceMaterial::sNormalMap, fbxsdk::FbxSurfaceMaterial::sBumpFactor);
-        //FetchMaterialProperty(&Material.Bump, fbxsdk::FbxSurfaceMaterial::sBump, fbxsdk::FbxSurfaceMaterial::sBumpFactor);
-      }
-
-      ModelData.Materials.insert(ModelData.Materials.cend(), Materials.begin(), Materials.end());
     }
 
     const size_t IndexOffset = ModelData.Vertices.size();
@@ -528,3 +434,192 @@ ModelData FBXLoader::Load(const char* _FilePath)const
 
   return ModelData;
 }
+#else
+#include <vdl/TextureManager/TextureLoader/TextureLoader.hpp>
+
+#include <vdl/Constants/Constants.hpp>
+#include <vdl/Misc/Misc.hpp>
+
+#include <ThirdParty/OpenFBX/ofbx.h>
+
+namespace
+{
+  vdl::float2 Cast(const ofbx::Vec2& _v)
+  {
+    return { _v.x, _v.y };
+  }
+
+  vdl::float3 Cast(const ofbx::Vec3& _v)
+  {
+    return { _v.x, _v.y, _v.z };
+  }
+
+  vdl::Matrix Cast(const ofbx::Matrix& _m)
+  {
+    return { static_cast<float>(_m.m[0]), static_cast<float>(_m.m[1]), static_cast<float>(_m.m[2]), static_cast<float>(_m.m[3]),
+     static_cast<float>(_m.m[4]), static_cast<float>(_m.m[5]), static_cast<float>(_m.m[6]), static_cast<float>(_m.m[7]),
+     static_cast<float>(_m.m[8]), static_cast<float>(_m.m[9]), static_cast<float>(_m.m[10]), static_cast<float>(_m.m[11]),
+     static_cast<float>(_m.m[12]), static_cast<float>(_m.m[13]), static_cast<float>(_m.m[14]), static_cast<float>(_m.m[15]) };
+  }
+}
+
+bool FBXLoader::CheckSupportFormat(const std::string& _FileFormat)
+{
+  return _FileFormat == "fbx";
+}
+
+//--------------------------------------------------
+
+ModelData FBXLoader::Load(const char* _FilePath)const
+{
+  const std::string FileFormat = GetFileFormat(_FilePath);
+  _ASSERT_EXPR_A(CheckSupportFormat(FileFormat), (FileFormat + "は対応していません。").c_str());
+
+  ModelData ModelData;
+
+  //  シーンのロード
+  ofbx::IScene* pScene;
+  {
+    std::ifstream IStream(_FilePath, std::ios::in | std::ios::binary);
+    assert(IStream);
+    IStream.seekg(0, std::fstream::end);
+    const size_t FileSize = static_cast<size_t>(IStream.tellg());
+    IStream.seekg(0, std::fstream::beg);
+
+    std::vector<ofbx::u8> Content(FileSize);
+    IStream.read(reinterpret_cast<char*>(Content.data()), FileSize);
+
+    pScene = ofbx::load(Content.data(), static_cast<int>(FileSize), static_cast<ofbx::u64>(ofbx::LoadFlags::TRIANGULATE));
+    _ASSERT_EXPR_A(pScene, ofbx::getError());
+  }
+
+  //  マテリアルのロード
+  {
+    const TextureLoader TextureLoader;
+    const std::string TextureDirectory;
+
+    const std::string Directory = std::filesystem::path(_FilePath).remove_filename().string();
+
+    ModelData.Materials.resize(1/*マテリアルを持ってないオブジェクト用*/);
+    const int ObjectNum = pScene->getAllObjectCount();
+    const ofbx::Object*const* pObjects = pScene->getAllObjects();
+    for (int ObjectCount = 0; ObjectCount < ObjectNum; ++ObjectCount)
+    {
+      const ofbx::Object* pObject = pObjects[ObjectCount];
+      if (pObject->getType() == ofbx::Object::Type::MATERIAL)
+      {
+        Material& Material = ModelData.Materials.emplace_back();
+        const ofbx::Material* pMaterial = static_cast<const ofbx::Material*>(pObject);
+
+        auto LoadMaterial = [&](vdl::CompressionImage* _pCompressionImage, ofbx::Texture::TextureType _TextureType)->bool
+        {
+          const ofbx::Texture* pTexture = pMaterial->getTexture(_TextureType);
+
+          //  持っていなければ終了
+          if (!pTexture)
+          {
+            return false;
+          }
+
+          char FileName[Constants::kMaxCharacterNum];
+          pTexture->getFileName().toString(FileName);
+          pTexture->getRelativeFileName().toString(FileName);
+
+          //const std::string FileName = (FileFormat == "fbx" ? Directory + pFileTexture->GetRelativeFileName() : pFileTexture->GetFileName());
+          (*_pCompressionImage) = TextureLoader.LoadFromFile(FileName);
+
+          return true;
+        };
+
+        LoadMaterial(&Material.Diffuse, ofbx::Texture::TextureType::DIFFUSE);
+      }
+    }
+  }
+
+  //  メッシュのロード
+  {
+    const int MeshNum = pScene->getMeshCount();
+    for (int MeshCount = 0; MeshCount < MeshNum; ++MeshCount)
+    {
+      const ofbx::Mesh* pMesh = pScene->getMesh(MeshCount);
+      const ofbx::Geometry* pGeometry = pMesh->getGeometry();
+
+      const size_t IndexOffset = ModelData.Vertices.size();
+      //  頂点データのロード
+      {
+        vdl::VertexSkinnedMeshs Vertices;
+
+        const int VertexNum = pGeometry->getVertexCount();
+        assert(VertexNum);
+        Vertices.resize(static_cast<size_t>(VertexNum));
+
+        const ofbx::Vec3* Positions = pGeometry->getVertices();
+        const ofbx::Vec3* Normals = pGeometry->getNormals();
+        const ofbx::Vec3* Tangents = pGeometry->getTangents();
+        const ofbx::Vec2* Texcoords = pGeometry->getUVs();
+
+        for (int VertexCount = 0; VertexCount < VertexNum; ++VertexCount)
+        {
+          vdl::VertexSkinnedMesh& Vertex = Vertices[VertexCount];
+          {
+            Vertex.Position = Cast(Positions[VertexCount]);
+            Vertex.Normal = (Normals ? Cast(Normals[VertexCount]) : vdl::float3::Forward());
+            Vertex.Tangent = (Tangents ? Cast(Tangents[VertexCount]) : Vertex.Normal.Cross(vdl::float3::Up()));
+            Vertex.Texcoord = (Texcoords ? Cast(Texcoords[VertexCount]) : vdl::float2(0.0));
+          }
+        }
+
+        ModelData.Vertices.insert(ModelData.Vertices.cend(), Vertices.begin(), Vertices.end());
+      }
+
+      const int IndexNum = pGeometry->getIndexCount();
+      assert(IndexNum % 3 == 0);
+      //  インデックスデータのロード
+      {
+        vdl::Indices Indices;
+
+        Indices.resize(static_cast<size_t>(IndexNum));
+
+        const int* FaceIndices = pGeometry->getFaceIndices();
+
+        //  負の値でポリゴンの最後を表現しているようなので正しい値に変換
+        auto GetIndex = [](int _Index)->vdl::IndexType
+        {
+          return static_cast<vdl::IndexType>(_Index < 0 ? -_Index + 1 : _Index);
+        };
+
+        const int PolygonNum = IndexNum / 3;
+        for (int PolygonCount = 0; PolygonCount < PolygonNum; ++PolygonCount)
+        {
+          Indices[PolygonCount * 3 + 0] = GetIndex(FaceIndices[PolygonCount * 3 + 0]);
+          Indices[PolygonCount * 3 + 1] = GetIndex(FaceIndices[PolygonCount * 3 + 1]);
+          Indices[PolygonCount * 3 + 2] = GetIndex(FaceIndices[PolygonCount * 3 + 2]);
+        }
+
+        ModelData.Indices.insert(ModelData.Indices.cend(), Indices.begin(), Indices.end());
+      }
+
+      {
+        constexpr vdl::Matrix kRotate = vdl::Matrix(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+        MeshData MeshData;
+        {
+          MeshData.IndexStart = static_cast<vdl::uint>(IndexOffset);
+          MeshData.IndexCount = static_cast<vdl::uint>(IndexNum);
+          MeshData.MaterialIndex;
+          MeshData.GlobalTransform = Cast(pMesh->getGeometricMatrix());
+        }
+      }
+
+      ////  マテリアルのロード
+      //{
+      //  Materials Materials;
+      //
+      //  pGeometry->getMaterials();
+      //  ModelData.Materials.insert(ModelData.Materials.cend(), Materials.begin(), Materials.end());
+      //}
+    }
+  }
+
+  return ModelData;
+}
+#endif // USING_FBX_SDK
