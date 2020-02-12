@@ -2,7 +2,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Window/IWindow.hpp>
-#include <vdl/SwapChain/ISwapChain.hpp>
+#include <vdl/DeviceContext/IDeviceContext.hpp>
 #include <vdl/CPUProfiler/ICPUProfiler.hpp>
 #include <vdl/MemoryProfiler/IMemoryProfiler.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
@@ -22,7 +22,7 @@
 
 void CSystem::Initialize()
 {
-  pSwapChain_ = Engine::Get<ISwapChain>();
+  pDeviceContext_ = Engine::Get<IDeviceContext>();
   pCPUProfiler_ = Engine::Get<ICPUProfiler>();
   pMemoryProfiler_ = Engine::Get<IMemoryProfiler>();
   pKeyboard_ = Engine::Get<IKeyboard>();
@@ -67,7 +67,7 @@ bool CSystem::Update()
 
     pGUI_->Draw();
 
-    pSwapChain_->Present();
+    pDeviceContext_->Present();
   }
 
   //--------------------------------------------------
@@ -82,18 +82,16 @@ bool CSystem::Update()
     }
     if (DefaultActionFlags_ & vdl::System::DefaultActionFlag::eChangeWindowMode)
     {
-      pSwapChain_->ChangeWindowMode();
+      pDeviceContext_->ChangeWindowMode();
     }
     if (DefaultActionFlags_ & vdl::System::DefaultActionFlag::eScreenShot)
     {
-      pSwapChain_->ScreenShot();
+      pDeviceContext_->ScreenShot();
     }
 
     //  èÛë‘ÇÃÉNÉäÉA
     DefaultActionFlags_ = 0;
   }
-
-  pSwapChain_->ScreenClear();
 
   //  FPSêßå‰
   {

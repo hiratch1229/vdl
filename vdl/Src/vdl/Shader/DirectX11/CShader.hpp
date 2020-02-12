@@ -1,8 +1,9 @@
 #pragma once
 #include "../IShader.hpp"
 
-#include <vdl/pch/DirectX11/pch.hpp>
 #include <vdl/Platform/IPlatform.hpp>
+
+#include <vdl/pch/DirectX11/pch.hpp>
 
 struct CVertexShader : public IVertexShader
 {

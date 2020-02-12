@@ -5,7 +5,6 @@
 #include "Window/IWindow.hpp"
 #include "Device/IDevice.hpp"
 #include "DeviceContext/IDeviceContext.hpp"
-#include "SwapChain/ISwapChain.hpp"
 #include "CPUProfiler/ICPUProfiler.hpp"
 #include "MemoryProfiler/IMemoryProfiler.hpp"
 #include "Input/Keyboard/IKeyboard.hpp"
@@ -40,14 +39,19 @@ Engine::Engine()
   pSystem_->Initialize();
   pWindow_->Initialize();
 
-  pDevice_->Initialize();
-  pDeviceContext_->Initialize();
-  pTextureManager_->Initialize();
-  pSwapChain_->Initialize();
-  pBufferManager_->Initialize();
-  pShaderManager_->Initialize();
-
   ThreadPool* ThreadPool = pSystem_->GetThreadPool();
+
+  std::future<void> Device = ThreadPool->EnqueueWithAcquireResult([&]
+  {
+    pDevice_->Initialize();
+    pTextureManager_->Initialize();
+    pBufferManager_->Initialize();
+    pShaderManager_->Initialize();
+    pDeviceContext_->Initialize();
+    pRenderer_->Initialize();
+    pComputer_->Initialize();
+    pGUI_->Initialize();
+  });
 
   std::future<void> InputsAndGraphics = ThreadPool->EnqueueWithAcquireResult([&]
   {
@@ -55,9 +59,6 @@ Engine::Engine()
     pMouse_->Initialize();
     pXInput_->Initialize();
     pGamepad_->Initialize();
-    pRenderer_->Initialize();
-    pComputer_->Initialize();
-    pGUI_->Initialize();
   });
   std::future<void> ManagersAndProfilers = ThreadPool->EnqueueWithAcquireResult([&]
   {
@@ -66,6 +67,7 @@ Engine::Engine()
     pCPUProfiler_->Initialize();
     pMemoryProfiler_->Initialize();
   });
+  Device.get();
   InputsAndGraphics.get();
   ManagersAndProfilers.get();
 #else
@@ -82,7 +84,6 @@ Engine::Engine()
   pShaderManager_->Initialize();
 
   pDeviceContext_->Initialize();
-  pSwapChain_->Initialize();
 
   pCPUProfiler_->Initialize();
   pMemoryProfiler_->Initialize();
@@ -107,7 +108,6 @@ Engine::~Engine()
   pRenderer_.Release();
   pMemoryProfiler_.Release();
   pCPUProfiler_.Release();
-  pSwapChain_.Release();
   pDeviceContext_.Release();
   pShaderManager_.Release();
   pBufferManager_.Release();

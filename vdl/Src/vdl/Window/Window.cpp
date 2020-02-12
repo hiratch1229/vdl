@@ -2,7 +2,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Window/IWindow.hpp>
-#include <vdl/SwapChain/ISwapChain.hpp>
+#include <vdl/DeviceContext/IDeviceContext.hpp>
 
 namespace vdl::Window
 {
@@ -13,11 +13,11 @@ namespace vdl::Window
 
   RenderTexture GetRenderTexture()
   {
-    return Engine::Get<ISwapChain>()->GetRenderTexture();
+    return Engine::Get<IDeviceContext>()->GetRenderTexture();
   }
 
   DepthStencilTexture GetDepthStencilTexture()
   {
-    return Engine::Get<ISwapChain>()->GetDepthStencilTexture();
+    return Engine::Get<IDeviceContext>()->GetDepthStencilTexture();
   }
 }

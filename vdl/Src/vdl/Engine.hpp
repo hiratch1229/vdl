@@ -5,7 +5,6 @@ class ISystem;
 class IWindow;
 class IDevice;
 class IDeviceContext;
-class ISwapChain;
 class ICPUProfiler;
 class IMemoryProfiler;
 class IKeyboard;
@@ -48,7 +47,6 @@ private:
   Component<IWindow> pWindow_;
   Component<IDevice> pDevice_;
   Component<IDeviceContext> pDeviceContext_;
-  Component<ISwapChain> pSwapChain_;
   Component<ICPUProfiler> pCPUProfiler_;
   Component<IMemoryProfiler> pMemoryProfiler_;
   Component<IKeyboard> pKeyboard_;
@@ -75,7 +73,6 @@ public:
   template<> [[nodiscard]] static IWindow* Get() { return pEngine->pWindow_.Get(); }
   template<> [[nodiscard]] static IDevice* Get() { return pEngine->pDevice_.Get(); }
   template<> [[nodiscard]] static IDeviceContext* Get() { return pEngine->pDeviceContext_.Get(); }
-  template<> [[nodiscard]] static ISwapChain* Get() { return pEngine->pSwapChain_.Get(); }
   template<> [[nodiscard]] static ICPUProfiler* Get() { return pEngine->pCPUProfiler_.Get(); }
   template<> [[nodiscard]] static IMemoryProfiler* Get() { return pEngine->pMemoryProfiler_.Get(); }
   template<> [[nodiscard]] static IKeyboard* Get() { return pEngine->pKeyboard_.Get(); }

@@ -13,25 +13,25 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX11\CBuffer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX11\CDeviceContext.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX11\SwapChain\SwapChain.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX11\CDevice.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Format\DirectX\Format.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\DirectX11\pch.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Scissor\DirectX\Scissor.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\DirectX11\CShader.hpp" />
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\DirectX11\CSwapChain.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX11\CTexture.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Topology\DirectX\Topology.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Viewport\DirectX11\Viewport.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX11\CDeviceContext.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX11\SwapChain\SwapChain.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX11\CDevice.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\DirectX11\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\DirectX11\CPlatform.cpp" />
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\DirectX11\CSwapChain.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX11\CTexture.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

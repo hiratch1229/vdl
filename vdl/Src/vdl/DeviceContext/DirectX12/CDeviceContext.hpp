@@ -19,6 +19,7 @@
 
 #include <vdl/pch/DirectX12/pch.hpp>
 
+#include "SwapChain/SwapChain.hpp"
 #include <vdl/Device/DirectX12/CommandList/CommandList.hpp>
 #include <vdl/Device/DirectX12/DescriptorHeap/DescriptorHeap.hpp>
 #include <vdl/Device/DirectX12/Fence/Fence.hpp>
@@ -29,7 +30,7 @@
 #include <unordered_map>
 
 class CDevice;
-class CSwapChain;
+class IWindow;
 class ITextureManager;
 class IBufferManager;
 class IShaderManager;
@@ -98,10 +99,11 @@ private:
   };
 private:
   ID3D12Device5* pD3D12Device_;
-  IDXGISwapChain* pDXGISwapChain_;
+  SwapChain SwapChain_;
+  vdl::uint CurrentBackBufferIndex_;
 private:
   CDevice* pDevice_;
-  CSwapChain* pSwapChain_;
+  IWindow* pWindow_;
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
@@ -157,8 +159,6 @@ private:
   vdl::uint GetVertexBufferStride()const;
   vdl::uint GetInstanceBufferStride()const;
 public:
-  void Present();
-public:
   CDeviceContext() = default;
 
   PlatformFlags GetPlatform()const final { return PlatformFlag::eDirectX12; }
@@ -173,9 +173,19 @@ public:
 
   void ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::Color4F& _ClearColor)override;
 
-  void Flush()override;
-
   void Execute(const BaseGraphicsCommandList& _GraphicsCommandList)override;
 
   void Execute(const ComputeCommandList& _ComputeCommandList)override;
+
+  void Flush()override;
+
+  void Present()override;
+
+  void ChangeWindowMode()override;
+
+  void ScreenShot()override;
+
+  const vdl::RenderTexture& GetRenderTexture()const override { return SwapChain_.GetRenderTexture(); }
+
+  const vdl::DepthStencilTexture& GetDepthStencilTexture()const override { return SwapChain_.GetDepthStencilTexture(); }
 };

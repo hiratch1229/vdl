@@ -142,7 +142,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\Shader.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\SoundManager\ISoundManager.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\StateChangeFlags\StateChangeFlags.hpp" />
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\ISwapChain.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\System\CSystem.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\System\ISystem.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\TextureManager\CTextureManager.hpp" />
@@ -197,7 +196,6 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\ShaderManager\ShaderManagerFactory.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Shader\Shader.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\SoundManager\SoundManagerFactory.cpp" />
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\SwapChainFactory.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\CSystem.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\System.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\SystemFactory.cpp" />

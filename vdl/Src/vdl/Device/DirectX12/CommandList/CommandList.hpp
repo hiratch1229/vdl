@@ -17,7 +17,7 @@ public:
 
   [[nodiscard]] ID3D12GraphicsCommandList4* Get()const { return pCommandList_.Get(); }
 
-  ID3D12GraphicsCommandList4* operator->()const { return pCommandList_.Get(); }
+  [[nodiscard]] ID3D12GraphicsCommandList4* operator->()const { return pCommandList_.Get(); }
 public:
   CommandList() = default;
 

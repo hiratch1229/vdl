@@ -13,24 +13,24 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\Vulkan\CBuffer.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\CDeviceContext.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\SwapChain\SwapChain.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\Vulkan\CDevice.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\Vulkan\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Vulkan\CPlatform.cpp" />
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\Vulkan\CSwapChain.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\Vulkan\CTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\Vulkan\CBuffer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\CDeviceContext.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\SwapChain\SwapChain.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\Vulkan\CDevice.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Format\Vulkan\Format.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\Vulkan\pch.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Scissor\Vulkan\Scissor.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\Vulkan\CShader.hpp" />
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\Vulkan\CSwapChain.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\Vulkan\CTexture.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Topology\Vulkan\Topology.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Viewport\Vulkan\Viewport.hpp" />

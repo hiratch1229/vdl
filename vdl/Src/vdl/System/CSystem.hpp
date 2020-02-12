@@ -5,7 +5,7 @@
 
 #include <chrono>
 
-class ISwapChain;
+class IDeviceContext;
 class ICPUProfiler;
 class IMemoryProfiler;
 class IKeyboard;
@@ -24,7 +24,7 @@ class CSystem : public ISystem
     ePause,
   };
 private:
-  ISwapChain* pSwapChain_;
+  IDeviceContext* pDeviceContext_;
   ICPUProfiler* pCPUProfiler_;
   IMemoryProfiler* pMemoryProfiler_;
   IKeyboard* pKeyboard_;

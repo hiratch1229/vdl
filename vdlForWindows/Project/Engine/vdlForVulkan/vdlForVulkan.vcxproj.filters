@@ -16,9 +16,6 @@
     <Filter Include="Src\Shader">
       <UniqueIdentifier>{207c4b13-500a-4229-8c87-c147e25154d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\SwapChain">
-      <UniqueIdentifier>{f376c5df-0115-4d3a-b5a3-b4b2473a4433}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Format">
       <UniqueIdentifier>{b9595e12-fde2-4be6-a8bf-2f7f59ea2b20}</UniqueIdentifier>
     </Filter>
@@ -40,6 +37,9 @@
     <Filter Include="Src\Platform">
       <UniqueIdentifier>{d6483eeb-7aee-42aa-83c7-e7ccc73d8233}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\DeviceContext\SwapChain">
+      <UniqueIdentifier>{2a6964af-a51f-4ba2-89e6-c8d93add5511}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\Vulkan\CBuffer.cpp">
@@ -47,9 +47,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\Vulkan\CTexture.cpp">
       <Filter>Src\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\Vulkan\CSwapChain.cpp">
-      <Filter>Src\SwapChain</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\Vulkan\pch.cpp">
       <Filter>Src\pch</Filter>
@@ -62,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Vulkan\CPlatform.cpp">
       <Filter>Src\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\SwapChain\SwapChain.cpp">
+      <Filter>Src\DeviceContext\SwapChain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -76,9 +76,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\Vulkan\CTexture.hpp">
       <Filter>Src\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\Vulkan\CSwapChain.hpp">
-      <Filter>Src\SwapChain</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\Vulkan\CShader.hpp">
       <Filter>Src\Shader</Filter>
@@ -97,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\Vulkan\CDevice.hpp">
       <Filter>Src\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\Vulkan\SwapChain\SwapChain.hpp">
+      <Filter>Src\DeviceContext\SwapChain</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

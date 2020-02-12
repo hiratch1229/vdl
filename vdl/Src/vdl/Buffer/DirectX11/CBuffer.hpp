@@ -1,10 +1,11 @@
 #pragma once
 #include "../IBuffer.hpp"
 
-#include <vdl/pch/DirectX11/pch.hpp>
 #include <vdl/Platform/IPlatform.hpp>
 
 #include <vdl/Macro.hpp>
+
+#include <vdl/pch/DirectX11/pch.hpp>
 
 #include <assert.h>
 

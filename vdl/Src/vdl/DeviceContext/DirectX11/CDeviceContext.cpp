@@ -2,11 +2,11 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Device/DirectX11/CDevice.hpp>
-#include <vdl/SwapChain/DirectX11/CSwapChain.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
-#include <vdl/CommandList/\GraphicsCommandList/GraphicsCommandList.hpp>
+#include <vdl/CommandList/GraphicsCommandList/GraphicsCommandList.hpp>
 #include <vdl/CommandList/ComputeCommandList/ComputeCommandList.hpp>
 
 #include <vdl/Topology/DirectX/Topology.hpp>
@@ -293,13 +293,15 @@ void CDeviceContext::Initialize()
 {
   CDevice* pDevice = Cast<CDevice>(Engine::Get<IDevice>());
   pDevice_ = pDevice;
-  pSwapChain_ = Cast<CSwapChain>(Engine::Get<ISwapChain>());
+  pWindow_ = Engine::Get<IWindow>();
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
 
   pD3D11Device_ = pDevice->GetDevice();
   pD3D11ImmediateContext_ = pDevice->GetImmediateContext();
+
+  SwapChain_.Initialize(pD3D11Device_, pDevice->GetSwapChain());
 }
 
 void CDeviceContext::CDeviceContext::SetRenderTextures(const vdl::RenderTextures& _RenderTextures, const vdl::DepthStencilTexture& _DepthStencilTexture)
@@ -352,17 +354,6 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
   assert(!_UnorderedAccessTexture.isEmpty());
 
   pD3D11ImmediateContext_->ClearUnorderedAccessViewFloat(Cast<CUnorderedAccessTexture>(pTextureManager_->GetTexture(_UnorderedAccessTexture.GetID()))->pUnorderedAccessView.Get(), &_ClearColor.Red);
-}
-
-void CDeviceContext::Flush()
-{
-  std::array<ID3D11ShaderResourceView*, Constants::kMaxShaderResourceNum> ShaderResourceViews = {};
-
-  pD3D11ImmediateContext_->VSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
-  pD3D11ImmediateContext_->HSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
-  pD3D11ImmediateContext_->DSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
-  pD3D11ImmediateContext_->GSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
-  pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
 }
 
 void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList)
@@ -891,6 +882,77 @@ void CDeviceContext::Execute(const ComputeCommandList& _ComputeCommandList)
   pD3D11ImmediateContext_->CSSetUnorderedAccessViews(0, Constants::kMaxUnorderedAccessObjectNum, UnorderedAccessViews.data(), nullptr);
 }
 
+void CDeviceContext::Flush()
+{
+  std::array<ID3D11ShaderResourceView*, Constants::kMaxShaderResourceNum> ShaderResourceViews = {};
+
+  pD3D11ImmediateContext_->VSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+  pD3D11ImmediateContext_->HSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+  pD3D11ImmediateContext_->DSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+  pD3D11ImmediateContext_->GSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+  pD3D11ImmediateContext_->PSSetShaderResources(0, Constants::kMaxShaderResourceNum, ShaderResourceViews.data());
+}
+
+void CDeviceContext::Present()
+{
+  HRESULT hr = S_OK;
+
+  hr = SwapChain_->Present(0, 0);
+  ERROR_CHECK(hr);
+
+  ClearRenderTexture(SwapChain_.GetRenderTexture(), pWindow_->GetScreenClearColor());
+  ClearDepthStencilTexture(SwapChain_.GetDepthStencilTexture(), Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
+}
+
+void CDeviceContext::ChangeWindowMode()
+{
+  //  TODO
+}
+
+void CDeviceContext::ScreenShot()
+{
+  //HRESULT hr = S_OK;
+  //
+  //Microsoft::WRL::ComPtr<ID3D11Texture2D> BackBuffer;
+  //{
+  //  hr = pSwapChain_->GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf()));
+  //  ERROR_CHECK(hr);
+  //}
+  //
+  //vdl::uint2 TextureSize;
+  //Microsoft::WRL::ComPtr<ID3D11Texture2D> CopyBuffer;
+  //{
+  //  D3D11_TEXTURE2D_DESC Texture2DDesc;
+  //  {
+  //    BackBuffer->GetDesc(&Texture2DDesc);
+  //    Texture2DDesc.BindFlags = 0;
+  //    Texture2DDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+  //    Texture2DDesc.Usage = D3D11_USAGE_STAGING;
+  //  }
+  //
+  //  TextureSize = { Texture2DDesc.Width, Texture2DDesc.Height };
+  //
+  //  hr = pD3D11Device_->CreateTexture2D(&Texture2DDesc, nullptr, CopyBuffer.GetAddressOf());
+  //  ERROR_CHECK(hr);
+  //
+  //  pD3D11ImmediateContext_->CopyResource(CopyBuffer.Get(), BackBuffer.Get());
+  //}
+  //
+  //vdl::Image Image;
+  //Image.Resize(TextureSize);
+  //{
+  //  D3D11_MAPPED_SUBRESOURCE MappedSubresorce;
+  //  hr = pD3D11ImmediateContext_->Map(CopyBuffer.Get(), 0, D3D11_MAP_READ, 0, &MappedSubresorce);
+  //  ERROR_CHECK(hr);
+  //
+  //  ::memcpy(Image.Buffer(), MappedSubresorce.pData, Image.BufferSize());
+  //
+  //  pD3D11ImmediateContext_->Unmap(CopyBuffer.Get(), 0);
+  //}
+  //
+  //Image.SavePNG(Constants::kScreenShotFileDirectory);
+}
+
 //--------------------------------------------------
 
 void CDeviceContext::RegisterInputLayout(vdl::InputLayoutType _Key, ID3DBlob* _pCode)
@@ -1085,7 +1147,7 @@ ID3D11RenderTargetView* CDeviceContext::GetRenderTargetView(const vdl::RenderTex
   ITexture* pTexture = pTextureManager_->GetTexture(_RenderTexture.GetID());
   if (pTexture->GetType() == TextureType::eSwapChainRenderTexture)
   {
-    return pSwapChain_->GetRenderTargetView();
+    return SwapChain_.GetRenderTargetView();
   }
   else
   {

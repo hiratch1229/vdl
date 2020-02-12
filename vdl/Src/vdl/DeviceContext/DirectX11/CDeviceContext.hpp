@@ -9,11 +9,12 @@
 #include <vdl/Variant.hpp>
 
 #include <vdl/pch/DirectX11/pch.hpp>
+#include "SwapChain/SwapChain.hpp"
 
 #include <unordered_map>
 
 class IDevice;
-class CSwapChain;
+class IWindow;
 class ITextureManager;
 class IBufferManager;
 class IShaderManager;
@@ -22,9 +23,10 @@ class CDeviceContext : public IDeviceContext
 {
   ID3D11Device* pD3D11Device_;
   ID3D11DeviceContext* pD3D11ImmediateContext_;
+  SwapChain SwapChain_;
 private:
   IDevice* pDevice_;
-  CSwapChain* pSwapChain_;
+  IWindow* pWindow_;
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
@@ -65,9 +67,19 @@ public:
 
   void ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::Color4F& _ClearColor)override;
 
-  void Flush()override;
-
   void Execute(const BaseGraphicsCommandList& _GraphicsCommandList)override;
 
   void Execute(const ComputeCommandList& _ComputeCommandList)override;
+
+  void Flush()override;
+
+  void Present()override;
+
+  void ChangeWindowMode()override;
+
+  void ScreenShot()override;
+
+  const vdl::RenderTexture& GetRenderTexture()const override { return SwapChain_.GetRenderTexture(); }
+
+  const vdl::DepthStencilTexture& GetDepthStencilTexture()const override { return SwapChain_.GetDepthStencilTexture(); }
 };

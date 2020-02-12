@@ -19,6 +19,7 @@
 
 #include <vdl/pch/Vulkan/pch.hpp>
 
+#include "SwapChain/SwapChain.hpp"
 #include <vdl/Texture/Vulkan/CTexture.hpp>
 #include <vdl/Shader/Vulkan/CShader.hpp>
 
@@ -26,7 +27,7 @@
 #include <unordered_map>
 
 class IDevice;
-class CSwapChain;
+class IWindow;
 class ITextureManager;
 class IBufferManager;
 class IShaderManager;
@@ -126,9 +127,10 @@ private:
   vk::Device VkDevice_;
   vk::Queue GraphicsQueue_;
   vk::Queue ComputeQueue_;
+  SwapChain SwapChain_;
 private:
   IDevice* pDevice_;
-  CSwapChain* pSwapChain_;
+  IWindow* pWindow_;
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
@@ -198,8 +200,6 @@ private:
   const vk::DescriptorImageInfo& GetUnorderedAccessTextureDescriptor(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vk::CommandBuffer& _CommandBuffer);
   const vk::DescriptorBufferInfo& GetUnorderedAccessBufferDescriptor(const vdl::Detail::UnorderedAccessBufferData& _UnorderedAccessBuffer);
 public:
-  void Present();
-public:
   CDeviceContext() = default;
 
   PlatformFlags GetPlatform()const final { return PlatformFlag::eVulkan; }
@@ -214,9 +214,19 @@ public:
 
   void ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::Color4F& _ClearColor)override;
 
-  void Flush()override;
-
   void Execute(const BaseGraphicsCommandList& _GraphicsCommandList)override;
 
   void Execute(const ComputeCommandList& _ComputeCommandList)override;
+
+  void Flush()override;
+
+  void Present()override;
+
+  void ChangeWindowMode()override;
+
+  void ScreenShot()override;
+
+  const vdl::RenderTexture& GetRenderTexture()const override { return SwapChain_.GetRenderTexture(); }
+
+  const vdl::DepthStencilTexture& GetDepthStencilTexture()const override { return SwapChain_.GetDepthStencilTexture(); }
 };

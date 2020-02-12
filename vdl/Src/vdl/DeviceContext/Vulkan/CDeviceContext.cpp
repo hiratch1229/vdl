@@ -2,7 +2,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Device/Vulkan/CDevice.hpp>
-#include <vdl/SwapChain/Vulkan/CSwapChain.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
@@ -422,8 +422,7 @@ namespace
 void CDeviceContext::Initialize()
 {
   pDevice_ = Engine::Get<IDevice>();
-  pSwapChain_ = Cast<CSwapChain>(Engine::Get<ISwapChain>());
-
+  pWindow_ = Engine::Get<IWindow>();
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
@@ -432,6 +431,7 @@ void CDeviceContext::Initialize()
   VkDevice_ = pDevice->GetDevice();
   GraphicsQueue_ = pDevice->GetGraphicsQueue();
   ComputeQueue_ = pDevice->GetComputeQueue();
+  SwapChain_.Initialize(pDevice);
 
   //  入力レイアウトの作成
   {
@@ -1009,66 +1009,6 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
       ClearTextures.insert(std::make_pair(TextureID, _UnorderedAccessTexture));
     }
   }
-}
-
-void CDeviceContext::Flush()
-{
-  const vk::CommandBuffer& CurrentCommandBuffer = GetCurrentGraphicsCommandBuffer();
-
-  switch (GraphicsCommandBufferState_)
-  {
-  case CDeviceContext::CommandBufferState::eIdle:
-    return;
-  case CDeviceContext::CommandBufferState::eBeginRenderPass:
-    CurrentCommandBuffer.endRenderPass();
-  case CDeviceContext::CommandBufferState::eBegin:
-    CurrentCommandBuffer.end();
-    break;
-  default: assert(false);
-  }
-
-  std::vector<vk::Semaphore> WaitSemaphores;
-  {
-    if (LastSemaphore_)
-    {
-      WaitSemaphores.push_back(LastSemaphore_);
-    }
-    if (const vk::Semaphore PresentSemaphore = pSwapChain_->GetSemaphore())
-    {
-      WaitSemaphores.push_back(PresentSemaphore);
-    }
-  }
-
-  const vk::Semaphore& CurrentSemaphore = GetCurrentGraphicsSemaphore();
-  const vdl::uint WaitSemaphoreNum = static_cast<vdl::uint>(WaitSemaphores.size());
-  std::vector<vk::PipelineStageFlags> PipelineStageFlags(WaitSemaphoreNum, vk::PipelineStageFlagBits::eBottomOfPipe);
-
-  vk::SubmitInfo SubmitInfo;
-  {
-    SubmitInfo.waitSemaphoreCount = WaitSemaphoreNum;
-    SubmitInfo.pWaitSemaphores = WaitSemaphores.data();
-    SubmitInfo.pWaitDstStageMask = PipelineStageFlags.data();
-    SubmitInfo.commandBufferCount = 1;
-    SubmitInfo.pCommandBuffers = &CurrentCommandBuffer;
-    SubmitInfo.signalSemaphoreCount = 1;
-    SubmitInfo.pSignalSemaphores = &CurrentSemaphore;
-  }
-
-  GraphicsQueue_.submit(SubmitInfo, GetCurrentGraphicsFence());
-
-  LastSemaphore_ = CurrentSemaphore;
-
-  const vdl::uint CurrentGraphicsCommandBufferIndex = GraphicsCommandBufferIndex_;
-
-  ++GraphicsCommandBufferIndex_ %= Constants::kGraphicsCommandBufferNum;
-  WaitFence(GetCurrentGraphicsFence());
-  GetCurrentGraphicsCommandBuffer().reset(vk::CommandBufferResetFlags());
-
-  GraphicsReserveDatas_[GraphicsCommandBufferIndex_].Clear();
-  GraphicsReserveDatas_[GraphicsCommandBufferIndex_].Pipelines.resize(1);
-  GraphicsReserveDatas_[GraphicsCommandBufferIndex_].Pipelines[0] = std::move(GraphicsReserveDatas_[CurrentGraphicsCommandBufferIndex].Pipelines.back());
-
-  GraphicsCommandBufferState_ = CommandBufferState::eIdle;
 }
 
 void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList)
@@ -2342,7 +2282,7 @@ void CDeviceContext::Execute(const ComputeCommandList& _ComputeCommandList)
     {
       WaitSemaphores.push_back(LastSemaphore_);
     }
-    if (const vk::Semaphore PresentSemaphore = pSwapChain_->GetSemaphore())
+    if (const vk::Semaphore PresentSemaphore = SwapChain_.GetSemaphore())
     {
       WaitSemaphores.push_back(PresentSemaphore);
     }
@@ -2392,7 +2332,65 @@ void CDeviceContext::Execute(const ComputeCommandList& _ComputeCommandList)
   }
 }
 
-//--------------------------------------------------
+void CDeviceContext::Flush()
+{
+  const vk::CommandBuffer& CurrentCommandBuffer = GetCurrentGraphicsCommandBuffer();
+
+  switch (GraphicsCommandBufferState_)
+  {
+  case CDeviceContext::CommandBufferState::eIdle:
+    return;
+  case CDeviceContext::CommandBufferState::eBeginRenderPass:
+    CurrentCommandBuffer.endRenderPass();
+  case CDeviceContext::CommandBufferState::eBegin:
+    CurrentCommandBuffer.end();
+    break;
+  default: assert(false);
+  }
+
+  std::vector<vk::Semaphore> WaitSemaphores;
+  {
+    if (LastSemaphore_)
+    {
+      WaitSemaphores.push_back(LastSemaphore_);
+    }
+    if (const vk::Semaphore PresentSemaphore = SwapChain_.GetSemaphore())
+    {
+      WaitSemaphores.push_back(PresentSemaphore);
+    }
+  }
+
+  const vk::Semaphore& CurrentSemaphore = GetCurrentGraphicsSemaphore();
+  const vdl::uint WaitSemaphoreNum = static_cast<vdl::uint>(WaitSemaphores.size());
+  std::vector<vk::PipelineStageFlags> PipelineStageFlags(WaitSemaphoreNum, vk::PipelineStageFlagBits::eBottomOfPipe);
+
+  vk::SubmitInfo SubmitInfo;
+  {
+    SubmitInfo.waitSemaphoreCount = WaitSemaphoreNum;
+    SubmitInfo.pWaitSemaphores = WaitSemaphores.data();
+    SubmitInfo.pWaitDstStageMask = PipelineStageFlags.data();
+    SubmitInfo.commandBufferCount = 1;
+    SubmitInfo.pCommandBuffers = &CurrentCommandBuffer;
+    SubmitInfo.signalSemaphoreCount = 1;
+    SubmitInfo.pSignalSemaphores = &CurrentSemaphore;
+  }
+
+  GraphicsQueue_.submit(SubmitInfo, GetCurrentGraphicsFence());
+
+  LastSemaphore_ = CurrentSemaphore;
+
+  const vdl::uint CurrentGraphicsCommandBufferIndex = GraphicsCommandBufferIndex_;
+
+  ++GraphicsCommandBufferIndex_ %= Constants::kGraphicsCommandBufferNum;
+  WaitFence(GetCurrentGraphicsFence());
+  GetCurrentGraphicsCommandBuffer().reset(vk::CommandBufferResetFlags());
+
+  GraphicsReserveDatas_[GraphicsCommandBufferIndex_].Clear();
+  GraphicsReserveDatas_[GraphicsCommandBufferIndex_].Pipelines.resize(1);
+  GraphicsReserveDatas_[GraphicsCommandBufferIndex_].Pipelines[0] = std::move(GraphicsReserveDatas_[CurrentGraphicsCommandBufferIndex].Pipelines.back());
+
+  GraphicsCommandBufferState_ = CommandBufferState::eIdle;
+}
 
 void CDeviceContext::Present()
 {
@@ -2418,7 +2416,7 @@ void CDeviceContext::Present()
   }
 
   //  バックバッファをPresent可能状態に変更
-  pSwapChain_->GetVkRenderTexture()->TextureData.SetImageLayout(CurrentCommandBuffer, vk::ImageLayout::ePresentSrcKHR, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+  SwapChain_.GetVkRenderTexture()->TextureData.SetImageLayout(CurrentCommandBuffer, vk::ImageLayout::ePresentSrcKHR, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
 
   Flush();
 
@@ -2427,8 +2425,8 @@ void CDeviceContext::Present()
     PresentInfo.waitSemaphoreCount = 1;
     PresentInfo.pWaitSemaphores = &LastSemaphore_;
     PresentInfo.swapchainCount = 1;
-    PresentInfo.pSwapchains = &pSwapChain_->GetSwapChain();
-    PresentInfo.pImageIndices = &pSwapChain_->GetCurrentBufferIndex();
+    PresentInfo.pSwapchains = &SwapChain_.GetSwapChain();
+    PresentInfo.pImageIndices = &SwapChain_.GetCurrentBufferIndex();
   }
 
   vk::Result Result = vk::Result::eSuccess;
@@ -2436,6 +2434,21 @@ void CDeviceContext::Present()
   assert(Result == vk::Result::eSuccess);
 
   LastSemaphore_ = vk::Semaphore();
+
+  SwapChain_.AcquireNextImage(VkDevice_);
+
+  ClearRenderTexture(SwapChain_.GetRenderTexture(), pWindow_->GetScreenClearColor());
+  ClearDepthStencilTexture(SwapChain_.GetDepthStencilTexture(), Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
+}
+
+void CDeviceContext::ChangeWindowMode()
+{
+  //  TODO
+}
+
+void CDeviceContext::ScreenShot()
+{
+  //  TODO
 }
 
 //--------------------------------------------------
@@ -2601,7 +2614,7 @@ void CDeviceContext::BeginRenderPassGraphicsCommandBuffer()
   GraphicsCommandBufferState_ = CommandBufferState::eBeginRenderPass;
 }
 
-void CDeviceContext::WaitFence(const vk::Fence & _Fence)
+void CDeviceContext::WaitFence(const vk::Fence& _Fence)
 {
   //  Fenceが有効な間は完了まで待つ
   while (_Fence)
@@ -2616,15 +2629,15 @@ void CDeviceContext::WaitFence(const vk::Fence & _Fence)
 
 //--------------------------------------------------
 
-CRenderTexture* CDeviceContext::GetVkRenderTexture(const vdl::RenderTexture & _RenderTexture)
+CRenderTexture* CDeviceContext::GetVkRenderTexture(const vdl::RenderTexture& _RenderTexture)
 {
   assert(!_RenderTexture.isEmpty());
 
   ITexture* pTexture = pTextureManager_->GetTexture(_RenderTexture.GetID());
-  return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? pSwapChain_->GetVkRenderTexture() : Cast<CRenderTexture>(pTexture));
+  return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? SwapChain_.GetVkRenderTexture() : Cast<CRenderTexture>(pTexture));
 }
 
-const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState & _RasterizerState)
+const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRasterizationStateInfo(const vdl::RasterizerState& _RasterizerState)
 {
   if (RasterizerStates_.find(_RasterizerState) == RasterizerStates_.end())
   {
@@ -2648,7 +2661,7 @@ const vk::PipelineRasterizationStateCreateInfo& CDeviceContext::GetPipelineRaste
   return RasterizerStates_.at(_RasterizerState);
 }
 
-const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState & _DepthStencilState)
+const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthStencilStateInfo(const vdl::DepthStencilState& _DepthStencilState)
 {
   if (DepthStencilStates_.find(_DepthStencilState) == DepthStencilStates_.end())
   {
@@ -2673,7 +2686,7 @@ const vk::PipelineDepthStencilStateCreateInfo& CDeviceContext::GetPipelineDepthS
   return DepthStencilStates_.at(_DepthStencilState);
 }
 
-const vk::PipelineColorBlendAttachmentState& CDeviceContext::GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState & _RenderTextureBlendState)
+const vk::PipelineColorBlendAttachmentState& CDeviceContext::GetPipelineColorBlendAttachmentState(const vdl::RenderTextureBlendState& _RenderTextureBlendState)
 {
   if (RenderTextureBlendStates_.find(_RenderTextureBlendState) == RenderTextureBlendStates_.end())
   {
@@ -2716,7 +2729,7 @@ const vk::PipelineMultisampleStateCreateInfo& CDeviceContext::GetMultisampleStat
   return MultisampleStates_.at(_AlphaToCoverageEnable);
 }
 
-const vk::DescriptorImageInfo& CDeviceContext::GetTextureDescriptor(ITexture * _pTexture, const vk::CommandBuffer & _CommandBuffer)
+const vk::DescriptorImageInfo& CDeviceContext::GetTextureDescriptor(ITexture* _pTexture, const vk::CommandBuffer& _CommandBuffer)
 {
   assert(_pTexture);
 
@@ -2762,7 +2775,7 @@ const vk::DescriptorImageInfo& CDeviceContext::GetTextureDescriptor(ITexture * _
   }
 }
 
-const vk::DescriptorImageInfo& CDeviceContext::GetSamplerDescriptor(const vdl::Sampler & _Sampler)
+const vk::DescriptorImageInfo& CDeviceContext::GetSamplerDescriptor(const vdl::Sampler& _Sampler)
 {
   if (Samplers_.find(_Sampler) == Samplers_.end())
   {
@@ -2799,7 +2812,7 @@ const vk::DescriptorImageInfo& CDeviceContext::GetSamplerDescriptor(const vdl::S
   return Samplers_.at(_Sampler).Descriptor;
 }
 
-const vk::DescriptorBufferInfo& CDeviceContext::GetConstantBufferDescriptor(const vdl::Detail::ConstantBufferData & _ConstantBuffer)
+const vk::DescriptorBufferInfo& CDeviceContext::GetConstantBufferDescriptor(const vdl::Detail::ConstantBufferData& _ConstantBuffer)
 {
   assert(!_ConstantBuffer.isEmpty());
 
@@ -2808,7 +2821,7 @@ const vk::DescriptorBufferInfo& CDeviceContext::GetConstantBufferDescriptor(cons
   return pConstantBuffer->Descriptor;
 }
 
-const vk::DescriptorImageInfo& CDeviceContext::GetUnorderedAccessTextureDescriptor(const vdl::UnorderedAccessTexture & _UnorderedAccessTexture, const vk::CommandBuffer & _CommandBuffer)
+const vk::DescriptorImageInfo& CDeviceContext::GetUnorderedAccessTextureDescriptor(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vk::CommandBuffer& _CommandBuffer)
 {
   assert(!_UnorderedAccessTexture.isEmpty());
 
@@ -2824,7 +2837,7 @@ const vk::DescriptorImageInfo& CDeviceContext::GetUnorderedAccessTextureDescript
   return pTexture->Descriptor;
 }
 
-const vk::DescriptorBufferInfo& CDeviceContext::GetUnorderedAccessBufferDescriptor(const vdl::Detail::UnorderedAccessBufferData & _UnorderedAccessBuffer)
+const vk::DescriptorBufferInfo& CDeviceContext::GetUnorderedAccessBufferDescriptor(const vdl::Detail::UnorderedAccessBufferData& _UnorderedAccessBuffer)
 {
   assert(!_UnorderedAccessBuffer.isEmpty());
 

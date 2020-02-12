@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\CDeviceContext.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\SwapChain\SwapChain.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CDevice.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandList\CommandList.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandQueue\CommandQueueManager.cpp" />
@@ -23,12 +24,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\DirectX12\CPlatform.cpp" />
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\DirectX12\CSwapChain.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX12\CTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Buffer\DirectX12\CBuffer.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\CDeviceContext.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX12\SwapChain\SwapChain.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CDevice.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandList\CommandList.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Device\DirectX12\CommandQueue\CommandQueueManager.hpp" />
@@ -38,7 +39,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\DirectX12\pch.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Scissor\DirectX\Scissor.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\DirectX12\CShader.hpp" />
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\DirectX12\CSwapChain.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX12\CTexture.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Topology\DirectX\Topology.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Viewport\DirectX12\Viewport.hpp" />

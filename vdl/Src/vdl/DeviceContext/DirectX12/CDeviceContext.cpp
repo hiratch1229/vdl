@@ -2,7 +2,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Device/DirectX12/CDevice.hpp>
-#include <vdl/SwapChain/DirectX12/CSwapChain.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
@@ -356,14 +356,14 @@ namespace
 void CDeviceContext::Initialize()
 {
   pDevice_ = Cast<CDevice>(Engine::Get<IDevice>());
-  pSwapChain_ = Cast<CSwapChain>(Engine::Get<ISwapChain>());
-
+  pWindow_ = Engine::Get<IWindow>();
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
 
   pD3D12Device_ = pDevice_->GetDevice();
-  pDXGISwapChain_ = pDevice_->GetSwapChain();
+  SwapChain_.Initialize(pDevice_);
+  CurrentBackBufferIndex_ = SwapChain_->GetCurrentBackBufferIndex();
   pGraphicsCommandQueue_ = pDevice_->GetCommandQueueManager()->GetGraphicsQueue();
   pComputeCommandQueue_ = pDevice_->GetCommandQueueManager()->GetComputeQueue();
   pSamplerDescriptorAllocator_ = pDevice_->GetDescriptorAllocator(DescriptorHeapType::eSampler);
@@ -776,60 +776,6 @@ void CDeviceContext::ClearUnorderedAccessTexture(const vdl::UnorderedAccessTextu
     if (ClearTextures.find(TextureID) == ClearTextures.end())
     {
       ClearTextures.insert(std::make_pair(TextureID, _UnorderedAccessTexture));
-    }
-  }
-}
-
-void CDeviceContext::Flush()
-{
-  CommandList& CurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
-  CurrentGraphicsCommandList.Close();
-
-  //  最後のコマンドをGPUで同期
-  if (pLastFence_)
-  {
-    pLastFence_->Wait(pGraphicsCommandQueue_);
-  }
-
-  //  コマンドを発行
-  CurrentGraphicsCommandList.Execute(pGraphicsCommandQueue_);
-
-  //  最後のフェンスを更新してGPUで更新設定
-  {
-    pLastFence_ = &GetCurrentGraphicsFence();
-    pLastFence_->Signal(pGraphicsCommandQueue_);
-  }
-
-  //  次のコマンドリストの設定
-  {
-    GraphicsReserveData& CurrentGraphicsReserveData = GetCurrentGraphicsReserveData();
-
-    //  次のコマンドリストへ
-    ++GraphicsCommandBufferIndex_ %= Constants::kGraphicsCommandBufferNum;
-
-    //  CPUで同期
-    GetCurrentGraphicsFence().Wait(FenceEvent_);
-
-    //  最終データの引き継ぎ
-    GraphicsReserveData& NextGraphicsReserveData = GetCurrentGraphicsReserveData();
-    {
-      NextGraphicsReserveData.Clear();
-      NextGraphicsReserveData.ShaderResourceHeaps.resize(1);
-      NextGraphicsReserveData.ShaderResourceHeaps[0] = std::move(CurrentGraphicsReserveData.ShaderResourceHeaps.back());
-      NextGraphicsReserveData.SamplerHeaps.resize(1);
-      NextGraphicsReserveData.SamplerHeaps[0] = std::move(CurrentGraphicsReserveData.SamplerHeaps.back());
-      NextGraphicsReserveData.ConstantBufferHeaps.resize(1);
-      NextGraphicsReserveData.ConstantBufferHeaps[0] = std::move(CurrentGraphicsReserveData.ConstantBufferHeaps.back());
-      NextGraphicsReserveData.PipelineStates.resize(1);
-      NextGraphicsReserveData.PipelineStates[0] = std::move(CurrentGraphicsReserveData.PipelineStates.back());
-    }
-
-    //  コマンドリストの初期設定  
-    CommandList& NextGraphicsCommandList = GetCurrentGraphicsCommandList();
-    {
-      NextGraphicsCommandList.Reset(NextGraphicsReserveData.PipelineStates[0].Get());
-      NextGraphicsCommandList->SetGraphicsRootSignature(pGraphicsRootSignature_.Get());
-      NextGraphicsCommandList->SetDescriptorHeaps(kDescriptorHeapNum, ppDescriptorHeaps_.data());
     }
   }
 }
@@ -1451,18 +1397,85 @@ void CDeviceContext::Execute(const ComputeCommandList& _ComputeCommandList)
   }
 }
 
-//--------------------------------------------------
+void CDeviceContext::Flush()
+{
+  CommandList& CurrentGraphicsCommandList = GetCurrentGraphicsCommandList();
+  CurrentGraphicsCommandList.Close();
+
+  //  最後のコマンドをGPUで同期
+  if (pLastFence_)
+  {
+    pLastFence_->Wait(pGraphicsCommandQueue_);
+  }
+
+  //  コマンドを発行
+  CurrentGraphicsCommandList.Execute(pGraphicsCommandQueue_);
+
+  //  最後のフェンスを更新してGPUで更新設定
+  {
+    pLastFence_ = &GetCurrentGraphicsFence();
+    pLastFence_->Signal(pGraphicsCommandQueue_);
+  }
+
+  //  次のコマンドリストの設定
+  {
+    GraphicsReserveData& CurrentGraphicsReserveData = GetCurrentGraphicsReserveData();
+
+    //  次のコマンドリストへ
+    ++GraphicsCommandBufferIndex_ %= Constants::kGraphicsCommandBufferNum;
+
+    //  CPUで同期
+    GetCurrentGraphicsFence().Wait(FenceEvent_);
+
+    //  最終データの引き継ぎ
+    GraphicsReserveData& NextGraphicsReserveData = GetCurrentGraphicsReserveData();
+    {
+      NextGraphicsReserveData.Clear();
+      NextGraphicsReserveData.ShaderResourceHeaps.resize(1);
+      NextGraphicsReserveData.ShaderResourceHeaps[0] = std::move(CurrentGraphicsReserveData.ShaderResourceHeaps.back());
+      NextGraphicsReserveData.SamplerHeaps.resize(1);
+      NextGraphicsReserveData.SamplerHeaps[0] = std::move(CurrentGraphicsReserveData.SamplerHeaps.back());
+      NextGraphicsReserveData.ConstantBufferHeaps.resize(1);
+      NextGraphicsReserveData.ConstantBufferHeaps[0] = std::move(CurrentGraphicsReserveData.ConstantBufferHeaps.back());
+      NextGraphicsReserveData.PipelineStates.resize(1);
+      NextGraphicsReserveData.PipelineStates[0] = std::move(CurrentGraphicsReserveData.PipelineStates.back());
+    }
+
+    //  コマンドリストの初期設定  
+    CommandList& NextGraphicsCommandList = GetCurrentGraphicsCommandList();
+    {
+      NextGraphicsCommandList.Reset(NextGraphicsReserveData.PipelineStates[0].Get());
+      NextGraphicsCommandList->SetGraphicsRootSignature(pGraphicsRootSignature_.Get());
+      NextGraphicsCommandList->SetDescriptorHeaps(kDescriptorHeapNum, ppDescriptorHeaps_.data());
+    }
+  }
+}
 
 void CDeviceContext::Present()
 {
-  pSwapChain_->GetD3D12RenderTexture()->TextureData.TransitionResourceBarrier(&GetCurrentGraphicsCommandList(), D3D12_RESOURCE_STATE_PRESENT);
+  SwapChain_.GetD3D12RenderTexture(CurrentBackBufferIndex_)->TextureData.TransitionResourceBarrier(&GetCurrentGraphicsCommandList(), D3D12_RESOURCE_STATE_PRESENT);
 
   Flush();
 
   HRESULT hr = S_OK;
 
-  hr = pDXGISwapChain_->Present(0, 0);
+  hr = SwapChain_->Present(0, 0);
   ERROR_CHECK(hr);
+
+  ++CurrentBackBufferIndex_ %= Constants::kBackBufferNum;
+
+  ClearRenderTexture(SwapChain_.GetRenderTexture(), pWindow_->GetScreenClearColor());
+  ClearDepthStencilTexture(SwapChain_.GetDepthStencilTexture(), Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
+}
+
+void CDeviceContext::ChangeWindowMode()
+{
+  //  TODO
+}
+
+void CDeviceContext::ScreenShot()
+{
+  //  TODO
 }
 
 //--------------------------------------------------
@@ -1472,7 +1485,7 @@ CRenderTexture* CDeviceContext::GetD3D12RenderTexture(const vdl::RenderTexture& 
   assert(!_RenderTexture.isEmpty());
 
   ITexture* pTexture = pTextureManager_->GetTexture(_RenderTexture.GetID());
-  return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? pSwapChain_->GetD3D12RenderTexture() : Cast<CRenderTexture>(pTexture));
+  return (pTexture->GetType() == TextureType::eSwapChainRenderTexture ? SwapChain_.GetD3D12RenderTexture(CurrentBackBufferIndex_) : Cast<CRenderTexture>(pTexture));
 }
 
 const D3D12_BLEND_DESC& CDeviceContext::GetBlendDesc(const vdl::BlendState& _BlendState)

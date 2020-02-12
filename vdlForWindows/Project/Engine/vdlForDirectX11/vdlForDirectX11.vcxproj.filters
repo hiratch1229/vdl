@@ -16,9 +16,6 @@
     <Filter Include="Src\Shader">
       <UniqueIdentifier>{a30c8f3b-ea62-4538-9b04-9a984f2bd226}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\SwapChain">
-      <UniqueIdentifier>{16cccd73-9e3b-466b-b347-e24f9e79edb1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Texture">
       <UniqueIdentifier>{cd4831d4-2fb0-4f70-8e00-b01aa03d3e72}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,9 @@
     </Filter>
     <Filter Include="Src\Platform">
       <UniqueIdentifier>{6c65df0a-9876-42ae-a6d0-dd3ad1776cab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\DeviceContext\SwapChain">
+      <UniqueIdentifier>{fe435fce-f4b4-4a5c-a11d-f5a352aa6ded}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,9 +63,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Shader\DirectX11\CShader.hpp">
       <Filter>Src\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\DirectX11\CSwapChain.hpp">
-      <Filter>Src\SwapChain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX11\CTexture.hpp">
       <Filter>Src\Texture</Filter>
     </ClInclude>
@@ -74,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Viewport\DirectX11\Viewport.hpp">
       <Filter>Src\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX11\SwapChain\SwapChain.hpp">
+      <Filter>Src\DeviceContext\SwapChain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,14 +86,14 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\DirectX11\pch.cpp">
       <Filter>Src\pch</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\DirectX11\CSwapChain.cpp">
-      <Filter>Src\SwapChain</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Texture\DirectX11\CTexture.cpp">
       <Filter>Src\Texture</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\DirectX11\CPlatform.cpp">
       <Filter>Src\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\DeviceContext\DirectX11\SwapChain\SwapChain.cpp">
+      <Filter>Src\DeviceContext\SwapChain</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

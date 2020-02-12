@@ -1,10 +1,9 @@
 #pragma once
 #include "../ITexture.hpp"
 
-#include <vdl/pch/DirectX11/pch.hpp>
-
 #include <vdl/Window.hpp>
 
+#include <vdl/pch/DirectX11/pch.hpp>
 #include <vdl/Platform/IPlatform.hpp>
 #include <vdl/Constants/Constants.hpp>
 

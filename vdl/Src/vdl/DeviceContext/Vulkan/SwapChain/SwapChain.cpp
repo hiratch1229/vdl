@@ -1,9 +1,7 @@
-#include "CSwapChain.hpp"
+#include "SwapChain.hpp"
 
 #include <vdl/Engine.hpp>
 #include <vdl/Device/Vulkan/CDevice.hpp>
-#include <vdl/DeviceContext/Vulkan/CDeviceContext.hpp>
-#include <vdl/Renderer/IRenderer.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 
 #if defined VDL_TARGET_WINDOWS
@@ -14,21 +12,10 @@
 
 #include <vdl/Format/Vulkan/Format.hpp>
 
-#include <vdl/Format/Format.hpp>
-#include <vdl/Constants/Constants.hpp>
-
-#include <vdl/DetectMemoryLeak.hpp>
-
-void CSwapChain::Initialize()
+void SwapChain::Initialize(CDevice* _pDevice)
 {
-  pWindow_ = Engine::Get<IWindow>();
-  pDeviceContext_ = Cast<CDeviceContext>(Engine::Get<IDeviceContext>());
-  pRenderer_ = Engine::Get<IRenderer>();
-
-  CDevice* pDevice = Cast<CDevice>(Engine::Get<IDevice>());
-  VkDevice_ = pDevice->GetDevice();
-
-  const vk::PhysicalDevice& PhysicalDevice = pDevice->GetPhysicalDevice();
+  const vk::Device& Device = _pDevice->GetDevice();
+  const vk::PhysicalDevice& PhysicalDevice = _pDevice->GetPhysicalDevice();
 
   constexpr vk::Format kSwapChainFormat = Cast(vdl::FormatType::eSwapChain);
 
@@ -43,9 +30,9 @@ void CSwapChain::Initialize()
       vk::Win32SurfaceCreateInfoKHR SurfaceInfo;
       {
         SurfaceInfo.hinstance = ::GetModuleHandle(nullptr);
-        SurfaceInfo.hwnd = Cast<CWindow>(pWindow_)->GetHandle();
+        SurfaceInfo.hwnd = Cast<CWindow>(Engine::Get<IWindow>())->GetHandle();
       }
-      Surface_ = pDevice->GetInstance().createWin32SurfaceKHRUnique(SurfaceInfo);
+      Surface_ = _pDevice->GetInstance().createWin32SurfaceKHRUnique(SurfaceInfo);
 #elif defined VK_USE_PLATFORM_XCB_KHR
       vk::XcbSurfaceCreateInfoKHR SurfaceInfo;
       {
@@ -79,7 +66,7 @@ void CSwapChain::Initialize()
 
     vk::SurfaceCapabilitiesKHR SurfaceCapabilities = PhysicalDevice.getSurfaceCapabilitiesKHR(Surface_.get());
 
-    const vdl::uint GraphicsQueueIndex = pDevice->FindQueue(vk::QueueFlagBits::eGraphics, Surface_.get());
+    const vdl::uint GraphicsQueueIndex = _pDevice->FindQueue(vk::QueueFlagBits::eGraphics, Surface_.get());
 
     vk::PresentModeKHR SwapChainPresentMode = vk::PresentModeKHR::eFifo;
     //  Presentモードを選択
@@ -125,16 +112,16 @@ void CSwapChain::Initialize()
       SwapChainInfo.oldSwapchain = vk::SwapchainKHR();
     }
 
-    VkSwapChain_ = VkDevice_.createSwapchainKHRUnique(SwapChainInfo);
+    VkSwapChain_ = Device.createSwapchainKHRUnique(SwapChainInfo);
     assert(VkSwapChain_);
   }
 
-  const vk::CommandBuffer& CommandBuffer = pDevice->GetCommandBuffer();
+  const vk::CommandBuffer& CommandBuffer = _pDevice->GetCommandBuffer();
   CommandBuffer.begin(vk::CommandBufferBeginInfo());
 
   //  バックバッファの作成
   {
-    std::vector<vk::Image> Images = VkDevice_.getSwapchainImagesKHR(VkSwapChain_.get());
+    std::vector<vk::Image> Images = Device.getSwapchainImagesKHR(VkSwapChain_.get());
 
     vk::ImageViewCreateInfo ImageViewInfo;
     {
@@ -159,7 +146,7 @@ void CSwapChain::Initialize()
       CRenderTexture& VkRenderTexture = VkRenderTextures_[i];
       VkRenderTexture.TextureData.Image = vk::UniqueImage(Images[i]);
       ImageViewInfo.image = VkRenderTexture.TextureData.Image.get();
-      VkRenderTexture.TextureData.View = VkDevice_.createImageViewUnique(ImageViewInfo);
+      VkRenderTexture.TextureData.View = Device.createImageViewUnique(ImageViewInfo);
       VkRenderTexture.Format = vdl::FormatType::eSwapChain;
       VkRenderTexture.VkFormat = Format;
       VkRenderTexture.TextureSize = Constants::kDefaultWindowSize;
@@ -177,7 +164,7 @@ void CSwapChain::Initialize()
       SubmitInfo.commandBufferCount = 1;
       SubmitInfo.pCommandBuffers = &CommandBuffer;
     }
-    pDevice->SubmitAndWait(SubmitInfo);
+    _pDevice->SubmitAndWait(SubmitInfo);
   }
 
   //  レンダーテクスチャの作成
@@ -196,11 +183,11 @@ void CSwapChain::Initialize()
   {
     vk::CommandPoolCreateInfo CommandPoolInfo;
     {
-      CommandPoolInfo.queueFamilyIndex = pDevice->GetGraphicsQueueIndex();
+      CommandPoolInfo.queueFamilyIndex = _pDevice->GetGraphicsQueueIndex();
       CommandPoolInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
     }
 
-    CommandPool_ = VkDevice_.createCommandPoolUnique(CommandPoolInfo);
+    CommandPool_ = Device.createCommandPoolUnique(CommandPoolInfo);
     assert(CommandPool_);
   }
 
@@ -213,48 +200,31 @@ void CSwapChain::Initialize()
       CommandBufferAllocateInfo.commandBufferCount = SwapChainImageNum;
     }
 
-    CommandBuffers_ = VkDevice_.allocateCommandBuffersUnique(CommandBufferAllocateInfo);
+    CommandBuffers_ = Device.allocateCommandBuffersUnique(CommandBufferAllocateInfo);
   }
 
   //  セマフォの作成
   {
-    Semaphore_ = VkDevice_.createSemaphoreUnique(vk::SemaphoreCreateInfo());
+    Semaphore_ = Device.createSemaphoreUnique(vk::SemaphoreCreateInfo());
     assert(Semaphore_);
   }
+
+  AcquireNextImage(Device);
 }
 
-CSwapChain::~CSwapChain()
+SwapChain::~SwapChain()
 {
   for (auto& VkRenderTexture : VkRenderTextures_)
   {
     VkRenderTexture.TextureData.Image.release();
     VkRenderTexture.TextureData.View.reset();
-  };
+  }
 }
 
-void CSwapChain::ScreenClear()
+void SwapChain::AcquireNextImage(const vk::Device& _Device)
 {
-  vk::ResultValue Result = VkDevice_.acquireNextImageKHR(VkSwapChain_.get(), UINT64_MAX, Semaphore_.get(), vk::Fence());
+  vk::ResultValue Result = _Device.acquireNextImageKHR(VkSwapChain_.get(), UINT64_MAX, Semaphore_.get(), vk::Fence());
   assert(Result.result == vk::Result::eSuccess);
   CurrentBufferIndex_ = Result.value;
   isAfterPresent_ = true;
-
-  pDeviceContext_->ClearRenderTexture(RenderTextures_[0], pWindow_->GetScreenClearColor());
-  pDeviceContext_->ClearDepthStencilTexture(DepthStencilTexture_, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
-  pRenderer_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
-}
-
-void CSwapChain::Present()
-{
-  pDeviceContext_->Present();
-}
-
-void CSwapChain::ChangeWindowMode()
-{
-  //  TODO
-}
-
-void CSwapChain::ScreenShot()
-{
-  //  TODO
 }

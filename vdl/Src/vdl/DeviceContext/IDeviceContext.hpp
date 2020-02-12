@@ -30,9 +30,19 @@ public:
 
   virtual void ClearUnorderedAccessTexture(const vdl::UnorderedAccessTexture& _UnorderedAccessTexture, const vdl::Color4F& _ClearColor) = 0;
 
-  virtual void Flush() = 0;
-
   virtual void Execute(const BaseGraphicsCommandList& _GraphicsCommandList) = 0;
 
   virtual void Execute(const ComputeCommandList& _ComputeCommandList) = 0;
+
+  virtual void Flush() = 0;
+
+  virtual void Present() = 0;
+
+  virtual void ChangeWindowMode() = 0;
+
+  virtual void ScreenShot() = 0;
+
+  virtual const vdl::RenderTexture& GetRenderTexture()const = 0;
+
+  virtual const vdl::DepthStencilTexture& GetDepthStencilTexture()const = 0;
 };

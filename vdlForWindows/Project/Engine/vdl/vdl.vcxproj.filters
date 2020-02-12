@@ -70,9 +70,6 @@
     <Filter Include="Src\DeviceContext">
       <UniqueIdentifier>{734694a4-d6ad-4bf4-87c3-2ffefcfdd523}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\SwapChain">
-      <UniqueIdentifier>{8f45d957-3ce0-45e8-81c9-0111f17c0491}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\ConstantBuffer">
       <UniqueIdentifier>{8d7368ea-56a3-451f-a310-33dbe0a322f9}</UniqueIdentifier>
     </Filter>
@@ -465,9 +462,6 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\StateChangeFlags\StateChangeFlags.hpp">
       <Filter>Src\StateChangeFlags</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vdl\Src\vdl\SwapChain\ISwapChain.hpp">
-      <Filter>Src\SwapChain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\System\CSystem.hpp">
       <Filter>Src\System</Filter>
     </ClInclude>
@@ -640,9 +634,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\SoundManager\SoundManagerFactory.cpp">
       <Filter>Src\SoundManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vdl\Src\vdl\SwapChain\SwapChainFactory.cpp">
-      <Filter>Src\SwapChain</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\System\CSystem.cpp">
       <Filter>Src\System</Filter>

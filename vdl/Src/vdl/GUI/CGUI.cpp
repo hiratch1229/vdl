@@ -5,7 +5,6 @@
 #include <vdl/Window/IWindow.hpp>
 #include <vdl/Device/IDevice.hpp>
 #include <vdl/DeviceContext/IDeviceContext.hpp>
-#include <vdl/SwapChain/ISwapChain.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
 #include <vdl/Input/Mouse/IMouse.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
@@ -615,9 +614,8 @@ void CGUI::Initialize()
 
   pConstantBuffer_ = std::make_unique<vdl::ConstantBuffer<ConstantBufferData>>();
 
-  ISwapChain* pSwapChain = Engine::Get<ISwapChain>();
-  RenderTextures_[0] = pSwapChain->GetRenderTexture();
-  DepthStencilTexture_ = pSwapChain->GetDepthStencilTexture();
+  RenderTextures_[0] = pDeviceContext_->GetRenderTexture();
+  DepthStencilTexture_ = pDeviceContext_->GetDepthStencilTexture();
 
   //  ImGui‚Ì‰Šú‰»
   {
