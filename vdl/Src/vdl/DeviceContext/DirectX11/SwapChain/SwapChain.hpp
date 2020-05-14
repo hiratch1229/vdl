@@ -15,6 +15,8 @@ public:
 
   [[nodiscard]] const vdl::RenderTexture& GetRenderTexture()const { return RenderTextures_[0]; }
 
+  [[nodiscard]] const vdl::RenderTextures& GetRenderTextures()const { return RenderTextures_; }
+
   [[nodiscard]] const vdl::DepthStencilTexture& GetDepthStencilTexture()const { return DepthStencilTexture_; }
 
   [[nodiscard]] IDXGISwapChain* operator->()const { return pSwapChain_; }

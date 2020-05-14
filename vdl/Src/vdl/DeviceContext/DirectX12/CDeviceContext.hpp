@@ -34,6 +34,7 @@ class IWindow;
 class ITextureManager;
 class IBufferManager;
 class IShaderManager;
+class IRenderer;
 
 class CDeviceContext : public IDeviceContext
 {
@@ -107,6 +108,7 @@ private:
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
+  IRenderer* pRenderer_;
 private:
   std::unordered_map<vdl::InputLayoutType, std::vector<D3D12_INPUT_ELEMENT_DESC>> InputLayouts_;
   std::unordered_map<vdl::BlendState, D3D12_BLEND_DESC> BlendStates_;

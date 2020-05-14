@@ -1,5 +1,5 @@
 #pragma once
-#pragma comment (linker, "/entry:\"wWinMainCRTStartup\"")
+#pragma comment (linker, "/entry:\"WinMainCRTStartup\"")
 
 #if defined _WINDOWS
 #define VDL_USING_WINDOWS

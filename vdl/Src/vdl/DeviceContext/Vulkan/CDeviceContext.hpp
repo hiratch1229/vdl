@@ -31,6 +31,7 @@ class IWindow;
 class ITextureManager;
 class IBufferManager;
 class IShaderManager;
+class IRenderer;
 
 class CDeviceContext : public IDeviceContext
 {
@@ -134,6 +135,7 @@ private:
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
+  IRenderer* pRenderer_;
 private:
   std::unordered_map<vdl::InputLayoutType, InputLayout> InputLayouts_;
   std::unordered_map<vdl::InputLayoutType, vk::PipelineVertexInputStateCreateInfo> PipelineVertexInputStateInfos_;

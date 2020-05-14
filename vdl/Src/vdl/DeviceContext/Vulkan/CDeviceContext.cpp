@@ -6,6 +6,7 @@
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
+#include <vdl/Renderer/IRenderer.hpp>
 
 #include <vdl/Topology/Vulkan/Topology.hpp>
 #include <vdl/Scissor/Vulkan/Scissor.hpp>
@@ -426,6 +427,7 @@ void CDeviceContext::Initialize()
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
+  pRenderer_ = Engine::Get<IRenderer>();
 
   CDevice* pDevice = Cast<CDevice>(pDevice_);
   VkDevice_ = pDevice->GetDevice();
@@ -2435,10 +2437,13 @@ void CDeviceContext::Present()
 
   LastSemaphore_ = vk::Semaphore();
 
+  //  ŽŸ‚ÌƒtƒŒ[ƒ€‚Ì€”õ
   SwapChain_.AcquireNextImage(VkDevice_);
-
-  ClearRenderTexture(SwapChain_.GetRenderTexture(), pWindow_->GetScreenClearColor());
-  ClearDepthStencilTexture(SwapChain_.GetDepthStencilTexture(), Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
+  const vdl::RenderTextures& RenderTextures = SwapChain_.GetRenderTextures();
+  const vdl::DepthStencilTexture& DepthStencilTexture = SwapChain_.GetDepthStencilTexture();
+  pRenderer_->SetRenderTextures(RenderTextures, DepthStencilTexture);
+  ClearRenderTexture(RenderTextures[0], pWindow_->GetScreenClearColor());
+  ClearDepthStencilTexture(DepthStencilTexture, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
 }
 
 void CDeviceContext::ChangeWindowMode()

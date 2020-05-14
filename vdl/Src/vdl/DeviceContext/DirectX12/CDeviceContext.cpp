@@ -6,6 +6,7 @@
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 #include <vdl/ShaderManager/IShaderManager.hpp>
+#include <vdl/Renderer/IRenderer.hpp>
 
 #include <vdl/Topology/DirectX/Topology.hpp>
 #include <vdl/Scissor/DirectX/Scissor.hpp>
@@ -360,6 +361,7 @@ void CDeviceContext::Initialize()
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
   pShaderManager_ = Engine::Get<IShaderManager>();
+  pRenderer_ = Engine::Get<IRenderer>();
 
   pD3D12Device_ = pDevice_->GetDevice();
   SwapChain_.Initialize(pDevice_);
@@ -1463,9 +1465,13 @@ void CDeviceContext::Present()
   ERROR_CHECK(hr);
 
   ++CurrentBackBufferIndex_ %= Constants::kBackBufferNum;
-
-  ClearRenderTexture(SwapChain_.GetRenderTexture(), pWindow_->GetScreenClearColor());
-  ClearDepthStencilTexture(SwapChain_.GetDepthStencilTexture(), Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
+  
+  //  ŽŸ‚ÌƒtƒŒ[ƒ€‚Ì€”õ
+  const vdl::RenderTextures& RenderTextures = SwapChain_.GetRenderTextures();
+  const vdl::DepthStencilTexture& DepthStencilTexture = SwapChain_.GetDepthStencilTexture();
+  pRenderer_->SetRenderTextures(RenderTextures, DepthStencilTexture);
+  ClearRenderTexture(RenderTextures[0], pWindow_->GetScreenClearColor());
+  ClearDepthStencilTexture(DepthStencilTexture, Constants::kDefaultClearDepth, Constants::kDefaultClearStencil);
 }
 
 void CDeviceContext::ChangeWindowMode()

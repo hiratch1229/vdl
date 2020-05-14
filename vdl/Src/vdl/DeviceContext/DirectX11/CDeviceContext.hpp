@@ -18,6 +18,7 @@ class IWindow;
 class ITextureManager;
 class IBufferManager;
 class IShaderManager;
+class IRenderer;
 
 class CDeviceContext : public IDeviceContext
 {
@@ -30,6 +31,7 @@ private:
   ITextureManager* pTextureManager_;
   IBufferManager* pBufferManager_;
   IShaderManager* pShaderManager_;
+  IRenderer* pRenderer_;
 private:
   vdl::InputLayoutType CurrentInputLayoutType_ = vdl::InputLayoutType::eNone;
 private:
