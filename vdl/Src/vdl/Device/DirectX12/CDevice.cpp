@@ -112,7 +112,7 @@ void CDevice::Initialize()
   //  エラーチェック用
   HRESULT hr = S_OK;
 
-#if defined( DEBUG ) || defined( _DEBUG )
+#if defined _DEBUG
   constexpr vdl::uint kDxgiCreateFactoryFlag = DXGI_CREATE_FACTORY_DEBUG;
 
   //  デバッグレイヤーを有効にする
@@ -247,7 +247,7 @@ void CDevice::Initialize()
     ConstantBufferAllocator_.Initialize(pConstantBuffer_->GetBuffer(), Constants::kParentConstantBufferSize);
   }
 
-#if defined( DEBUG ) || defined( _DEBUG )
+#if defined _DEBUG
   Microsoft::WRL::ComPtr<ID3D12InfoQueue> pInfoQueue_;
   pDevice_.As(&pInfoQueue_);
 

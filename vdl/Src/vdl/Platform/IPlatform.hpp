@@ -1,5 +1,5 @@
 #pragma once
-#if defined(DEBUG) | defined(_DEBUG)
+#if defined _DEBUG
 #include <vdl/Engine.hpp>
 #endif
 #include "Platform.hpp"

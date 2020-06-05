@@ -27,7 +27,7 @@ private:
   std::unique_ptr<CConstantBuffer> pConstantBuffer_;
   MemoryAllocator ConstantBufferAllocator_;
 private:
-#if defined(DEBUG) | defined(_DEBUG)
+#if defined _DEBUG
   PFN_vkDestroyDebugReportCallbackEXT	DestroyReportFunction_;
   vk::DebugReportCallbackEXT DebugReportCallBack_;
 #endif

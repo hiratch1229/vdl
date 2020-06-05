@@ -112,7 +112,7 @@ void CDevice::Initialize()
   //  エラーチェック用
   HRESULT hr = S_OK;
 
-#if defined( DEBUG ) || defined( _DEBUG )
+#if defined _DEBUG
   constexpr vdl::uint kCreateDeviceFlag = D3D11_CREATE_DEVICE_DEBUG;
   constexpr vdl::uint kDxgiCreateFactoryFlag = DXGI_CREATE_FACTORY_DEBUG;
 #else

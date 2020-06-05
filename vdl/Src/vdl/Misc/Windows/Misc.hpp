@@ -3,7 +3,7 @@
 
 #include "../Misc.hpp"
 
-#if defined( DEBUG ) || defined( _DEBUG )
+#if defined _DEBUG
 inline LPSTR hResultTrace(HRESULT hr)
 {
   LPSTR Msg = {};

@@ -329,7 +329,7 @@ void CDevice::Initialize()
     const char* Extensions[] = {
       VK_KHR_SURFACE_EXTENSION_NAME,
       VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-#if defined DEBUG | _DEBUG
+#if defined _DEBUG
       VK_EXT_DEBUG_REPORT_EXTENSION_NAME, //  デバッグレポート用
 #endif
     };
@@ -348,7 +348,7 @@ void CDevice::Initialize()
       InstanceInfo.pApplicationInfo = &ApplicationInfo;
       InstanceInfo.enabledExtensionCount = static_cast<vdl::uint>(vdl::Macro::ArraySize(Extensions));
       InstanceInfo.ppEnabledExtensionNames = Extensions;
-#if defined DEBUG | _DEBUG
+#if defined _DEBUG
       InstanceInfo.enabledLayerCount = static_cast<vdl::uint>(vdl::Macro::ArraySize(Layers));
       InstanceInfo.ppEnabledLayerNames = Layers;
 #endif
@@ -469,7 +469,7 @@ void CDevice::Initialize()
     ConstantBufferAllocator_.Initialize(pConstantBuffer_->GetBuffer(), Constants::kParentConstantBufferSize);
   }
 
-#if defined(DEBUG) | defined(_DEBUG)
+#if defined _DEBUG
   //  デバッグ用コールバック設定
   {
     DestroyReportFunction_ = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(Instance_->getProcAddr("vkDestroyDebugReportCallbackEXT"));
@@ -485,7 +485,7 @@ void CDevice::Initialize()
 
 CDevice::~CDevice()
 {
-#if defined(DEBUG) | defined(_DEBUG)
+#if defined _DEBUG
   DestroyReportFunction_(static_cast<VkInstance>(Instance_.get()), static_cast<VkDebugReportCallbackEXT>(DebugReportCallBack_), nullptr);
 #endif
 }
