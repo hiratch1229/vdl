@@ -1497,7 +1497,7 @@ void ImDrawListSplitter::Merge(ImDrawList* draw_list)
         }
         if (!ch._CmdBuffer.empty())
             last_cmd = &ch._CmdBuffer.back();
-        new_cmd_buffer_count += ch._CmdBuffer.size();
+        new_cmd_buffer_count += static_cast<int>(ch._CmdBuffer.size());
         new_idx_buffer_count += ch._IdxBuffer.Size;
         for (int cmd_n = 0; cmd_n < ch._CmdBuffer.size(); cmd_n++)
         {

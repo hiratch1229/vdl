@@ -510,6 +510,9 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\CommandList\GraphicsCommandList\GraphicsCommandList.hpp">
       <Filter>Src\CommandList\GraphicsCommandList</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\SIMD.hpp">
+      <Filter>Include\vdl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Engine.cpp">

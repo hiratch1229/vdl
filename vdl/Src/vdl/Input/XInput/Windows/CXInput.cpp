@@ -57,11 +57,11 @@ vdl::float2 CXInput::GetLeftStick(vdl::uint _Index, float _DeadZone)const
 
   vdl::float2 Value = Status_[_Index].LeftStick;
   {
-    if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone)
+    if (vdl::Math::Abs(Value.x) < _DeadZone)
     {
       Value.x = 0.0f;
     }
-    if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone)
+    if (vdl::Math::Abs(Value.y) < _DeadZone)
     {
       Value.y = 0.0f;
     }
@@ -79,11 +79,11 @@ vdl::float2 CXInput::GetRightStick(vdl::uint _Index, float _DeadZone)const
 
   vdl::float2 Value = Status_[_Index].RightStick;
   {
-    if (vdl::Math::GetAbsoluteValue(Value.x) < _DeadZone)
+    if (vdl::Math::Abs(Value.x) < _DeadZone)
     {
       Value.x = 0.0f;
     }
-    if (vdl::Math::GetAbsoluteValue(Value.y) < _DeadZone)
+    if (vdl::Math::Abs(Value.y) < _DeadZone)
     {
       Value.y = 0.0f;
     }

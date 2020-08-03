@@ -66,7 +66,7 @@ namespace vdl
       Start();
     }
 
-    // Œo‰ßŠÔ‚ğæ“¾
+    // Œo‰ßŠÔ‚ğæ“¾(•b)
     [[nodiscard]] Duration GetDeltaTime()const
     {
       const TimePoint CurrentTime = Clock::now();

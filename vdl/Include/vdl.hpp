@@ -29,9 +29,9 @@
 #include <vdl/Type3.hpp>
 #include <vdl/Type4.hpp>
 #include <vdl/Half.hpp>
+#include <vdl/Angle.hpp>
 #include <vdl/Quaternion.hpp>
 #include <vdl/Matrix.hpp>
-#include <vdl/Angle.hpp>
 
 //--------------------------------------------------
 //  •`‰æ

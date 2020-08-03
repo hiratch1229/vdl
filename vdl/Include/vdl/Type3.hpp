@@ -1,5 +1,6 @@
 #pragma once
-#include <cmath>
+#include "Math.hpp"
+
 #include <string>
 #include <fstream>
 
@@ -40,7 +41,7 @@ namespace vdl
   template<class Type>
   struct Type3
   {
-    static_assert(std::is_fundamental<Type>::value, "");
+    static_assert(std::is_fundamental<Type>::value, "ëŒâûÇµÇƒÇ¢Ç»Ç¢å^Ç≈Ç∑ÅB");
 
     Type x, y, z;
   public:
@@ -99,7 +100,7 @@ namespace vdl
     [[nodiscard]] constexpr Type3 operator+()const noexcept { return *this; }
 
     [[nodiscard]] constexpr Type3 operator-()const noexcept { return { -x, -y, -z }; }
-    
+
     ARITHMETIC_OPERATOR(+);
 
     ARITHMETIC_OPERATOR(-);
@@ -118,17 +119,17 @@ namespace vdl
 
     ASSIGNMENT_OPERATOR(/= );
   public:
-    [[nodiscard]] Type Length()const noexcept { return std::sqrt(LengthSq()); }
+    [[nodiscard]] constexpr Type Length()const noexcept { return Math::Sqrt(LengthSq()); }
 
     [[nodiscard]] constexpr Type LengthSq()const noexcept { return x * x + y * y + z * z; }
 
-    [[nodiscard]] Type3 Normalize()const noexcept { return *this / Length(); }
+    [[nodiscard]] constexpr Type3 Normalize()const noexcept { return *this / Length(); }
 
     template<class T>
-    [[nodiscard]] constexpr auto Dot(const Type3<T>& _v)const noexcept->decltype(x * _v.x) { return x * _v.x + y * _v.y + z * _v.z; }
+    [[nodiscard]] constexpr auto Dot(const Type3<T>& _v)const noexcept->decltype(x* _v.x) { return x * _v.x + y * _v.y + z * _v.z; }
 
     template<class T>
-    [[nodiscard]] constexpr auto Cross(const Type3<T>& _v)const noexcept->Type3<decltype(x * _v.x)> { return{ y * _v.z - z * _v.y, z * _v.x - x * _v.z, x * _v.y - y * _v.x }; }
+    [[nodiscard]] constexpr auto Cross(const Type3<T>& _v)const noexcept->Type3<decltype(x* _v.x)> { return{ y * _v.z - z * _v.y, z * _v.x - x * _v.z, x * _v.y - y * _v.x }; }
   public:
     [[nodiscard]] constexpr Type2<Type> xy()const noexcept { return { x, y }; }
 

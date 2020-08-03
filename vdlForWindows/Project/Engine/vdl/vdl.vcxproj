@@ -83,6 +83,7 @@
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Scissor.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Serialize.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Shader.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\SIMD.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Singleton.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Sphere.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Stopwatch.hpp" />
@@ -561,7 +562,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>

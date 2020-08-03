@@ -23,6 +23,7 @@ namespace vdl
   using int2 = Type2<int>;
   using uint2 = Type2<unsigned int>;
   using float2 = Type2<float>;
+  using double2 = Type2<double>;
 
   //-------------------------
   //  Type3.hpp
@@ -31,6 +32,7 @@ namespace vdl
   using int3 = Type3<int>;
   using uint3 = Type3<unsigned int>;
   using float3 = Type3<float>;
+  using double3 = Type3<double>;
 
   //-------------------------
   //  Type4.hpp
@@ -39,4 +41,5 @@ namespace vdl
   using int4 = Type4<int>;
   using uint4 = Type4<unsigned int>;
   using float4 = Type4<float>;
+  using double4 = Type4<double>;
 }

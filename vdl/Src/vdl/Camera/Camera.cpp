@@ -27,7 +27,7 @@ namespace vdl
     if (isPerspective)
     {
       const float AspectRatio = _Size.x / _Size.y;
-      const float Height = 1.0f / std::tan(vdl::Math::ToRadian(Fov) * 0.5f);
+      const float Height = 1.0f / std::tan(Radian(Fov) * 0.5f);
       const float Width = Height / AspectRatio;
       const float Range = Far / (Far - Near);
 

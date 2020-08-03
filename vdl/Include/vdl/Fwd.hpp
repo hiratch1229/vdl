@@ -8,6 +8,13 @@
 namespace vdl
 {
   //-------------------------
+  //  SIMD.hpp
+  //-------------------------
+  template<class Type> class SIMD;
+  using SIMD_float4 = SIMD<float>;
+  using SIMD_double2 = SIMD<double>;
+
+  //-------------------------
   //  Half.hpp
   //-------------------------
   class half;

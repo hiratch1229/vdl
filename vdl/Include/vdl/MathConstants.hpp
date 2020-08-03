@@ -1,25 +1,32 @@
 #pragma once
+#include <type_traits>
+#include <limits>
+
+#undef max
+#undef min
 
 namespace vdl::Math
 {
+  //  型の最大値
+  template<class T, std::enable_if_t<std::is_fundamental<T>::value, std::nullptr_t> = nullptr>
+  inline constexpr T kMax = std::numeric_limits<T>::max();
+
+  //  型の最低値
+  template<class T, std::enable_if_t<std::is_fundamental<T>::value, std::nullptr_t> = nullptr>
+  inline constexpr T kMin = std::numeric_limits<T>::min();
+
   //  π
-  constexpr float kPI = 3.1415926535897932385f;
+  template<class T>
+  inline constexpr T kPI = static_cast<T>(3.14159265358979323846);
+  inline constexpr float kPIf = kPI<float>;
 
   //  2π
-  constexpr float kTwoPI = kPI * 2.0f;
+  template<class T>
+  inline constexpr T kTwoPI = kPI<T> * static_cast<T>(2);
+  inline constexpr float kTwoPIf = kTwoPI<float>;
 
   //  1/2π
-  constexpr float kHalfPI = kPI * 0.5f;
-
-  //  ラジアン(Radian)を度数法(Degree)に変換
-  constexpr float ToDegree(float _Radian)
-  {
-    return _Radian * (180.0f / kPI);
-  }
-
-  //  度数法(Degree)をラジアン(Radian)に変換
-  constexpr float ToRadian(float _Degree)
-  {
-    return _Degree * (kPI / 180.0f);
-  }
+  template<class T>
+  inline constexpr T kHalfPI = kPI<T> / static_cast<T>(2);
+  inline constexpr float kHalfPIf = kHalfPI<float>;
 }

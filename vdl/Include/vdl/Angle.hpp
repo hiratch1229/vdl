@@ -1,6 +1,6 @@
 #pragma once
 #include "Fwd.hpp"
-#include "MathConstants.hpp"
+#include "Math.hpp"
 
 #define MEMBER_COMPARISON_OPERATOR(ClassName, Operator)\
 [[nodiscard]] constexpr bool operator##Operator(const ClassName& _##ClassName)const noexcept { return Value_ Operator _##ClassName.Value_; }\
@@ -91,7 +91,7 @@ namespace vdl
 
     Radian(Radian&&) = default;
 
-   constexpr Radian(float _Radian)noexcept
+    constexpr Radian(float _Radian)noexcept
       : Value_(_Radian) {}
 
     constexpr Radian(const Degree& _Degree)noexcept;
@@ -104,8 +104,8 @@ namespace vdl
     {
       float Value = Value_;
 
-      while (Value > Math::kHalfPI) Value -= Math::kPI;
-      while (Value < -Math::kHalfPI) Value += Math::kPI;
+      while (Value > Math::kHalfPIf) Value -= Math::kPIf;
+      while (Value < -Math::kHalfPIf) Value += Math::kPIf;
 
       return Value;
     }
@@ -151,14 +151,72 @@ namespace vdl
   };
 
   inline constexpr Radian::Radian(const Degree& _Degree)noexcept
-    : Value_(Math::ToRadian(_Degree)) {}
+    : Value_(Math::ToRadian(static_cast<float>(_Degree))) {}
 
   inline constexpr Degree::Degree(const Radian& _Radian)noexcept
-    : Value_(Math::ToDegree(_Radian)) {}
+    : Value_(Math::ToDegree(static_cast<float>(_Radian))) {}
 
   COMMON_OPERATOR(Radian);
 
   COMMON_OPERATOR(Degree);
+
+  namespace Math
+  {
+    [[nodiscard]] inline constexpr Radian Abs(const Radian& _x)
+    {
+      return Abs(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Degree Abs(const Degree& _x)
+    {
+      return Abs(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Radian Sqrt(const Radian& _x)
+    {
+      return Sqrt(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Degree Sqrt(const Degree& _x)
+    {
+      return Sqrt(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Radian Sin(const Radian& _x)
+    {
+      return Sin(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Radian Cos(const Radian& _x)
+    {
+      return Cos(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Radian Tan(const Radian& _x)
+    {
+      return Tan(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Radian ASin(const Radian& _x)
+    {
+      return ASin(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Radian ACos(const Radian& _x)
+    {
+      return ACos(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Radian ATan(const Radian& _x)
+    {
+      return ATan(static_cast<float>(_x));
+    }
+
+    [[nodiscard]] inline constexpr Radian ATan2(const Radian& _y, const Radian& _x)
+    {
+      return ATan2(static_cast<float>(_y), static_cast<float>(_x));
+    }
+  }
 }
 
 namespace std

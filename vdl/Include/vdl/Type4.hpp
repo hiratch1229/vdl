@@ -1,5 +1,7 @@
 #pragma once
-#include <cmath>
+#include "Fwd.hpp"
+#include "Math.hpp"
+
 #include <string>
 #include <fstream>
 
@@ -42,7 +44,7 @@ namespace vdl
   template<class Type>
   struct Type4
   {
-    static_assert(std::is_fundamental<Type>::value, "");
+    static_assert(std::is_fundamental<Type>::value, "ëŒâûÇµÇƒÇ¢Ç»Ç¢å^Ç≈Ç∑ÅB");
 
     Type x, y, z, w;
   public:
@@ -119,10 +121,16 @@ namespace vdl
       , y(static_cast<Type>(_yzw.x))
       , z(static_cast<Type>(_yzw.y))
       , w(static_cast<Type>(_yzw.z)) {}
+
+    template<std::enable_if_t<sizeof(Type) == 4, std::nullptr_t> = nullptr>
+    Type4(const SIMD<Type>& _v)noexcept;
   public:
     Type4& operator=(const Type4&) = default;
 
     Type4& operator=(Type4&&) = default;
+
+    template<std::enable_if_t<sizeof(Type) == 4, std::nullptr_t> = nullptr>
+    Type4& operator=(const SIMD<Type>& _v)noexcept;
 
     [[nodiscard]] constexpr Type& operator[](uint _Index) { return (&x)[_Index]; }
 
@@ -135,7 +143,7 @@ namespace vdl
     [[nodiscard]] constexpr Type4 operator+()const noexcept { return *this; }
 
     [[nodiscard]] constexpr Type4 operator-()const noexcept { return { -x, -y, -z, -w }; }
-    
+
     ARITHMETIC_OPERATOR(+);
 
     ARITHMETIC_OPERATOR(-);
@@ -154,11 +162,11 @@ namespace vdl
 
     ASSIGNMENT_OPERATOR(/= );
   public:
-    [[nodiscard]] Type Length()const noexcept { return std::sqrt(LengthSq()); }
+    [[nodiscard]] constexpr Type Length()const noexcept { return Math::Sqrt(LengthSq()); }
 
     [[nodiscard]] constexpr Type LengthSq()const noexcept { return x * x + y * y + z * z + w * w; }
 
-    [[nodiscard]] Type4 Normalize()const noexcept { return *this / Length(); }
+    [[nodiscard]] constexpr Type4 Normalize()const noexcept { return *this / Length(); }
 
     template<class T>
     [[nodiscard]] constexpr auto Dot(const Type4<T>& _v)const noexcept->decltype(x* _v.x) { return x * _v.x + y * _v.y + z * _v.z + w * _v.w; }

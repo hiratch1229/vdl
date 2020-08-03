@@ -145,12 +145,12 @@ namespace vdl
       for (uint i = 0; i <= _StackCount; ++i)
       {
         const float V = i / static_cast<float>(_StackCount);
-        const float Phi = V * Math::kPI;
+        const float Phi = V * Math::kPIf;
 
         for (uint j = 0; j <= _SliceCount; ++j)
         {
           const float U = j / static_cast<float>(_SliceCount);
-          const float Theta = U * Math::kTwoPI;
+          const float Theta = U * Math::kTwoPIf;
 
           VertexStaticMesh& Vertex = ModelData.Vertices.emplace_back();
           {
