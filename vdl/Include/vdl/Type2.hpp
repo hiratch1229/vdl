@@ -1,4 +1,5 @@
 #pragma once
+#include "Fwd.hpp"
 #include "Math.hpp"
 
 #include <string>

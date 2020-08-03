@@ -29,13 +29,6 @@ namespace vdl::Math
 
   //----------------------------------------------------------------------------------------------------
 
-  //  aとbの間をtで線形補間した値を返します
-  template<class T, std::enable_if_t<std::is_floating_point<T>::value, std::nullptr_t> = nullptr>
-  [[nodiscard]] inline constexpr T Lerp(T a, T b, T t)noexcept
-  {
-    return a + t * (b - a);
-  }
-
   //  負の値ならtrueを返します
   template<class T, std::enable_if_t<std::is_fundamental<T>::value, std::nullptr_t> = nullptr>
   [[nodiscard]] inline constexpr bool SignBit(T _x)noexcept
@@ -221,12 +214,19 @@ namespace vdl::Math
     }
 
     double y = 1.0;
-    double result = 0.0;
-    for (uint i = 0; i < 10; ++i)
+    double Result = 0.0;
+    for (uint i = 0; ; ++i)
     {
-      y = result = (y + _x / y) / 2.0;
+      Result = (y + _x / y) / 2.0;
+
+      //  精度問題で数値が変動しなくなったら終了
+      if (isInf(Result) || y == Result)
+      {
+        return static_cast<T>(Result);
+      }
+
+      y = Result;
     }
-    return static_cast<T>(result);
   }
 
   //  e(ネイピア数)の累乗を返します
@@ -669,10 +669,24 @@ namespace vdl::Math
   }
 
   //  値を範囲内に収めます
-  template <class T>
+  template<class T>
   [[nodiscard]] inline constexpr const T& Clamp(const T& _x, const T& _min, const T& _max)
   {
     return (_x < _min ? _min : _max < _x ? _max : _x);
+  }
+
+  //  値を0~1に収めます
+  template<class T>
+  [[nodiscard]] inline constexpr T Saturate(T _x)
+  {
+    return (_x < static_cast<T>(0) ? static_cast<T>(0) : static_cast<T>(1) < _x ? static_cast<T>(1) : _x);
+  }
+
+  //  aとbの間をtで線形補間した値を返します
+  template<class T, std::enable_if_t<std::is_floating_point<T>::value, std::nullptr_t> = nullptr>
+  [[nodiscard]] inline constexpr T Lerp(T a, T b, T t)noexcept
+  {
+    return a + t * (b - a);
   }
 
   //  最小値を返します

@@ -600,6 +600,11 @@ namespace
   {
     return { static_cast<float>(_v.x), static_cast<float>(_v.y) };
   }
+
+  inline ImVec4 Cast(const vdl::Color4F& _color)
+  {
+    return { _color.Red, _color.Green, _color.Blue, _color.Alpha };
+  }
 }
 
 void CGUI::Initialize()
@@ -691,9 +696,62 @@ void CGUI::Initialize()
       pStyle->FrameBorderSize = 1.0f;
       pStyle->WindowRounding = 0.0f;
       pStyle->TabRounding = 0.0f;
+      pStyle->FrameRounding = 0.0f;
+      pStyle->AntiAliasedLines = true;
+      pStyle->AntiAliasedFill = true;
 
       //  TODO
       //ImVec4* Colors = pStyle->Colors;
+      //{
+      //  constexpr vdl::Color3 kColorPrimaryBase = vdl::Color3(0x1c, 0xfe, 0xff);
+      //  constexpr vdl::Color4 kColorPrimary = vdl::Color4(kColorPrimaryBase, 0xcc);
+      //  constexpr vdl::Color4 kColorPrimaryA99 = vdl::Color4(kColorPrimaryBase, 0xff);
+      //  constexpr vdl::Color4 kColorPrimaryA66 = vdl::Color4(kColorPrimaryBase, 0x66);
+      //  constexpr vdl::Color4 kColorPrimaryA33 = vdl::Color4(kColorPrimaryBase, 0x33);
+      //  constexpr vdl::Color4 kColorPrimaryDark = vdl::Color4(0x03, 0x19, 0x1a, 0xff);
+      //
+      //  constexpr vdl::Color3 kColorAccentBase = vdl::Color3(0xff, 0xa1, 0x00);
+      //  constexpr vdl::Color4 kColorAccent = vdl::Color4(kColorAccentBase, 0xee);
+      //  constexpr vdl::Color4 kColorAccentAcc = vdl::Color4(kColorAccentBase, 0xcc);
+      //  constexpr vdl::Color4 kColorAccentA99 = vdl::Color4(kColorAccentBase, 0x99);
+      //
+      //  constexpr vdl::Color4 kColorWhite = vdl::Color4(0xdd, 0xdd, 0xdd, 0xcc);
+      //  constexpr vdl::Color4 kColorBlackA55 = vdl::Color4(0x11, 0x11, 0x11, 0x55);
+      //
+      //  Colors[ImGuiCol_MenuBarBg] = Cast(kColorPrimaryA33);
+      //  Colors[ImGuiCol_TitleBg] = Cast(kColorPrimaryDark);
+      //  Colors[ImGuiCol_TitleBgCollapsed] = Cast(kColorPrimaryDark);
+      //  Colors[ImGuiCol_TitleBgActive] = Cast(kColorPrimaryA99);
+      //  Colors[ImGuiCol_WindowBg] = Cast(kColorPrimaryDark);
+      //  Colors[ImGuiCol_Border] = Cast(kColorPrimaryA99);
+      //  Colors[ImGuiCol_FrameBg] = Cast(kColorPrimaryA33);
+      //  Colors[ImGuiCol_FrameBgHovered] = Cast(kColorAccentAcc);
+      //  Colors[ImGuiCol_FrameBgActive] = Cast(kColorAccent);
+      //  Colors[ImGuiCol_ScrollbarBg] = Cast(kColorPrimaryA33);
+      //  Colors[ImGuiCol_ScrollbarGrab] = Cast(kColorPrimaryA99);
+      //  Colors[ImGuiCol_ScrollbarGrabHovered] = Cast(kColorPrimaryA99);
+      //  Colors[ImGuiCol_ScrollbarGrabActive] = Cast(kColorPrimary);
+      //  Colors[ImGuiCol_CheckMark] = Cast(kColorAccent);
+      //  Colors[ImGuiCol_SliderGrab] = Cast(kColorPrimaryA99);
+      //  Colors[ImGuiCol_SliderGrabActive] = Cast(kColorPrimary);
+      //  Colors[ImGuiCol_Button] = Cast(kColorPrimaryA33);
+      //  Colors[ImGuiCol_ButtonHovered] = Cast(kColorAccentAcc);
+      //  Colors[ImGuiCol_ButtonActive] = Cast(kColorAccent);
+      //  Colors[ImGuiCol_Header] = Cast(kColorAccentA99);
+      //  Colors[ImGuiCol_HeaderHovered] = Cast(kColorAccentAcc);
+      //  Colors[ImGuiCol_HeaderActive] = Cast(kColorAccent);
+      //  //Colors[ImGuiCol_Column] = Cast(kColorBlackA55);
+      //  //Colors[ImGuiCol_ColumnHovered] = Cast(kColorAccentAcc);
+      //  //Colors[ImGuiCol_ColumnActive] = Cast(kColorAccent);
+      //  Colors[ImGuiCol_PlotLines] = Cast(kColorPrimaryA99);
+      //  Colors[ImGuiCol_PlotLinesHovered] = Cast(kColorPrimary);
+      //  Colors[ImGuiCol_PlotHistogram] = Cast(kColorPrimaryA99);
+      //  Colors[ImGuiCol_PlotHistogramHovered] = Cast(kColorPrimary);
+      //  Colors[ImGuiCol_Text] = Cast(kColorPrimary);
+      //  Colors[ImGuiCol_TextDisabled] = Cast(kColorPrimaryA66);
+      //  Colors[ImGuiCol_TextSelectedBg] = Cast(kColorAccent);
+      //  Colors[ImGuiCol_PopupBg] = Cast(kColorPrimaryDark);
+      //}
     }
   }
 

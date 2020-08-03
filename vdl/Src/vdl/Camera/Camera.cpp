@@ -73,6 +73,8 @@ namespace vdl
         _pCamera->Target += Move;
       }
     }
+
+    //  TODO:^ã,^‰º‚ÌC³
     if (pMouse->Press(Input::Mouse::Buttons::eRight))
     {
       if (const int2 MouseDelta = pMouse->GetDelta(); MouseDelta != 0)
@@ -88,6 +90,7 @@ namespace vdl
         _pCamera->Target = _pCamera->Position + AxisZ * Rotation * ViewVector.Length();
       }
     }
+
     if (int Wheel = pMouse->GetWheel().y; Wheel != 0)
     {
       constexpr float kMultiple = 1.5f;
