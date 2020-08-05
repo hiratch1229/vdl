@@ -25,13 +25,6 @@ namespace vdl::Macro
     }
   }
 
-  //  配列サイズを取得
-  template<class T, std::size_t Size>
-  inline constexpr size_t ArraySize(const T(&)[Size])
-  {
-    return Size;
-  }
-
   //  データの入れ替え
   template<class T>
   inline void Swap(T& _Obj1, T& _Obj2)
@@ -48,5 +41,12 @@ namespace vdl::Macro
       _Obj1 = _Obj2;
       _Obj2 = Temp;
     }
+  }
+
+  //  配列サイズを取得
+  template<class T, std::size_t Size>
+  [[nodiscard]] inline constexpr size_t ArraySize(const T(&)[Size])noexcept
+  {
+    return Size;
   }
 }

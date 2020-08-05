@@ -13,7 +13,7 @@ namespace vdl
   private:
     Random() = default;
   private:
-    static uint Rand()
+    static uint Rand()noexcept
     {
       uint Temp = (Data.x ^ (Data.x << 11));
       Data.x = Data.y;
@@ -23,7 +23,7 @@ namespace vdl
       return Data.w = (Data.w ^ (Data.w >> 19)) ^ (Temp ^ (Temp >> 8));
     }
   public:
-    [[nodiscard]] static int Range(int _Min, int _Max)
+    [[nodiscard]] static int Range(int _Min, int _Max)noexcept
     {
       const uint Value = Rand();
 
@@ -37,7 +37,7 @@ namespace vdl
       return Value % (_Max - _Min) + _Min;
     }
 
-    [[nodiscard]] static float Range(float _Min, float _Max)
+    [[nodiscard]] static float Range(float _Min, float _Max)noexcept
     {
       const uint Value = Rand();
 
@@ -51,7 +51,7 @@ namespace vdl
       return (static_cast<float>(Value) / ~0u) * (_Max - _Min) + _Min;
     }
 
-    [[nodiscard]] static void SetSeed(const uint4& _Seed = kInitSeedValue)
+    static void SetSeed(const uint4& _Seed = kInitSeedValue)noexcept
     {
       assert(_Seed == 0);
 

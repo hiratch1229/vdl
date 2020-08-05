@@ -31,10 +31,10 @@ namespace vdl
     Indices Indices;
     StaticMeshDatas MeshDatas;
   public:
-    static StaticModelData Rectangle(const Texture& _Diffuse = Palette::Diffuse, const Texture& _NormalMap = Palette::NormalMap);
-    static StaticModelData Box(const Texture& _Diffuse = Palette::Diffuse, const Texture& _NormalMap = Palette::NormalMap);
-    static StaticModelData Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse = Palette::Diffuse, const Texture& _NormalMap = Palette::NormalMap);
-    //static StaticModelData Capsule(uint _SliceCount, uint _StackCount, float _Height, const Texture& _Diffuse = Palette::Diffuse);
+    [[nodiscard]] static StaticModelData Rectangle(const Texture& _Diffuse = Palette::Diffuse, const Texture& _NormalMap = Palette::NormalMap);
+    [[nodiscard]] static StaticModelData Box(const Texture& _Diffuse = Palette::Diffuse, const Texture& _NormalMap = Palette::NormalMap);
+    [[nodiscard]] static StaticModelData Sphere(uint _SliceCount, uint _StackCount, const Texture& _Diffuse = Palette::Diffuse, const Texture& _NormalMap = Palette::NormalMap);
+    //[[nodiscard]] static StaticModelData Capsule(uint _SliceCount, uint _StackCount, float _Height, const Texture& _Diffuse = Palette::Diffuse);
   };
 
   struct Bone
@@ -59,10 +59,10 @@ namespace vdl
   public:
     SkinnedMeshData() = default;
 
-    SkinnedMeshData(const StaticMeshData& _StaticMeshData)
+    SkinnedMeshData(const StaticMeshData& _StaticMeshData)noexcept
       : StaticMeshData(_StaticMeshData) {}
 
-    SkinnedMeshData(StaticMeshData&& _StaticMeshData)
+    SkinnedMeshData(StaticMeshData&& _StaticMeshData)noexcept
       : StaticMeshData(_StaticMeshData) {}
   };
 
@@ -79,7 +79,6 @@ namespace vdl
     {
       const size_t VertexNum = _StaticModelData.Vertices.size();
       Vertices.resize(VertexNum);
-
       for (size_t VertexCount = 0; VertexCount < VertexNum; ++VertexCount)
       {
         Vertices[VertexCount] = _StaticModelData.Vertices[VertexCount];
@@ -87,7 +86,6 @@ namespace vdl
 
       const size_t MeshNum = _StaticModelData.MeshDatas.size();
       MeshDatas.resize(MeshNum);
-
       for (size_t MeshCount = 0; MeshCount < MeshNum; ++MeshCount)
       {
         MeshDatas[MeshCount] = _StaticModelData.MeshDatas[MeshCount];
@@ -99,7 +97,6 @@ namespace vdl
     {
       const size_t VertexNum = _StaticModelData.Vertices.size();
       Vertices.resize(VertexNum);
-
       for (size_t VertexCount = 0; VertexCount < VertexNum; ++VertexCount)
       {
         Vertices[VertexCount] = std::move(_StaticModelData.Vertices[VertexCount]);
@@ -107,7 +104,6 @@ namespace vdl
 
       const size_t MeshNum = _StaticModelData.MeshDatas.size();
       MeshDatas.resize(MeshNum);
-
       for (size_t MeshCount = 0; MeshCount < MeshNum; ++MeshCount)
       {
         MeshDatas[MeshCount] = std::move(_StaticModelData.MeshDatas[MeshCount]);

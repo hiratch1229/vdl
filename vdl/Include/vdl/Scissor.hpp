@@ -11,14 +11,14 @@ namespace vdl
   public:
     Scissor() = default;
 
-    constexpr Scissor(int _LeftTopX, int _LeftTopY, uint _Width, uint _Height)
+    constexpr Scissor(int _LeftTopX, int _LeftTopY, uint _Width, uint _Height)noexcept
       : LeftTop(_LeftTopX, _LeftTopY), Size(_Width, _Height) {}
 
-    constexpr Scissor(const int2& _LeftTop, const uint2& _Size)
+    constexpr Scissor(const int2& _LeftTop, const uint2& _Size)noexcept
       : LeftTop(_LeftTop), Size(_Size) {}
   public:
-    [[nodiscard]] constexpr bool operator==(const Scissor& _Scissor)const { return LeftTop == _Scissor.LeftTop && Size == _Scissor.Size; }
+    [[nodiscard]] constexpr bool operator==(const Scissor& _Scissor)const noexcept { return LeftTop == _Scissor.LeftTop && Size == _Scissor.Size; }
 
-    [[nodiscard]] constexpr bool operator!=(const Scissor& _Scissor)const { return LeftTop != _Scissor.LeftTop || Size != _Scissor.Size; }
+    [[nodiscard]] constexpr bool operator!=(const Scissor& _Scissor)const noexcept { return LeftTop != _Scissor.LeftTop || Size != _Scissor.Size; }
   };
 }

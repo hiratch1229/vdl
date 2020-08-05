@@ -11,8 +11,8 @@ namespace vdl
     DepthStencilState DepthStencilState;
     RasterizerState RasterizerState;
   public:
-    [[nodiscard]] bool operator==(const GraphicsStates& _GraphicsStates)const { return BlendState == _GraphicsStates.BlendState && DepthStencilState == _GraphicsStates.DepthStencilState && RasterizerState == _GraphicsStates.RasterizerState; }
+    [[nodiscard]] bool operator==(const GraphicsStates& _GraphicsStates)const noexcept { return BlendState == _GraphicsStates.BlendState && DepthStencilState == _GraphicsStates.DepthStencilState && RasterizerState == _GraphicsStates.RasterizerState; }
 
-    [[nodiscard]] bool operator!=(const GraphicsStates& _GraphicsStates)const { return BlendState != _GraphicsStates.BlendState || DepthStencilState != _GraphicsStates.DepthStencilState || RasterizerState != _GraphicsStates.RasterizerState; }
+    [[nodiscard]] bool operator!=(const GraphicsStates& _GraphicsStates)const noexcept { return BlendState != _GraphicsStates.BlendState || DepthStencilState != _GraphicsStates.DepthStencilState || RasterizerState != _GraphicsStates.RasterizerState; }
   };
 }

@@ -11,7 +11,7 @@ namespace vdl
       float f;
     };
   private:
-    static uint16_t ToHalf(float _v)noexcept
+    [[nodiscard]] static uint16_t ToHalf(float _v)noexcept
     {
       Converter Converter;
       Converter.f = _v;

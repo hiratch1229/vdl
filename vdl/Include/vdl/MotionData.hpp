@@ -16,19 +16,19 @@ namespace vdl
   public:
     MotionBlendData() = default;
 
-    MotionBlendData(const MotionData& _MotionData, float _BlendRate)
+    MotionBlendData(const MotionData& _MotionData, float _BlendRate)noexcept
       : BlendRate(_BlendRate)
     {
       Frame = _MotionData.Frame;
       Number = _MotionData.Number;
     }
-    MotionBlendData(const MotionData& _MotionData)
+    MotionBlendData(const MotionData& _MotionData)noexcept
     {
       Frame = _MotionData.Frame;
       Number = _MotionData.Number;
       BlendRate = 1.0f;
     }
-    const MotionBlendData& operator=(const MotionData& _MotionData)
+    const MotionBlendData& operator=(const MotionData& _MotionData)noexcept
     {
       Frame = _MotionData.Frame;
       Number = _MotionData.Number;

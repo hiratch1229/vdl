@@ -14,13 +14,13 @@ namespace vdl
     TimePoint Start_;
     Duration Accumulation_ = Duration(0.0);
   public:
-    bool isStart()const { return isStart_ && !isPause_; }
-    bool isPause()const { return isStart_ && isPause_; }
+    [[nodiscard]] bool isStart()const noexcept { return isStart_ && !isPause_; }
+    [[nodiscard]] bool isPause()const noexcept { return isStart_ && isPause_; }
   public:
     Stopwatch() = default;
 
     //  計測を開始
-    void Start()
+    void Start()noexcept
     {
       if (!isPause_)
       {
@@ -33,14 +33,14 @@ namespace vdl
     }
 
     //  計測を一時停止
-    void Pause()
+    void Pause()noexcept
     {
       Accumulation_ = GetDeltaTime();
       isPause_ = true;
     }
 
     //  経過時間をリセット
-    void Reset()
+    void Reset()noexcept
     {
       isStart_ = false;
       isPause_ = true;
@@ -48,7 +48,7 @@ namespace vdl
     }
 
     //  計測を再開
-    void Resume()
+    void Resume()noexcept
     {
       if (!isPause())
       {
@@ -59,7 +59,7 @@ namespace vdl
     }
 
     //  経過時間をリセットして開始
-    void Restart()
+    void Restart()noexcept
     {
       Reset();
 
@@ -67,7 +67,7 @@ namespace vdl
     }
 
     // 経過時間を取得(秒)
-    [[nodiscard]] Duration GetDeltaTime()const
+    [[nodiscard]] Duration GetDeltaTime()const noexcept
     {
       const TimePoint CurrentTime = Clock::now();
 

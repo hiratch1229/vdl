@@ -158,12 +158,14 @@ namespace vdl
     GeometryShader GeometryShader;
     PixelShader PixelShader;
   public:
-    [[nodiscard]] bool operator==(const GraphicsShaders& _GraphicsShaders)const noexcept {
+    [[nodiscard]] bool operator==(const GraphicsShaders& _GraphicsShaders)const noexcept
+    {
       return VertexShader == _GraphicsShaders.VertexShader && HullShader == _GraphicsShaders.HullShader
         && DomainShader == _GraphicsShaders.DomainShader && GeometryShader == _GraphicsShaders.GeometryShader && PixelShader == _GraphicsShaders.PixelShader;
     }
 
-    [[nodiscard]] bool operator!=(const GraphicsShaders& _GraphicsShaders)const noexcept {
+    [[nodiscard]] bool operator!=(const GraphicsShaders& _GraphicsShaders)const noexcept 
+    {
       return VertexShader != _GraphicsShaders.VertexShader || HullShader != _GraphicsShaders.HullShader
         || DomainShader != _GraphicsShaders.DomainShader || GeometryShader != _GraphicsShaders.GeometryShader || PixelShader != _GraphicsShaders.PixelShader;
     }

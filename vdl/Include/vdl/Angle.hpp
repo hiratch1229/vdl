@@ -162,57 +162,57 @@ namespace vdl
 
   namespace Math
   {
-    [[nodiscard]] inline constexpr Radian Abs(const Radian& _x)
+    [[nodiscard]] inline constexpr Radian Abs(const Radian& _x)noexcept
     {
       return Abs(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Degree Abs(const Degree& _x)
+    [[nodiscard]] inline constexpr Degree Abs(const Degree& _x)noexcept
     {
       return Abs(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Radian Sqrt(const Radian& _x)
+    [[nodiscard]] inline constexpr Radian Sqrt(const Radian& _x)noexcept
     {
       return Sqrt(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Degree Sqrt(const Degree& _x)
+    [[nodiscard]] inline constexpr Degree Sqrt(const Degree& _x)noexcept
     {
       return Sqrt(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Radian Sin(const Radian& _x)
+    [[nodiscard]] inline constexpr Radian Sin(const Radian& _x)noexcept
     {
       return Sin(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Radian Cos(const Radian& _x)
+    [[nodiscard]] inline constexpr Radian Cos(const Radian& _x)noexcept
     {
       return Cos(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Radian Tan(const Radian& _x)
+    [[nodiscard]] inline constexpr Radian Tan(const Radian& _x)noexcept
     {
       return Tan(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Radian ASin(const Radian& _x)
+    [[nodiscard]] inline constexpr Radian ASin(const Radian& _x)noexcept
     {
       return ASin(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Radian ACos(const Radian& _x)
+    [[nodiscard]] inline constexpr Radian ACos(const Radian& _x)noexcept
     {
       return ACos(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Radian ATan(const Radian& _x)
+    [[nodiscard]] inline constexpr Radian ATan(const Radian& _x)noexcept
     {
       return ATan(static_cast<float>(_x));
     }
 
-    [[nodiscard]] inline constexpr Radian ATan2(const Radian& _y, const Radian& _x)
+    [[nodiscard]] inline constexpr Radian ATan2(const Radian& _y, const Radian& _x)noexcept
     {
       return ATan2(static_cast<float>(_y), static_cast<float>(_x));
     }
@@ -221,46 +221,46 @@ namespace vdl
 
 namespace std
 {
-  [[nodiscard]] inline string to_string(const vdl::Radian& _Angle)
+  [[nodiscard]] inline string to_string(const vdl::Radian& _Angle)noexcept
   {
     return to_string(static_cast<float>(_Angle));
   }
 
-  [[nodiscard]] inline wstring to_wstring(const vdl::Radian& _Angle)
+  [[nodiscard]] inline string to_string(const vdl::Degree& _Angle)noexcept
+  {
+    return to_string(static_cast<float>(_Angle));
+  }
+
+  [[nodiscard]] inline wstring to_wstring(const vdl::Radian& _Angle)noexcept
+  {
+    return to_wstring(static_cast<float>(_Angle));
+  }
+
+  [[nodiscard]] inline wstring to_wstring(const vdl::Degree& _Angle)noexcept
   {
     return to_wstring(static_cast<float>(_Angle));
   }
 
   template <class CharType>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Radian& _Angle)
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Radian& _Angle)noexcept
   {
     return _OStream << static_cast<float>(_Angle);
   }
 
   template <class CharType>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Radian& _Angle)
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Degree& _Angle)noexcept
+  {
+    return _OStream << static_cast<float>(_Angle);
+  }
+
+  template <class CharType>
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Radian& _Angle)noexcept
   {
     return _IStream >> reinterpret_cast<float&>(_Angle);
   }
 
-  [[nodiscard]] inline string to_string(const vdl::Degree& _Angle)
-  {
-    return to_string(static_cast<float>(_Angle));
-  }
-
-  [[nodiscard]] inline wstring to_wstring(const vdl::Degree& _Angle)
-  {
-    return to_wstring(static_cast<float>(_Angle));
-  }
-
   template <class CharType>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Degree& _Angle)
-  {
-    return _OStream << static_cast<float>(_Angle);
-  }
-
-  template <class CharType>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Degree& _Angle)
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Degree& _Angle)noexcept
   {
     return _IStream >> reinterpret_cast<float&>(_Angle);
   }

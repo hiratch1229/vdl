@@ -33,11 +33,10 @@ namespace vdl
     };
   }
 
-  template<class T>
+  template<class T, std::enable_if_t<sizeof(T) % 16 == 0, std::nullptr_t>>
   class ConstantBuffer
   {
     static constexpr uint kBufferSize = sizeof(T);
-    static_assert(kBufferSize % 16 == 0);
   private:
     Detail::ConstantBufferData Data_;
   public:

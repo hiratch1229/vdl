@@ -1,5 +1,5 @@
 #pragma once
-#include "Types.hpp"
+#include "Fwd.hpp"
 #include "Type2.hpp"
 #include "Type4.hpp"
 
@@ -8,7 +8,7 @@
 
 namespace vdl
 {
-  template<class Type>
+  template<class Type, std::enable_if_t<std::is_fundamental<Type>::value, std::nullptr_t> /*= nullptr*/>
   class alignas(16) SIMD { static_assert(std::is_fundamental<Type>::value, "‘Î‰‚µ‚Ä‚¢‚È‚¢Œ^‚Å‚·B"); };
 
   //template<>

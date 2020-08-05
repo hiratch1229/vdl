@@ -119,8 +119,8 @@ namespace vdl
     vdl::RenderTextures RenderTextures;
     vdl::DepthStencilTexture DepthStencilTexture;
   public:
-    [[nodiscard]] bool operator==(const OutputManager& _OutputManager)const { return RenderTextures == _OutputManager.RenderTextures && DepthStencilTexture == _OutputManager.DepthStencilTexture; }
+    [[nodiscard]] bool operator==(const OutputManager& _OutputManager)const noexcept { return RenderTextures == _OutputManager.RenderTextures && DepthStencilTexture == _OutputManager.DepthStencilTexture; }
 
-    [[nodiscard]] bool operator!=(const OutputManager& _OutputManager)const { return RenderTextures != _OutputManager.RenderTextures || DepthStencilTexture != _OutputManager.DepthStencilTexture; }
+    [[nodiscard]] bool operator!=(const OutputManager& _OutputManager)const noexcept { return RenderTextures != _OutputManager.RenderTextures || DepthStencilTexture != _OutputManager.DepthStencilTexture; }
   };
 }

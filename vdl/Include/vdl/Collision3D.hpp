@@ -3,7 +3,7 @@
 
 namespace vdl::Collision3D
 {
-  bool isHit(const Geometry3D::Sphere& _Sphere0, const Geometry3D::Sphere& _Sphere1);
+  [[nodiscard]] bool isHit(const Geometry3D::Sphere& _Sphere0, const Geometry3D::Sphere& _Sphere1)noexcept;
 
-  bool isHit(const Geometry3D::Sphere& _Sphere, const Geometry3D::Capsule& _Capsule);
+  [[nodiscard]] bool isHit(const Geometry3D::Sphere& _Sphere, const Geometry3D::Capsule& _Capsule)noexcept;
 }

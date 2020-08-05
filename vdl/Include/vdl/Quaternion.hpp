@@ -117,7 +117,7 @@ namespace vdl
       return { 0.0f, 0.0f, 0.0f, 1.0f };
     }
 
-    [[nodiscard]] static constexpr Quaternion RotationAxis(const float3& _Axis, const Radian& _Angle)
+    [[nodiscard]] static constexpr Quaternion RotationAxis(const float3& _Axis, const Radian& _Angle)noexcept
     {
       const float Cos = Math::Cos(_Angle * 0.5f);
       const float Sin = Math::Sin(_Angle * 0.5f);
@@ -129,24 +129,24 @@ namespace vdl
 
 namespace std
 {
-  [[nodiscard]] inline string to_string(const vdl::Quaternion& _q)
+  [[nodiscard]] inline string to_string(const vdl::Quaternion& _q)noexcept
   {
     return to_string(_q.x) + ',' + to_string(_q.y) + ',' + to_string(_q.z) + ',' + to_string(_q.w);
   }
 
-  [[nodiscard]] inline wstring to_wstring(const vdl::Quaternion& _q)
+  [[nodiscard]] inline wstring to_wstring(const vdl::Quaternion& _q)noexcept
   {
     return to_wstring(_q.x) + L',' + to_wstring(_q.y) + L',' + to_wstring(_q.z) + L',' + to_wstring(_q.w);
   }
 
   template <class CharType>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Quaternion& _q)
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Quaternion& _q)noexcept
   {
-    return _OStream << _q.x << CharType(',') << _q.y << CharType(',') << _q.z << CharType(',') << _q.w;
+    return _OStream << _q.x << static_cast<CharType>(',') << _q.y << static_cast<CharType>(',') << _q.z << static_cast<CharType>(',') << _q.w;
   }
 
   template <class CharType>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Quaternion& _q)
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Quaternion& _q)noexcept
   {
     CharType Temp;
     return _IStream >> _q.x >> Temp >> _q.y >> Temp >> _q.z >> Temp >> _q.w;

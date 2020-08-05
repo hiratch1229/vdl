@@ -18,14 +18,14 @@ namespace vdl
     Camera() = default;
 
     constexpr Camera(const float3& _Position, const float3& _Target = 0.0f, const float3& _Up = float3::Up(),
-      float _Near = 0.1f, float _Far = 1000.0f, const Degree& _Fov = 30.0f, bool _isPerspective = true)
+      float _Near = 0.1f, float _Far = 1000.0f, const Degree& _Fov = 30.0f, bool _isPerspective = true)noexcept
       : Position(_Position), Target(_Target), Up(_Up), Near(_Near), Far(_Far), Fov(_Fov), isPerspective(_isPerspective) {}
   public:
-    [[nodiscard]] float3 ViewVector()const { return Target - Position; }
+    [[nodiscard]] float3 ViewVector()const noexcept { return Target - Position; }
 
-    [[nodiscard]] Matrix View()const;
+    [[nodiscard]] Matrix View()const noexcept;
 
-    [[nodiscard]] Matrix Projection(const float2& _Size)const;
+    [[nodiscard]] Matrix Projection(const float2& _Size)const noexcept;
   };
 
   void FreeCamera(Camera* _pCamera);

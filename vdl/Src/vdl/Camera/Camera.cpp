@@ -9,9 +9,11 @@
 #include <vdl/Quaternion.hpp>
 #include <vdl/Matrix.hpp>
 
+#include <assert.h>
+
 namespace vdl
 {
-  Matrix Camera::View()const
+  Matrix Camera::View()const noexcept
   {
     const float3 Z = ViewVector().Normalize();
     const float3 X = Up.Cross(Z).Normalize();
@@ -22,12 +24,12 @@ namespace vdl
     return Matrix({ X, X.Dot(NegPosition) }, { Y, Y.Dot(NegPosition) }, { Z, Z.Dot(NegPosition) }, { 0.0f, 0.0f, 0.0f, 1.0f }).Transpose();
   }
 
-  Matrix Camera::Projection(const float2& _Size)const
+  Matrix Camera::Projection(const float2& _Size)const noexcept
   {
     if (isPerspective)
     {
       const float AspectRatio = _Size.x / _Size.y;
-      const float Height = 1.0f / std::tan(Radian(Fov) * 0.5f);
+      const float Height = 1.0f / Math::Tan(Fov * 0.5f);
       const float Width = Height / AspectRatio;
       const float Range = Far / (Far - Near);
 
@@ -53,6 +55,8 @@ namespace vdl
 
   void FreeCamera(Camera* _pCamera)
   {
+    assert(_pCamera);
+
     IMouse* pMouse = Engine::Get<IMouse>();
 
     if (pMouse->Press(Input::Mouse::Buttons::eMiddle))

@@ -29,11 +29,10 @@ namespace vdl
     };
   }
 
-  template<class T>
+  template<class T, std::enable_if_t<sizeof(T) % 16 == 0, std::nullptr_t>>
   class UnorderedAccessBuffer
   {
     static constexpr uint kSize = sizeof(T);
-    static_assert(kSize % 16 == 0);
   private:
     Detail::UnorderedAccessBufferData Data_;
   public:
@@ -49,6 +48,6 @@ namespace vdl
 
     [[nodiscard]] bool operator!=(const UnorderedAccessBuffer& _UnorderedAccessBuffer)const noexcept { return Data_ != _UnorderedAccessBuffer.Data_; }
   public:
-    [[nodiscard]] const Detail::UnorderedAccessBufferData& GetDetail()const { return Data_; }
+    [[nodiscard]] const Detail::UnorderedAccessBufferData& GetDetail()const noexcept { return Data_; }
   };
 }

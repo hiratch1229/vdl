@@ -25,9 +25,9 @@ namespace vdl
 
     [[nodiscard]] bool isEmpty()const noexcept { return Buffer_.empty(); }
 
-    [[nodiscard]] Color4* Buffer() { return Buffer_.data(); }
+    [[nodiscard]] Color4* Buffer()noexcept { return Buffer_.data(); }
 
-    [[nodiscard]] const Color4* Buffer()const { return Buffer_.data(); }
+    [[nodiscard]] const Color4* Buffer()const noexcept { return Buffer_.data(); }
 
     [[nodiscard]] const Color4 GetColor(const uint2& _Pos)const { return Buffer_[_Pos.x + _Pos.y * Size_.x]; }
 
@@ -53,7 +53,7 @@ namespace vdl
 
     [[nodiscard]] bool isEmpty()const noexcept { return Buffer_.empty(); }
 
-    [[nodiscard]] const uint8_t* Buffer()const { return Buffer_.data(); }
+    [[nodiscard]] const uint8_t* Buffer()const noexcept { return Buffer_.data(); }
   public:
     CEREAL_SERIALIZE(Size_, Buffer_)
   };

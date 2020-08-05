@@ -2,6 +2,7 @@
 #include "Types.hpp"
 #include "Constants.hpp"
 
+#include <type_traits>
 #include <array>
 #include <vector>
 
@@ -10,7 +11,7 @@ namespace vdl
   //-------------------------
   //  SIMD.hpp
   //-------------------------
-  template<class Type> class SIMD;
+  template<class Type, std::enable_if_t<std::is_fundamental<Type>::value, std::nullptr_t> = nullptr> class SIMD;
   using SIMD_float4 = SIMD<float>;
   using SIMD_double2 = SIMD<double>;
 
@@ -158,7 +159,7 @@ namespace vdl
   {
     class ConstantBufferData;
   }
-  template<class T> class ConstantBuffer;
+  template<class T, std::enable_if_t<sizeof(T) % 16 == 0, std::nullptr_t> = nullptr> class ConstantBuffer;
 
   //-------------------------
   //  UnorderedAccessBuffer.hpp
@@ -167,7 +168,7 @@ namespace vdl
   {
     class UnorderedAccessBufferData;
   }
-  template<class T> class UnorderedAccessBuffer;
+  template<class T, std::enable_if_t<sizeof(T) % 16 == 0, std::nullptr_t> = nullptr> class UnorderedAccessBuffer;
 
   //-------------------------
   //  Variant.hpp
@@ -272,7 +273,7 @@ namespace vdl
   //-------------------------
   //  Flag.hpp
   //-------------------------
-  template<class FlagType, class DataType> class Flags;
+  template<class FlagType, class DataType = uint, std::enable_if_t<std::is_enum<FlagType>::value, std::nullptr_t> = nullptr> class Flags;
 
   //-------------------------
   //  System.hpp

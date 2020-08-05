@@ -5,12 +5,12 @@
 
 namespace vdl::Collision3D
 {
-  bool isHit(const Geometry3D::Sphere& _Sphere0, const Geometry3D::Sphere& _Sphere1)
+  bool isHit(const Geometry3D::Sphere& _Sphere0, const Geometry3D::Sphere& _Sphere1)noexcept
   {
     return (_Sphere1.Position - _Sphere0.Position).LengthSq() <= ((_Sphere0.Radius + _Sphere1.Radius) * (_Sphere0.Radius + _Sphere1.Radius));
   }
 
-  bool isHit(const Geometry3D::Sphere& _Sphere, const Geometry3D::Capsule& _Capsule)
+  bool isHit(const Geometry3D::Sphere& _Sphere, const Geometry3D::Capsule& _Capsule)noexcept
   {
     //  ƒJƒvƒZƒ‹‚ÌŒü‚«
     const float3 CapsuleDirection = _Capsule.Direction.Normalize();

@@ -60,11 +60,11 @@ namespace vdl
 #pragma warning(default:4201)
   public:
     constexpr RasterizerState(FillModeType _FillMode = FillModeType::eSolid, CullModeType _CullMode = CullModeType::eBack, bool _FrontCounterClockwise = false,
-      bool _DepthClipEnable = true, int _DepthBias = 0, bool _ScissorEnable = false, bool _AntialiasedLineEnable = false)
+      bool _DepthClipEnable = true, int _DepthBias = 0, bool _ScissorEnable = false, bool _AntialiasedLineEnable = false)noexcept
       : FillMode(_FillMode), CullMode(_CullMode), FrontCounterClockwise(_FrontCounterClockwise), DepthClipEnable(_DepthClipEnable),
       ScissorEnable(_ScissorEnable), AntialiasedLineEnable(_AntialiasedLineEnable), DepthBias(_DepthBias) {}
 
-    RasterizerState(PreDefined _PreDefined)
+    RasterizerState(PreDefined _PreDefined)noexcept
     {
       static constexpr RasterizerState PreDefineds[static_cast<uint>(PreDefined::Num)] =
       {

@@ -9,10 +9,10 @@ namespace vdl
   protected:
     ID ID_;
   public:
-    Resource()
+    Resource()noexcept
       : ID_(Constants::kDisableID) {}
 
-    Resource(ID _ID)
+    Resource(ID _ID)noexcept
       : ID_(_ID) {}
   public:
     [[nodiscard]] ID GetID()const noexcept { return ID_; }

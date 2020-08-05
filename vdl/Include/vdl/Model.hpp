@@ -65,8 +65,8 @@ namespace vdl
 
     [[nodiscard]] uint Size()const noexcept { return static_cast<uint>(Meshes_.size()); }
 
-    [[nodiscard]] bool hasAnimation()const noexcept { return !isEmpty() && Meshes_[0].hasAnimation(); }
+    [[nodiscard]] bool hasAnimation()const { return !isEmpty() && Meshes_[0].hasAnimation(); }
 
-    [[nodiscard]] const std::vector<SkinnedMesh>& GetMeshes()const { return Meshes_; }
+    [[nodiscard]] const std::vector<SkinnedMesh>& GetMeshes()const noexcept { return Meshes_; }
   };
 }

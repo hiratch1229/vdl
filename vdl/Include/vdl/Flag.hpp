@@ -3,7 +3,7 @@
 
 namespace vdl
 {
-  template<class FlagType, class DataType = uint>
+  template<class FlagType, class DataType /*= uint*/, std::enable_if_t<std::is_enum<FlagType>::value, std::nullptr_t>/* = nullptr*/>
   class Flags
   {
     DataType Mask_;

@@ -41,11 +41,9 @@ Type4& operator Operator(T _s)noexcept\
 
 namespace vdl
 {
-  template<class Type>
+  template<class Type, std::enable_if_t<std::is_fundamental<Type>::value, std::nullptr_t> /*= nullptr*/>
   struct Type4
   {
-    static_assert(std::is_fundamental<Type>::value, "ëŒâûÇµÇƒÇ¢Ç»Ç¢å^Ç≈Ç∑ÅB");
-
     Type x, y, z, w;
   public:
     Type4() = default;
@@ -208,28 +206,27 @@ namespace vdl
 namespace std
 {
   template <class Type>
-  [[nodiscard]] inline string to_string(const vdl::Type4<Type>& _v)
+  [[nodiscard]] inline string to_string(const vdl::Type4<Type>& _v)noexcept
   {
     return to_string(_v.x) + ',' + to_string(_v.y) + ',' + to_string(_v.z) + ',' + to_string(_v.w);
   }
 
   template <class Type>
-  [[nodiscard]] inline wstring to_wstring(const vdl::Type4<Type>& _v)
+  [[nodiscard]] inline wstring to_wstring(const vdl::Type4<Type>& _v)noexcept
   {
     return to_wstring(_v.x) + L',' + to_wstring(_v.y) + L',' + to_wstring(_v.z) + L',' + to_wstring(_v.w);
   }
 
   template <class CharType, class Type>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Type4<Type>& _v)
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Type4<Type>& _v)noexcept
   {
-    return _OStream << _v.x << CharType(',') << _v.y << CharType(',') << _v.z << CharType(',') << _v.w;
+    return _OStream << _v.x << static_cast<CharType>(',') << _v.y << static_cast<CharType>(',') << _v.z << static_cast<CharType>(',') << _v.w;
   }
 
   template <class CharType, class Type>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Type4<Type>& _v)
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Type4<Type>& _v)noexcept
   {
     CharType Temp;
-
     return _IStream >> _v.x >> Temp >> _v.y >> Temp >> _v.z >> Temp >> _v.w;
   }
 }

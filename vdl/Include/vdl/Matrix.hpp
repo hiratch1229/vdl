@@ -394,27 +394,26 @@ namespace vdl
 
 namespace std
 {
-  [[nodiscard]] inline string to_string(const vdl::Matrix& _m)
+  [[nodiscard]] inline string to_string(const vdl::Matrix& _m)noexcept
   {
     return to_string(_m.r[0]) + ',' + to_string(_m.r[1]) + ',' + to_string(_m.r[2]) + ',' + to_string(_m.r[3]);
   }
 
-  [[nodiscard]] inline wstring to_wstring(const vdl::Matrix& _m)
+  [[nodiscard]] inline wstring to_wstring(const vdl::Matrix& _m)noexcept
   {
     return to_wstring(_m.r[0]) + L',' + to_wstring(_m.r[1]) + L',' + to_wstring(_m.r[2]) + L',' + to_wstring(_m.r[3]);
   }
 
   template <class CharType>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Matrix& _m)
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Matrix& _m)noexcept
   {
-    return _OStream << _m.r[0] << CharType(',') << _m.r[1] << CharType(',') << _m.r[2] << CharType(',') << _m.r[3];
+    return _OStream << _m.r[0] << static_cast<CharType>(',') << _m.r[1] << static_cast<CharType>(',') << _m.r[2] << static_cast<CharType>(',') << _m.r[3];
   }
 
   template <class CharType>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Matrix& _m)
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Matrix& _m)noexcept
   {
     CharType Temp;
-
     return _IStream >> _m.r[0] >> Temp >> _m.r[1] >> Temp >> _m.r[2] >> Temp >> _m.r[3];
   }
 }

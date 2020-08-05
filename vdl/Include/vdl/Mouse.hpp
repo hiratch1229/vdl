@@ -17,15 +17,15 @@ namespace vdl::Input
     };
 
     //  左 ボタン
-    constexpr Button ButtonLeft{ InputDeviceType::eMouse, Buttons::eLeft };
+    inline constexpr Button ButtonLeft{ InputDeviceType::eMouse, Buttons::eLeft };
     //  中(ホイール) ボタン
-    constexpr Button ButtonCenter{ InputDeviceType::eMouse, Buttons::eMiddle };
+    inline constexpr Button ButtonCenter{ InputDeviceType::eMouse, Buttons::eMiddle };
     //  右 ボタン
-    constexpr Button ButtonRight{ InputDeviceType::eMouse, Buttons::eRight };
+    inline constexpr Button ButtonRight{ InputDeviceType::eMouse, Buttons::eRight };
     //  X1(戻る) ボタン
-    constexpr Button ButtonX1{ InputDeviceType::eMouse, Buttons::eX1 };
+    inline constexpr Button ButtonX1{ InputDeviceType::eMouse, Buttons::eX1 };
     //  X2(進む) ボタン
-    constexpr Button ButtonX2{ InputDeviceType::eMouse, Buttons::eX2 };
+    inline constexpr Button ButtonX2{ InputDeviceType::eMouse, Buttons::eX2 };
 
     //  座標を取得
     int2 GetPos();
@@ -42,25 +42,25 @@ namespace vdl::Input
   }
 
   //  何か押されているならtrueを返す
-  inline bool isPressAnyButtonOnMouse()
+  [[nodiscard]] inline bool isPressAnyButtonOnMouse()
   {
     return isPressOr(Mouse::ButtonLeft, Mouse::ButtonCenter, Mouse::ButtonRight, Mouse::ButtonX1, Mouse::ButtonX2);
   }
 
   //  何か押された瞬間ならtrueを返す
-  inline bool isPressedAnyButtonOnMouse()
+  [[nodiscard]] inline bool isPressedAnyButtonOnMouse()
   {
     return isPressedOr(Mouse::ButtonLeft, Mouse::ButtonCenter, Mouse::ButtonRight, Mouse::ButtonX1, Mouse::ButtonX2);
   }
 
   //  何か離された瞬間ならtrueを返す
-  inline bool isReleasedAnyButtonOnMouse()
+  [[nodiscard]] inline bool isReleasedAnyButtonOnMouse()
   {
     return isReleasedOr(Mouse::ButtonLeft, Mouse::ButtonCenter, Mouse::ButtonRight, Mouse::ButtonX1, Mouse::ButtonX2);
   }
 
   //  何か押されていないならtrueを返す
-  inline bool isReleaseAnyButtonOnMouse()
+  [[nodiscard]] inline bool isReleaseAnyButtonOnMouse()
   {
     return isReleaseOr(Mouse::ButtonLeft, Mouse::ButtonCenter, Mouse::ButtonRight, Mouse::ButtonX1, Mouse::ButtonX2);
   }

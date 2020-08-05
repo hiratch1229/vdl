@@ -92,7 +92,7 @@ namespace vdl::Input
   void StopVibration(const Gamepad& _Gamepad);
 
   //  ‰½‚©‰Ÿ‚³‚ê‚Ä‚¢‚é‚È‚çtrue‚ð•Ô‚·
-  inline bool isPressAnyButtonOnGamepad(const Gamepad& _Gamepad)
+  [[nodiscard]] inline bool isPressAnyButtonOnGamepad(const Gamepad& _Gamepad)
   {
     const uint ButtonNum = _Gamepad.GetButtonNum();
     for (uint ButtonCount = 0; ButtonCount < ButtonNum; ++ButtonCount)
@@ -107,7 +107,7 @@ namespace vdl::Input
   }
 
   //  ‰½‚©‰Ÿ‚³‚ê‚½uŠÔ‚È‚çtrue‚ð•Ô‚·
-  inline bool isPressedAnyButtonOnGamepad(const Gamepad& _Gamepad)
+  [[nodiscard]] inline bool isPressedAnyButtonOnGamepad(const Gamepad& _Gamepad)
   {
     const uint ButtonNum = _Gamepad.GetButtonNum();
     for (uint ButtonCount = 0; ButtonCount < ButtonNum; ++ButtonCount)
@@ -122,7 +122,7 @@ namespace vdl::Input
   }
 
   //  ‰½‚©—£‚³‚ê‚½uŠÔ‚È‚çtrue‚ð•Ô‚·
-  inline bool isReleasedAnyButtonOnGamepad(const Gamepad& _Gamepad)
+  [[nodiscard]] inline bool isReleasedAnyButtonOnGamepad(const Gamepad& _Gamepad)
   {
     const uint ButtonNum = _Gamepad.GetButtonNum();
     for (uint ButtonCount = 0; ButtonCount < ButtonNum; ++ButtonCount)
@@ -137,7 +137,7 @@ namespace vdl::Input
   }
 
   //  ‰½‚©‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢‚È‚çtrue‚ð•Ô‚·
-  inline bool isReleaseAnyButtonOnGamepad(const Gamepad& _Gamepad)
+  [[nodiscard]] inline bool isReleaseAnyButtonOnGamepad(const Gamepad& _Gamepad)
   {
     const uint ButtonNum = _Gamepad.GetButtonNum();
     for (uint ButtonCount = 0; ButtonCount < ButtonNum; ++ButtonCount)

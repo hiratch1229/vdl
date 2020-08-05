@@ -96,7 +96,7 @@ namespace vdl::Input
   void StopVibration(const XInput& _XInput);
 
   //  âΩÇ©âüÇ≥ÇÍÇƒÇ¢ÇÈÇ»ÇÁtrueÇï‘Ç∑
-  inline bool isPressAnyButtonOnXInput(const XInput& _XInput)
+  [[nodiscard]] inline bool isPressAnyButtonOnXInput(const XInput& _XInput)
   {
     return isPressOr(_XInput.ButtonUp(), _XInput.ButtonDown(), _XInput.ButtonLeft(), _XInput.ButtonRight(),
       _XInput.ButtonStart(), _XInput.ButtonSelect(), _XInput.ButtonLeftStick(), _XInput.ButtonRightStick(),
@@ -104,7 +104,7 @@ namespace vdl::Input
   }
 
   //  âΩÇ©âüÇ≥ÇÍÇΩèuä‘Ç»ÇÁtrueÇï‘Ç∑
-  inline bool isPressedAnyButtonOnXInput(const XInput& _XInput)
+  [[nodiscard]] inline bool isPressedAnyButtonOnXInput(const XInput& _XInput)
   {
     return isPressedOr(_XInput.ButtonUp(), _XInput.ButtonDown(), _XInput.ButtonLeft(), _XInput.ButtonRight(),
       _XInput.ButtonStart(), _XInput.ButtonSelect(), _XInput.ButtonLeftStick(), _XInput.ButtonRightStick(),
@@ -112,7 +112,7 @@ namespace vdl::Input
   }
 
   //  âΩÇ©ó£Ç≥ÇÍÇΩèuä‘Ç»ÇÁtrueÇï‘Ç∑
-  inline bool isReleasedAnyButtonOnXInput(const XInput& _XInput)
+  [[nodiscard]] inline bool isReleasedAnyButtonOnXInput(const XInput& _XInput)
   {
     return isReleasedOr(_XInput.ButtonUp(), _XInput.ButtonDown(), _XInput.ButtonLeft(), _XInput.ButtonRight(),
       _XInput.ButtonStart(), _XInput.ButtonSelect(), _XInput.ButtonLeftStick(), _XInput.ButtonRightStick(),
@@ -120,7 +120,7 @@ namespace vdl::Input
   }
 
   //  âΩÇ©âüÇ≥ÇÍÇƒÇ¢Ç»Ç¢Ç»ÇÁtrueÇï‘Ç∑
-  inline bool isReleaseAnyButtonOnXInput(const XInput& _XInput)
+  [[nodiscard]] inline bool isReleaseAnyButtonOnXInput(const XInput& _XInput)
   {
     return isReleaseOr(_XInput.ButtonUp(), _XInput.ButtonDown(), _XInput.ButtonLeft(), _XInput.ButtonRight(),
       _XInput.ButtonStart(), _XInput.ButtonSelect(), _XInput.ButtonLeftStick(), _XInput.ButtonRightStick(),

@@ -14,8 +14,8 @@ namespace vdl
     float2 Position;
     float2 Texcoord;
   public:
-    [[nodiscard]] bool operator==(const Vertex2D& _Vertex)const { return Position == _Vertex.Position && Texcoord == _Vertex.Texcoord; }
-    [[nodiscard]] bool operator!=(const Vertex2D& _Vertex)const { return Position != _Vertex.Position || Texcoord != _Vertex.Texcoord; }
+    [[nodiscard]] bool operator==(const Vertex2D& _Vertex)const noexcept { return Position == _Vertex.Position && Texcoord == _Vertex.Texcoord; }
+    [[nodiscard]] bool operator!=(const Vertex2D& _Vertex)const noexcept { return Position != _Vertex.Position || Texcoord != _Vertex.Texcoord; }
   };
 
   struct VertexStaticMesh
@@ -25,8 +25,8 @@ namespace vdl
     float3 Tangent;
     float2 Texcoord;
   public:
-    [[nodiscard]] bool operator==(const VertexStaticMesh& _Vertex)const { return Position == _Vertex.Position && Normal == _Vertex.Normal && Tangent == _Vertex.Tangent && Texcoord == _Vertex.Texcoord; }
-    [[nodiscard]] bool operator!=(const VertexStaticMesh& _Vertex)const { return Position != _Vertex.Position || Normal != _Vertex.Normal || Tangent != _Vertex.Tangent || Texcoord != _Vertex.Texcoord; }
+    [[nodiscard]] bool operator==(const VertexStaticMesh& _Vertex)const noexcept { return Position == _Vertex.Position && Normal == _Vertex.Normal && Tangent == _Vertex.Tangent && Texcoord == _Vertex.Texcoord; }
+    [[nodiscard]] bool operator!=(const VertexStaticMesh& _Vertex)const noexcept { return Position != _Vertex.Position || Normal != _Vertex.Normal || Tangent != _Vertex.Tangent || Texcoord != _Vertex.Texcoord; }
   };
 
   struct VertexSkinnedMesh : public VertexStaticMesh
@@ -36,11 +36,11 @@ namespace vdl
   public:
     VertexSkinnedMesh() = default;
 
-    VertexSkinnedMesh(const VertexStaticMesh& _VertexStaticMesh)
+    VertexSkinnedMesh(const VertexStaticMesh& _VertexStaticMesh)noexcept
       : VertexStaticMesh(_VertexStaticMesh) {}
   public:
-    [[nodiscard]] bool operator==(const VertexSkinnedMesh& _Vertex)const { return Position == _Vertex.Position && Normal == _Vertex.Normal && Tangent == _Vertex.Tangent && Texcoord == _Vertex.Texcoord && BoneWeights == _Vertex.BoneWeights && BoneIndices == _Vertex.BoneIndices; }
-    [[nodiscard]] bool operator!=(const VertexSkinnedMesh& _Vertex)const { return Position != _Vertex.Position || Normal != _Vertex.Normal || Tangent != _Vertex.Tangent || Texcoord != _Vertex.Texcoord || BoneWeights != _Vertex.BoneWeights || BoneIndices != _Vertex.BoneIndices; }
+    [[nodiscard]] bool operator==(const VertexSkinnedMesh& _Vertex)const noexcept { return Position == _Vertex.Position && Normal == _Vertex.Normal && Tangent == _Vertex.Tangent && Texcoord == _Vertex.Texcoord && BoneWeights == _Vertex.BoneWeights && BoneIndices == _Vertex.BoneIndices; }
+    [[nodiscard]] bool operator!=(const VertexSkinnedMesh& _Vertex)const noexcept { return Position != _Vertex.Position || Normal != _Vertex.Normal || Tangent != _Vertex.Tangent || Texcoord != _Vertex.Texcoord || BoneWeights != _Vertex.BoneWeights || BoneIndices != _Vertex.BoneIndices; }
   };
 
   struct Instance2D
