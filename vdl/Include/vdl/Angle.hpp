@@ -221,46 +221,46 @@ namespace vdl
 
 namespace std
 {
-  [[nodiscard]] inline string to_string(const vdl::Radian& _Angle)noexcept
+  [[nodiscard]] inline string to_string(const vdl::Radian& _Angle)
   {
     return to_string(static_cast<float>(_Angle));
   }
 
-  [[nodiscard]] inline string to_string(const vdl::Degree& _Angle)noexcept
+  [[nodiscard]] inline string to_string(const vdl::Degree& _Angle)
   {
     return to_string(static_cast<float>(_Angle));
   }
 
-  [[nodiscard]] inline wstring to_wstring(const vdl::Radian& _Angle)noexcept
+  [[nodiscard]] inline wstring to_wstring(const vdl::Radian& _Angle)
   {
     return to_wstring(static_cast<float>(_Angle));
   }
 
-  [[nodiscard]] inline wstring to_wstring(const vdl::Degree& _Angle)noexcept
+  [[nodiscard]] inline wstring to_wstring(const vdl::Degree& _Angle)
   {
     return to_wstring(static_cast<float>(_Angle));
   }
 
   template <class CharType>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Radian& _Angle)noexcept
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Radian& _Angle)
   {
     return _OStream << static_cast<float>(_Angle);
   }
 
   template <class CharType>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Degree& _Angle)noexcept
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Degree& _Angle)
   {
     return _OStream << static_cast<float>(_Angle);
   }
 
   template <class CharType>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Radian& _Angle)noexcept
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Radian& _Angle)
   {
     return _IStream >> reinterpret_cast<float&>(_Angle);
   }
 
   template <class CharType>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Degree& _Angle)noexcept
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Degree& _Angle)
   {
     return _IStream >> reinterpret_cast<float&>(_Angle);
   }

@@ -137,25 +137,25 @@ namespace vdl
 namespace std
 {
   template <class Type>
-  [[nodiscard]] inline string to_string(const vdl::Type2<Type>& _v)noexcept
+  [[nodiscard]] inline string to_string(const vdl::Type2<Type>& _v)
   {
     return to_string(_v.x) + ',' + to_string(_v.y);
   }
 
   template <class Type>
-  [[nodiscard]] inline wstring to_wstring(const vdl::Type2<Type>& _v)noexcept
+  [[nodiscard]] inline wstring to_wstring(const vdl::Type2<Type>& _v)
   {
     return to_wstring(_v.x) + L',' + to_wstring(_v.y);
   }
 
   template <class CharType, class Type>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Type2<Type>& _v)noexcept
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Type2<Type>& _v)
   {
     return _OStream << _v.x << static_cast<CharType>(',') << _v.y;
   }
 
   template <class CharType, class Type>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Type2<Type>& _v)noexcept
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Type2<Type>& _v)
   {
     CharType Temp;
     return _IStream >> _v.x >> Temp >> _v.y;

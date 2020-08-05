@@ -129,24 +129,24 @@ namespace vdl
 
 namespace std
 {
-  [[nodiscard]] inline string to_string(const vdl::Quaternion& _q)noexcept
+  [[nodiscard]] inline string to_string(const vdl::Quaternion& _q)
   {
     return to_string(_q.x) + ',' + to_string(_q.y) + ',' + to_string(_q.z) + ',' + to_string(_q.w);
   }
 
-  [[nodiscard]] inline wstring to_wstring(const vdl::Quaternion& _q)noexcept
+  [[nodiscard]] inline wstring to_wstring(const vdl::Quaternion& _q)
   {
     return to_wstring(_q.x) + L',' + to_wstring(_q.y) + L',' + to_wstring(_q.z) + L',' + to_wstring(_q.w);
   }
 
   template <class CharType>
-  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Quaternion& _q)noexcept
+  inline basic_ostream<CharType>& operator<<(basic_ostream<CharType>& _OStream, const vdl::Quaternion& _q)
   {
     return _OStream << _q.x << static_cast<CharType>(',') << _q.y << static_cast<CharType>(',') << _q.z << static_cast<CharType>(',') << _q.w;
   }
 
   template <class CharType>
-  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Quaternion& _q)noexcept
+  inline basic_istream<CharType>& operator>>(basic_istream<CharType>& _IStream, vdl::Quaternion& _q)
   {
     CharType Temp;
     return _IStream >> _q.x >> Temp >> _q.y >> Temp >> _q.z >> Temp >> _q.w;
