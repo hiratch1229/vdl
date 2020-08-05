@@ -655,14 +655,15 @@ void CGUI::Initialize()
 
     //  フラグの設定
     {
-      io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; //  ドッキング有効化
+      io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   //  ドッキング有効化
+      io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; //  マルチビューポート有効化
 
       io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;       // We can honor GetMouseCursor() values (optional)
       io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;        // We can honor io.WantSetMousePos requests (optional, rarely used)
-      io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
+      io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;    // We can create multi-viewports on the Platform side (optional)
+      io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can set io.MouseHoveredViewport correctly (optional, not easy)
       io.BackendRendererName = "vdl";
       io.BackendPlatformName = "vdl";
-      //io.ImeWindowHandle = Engine::Get<IWindow>()->GetHandle();
 
       // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array that we will update during the application lifetime.
       io.KeyMap[ImGuiKey_Tab] = VK_TAB;
@@ -753,6 +754,15 @@ void CGUI::Initialize()
       //  Colors[ImGuiCol_PopupBg] = Cast(kColorPrimaryDark);
       //}
     }
+
+    //{
+    //  ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+    //  main_viewport->PlatformHandle = main_viewport->PlatformHandleRaw = Engine::Get<IWindow>()->;
+    //  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    //  {
+    //    ImGui_ImplWin32_InitPlatformInterface();
+    //  }
+    //}
   }
 
   //  コマンドリストの初期化
@@ -824,6 +834,27 @@ void CGUI::Update()
     const vdl::float2 Pos = pMouse_->GetPos();
     io.MousePos.x = Pos.x;
     io.MousePos.y = Pos.y;
+
+    // Show OS mouse cursor
+    {
+      MouseCursorType CursorType;
+      {
+        switch (ImGui::GetMouseCursor())
+        {
+        case ImGuiMouseCursor_Arrow:      CursorType = MouseCursorType::eArrow; break;
+        case ImGuiMouseCursor_TextInput:  CursorType = MouseCursorType::eTextInput; break;
+        case ImGuiMouseCursor_ResizeAll:  CursorType = MouseCursorType::eResizeAll; break;
+        case ImGuiMouseCursor_ResizeEW:   CursorType = MouseCursorType::eResizeEW; break;
+        case ImGuiMouseCursor_ResizeNS:   CursorType = MouseCursorType::eResizeNS; break;
+        case ImGuiMouseCursor_ResizeNESW: CursorType = MouseCursorType::eResizeNESW; break;
+        case ImGuiMouseCursor_ResizeNWSE: CursorType = MouseCursorType::eResizeNWSE; break;
+        case ImGuiMouseCursor_Hand:       CursorType = MouseCursorType::eHand; break;
+        case ImGuiMouseCursor_NotAllowed: CursorType = MouseCursorType::eNotArrow; break;
+        }
+      }
+
+      pMouse_->SetCursor(CursorType);
+    }
   }
 
   ImGui::NewFrame();

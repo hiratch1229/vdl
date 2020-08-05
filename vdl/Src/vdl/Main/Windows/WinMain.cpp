@@ -52,9 +52,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
   case WM_MOUSEHWHEEL:
     Engine::Get<IMouse>()->Scroll(vdl::int2(GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA, 0));
     break;
+    //  ウィンドウを非選択状態になった時
+  case WM_KILLFOCUS:
+    //  ウィンドウの移動開始時
   case WM_ENTERSIZEMOVE:
     Engine::Get<ISystem>()->Pause();
     break;
+    //  ウィンドウを選択状態になった時
+  case WM_SETFOCUS:
+    //  ウィンドウの移動終了時
   case WM_EXITSIZEMOVE:
     Engine::Get<ISystem>()->Resume();
     break;

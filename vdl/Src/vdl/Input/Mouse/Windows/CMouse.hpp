@@ -59,4 +59,6 @@ public:
   void SetPos(const vdl::int2& _Pos)override;
 
   void Scroll(const vdl::int2& _Scroll)override;
+
+  void SetCursor(MouseCursorType _Type)override;
 };

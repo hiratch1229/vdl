@@ -4,6 +4,19 @@
 
 #include <vdl/Platform/Platform.hpp>
 
+enum class MouseCursorType
+{
+  eArrow,
+  eTextInput,
+  eResizeAll,
+  eResizeEW,
+  eResizeNS,
+  eResizeNESW,
+  eResizeNWSE,
+  eHand,
+  eNotArrow,
+};
+
 class IMouse
 {
 public:
@@ -36,4 +49,6 @@ public:
   virtual void SetPos(const vdl::int2& _Pos) = 0;
 
   virtual void Scroll(const vdl::int2& _Scroll) = 0;
+
+  virtual void SetCursor(MouseCursorType _Type) = 0;
 };

@@ -67,3 +67,25 @@ void CMouse::Scroll(const vdl::int2& _Scroll)
 
   AccumulationScroll_ += _Scroll;
 }
+
+void CMouse::SetCursor(MouseCursorType _Type)
+{
+  LPTSTR Cursor = IDC_ARROW;
+  {
+    switch (_Type)
+    {
+    case MouseCursorType::eArrow:       Cursor = IDC_ARROW; break;
+    case MouseCursorType::eTextInput:   Cursor = IDC_IBEAM; break;
+    case MouseCursorType::eResizeAll:   Cursor = IDC_SIZEALL; break;
+    case MouseCursorType::eResizeEW:    Cursor = IDC_SIZEWE; break;
+    case MouseCursorType::eResizeNS:    Cursor = IDC_SIZENS; break;
+    case MouseCursorType::eResizeNESW:  Cursor = IDC_SIZENESW; break;
+    case MouseCursorType::eResizeNWSE:  Cursor = IDC_SIZENWSE; break;
+    case MouseCursorType::eHand:        Cursor = IDC_HAND; break;
+    case MouseCursorType::eNotArrow:    Cursor = IDC_NO; break;
+    default: assert(false);
+    }
+  }
+
+  ::SetCursor(::LoadCursor(nullptr, Cursor));
+}
