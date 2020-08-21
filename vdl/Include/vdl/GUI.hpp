@@ -199,6 +199,18 @@ namespace vdl::GUI
     e_OptionsDefault = eUint8 | eDisplayRGB | eInputRGB | ePickerHueBar,
   };
 
+  // Flags for DragFloat(), DragInt(), SliderFloat(), SliderInt() etc.
+  // We use the same sets of flags for DragXXX() and SliderXXX() functions as the features are the same and it makes it easier to swap them.
+  enum class SliderFlag : uint
+  {
+    eNone = 0,
+    eClampOnInput = 1 << 4,       // Clamp value to min/max bounds when input manually with CTRL+Click. By default CTRL+Click allows going out of bounds.
+    eLogarithmic = 1 << 5,       // Make the widget logarithmic (linear otherwise). Consider using ImGuiSliderFlags_NoRoundToFormat with this if using a format-string with small amount of digits.
+    eNoRoundToFormat = 1 << 6,       // Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
+    eNoInput = 1 << 7,       // Disable CTRL+Click or Enter key allowing to input text directly into the widget
+    eInvalidMask_ = 0x7000000F    // [Internal] We treat using those bits as being potentially a 'float power' argument from the previous API that has got miscast to this enum, and will trigger an assert if needed.
+  };
+
   // Enumateration for ImGui::SetWindow***(), SetNextWindow***(), SetNextItem***() functions
   // Represent a condition.
   enum class Condition
@@ -462,9 +474,6 @@ namespace vdl::GUI
   bool BeginPopupContextVoid(const char* _StrID = nullptr);                                                       // helper to open and begin popup when clicked in void (where there are no imgui windows).
   bool BeginPopupModal(const char* _Name, bool* _pOpen = nullptr, const WindowFlags& _Flags = WindowFlag::eNone); // modal dialog (regular window with title bar, block interactions behind the modal window, can't close the modal window by clicking outside)
   void EndPopup();                                                                                                // only call EndPopup() if BeginPopupXXX() returns true!
-  bool OpenPopupOnItemClick(const char* _StrID = nullptr);                                                        // helper to open popup when clicked on last item (note: actually triggers on the mouse _released_ event to be consistent with popup behaviors). return true when just opened.
-  bool IsPopupOpen(const char* _StrID);                                                                           // return true if the popup is open at the current begin-ed level of the popup stack.
-  void CloseCurrentPopup();                                                                                       // close the popup we have begin-ed into. clicking on a MenuItem or Selectable automatically close the current popup.
 
   // Columns
   // - You can also use SameLine(pos_x) to mimic simplified columns.

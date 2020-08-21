@@ -123,11 +123,11 @@ namespace vdl::GUI
       }
     }
 
-    bool DragScalar(const char* _Label, DataType _Type, void* _pData, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power);
-    bool DragScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power);
+    bool DragScalar(const char* _Label, DataType _Type, void* _pData, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, const SliderFlags& _Flags);
+    bool DragScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, const SliderFlags& _Flags);
 
-    bool SliderScalar(const char* _Label, DataType _Type, void* _pData, const void* _pMin, const void* _pMax, const char* _Format, float _Power);
-    bool SliderScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pMin, const void* _pMax, const char* _Format, float _Power);
+    bool SliderScalar(const char* _Label, DataType _Type, void* _pData, const void* _pMin, const void* _pMax, const char* _Format, const SliderFlags& _Flags);
+    bool SliderScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pMin, const void* _pMax, const char* _Format, const SliderFlags& _Flags);
 
     bool InputScalar(const char* _Label, DataType _Type, void* _pData, const void* _pStep, const void* _pStepFast, const char* _Format, const InputTextFlags& _Flags);
     bool InputScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pStep, const void* _pStepFast, const char* _Format, const InputTextFlags& _Flags);
@@ -136,47 +136,47 @@ namespace vdl::GUI
   //--------------------------------------------------
 
   template<class Type>
-  inline bool Drag(const char* _Label, Type* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
+  inline bool Drag(const char* _Label, Type* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const SliderFlags& _Flags = SliderFlag::eNone)
   {
-    return DragScalar(_Label, Detail::GetDataType<Type>(), _pData, _Speed, &_Min, &_Max, _Format, _Power);
+    return DragScalar(_Label, Detail::GetDataType<Type>(), _pData, _Speed, &_Min, &_Max, _Format, _Flags);
   }
   template<class Type>
-  inline bool Drag(const char* _Label, Type2<Type>* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
+  inline bool Drag(const char* _Label, Type2<Type>* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const SliderFlags& _Flags = SliderFlag::eNone)
   {
-    return DragScalarN(_Label, Detail::GetDataType<Type>(), _pData, 2, _Speed, &_Min, &_Max, _Format, _Power);
+    return DragScalarN(_Label, Detail::GetDataType<Type>(), _pData, 2, _Speed, &_Min, &_Max, _Format, _Flags);
   }
   template<class Type>
-  inline bool Drag(const char* _Label, Type3<Type>* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
+  inline bool Drag(const char* _Label, Type3<Type>* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const SliderFlags& _Flags = SliderFlag::eNone)
   {
-    return DragScalarN(_Label, Detail::GetDataType<Type>(), _pData, 3, _Speed, &_Min, &_Max, _Format, _Power);
+    return DragScalarN(_Label, Detail::GetDataType<Type>(), _pData, 3, _Speed, &_Min, &_Max, _Format, _Flags);
   }
   template<class Type>
-  inline bool Drag(const char* _Label, Type4<Type>* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
+  inline bool Drag(const char* _Label, Type4<Type>* _pData, float _Speed = 1.0f, Type _Min = 0, Type _Max = 0, const char* _Format = Detail::GetDefaultFormat<Type>(), const SliderFlags& _Flags = SliderFlag::eNone)
   {
-    return DragScalarN(_Label, Detail::GetDataType<Type>(), _pData, 4, _Speed, &_Min, &_Max, _Format, _Power);
+    return DragScalarN(_Label, Detail::GetDataType<Type>(), _pData, 4, _Speed, &_Min, &_Max, _Format, _Flags);
   }
 
   //--------------------------------------------------
 
   template<class Type>
-  inline bool Slider(const char* _Label, Type* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
+  inline bool Slider(const char* _Label, Type* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), const SliderFlags& _Flags = SliderFlag::eNone)
   {
-    return SliderScalar(_Label, Detail::GetDataType<Type>(), _pData, &_Min, &_Max, _Format, _Power);
+    return SliderScalar(_Label, Detail::GetDataType<Type>(), _pData, &_Min, &_Max, _Format, _Flags);
   }
   template<class Type>
-  inline bool Slider(const char* _Label, Type2<Type>* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
+  inline bool Slider(const char* _Label, Type2<Type>* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), const SliderFlags& _Flags = SliderFlag::eNone)
   {
-    return SliderScalarN(_Label, Detail::GetDataType<Type>(), _pData, 2, &_Min, &_Max, _Format, _Power);
+    return SliderScalarN(_Label, Detail::GetDataType<Type>(), _pData, 2, &_Min, &_Max, _Format, _Flags);
   }
   template<class Type>
-  inline bool Slider(const char* _Label, Type3<Type>* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
+  inline bool Slider(const char* _Label, Type3<Type>* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), const SliderFlags& _Flags = SliderFlag::eNone)
   {
-    return SliderScalarN(_Label, Detail::GetDataType<Type>(), _pData, 3, &_Min, &_Max, _Format, _Power);
+    return SliderScalarN(_Label, Detail::GetDataType<Type>(), _pData, 3, &_Min, &_Max, _Format, _Flags);
   }
   template<class Type>
-  inline bool Slider(const char* _Label, Type4<Type>* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), float _Power = 1.0f)
+  inline bool Slider(const char* _Label, Type4<Type>* _pData, Type _Min, Type _Max, const char* _Format = Detail::GetDefaultFormat<Type>(), const SliderFlags& _Flags = SliderFlag::eNone)
   {
-    return SliderScalarN(_Label, Detail::GetDataType<Type>(), _pData, 4, &_Min, &_Max, _Format, _Power);
+    return SliderScalarN(_Label, Detail::GetDataType<Type>(), _pData, 4, &_Min, &_Max, _Format, _Flags);
   }
 
   //--------------------------------------------------
