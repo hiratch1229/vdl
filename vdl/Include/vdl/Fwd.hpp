@@ -309,5 +309,7 @@ namespace vdl
     using HoveredFlags = Flags<HoveredFlag, uint8_t>;
     enum class ColorEditFlag : uint;
     using ColorEditFlags = Flags<ColorEditFlag, uint>;
+    enum class SliderFlag : uint;
+    using SliderFlags = Flags<SliderFlag, uint>;
   }
 }

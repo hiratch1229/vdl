@@ -34,6 +34,9 @@ Index of this file:
 
 #pragma once
 #include <vdl/Fwd.hpp>
+#include <vdl/Type2.hpp>
+#include <vdl/Type4.hpp>
+#include <vdl/Color.hpp>
 #include <vdl/Texture.hpp>
 
 #ifndef IMGUI_DISABLE
@@ -47,7 +50,7 @@ Index of this file:
 #endif
 
 #include <stdio.h>      // FILE*, sscanf
-#include <stdlib.h>     // NULL, malloc, free, qsort, atoi, atof
+#include <stdlib.h>     // nullptr, malloc, free, qsort, atoi, atof
 #include <math.h>       // sqrtf, fabsf, fmodf, powf, floorf, ceilf, cosf, sinf
 #include <limits.h>     // INT_MIN, INT_MAX
 
@@ -298,7 +301,7 @@ static inline bool      ImCharIsBlankW(unsigned int c)  { return c == ' ' || c =
 // Helpers: UTF-8 <> wchar conversions
 IMGUI_API int           ImTextStrToUtf8(char* buf, int buf_size, const ImWchar* in_text, const ImWchar* in_text_end);      // return output UTF-8 bytes count
 IMGUI_API int           ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);          // read one character. return input UTF-8 bytes count
-IMGUI_API int           ImTextStrFromUtf8(ImWchar* buf, int buf_size, const char* in_text, const char* in_text_end, const char** in_remaining = NULL);   // return input UTF-8 bytes count
+IMGUI_API int           ImTextStrFromUtf8(ImWchar* buf, int buf_size, const char* in_text, const char* in_text_end, const char** in_remaining = nullptr);   // return input UTF-8 bytes count
 IMGUI_API int           ImTextCountCharsFromUtf8(const char* in_text, const char* in_text_end);                            // return number of UTF-8 code-points (NOT bytes count)
 IMGUI_API int           ImTextCountUtf8BytesFromChar(const char* in_text, const char* in_text_end);                        // return number of bytes to express one char in UTF-8
 IMGUI_API int           ImTextCountUtf8BytesFromStr(const ImWchar* in_text, const ImWchar* in_text_end);                   // return number of bytes to express string in UTF-8
@@ -328,7 +331,7 @@ static inline ImVec4 operator*(const ImVec4& lhs, const ImVec4& rhs)            
 #ifdef IMGUI_DISABLE_FILE_FUNCTIONS
 #define IMGUI_DISABLE_DEFAULT_FILE_FUNCTIONS
 typedef void* ImFileHandle;
-static inline ImFileHandle  ImFileOpen(const char*, const char*)                    { return NULL; }
+static inline ImFileHandle  ImFileOpen(const char*, const char*)                    { return nullptr; }
 static inline bool          ImFileClose(ImFileHandle)                               { return false; }
 static inline ImU64         ImFileGetSize(ImFileHandle)                             { return (ImU64)-1; }
 static inline ImU64         ImFileRead(void*, ImU64, ImU64, ImFileHandle)           { return 0; }
@@ -344,7 +347,7 @@ IMGUI_API ImU64             ImFileWrite(const void* data, ImU64 size, ImU64 coun
 #else
 #define IMGUI_DISABLE_TTY_FUNCTIONS // Can't use stdout, fflush if we are not using default file functions
 #endif
-IMGUI_API void*             ImFileLoadToMemory(const char* filename, const char* mode, size_t* out_file_size = NULL, int padding_bytes = 0);
+IMGUI_API void*             ImFileLoadToMemory(const char* filename, const char* mode, size_t* out_file_size = nullptr, int padding_bytes = 0);
 
 // Helpers: Maths
 // - Wrapper for standard libs functions. (Note that imgui_demo.cpp does _not_ use them to keep the code easy to copy)
@@ -373,39 +376,40 @@ static inline double ImSign(double x)           { return (x < 0.0) ? -1.0 : ((x 
 template<typename T> static inline T ImMin(T lhs, T rhs)                        { return lhs < rhs ? lhs : rhs; }
 template<typename T> static inline T ImMax(T lhs, T rhs)                        { return lhs >= rhs ? lhs : rhs; }
 template<typename T> static inline T ImClamp(T v, T mn, T mx)                   { return (v < mn) ? mn : (v > mx) ? mx : v; }
-template<typename T> static inline T ImLerp(T a, T b, float t)                  { return (T)(a + (b - a) * t); }
+template<typename T> static inline T ImLerp(const T& a, const T& b, float t)                  { return (T)(a + (b - a) * t); }
+template<> static inline vdl::Color4F ImLerp(const vdl::Color4F& a, const vdl::Color4F& b, float t) { return vdl::Color4F(a.Red + (b.Red - a.Red) * t, a.Green + (b.Green - a.Green) * t, a.Blue + (b.Blue - a.Blue) * t, a.Alpha + (b.Alpha - a.Alpha) * t); }
 template<typename T> static inline void ImSwap(T& a, T& b)                      { T tmp = a; a = b; b = tmp; }
 template<typename T> static inline T ImAddClampOverflow(T a, T b, T mn, T mx)   { if (b < 0 && (a < mn - b)) return mn; if (b > 0 && (a > mx - b)) return mx; return a + b; }
 template<typename T> static inline T ImSubClampOverflow(T a, T b, T mn, T mx)   { if (b > 0 && (a < mn + b)) return mn; if (b < 0 && (a > mx + b)) return mx; return a - b; }
 // - Misc maths helpers
-static inline ImVec2 ImMin(const ImVec2& lhs, const ImVec2& rhs)                { return ImVec2(lhs.x < rhs.x ? lhs.x : rhs.x, lhs.y < rhs.y ? lhs.y : rhs.y); }
-static inline ImVec2 ImMax(const ImVec2& lhs, const ImVec2& rhs)                { return ImVec2(lhs.x >= rhs.x ? lhs.x : rhs.x, lhs.y >= rhs.y ? lhs.y : rhs.y); }
-static inline ImVec2 ImClamp(const ImVec2& v, const ImVec2& mn, ImVec2 mx)      { return ImVec2((v.x < mn.x) ? mn.x : (v.x > mx.x) ? mx.x : v.x, (v.y < mn.y) ? mn.y : (v.y > mx.y) ? mx.y : v.y); }
-static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, float t)          { return ImVec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t); }
-static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, const ImVec2& t)  { return ImVec2(a.x + (b.x - a.x) * t.x, a.y + (b.y - a.y) * t.y); }
-static inline ImVec4 ImLerp(const ImVec4& a, const ImVec4& b, float t)          { return ImVec4(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t, a.w + (b.w - a.w) * t); }
-static inline float  ImSaturate(float f)                                        { return (f < 0.0f) ? 0.0f : (f > 1.0f) ? 1.0f : f; }
-static inline float  ImLengthSqr(const ImVec2& lhs)                             { return (lhs.x * lhs.x) + (lhs.y * lhs.y); }
-static inline float  ImLengthSqr(const ImVec4& lhs)                             { return (lhs.x * lhs.x) + (lhs.y * lhs.y) + (lhs.z * lhs.z) + (lhs.w * lhs.w); }
-static inline float  ImInvLength(const ImVec2& lhs, float fail_value)           { float d = (lhs.x * lhs.x) + (lhs.y * lhs.y); if (d > 0.0f) return 1.0f / ImSqrt(d); return fail_value; }
-static inline float  ImFloor(float f)                                           { return (float)(int)(f); }
-static inline ImVec2 ImFloor(const ImVec2& v)                                   { return ImVec2((float)(int)(v.x), (float)(int)(v.y)); }
-static inline int    ImModPositive(int a, int b)                                { return (a + b) % b; }
-static inline float  ImDot(const ImVec2& a, const ImVec2& b)                    { return a.x * b.x + a.y * b.y; }
-static inline ImVec2 ImRotate(const ImVec2& v, float cos_a, float sin_a)        { return ImVec2(v.x * cos_a - v.y * sin_a, v.x * sin_a + v.y * cos_a); }
-static inline float  ImLinearSweep(float current, float target, float speed)    { if (current < target) return ImMin(current + speed, target); if (current > target) return ImMax(current - speed, target); return current; }
-static inline ImVec2 ImMul(const ImVec2& lhs, const ImVec2& rhs)                { return ImVec2(lhs.x * rhs.x, lhs.y * rhs.y); }
+static inline vdl::float2 ImMin(const vdl::float2& lhs, const vdl::float2& rhs)                       { return vdl::float2(lhs.x < rhs.x ? lhs.x : rhs.x, lhs.y < rhs.y ? lhs.y : rhs.y); }
+static inline vdl::float2 ImMax(const vdl::float2& lhs, const vdl::float2& rhs)                       { return vdl::float2(lhs.x >= rhs.x ? lhs.x : rhs.x, lhs.y >= rhs.y ? lhs.y : rhs.y); }
+static inline vdl::float2 ImClamp(const vdl::float2& v, const vdl::float2& mn, const vdl::float2& mx) { return vdl::float2((v.x < mn.x) ? mn.x : (v.x > mx.x) ? mx.x : v.x, (v.y < mn.y) ? mn.y : (v.y > mx.y) ? mx.y : v.y); }
+static inline vdl::float2 ImLerp(const vdl::float2& a, const vdl::float2& b, float t)                 { return vdl::float2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t); }
+static inline vdl::float2 ImLerp(const vdl::float2& a, const vdl::float2& b, const vdl::float2& t)    { return vdl::float2(a.x + (b.x - a.x) * t.x, a.y + (b.y - a.y) * t.y); }
+static inline vdl::float4 ImLerp(const vdl::float4& a, const vdl::float4& b, float t)                 { return vdl::float4(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t, a.w + (b.w - a.w) * t); }
+static inline float       ImSaturate(float f)                                                         { return (f < 0.0f) ? 0.0f : (f > 1.0f) ? 1.0f : f; }
+static inline float       ImLengthSqr(const vdl::float2& lhs)                                         { return (lhs.x * lhs.x) + (lhs.y * lhs.y); }
+static inline float       ImLengthSqr(const vdl::float4& lhs)                                         { return (lhs.x * lhs.x) + (lhs.y * lhs.y) + (lhs.z * lhs.z) + (lhs.w * lhs.w); }
+static inline float       ImInvLength(const vdl::float2& lhs, float fail_value)                       { float d = (lhs.x * lhs.x) + (lhs.y * lhs.y); if (d > 0.0f) return 1.0f / ImSqrt(d); return fail_value; }
+static inline float       ImFloor(float f)                                                            { return (float)(int)(f); }
+static inline vdl::float2 ImFloor(const vdl::float2& v)                                               { return vdl::float2((float)(int)(v.x), (float)(int)(v.y)); }
+static inline int         ImModPositive(int a, int b)                                                 { return (a + b) % b; }
+static inline float       ImDot(const vdl::float2& a, const vdl::float2& b)                           { return a.x * b.x + a.y * b.y; }
+static inline vdl::float2 ImRotate(const vdl::float2& v, float cos_a, float sin_a)                    { return vdl::float2(v.x * cos_a - v.y * sin_a, v.x * sin_a + v.y * cos_a); }
+static inline float       ImLinearSweep(float current, float target, float speed)                     { if (current < target) return ImMin(current + speed, target); if (current > target) return ImMax(current - speed, target); return current; }
+static inline vdl::float2 ImMul(const vdl::float2& lhs, const vdl::float2& rhs)                       { return vdl::float2(lhs.x * rhs.x, lhs.y * rhs.y); }
 
 // Helpers: Geometry
-IMGUI_API ImVec2     ImBezierCalc(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, float t);                                         // Cubic Bezier
-IMGUI_API ImVec2     ImBezierClosestPoint(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& p, int num_segments);       // For curves with explicit number of segments
-IMGUI_API ImVec2     ImBezierClosestPointCasteljau(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& p, float tess_tol);// For auto-tessellated curves you can use tess_tol = style.CurveTessellationTol
-IMGUI_API ImVec2     ImLineClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& p);
-IMGUI_API bool       ImTriangleContainsPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p);
-IMGUI_API ImVec2     ImTriangleClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p);
-IMGUI_API void       ImTriangleBarycentricCoords(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p, float& out_u, float& out_v, float& out_w);
-inline float         ImTriangleArea(const ImVec2& a, const ImVec2& b, const ImVec2& c) { return ImFabs((a.x * (b.y - c.y)) + (b.x * (c.y - a.y)) + (c.x * (a.y - b.y))) * 0.5f; }
-IMGUI_API ImGuiDir   ImGetDirQuadrantFromDelta(float dx, float dy);
+IMGUI_API vdl::float2     ImBezierCalc(const vdl::float2& p1, const vdl::float2& p2, const vdl::float2& p3, const vdl::float2& p4, float t);                                         // Cubic Bezier
+IMGUI_API vdl::float2     ImBezierClosestPoint(const vdl::float2& p1, const vdl::float2& p2, const vdl::float2& p3, const vdl::float2& p4, const vdl::float2& p, int num_segments);       // For curves with explicit number of segments
+IMGUI_API vdl::float2     ImBezierClosestPointCasteljau(const vdl::float2& p1, const vdl::float2& p2, const vdl::float2& p3, const vdl::float2& p4, const vdl::float2& p, float tess_tol);// For auto-tessellated curves you can use tess_tol = style.CurveTessellationTol
+IMGUI_API vdl::float2     ImLineClosestPoint(const vdl::float2& a, const vdl::float2& b, const vdl::float2& p);
+IMGUI_API bool            ImTriangleContainsPoint(const vdl::float2& a, const vdl::float2& b, const vdl::float2& c, const vdl::float2& p);
+IMGUI_API vdl::float2     ImTriangleClosestPoint(const vdl::float2& a, const vdl::float2& b, const vdl::float2& c, const vdl::float2& p);
+IMGUI_API void            ImTriangleBarycentricCoords(const vdl::float2& a, const vdl::float2& b, const vdl::float2& c, const vdl::float2& p, float& out_u, float& out_v, float& out_w);
+inline float              ImTriangleArea(const vdl::float2& a, const vdl::float2& b, const vdl::float2& c) { return ImFabs((a.x * (b.y - c.y)) + (b.x * (c.y - a.y)) + (c.x * (a.y - b.y))) * 0.5f; }
+IMGUI_API ImGuiDir        ImGetDirQuadrantFromDelta(float dx, float dy);
 
 // Helper: ImVec1 (1D vector)
 // (this odd construct is used to facilitate the transition between 1D and 2D, and the maintenance of some branches/patches)
@@ -422,44 +426,44 @@ struct ImVec2ih
     short   x, y;
     ImVec2ih()                           { x = y = 0; }
     ImVec2ih(short _x, short _y)         { x = _x; y = _y; }
-    explicit ImVec2ih(const ImVec2& rhs) { x = (short)rhs.x; y = (short)rhs.y; }
+    explicit ImVec2ih(const vdl::float2& rhs) { x = (short)rhs.x; y = (short)rhs.y; }
 };
 
 // Helper: ImRect (2D axis aligned bounding-box)
 // NB: we can't rely on ImVec2 math operators being available here!
 struct IMGUI_API ImRect
 {
-    ImVec2      Min;    // Upper-left
-    ImVec2      Max;    // Lower-right
+    vdl::float2      Min;    // Upper-left
+    vdl::float2      Max;    // Lower-right
 
-    ImRect()                                        : Min(0.0f, 0.0f), Max(0.0f, 0.0f)  {}
-    ImRect(const ImVec2& min, const ImVec2& max)    : Min(min), Max(max)                {}
-    ImRect(const ImVec4& v)                         : Min(v.x, v.y), Max(v.z, v.w)      {}
-    ImRect(float x1, float y1, float x2, float y2)  : Min(x1, y1), Max(x2, y2)          {}
+    ImRect()                                              : Min(0.0f, 0.0f), Max(0.0f, 0.0f)  {}
+    ImRect(const vdl::float2 min, const vdl::float2& max) : Min(min), Max(max)                {}
+    ImRect(const vdl::float4& v)                          : Min(v.x, v.y), Max(v.z, v.w)      {}
+    ImRect(float x1, float y1, float x2, float y2)        : Min(x1, y1), Max(x2, y2)          {}
 
-    ImVec2      GetCenter() const                   { return ImVec2((Min.x + Max.x) * 0.5f, (Min.y + Max.y) * 0.5f); }
-    ImVec2      GetSize() const                     { return ImVec2(Max.x - Min.x, Max.y - Min.y); }
+    vdl::float2 GetCenter() const                   { return vdl::float2((Min.x + Max.x) * 0.5f, (Min.y + Max.y) * 0.5f); }
+    vdl::float2 GetSize() const                     { return vdl::float2(Max.x - Min.x, Max.y - Min.y); }
     float       GetWidth() const                    { return Max.x - Min.x; }
     float       GetHeight() const                   { return Max.y - Min.y; }
-    ImVec2      GetTL() const                       { return Min; }                   // Top-left
-    ImVec2      GetTR() const                       { return ImVec2(Max.x, Min.y); }  // Top-right
-    ImVec2      GetBL() const                       { return ImVec2(Min.x, Max.y); }  // Bottom-left
-    ImVec2      GetBR() const                       { return Max; }                   // Bottom-right
-    bool        Contains(const ImVec2& p) const     { return p.x     >= Min.x && p.y     >= Min.y && p.x     <  Max.x && p.y     <  Max.y; }
+    vdl::float2 GetTL() const                       { return Min; }                   // Top-left
+    vdl::float2 GetTR() const                       { return vdl::float2(Max.x, Min.y); }  // Top-right
+    vdl::float2 GetBL() const                       { return vdl::float2(Min.x, Max.y); }  // Bottom-left
+    vdl::float2 GetBR() const                       { return Max; }                   // Bottom-right
+    bool        Contains(const vdl::float2& p) const{ return p.x     >= Min.x && p.y     >= Min.y && p.x     <  Max.x && p.y     <  Max.y; }
     bool        Contains(const ImRect& r) const     { return r.Min.x >= Min.x && r.Min.y >= Min.y && r.Max.x <= Max.x && r.Max.y <= Max.y; }
     bool        Overlaps(const ImRect& r) const     { return r.Min.y <  Max.y && r.Max.y >  Min.y && r.Min.x <  Max.x && r.Max.x >  Min.x; }
-    void        Add(const ImVec2& p)                { if (Min.x > p.x)     Min.x = p.x;     if (Min.y > p.y)     Min.y = p.y;     if (Max.x < p.x)     Max.x = p.x;     if (Max.y < p.y)     Max.y = p.y; }
+    void        Add(const vdl::float2& p)           { if (Min.x > p.x)     Min.x = p.x;     if (Min.y > p.y)     Min.y = p.y;     if (Max.x < p.x)     Max.x = p.x;     if (Max.y < p.y)     Max.y = p.y; }
     void        Add(const ImRect& r)                { if (Min.x > r.Min.x) Min.x = r.Min.x; if (Min.y > r.Min.y) Min.y = r.Min.y; if (Max.x < r.Max.x) Max.x = r.Max.x; if (Max.y < r.Max.y) Max.y = r.Max.y; }
     void        Expand(const float amount)          { Min.x -= amount;   Min.y -= amount;   Max.x += amount;   Max.y += amount; }
-    void        Expand(const ImVec2& amount)        { Min.x -= amount.x; Min.y -= amount.y; Max.x += amount.x; Max.y += amount.y; }
-    void        Translate(const ImVec2& d)          { Min.x += d.x; Min.y += d.y; Max.x += d.x; Max.y += d.y; }
+    void        Expand(const vdl::float2& amount)   { Min.x -= amount.x; Min.y -= amount.y; Max.x += amount.x; Max.y += amount.y; }
+    void        Translate(const vdl::float2& d)     { Min.x += d.x; Min.y += d.y; Max.x += d.x; Max.y += d.y; }
     void        TranslateX(float dx)                { Min.x += dx; Max.x += dx; }
     void        TranslateY(float dy)                { Min.y += dy; Max.y += dy; }
     void        ClipWith(const ImRect& r)           { Min = ImMax(Min, r.Min); Max = ImMin(Max, r.Max); }                   // Simple version, may lead to an inverted rectangle, which is fine for Contains/Overlaps test but not for display.
     void        ClipWithFull(const ImRect& r)       { Min = ImClamp(Min, r.Min, r.Max); Max = ImClamp(Max, r.Min, r.Max); } // Full version, ensure both points are fully clipped.
     void        Floor()                             { Min.x = IM_FLOOR(Min.x); Min.y = IM_FLOOR(Min.y); Max.x = IM_FLOOR(Max.x); Max.y = IM_FLOOR(Max.y); }
     bool        IsInverted() const                  { return Min.x > Max.x || Min.y > Max.y; }
-    ImVec4      ToVec4() const                      { return ImVec4(Min.x, Min.y, Max.x, Max.y); }
+    vdl::float4 ToVec4() const                      { return vdl::float4(Min.x, Min.y, Max.x, Max.y); }
 };
 
 // Helper: ImBitArray
@@ -503,7 +507,7 @@ struct IMGUI_API ImPool
 
     ImPool()    { FreeIdx = 0; }
     ~ImPool()   { Clear(); }
-    T*          GetByKey(ImGuiID key)               { int idx = Map.GetInt(key, -1); return (idx != -1) ? &Buf[idx] : NULL; }
+    T*          GetByKey(ImGuiID key)               { int idx = Map.GetInt(key, -1); return (idx != -1) ? &Buf[idx] : nullptr; }
     T*          GetByIndex(ImPoolIdx n)             { return &Buf[n]; }
     ImPoolIdx   GetIndex(const T* p) const          { IM_ASSERT(p >= Buf.Data && p < Buf.Data + Buf.Size); return (ImPoolIdx)(p - Buf.Data); }
     T*          GetOrAddByKey(ImGuiID key)          { int* p_idx = Map.GetIntRef(key, -1); if (*p_idx != -1) return &Buf[*p_idx]; *p_idx = FreeIdx; return Add(); }
@@ -530,7 +534,7 @@ struct IMGUI_API ImChunkStream
     bool    empty() const               { return Buf.Size == 0; }
     int     size() const                { return Buf.Size; }
     T*      alloc_chunk(size_t sz)      { size_t HDR_SZ = 4; sz = ((HDR_SZ + sz) + 3u) & ~3u; int off = Buf.Size; Buf.resize(off + (int)sz); ((int*)(void*)(Buf.Data + off))[0] = (int)sz; return (T*)(void*)(Buf.Data + off + (int)HDR_SZ); }
-    T*      begin()                     { size_t HDR_SZ = 4; if (!Buf.Data) return NULL; return (T*)(void*)(Buf.Data + HDR_SZ); }
+    T*      begin()                     { size_t HDR_SZ = 4; if (!Buf.Data) return nullptr; return (T*)(void*)(Buf.Data + HDR_SZ); }
     T*      next_chunk(T* p)            { size_t HDR_SZ = 4; IM_ASSERT(p >= begin() && p < end()); p = (T*)(void*)((char*)(void*)p + chunk_size(p)); if (p == (T*)(void*)((char*)end() + HDR_SZ)) return (T*)0; IM_ASSERT(p < end()); return p; }
     int     chunk_size(const T* p)      { return ((const int*)p)[-1]; }
     T*      end()                       { return (T*)(void*)(Buf.Data + Buf.Size); }
@@ -556,18 +560,18 @@ struct IMGUI_API ImChunkStream
 // You may want to create your own instance of this if you want to use ImDrawList completely without ImGui. In that case, watch out for future changes to this structure.
 struct IMGUI_API ImDrawListSharedData
 {
-    ImVec2          TexUvWhitePixel;            // UV of white pixel in the atlas
+  vdl::float2       TexUvWhitePixel;            // UV of white pixel in the atlas
     ImFont*         Font;                       // Current/default font (optional, for simplified AddText overload)
     float           FontSize;                   // Current/default font size (optional, for simplified AddText overload)
     float           CurveTessellationTol;       // Tessellation tolerance when using PathBezierCurveTo()
     float           CircleSegmentMaxError;      // Number of circle segments to use per pixel of radius for AddCircle() etc
-    ImVec4          ClipRectFullscreen;         // Value for PushClipRectFullscreen()
+    vdl::float4     ClipRectFullscreen;         // Value for PushClipRectFullscreen()
     ImDrawListFlags InitialFlags;               // Initial flags at the beginning of the frame (it is possible to alter flags on a per-drawlist basis afterwards)
 
     // [Internal] Lookup tables
-    ImVec2          ArcFastVtx[12 * IM_DRAWLIST_ARCFAST_TESSELLATION_MULTIPLIER];  // FIXME: Bake rounded corners fill/borders in atlas
-    ImU8            CircleSegmentCounts[64];    // Precomputed segment count for given radius (array index + 1) before we calculate it dynamically (to avoid calculation overhead)
-    const ImVec4*   TexUvLines;                 // UV of anti-aliased lines in the atlas
+    vdl::float2         ArcFastVtx[12 * IM_DRAWLIST_ARCFAST_TESSELLATION_MULTIPLIER];  // FIXME: Bake rounded corners fill/borders in atlas
+    ImU8                CircleSegmentCounts[64];    // Precomputed segment count for given radius (array index + 1) before we calculate it dynamically (to avoid calculation overhead)
+    const vdl::float4*  TexUvLines;                 // UV of anti-aliased lines in the atlas
 
     ImDrawListSharedData();
     void SetCircleSegmentMaxError(float max_error);
@@ -816,8 +820,8 @@ enum ImGuiDataTypePrivate_
 // Stacked color modifier, backup of modified data so we can restore it
 struct ImGuiColorMod
 {
-    ImGuiCol    Col;
-    ImVec4      BackupValue;
+    ImGuiCol     Col;
+    vdl::Color4F BackupValue;
 };
 
 // Stacked style modifier, backup of modified data so we can restore it. Data type inferred from the variable.
@@ -827,17 +831,17 @@ struct ImGuiStyleMod
     union           { int BackupInt[2]; float BackupFloat[2]; };
     ImGuiStyleMod(ImGuiStyleVar idx, int v)     { VarIdx = idx; BackupInt[0] = v; }
     ImGuiStyleMod(ImGuiStyleVar idx, float v)   { VarIdx = idx; BackupFloat[0] = v; }
-    ImGuiStyleMod(ImGuiStyleVar idx, ImVec2 v)  { VarIdx = idx; BackupFloat[0] = v.x; BackupFloat[1] = v.y; }
+    ImGuiStyleMod(ImGuiStyleVar idx, const vdl::float2& v)  { VarIdx = idx; BackupFloat[0] = v.x; BackupFloat[1] = v.y; }
 };
 
 // Stacked storage data for BeginGroup()/EndGroup()
 struct ImGuiGroupData
 {
-    ImVec2      BackupCursorPos;
-    ImVec2      BackupCursorMaxPos;
+    vdl::float2 BackupCursorPos;
+    vdl::float2 BackupCursorMaxPos;
     ImVec1      BackupIndent;
     ImVec1      BackupGroupOffset;
-    ImVec2      BackupCurrLineSize;
+    vdl::float2 BackupCurrLineSize;
     float       BackupCurrLineTextBaseOffset;
     ImGuiID     BackupActiveIdIsAlive;
     bool        BackupActiveIdPreviousFrameIsAlive;
@@ -901,10 +905,10 @@ struct ImGuiPopupData
     ImGuiWindow*        SourceWindow;   // Set on OpenPopup() copy of NavWindow at the time of opening the popup
     int                 OpenFrameCount; // Set on OpenPopup()
     ImGuiID             OpenParentId;   // Set on OpenPopup(), we need this to differentiate multiple menu sets from each others (e.g. inside menu bar vs loose menu items)
-    ImVec2              OpenPopupPos;   // Set on OpenPopup(), preferred popup position (typically == OpenMousePos when using mouse)
-    ImVec2              OpenMousePos;   // Set on OpenPopup(), copy of mouse position at the time of opening popup
+    vdl::float2         OpenPopupPos;   // Set on OpenPopup(), preferred popup position (typically == OpenMousePos when using mouse)
+    vdl::float2         OpenMousePos;   // Set on OpenPopup(), copy of mouse position at the time of opening popup
 
-    ImGuiPopupData() { PopupId = 0; Window = SourceWindow = NULL; OpenFrameCount = -1; OpenParentId = 0; }
+    ImGuiPopupData() { PopupId = 0; Window = SourceWindow = nullptr; OpenFrameCount = -1; OpenParentId = 0; }
 };
 
 struct ImGuiNavMoveResult
@@ -918,7 +922,7 @@ struct ImGuiNavMoveResult
     ImRect          RectRel;            // Best candidate bounding box in window relative space
 
     ImGuiNavMoveResult() { Clear(); }
-    void Clear()         { Window = NULL; ID = FocusScopeId = 0; DistBox = DistCenter = DistAxial = FLT_MAX; RectRel = ImRect(); }
+    void Clear()         { Window = nullptr; ID = FocusScopeId = 0; DistBox = DistCenter = DistAxial = FLT_MAX; RectRel = ImRect(); }
 };
 
 enum ImGuiNextWindowDataFlags_
@@ -945,11 +949,11 @@ struct ImGuiNextWindowData
     ImGuiCond                   SizeCond;
     ImGuiCond                   CollapsedCond;
     ImGuiCond                   DockCond;
-    ImVec2                      PosVal;
-    ImVec2                      PosPivotVal;
-    ImVec2                      SizeVal;
-    ImVec2                      ContentSizeVal;
-    ImVec2                      ScrollVal;
+    vdl::float2                 PosVal;
+    vdl::float2                 PosPivotVal;
+    vdl::float2                 SizeVal;
+    vdl::float2                 ContentSizeVal;
+    vdl::float2                 ScrollVal;
     bool                        PosUndock;
     bool                        CollapsedVal;
     ImRect                      SizeConstraintRect;
@@ -959,7 +963,7 @@ struct ImGuiNextWindowData
     ImGuiID                     ViewportId;
     ImGuiID                     DockId;
     ImGuiWindowClass            WindowClass;
-    ImVec2                      MenuBarOffsetMinVal;    // (Always on) This is not exposed publicly, so we don't clear it and it doesn't have a corresponding flag (could we? for consistency?)
+    vdl::float2                 MenuBarOffsetMinVal;    // (Always on) This is not exposed publicly, so we don't clear it and it doesn't have a corresponding flag (could we? for consistency?)
 
     ImGuiNextWindowData()       { memset(this, 0, sizeof(*this)); }
     inline void ClearFlags()    { Flags = ImGuiNextWindowDataFlags_None; }
@@ -996,7 +1000,7 @@ struct ImGuiPtrOrIndex
     int         Index;          // Usually index in a main pool.
 
     ImGuiPtrOrIndex(void* ptr)  { Ptr = ptr; Index = -1; }
-    ImGuiPtrOrIndex(int index)  { Ptr = NULL; Index = index; }
+    ImGuiPtrOrIndex(int index)  { Ptr = nullptr; Index = index; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1123,9 +1127,9 @@ struct ImGuiDockNode
     ImGuiDockNode*          ChildNodes[2];              // [Split node only] Child nodes (left/right or top/bottom). Consider switching to an array.
     ImVector<ImGuiWindow*>  Windows;                    // Note: unordered list! Iterate TabBar->Tabs for user-order.
     ImGuiTabBar*            TabBar;
-    ImVec2                  Pos;                        // Current position
-    ImVec2                  Size;                       // Current size
-    ImVec2                  SizeRef;                    // [Split node only] Last explicitly written-to size (overridden when using a splitter affecting the node), used to calculate Size.
+    vdl::float2             Pos;                        // Current position
+    vdl::float2             Size;                       // Current size
+    vdl::float2             SizeRef;                    // [Split node only] Last explicitly written-to size (overridden when using a splitter affecting the node), used to calculate Size.
     ImGuiAxis               SplitAxis;                  // [Split node only] Split axis (X or Y)
     ImGuiWindowClass        WindowClass;                // [Root node only]
 
@@ -1157,15 +1161,15 @@ struct ImGuiDockNode
 
     ImGuiDockNode(ImGuiID id);
     ~ImGuiDockNode();
-    bool                    IsRootNode() const      { return ParentNode == NULL; }
+    bool                    IsRootNode() const      { return ParentNode == nullptr; }
     bool                    IsDockSpace() const     { return (LocalFlags & ImGuiDockNodeFlags_DockSpace) != 0; }
-    bool                    IsFloatingNode() const  { return ParentNode == NULL && (LocalFlags & ImGuiDockNodeFlags_DockSpace) == 0; }
+    bool                    IsFloatingNode() const  { return ParentNode == nullptr && (LocalFlags & ImGuiDockNodeFlags_DockSpace) == 0; }
     bool                    IsCentralNode() const   { return (LocalFlags & ImGuiDockNodeFlags_CentralNode) != 0; }
     bool                    IsHiddenTabBar() const  { return (LocalFlags & ImGuiDockNodeFlags_HiddenTabBar) != 0; } // Hidden tab bar can be shown back by clicking the small triangle
     bool                    IsNoTabBar() const      { return (LocalFlags & ImGuiDockNodeFlags_NoTabBar) != 0; }     // Never show a tab bar
-    bool                    IsSplitNode() const     { return ChildNodes[0] != NULL; }
-    bool                    IsLeafNode() const      { return ChildNodes[0] == NULL; }
-    bool                    IsEmpty() const         { return ChildNodes[0] == NULL && Windows.Size == 0; }
+    bool                    IsSplitNode() const     { return ChildNodes[0] != nullptr; }
+    bool                    IsLeafNode() const      { return ChildNodes[0] == nullptr; }
+    bool                    IsEmpty() const         { return ChildNodes[0] == nullptr && Windows.Size == 0; }
     ImGuiDockNodeFlags      GetMergedFlags() const  { return SharedFlags | LocalFlags; }
     ImRect                  Rect() const            { return ImRect(Pos.x, Pos.y, Pos.x + Size.x, Pos.y + Size.y); }
 };
@@ -1196,7 +1200,7 @@ struct ImGuiViewportP : public ImGuiViewport
     int                 LastFrameDrawLists[2];    // Last frame number the background (0) and foreground (1) draw lists were used
     int                 LastFrontMostStampCount;  // Last stamp number from when a window hosted by this viewport was made front-most (by comparing this value between two viewport we have an implicit viewport z-order
     ImGuiID             LastNameHash;
-    ImVec2              LastPos;
+    vdl::float2         LastPos;
     float               Alpha;                    // Window opacity (when dragging dockable windows/viewports we make them transparent)
     float               LastAlpha;
     short               PlatformMonitor;
@@ -1205,13 +1209,13 @@ struct ImGuiViewportP : public ImGuiViewport
     ImDrawList*         DrawLists[2];             // Convenience background (0) and foreground (1) draw lists. We use them to draw software mouser cursor when io.MouseDrawCursor is set and to draw most debug overlays.
     ImDrawData          DrawDataP;
     ImDrawDataBuilder   DrawDataBuilder;
-    ImVec2              LastPlatformPos;
-    ImVec2              LastPlatformSize;
-    ImVec2              LastRendererSize;
-    ImVec2              CurrWorkOffsetMin;        // Work area top-left offset being increased during the frame
-    ImVec2              CurrWorkOffsetMax;        // Work area bottom-right offset being decreased during the frame
+    vdl::float2         LastPlatformPos;
+    vdl::float2         LastPlatformSize;
+    vdl::float2         LastRendererSize;
+    vdl::float2         CurrWorkOffsetMin;        // Work area top-left offset being increased during the frame
+    vdl::float2         CurrWorkOffsetMax;        // Work area bottom-right offset being decreased during the frame
 
-    ImGuiViewportP()                { Idx = -1; LastFrameActive = LastFrameDrawLists[0] = LastFrameDrawLists[1] = LastFrontMostStampCount = -1; LastNameHash = 0; Alpha = LastAlpha = 1.0f; PlatformMonitor = -1; PlatformWindowCreated = false; Window = NULL; DrawLists[0] = DrawLists[1] = NULL; LastPlatformPos = LastPlatformSize = LastRendererSize = ImVec2(FLT_MAX, FLT_MAX); }
+    ImGuiViewportP()                { Idx = -1; LastFrameActive = LastFrameDrawLists[0] = LastFrameDrawLists[1] = LastFrontMostStampCount = -1; LastNameHash = 0; Alpha = LastAlpha = 1.0f; PlatformMonitor = -1; PlatformWindowCreated = false; Window = nullptr; DrawLists[0] = DrawLists[1] = nullptr; LastPlatformPos = LastPlatformSize = LastRendererSize = vdl::float2(FLT_MAX, FLT_MAX); }
     ~ImGuiViewportP()               { if (DrawLists[0]) IM_DELETE(DrawLists[0]); if (DrawLists[1]) IM_DELETE(DrawLists[1]); }
     ImRect  GetMainRect() const     { return ImRect(Pos.x, Pos.y, Pos.x + Size.x, Pos.y + Size.y); }
     ImRect  GetWorkRect() const     { return ImRect(Pos.x + WorkOffsetMin.x, Pos.y + WorkOffsetMin.y, Pos.x + Size.x + WorkOffsetMax.x, Pos.y + Size.y + WorkOffsetMax.y); }
@@ -1297,12 +1301,12 @@ struct ImGuiContext
     int                     WindowsActiveCount;                 // Number of unique windows submitted by frame
     ImGuiWindow*            CurrentWindow;                      // Window being drawn into
     ImGuiWindow*            HoveredWindow;                      // Window the mouse is hovering. Will typically catch mouse inputs.
-    ImGuiWindow*            HoveredRootWindow;                  // == HoveredWindow ? HoveredWindow->RootWindow : NULL, merely a shortcut to avoid null test in some situation.
+    ImGuiWindow*            HoveredRootWindow;                  // == HoveredWindow ? HoveredWindow->RootWindow : nullptr, merely a shortcut to avoid null test in some situation.
     ImGuiWindow*            HoveredWindowUnderMovingWindow;     // Hovered window ignoring MovingWindow. Only set if MovingWindow is set.
     ImGuiDockNode*          HoveredDockNode;
     ImGuiWindow*            MovingWindow;                       // Track the window we clicked on (in order to preserve focus). The actual window that is moved is generally MovingWindow->RootWindow.
     ImGuiWindow*            WheelingWindow;                     // Track the window we started mouse-wheeling on. Until a timer elapse or mouse has moved, generally keep scrolling the same window even if during the course of scrolling the mouse ends up hovering a child window.
-    ImVec2                  WheelingWindowRefMousePos;
+    vdl::float2             WheelingWindowRefMousePos;
     float                   WheelingWindowTimer;
 
     // Item/widgets state and tracking information
@@ -1324,7 +1328,7 @@ struct ImGuiContext
     ImU32                   ActiveIdUsingNavDirMask;            // Active widget will want to read those nav move requests (e.g. can activate a button and move away from it)
     ImU32                   ActiveIdUsingNavInputMask;          // Active widget will want to read those nav inputs.
     ImU64                   ActiveIdUsingKeyInputMask;          // Active widget will want to read those key inputs. When we grow the ImGuiKey enum we'll need to either to order the enum to make useful keys come first, either redesign this into e.g. a small array.
-    ImVec2                  ActiveIdClickOffset;                // Clicked offset from upper-left corner, if applicable (currently only set by ButtonBehavior)
+    vdl::float2             ActiveIdClickOffset;                // Clicked offset from upper-left corner, if applicable (currently only set by ButtonBehavior)
     ImGuiWindow*            ActiveIdWindow;
     ImGuiInputSource        ActiveIdSource;                     // Activating with mouse or nav (gamepad/keyboard)
     int                     ActiveIdMouseButton;
@@ -1442,7 +1446,7 @@ struct ImGuiContext
     ImVector<ImGuiShrinkWidthItem>  ShrinkWidthBuffer;
 
     // Widget state
-    ImVec2                  LastValidMousePos;
+    vdl::float2             LastValidMousePos;
     ImGuiInputTextState     InputTextState;
     ImFont                  InputTextPasswordFont;
     ImGuiID                 TempInputId;                        // Temporary text input when CTRL+clicking on a slider, etc.
@@ -1450,7 +1454,7 @@ struct ImGuiContext
     float                   ColorEditLastHue;                   // Backup of last Hue associated to LastColor[3], so we can restore Hue in lossy RGB<>HSV round trips
     float                   ColorEditLastSat;                   // Backup of last Saturation associated to LastColor[3], so we can restore Saturation in lossy RGB<>HSV round trips
     float                   ColorEditLastColor[3];
-    ImVec4                  ColorPickerRef;                     // Initial/reference color at the time of opening the color picker.
+    vdl::Color4F            ColorPickerRef;                     // Initial/reference color at the time of opening the color picker.
     float                   SliderCurrentAccum;                 // Accumulated slider delta when using navigation controls.
     bool                    SliderCurrentAccumDirty;            // Has the accumulated slider delta changed since last time we tried to apply it?
     bool                    DragCurrentAccumDirty;
@@ -1462,8 +1466,8 @@ struct ImGuiContext
     ImVector<ImGuiID>       MenusIdSubmittedThisFrame;          // A list of menu IDs that were rendered at least once
 
     // Platform support
-    ImVec2                  PlatformImePos;                     // Cursor position request & last passed to the OS Input Method Editor
-    ImVec2                  PlatformImeLastPos;
+    vdl::float2             PlatformImePos;                     // Cursor position request & last passed to the OS Input Method Editor
+    vdl::float2             PlatformImeLastPos;
     ImGuiViewportP*         PlatformImePosViewport;
 
     // Extensions
@@ -1480,7 +1484,7 @@ struct ImGuiContext
     // Capture/Logging
     bool                    LogEnabled;                         // Currently capturing
     ImGuiLogType            LogType;                            // Capture target
-    ImFileHandle            LogFile;                            // If != NULL log to stdout/ file
+    ImFileHandle            LogFile;                            // If != nullptr log to stdout/ file
     ImGuiTextBuffer         LogBuffer;                          // Accumulation buffer when log to clipboard. This is pointer so our GImGui static constructor doesn't call heap allocators.
     float                   LogLinePosY;
     bool                    LogLineFirstItem;
@@ -1506,7 +1510,7 @@ struct ImGuiContext
         Initialized = false;
         ConfigFlagsCurrFrame = ConfigFlagsLastFrame = ImGuiConfigFlags_None;
         FontAtlasOwnedByContext = shared_font_atlas ? false : true;
-        Font = NULL;
+        Font = nullptr;
         FontSize = FontBaseSize = 0.0f;
         IO.Fonts = shared_font_atlas ? shared_font_atlas : IM_NEW(ImFontAtlas)();
         Time = 0.0f;
@@ -1515,16 +1519,16 @@ struct ImGuiContext
         WithinFrameScope = WithinFrameScopeWithImplicitWindow = WithinEndChild = false;
         TestEngineHookItems = false;
         TestEngineHookIdInfo = 0;
-        TestEngine = NULL;
+        TestEngine = nullptr;
 
         WindowsActiveCount = 0;
-        CurrentWindow = NULL;
-        HoveredWindow = NULL;
-        HoveredRootWindow = NULL;
-        HoveredWindowUnderMovingWindow = NULL;
-        HoveredDockNode = NULL;
-        MovingWindow = NULL;
-        WheelingWindow = NULL;
+        CurrentWindow = nullptr;
+        HoveredWindow = nullptr;
+        HoveredRootWindow = nullptr;
+        HoveredWindowUnderMovingWindow = nullptr;
+        HoveredDockNode = nullptr;
+        MovingWindow = nullptr;
+        WheelingWindow = nullptr;
         WheelingWindowTimer = 0.0f;
 
         HoveredId = HoveredIdPreviousFrame = 0;
@@ -1543,24 +1547,24 @@ struct ImGuiContext
         ActiveIdUsingNavDirMask = 0x00;
         ActiveIdUsingNavInputMask = 0x00;
         ActiveIdUsingKeyInputMask = 0x00;
-        ActiveIdClickOffset = ImVec2(-1, -1);
-        ActiveIdWindow = NULL;
+        ActiveIdClickOffset = vdl::float2(-1.0f, -1.0f);
+        ActiveIdWindow = nullptr;
         ActiveIdSource = ImGuiInputSource_None;
         ActiveIdMouseButton = 0;
         ActiveIdPreviousFrame = 0;
         ActiveIdPreviousFrameIsAlive = false;
         ActiveIdPreviousFrameHasBeenEditedBefore = false;
-        ActiveIdPreviousFrameWindow = NULL;
+        ActiveIdPreviousFrameWindow = nullptr;
         LastActiveId = 0;
         LastActiveIdTimer = 0.0f;
 
         CurrentDpiScale = 0.0f;
-        CurrentViewport = NULL;
-        MouseViewport = MouseLastHoveredViewport = NULL;
+        CurrentViewport = nullptr;
+        MouseViewport = MouseLastHoveredViewport = nullptr;
         PlatformLastFocusedViewport = 0;
         ViewportFrontMostStampCount = 0;
 
-        NavWindow = NULL;
+        NavWindow = nullptr;
         NavId = NavFocusScopeId = NavActivateId = NavActivateDownId = NavActivatePressedId = NavInputId = 0;
         NavJustTabbedId = NavJustMovedToId = NavJustMovedToFocusScopeId = NavNextActivateId = 0;
         NavJustMovedToKeyMods = ImGuiKeyModFlags_None;
@@ -1583,14 +1587,14 @@ struct ImGuiContext
         NavMoveRequestForward = ImGuiNavForward_None;
         NavMoveRequestKeyMods = ImGuiKeyModFlags_None;
         NavMoveDir = NavMoveDirLast = NavMoveClipDir = ImGuiDir_None;
-        NavWrapRequestWindow = NULL;
+        NavWrapRequestWindow = nullptr;
         NavWrapRequestFlags = ImGuiNavMoveFlags_None;
 
-        NavWindowingTarget = NavWindowingTargetAnim = NavWindowingListWindow = NULL;
+        NavWindowingTarget = NavWindowingTargetAnim = NavWindowingListWindow = nullptr;
         NavWindowingTimer = NavWindowingHighlightAlpha = 0.0f;
         NavWindowingToggleLayer = false;
 
-        FocusRequestCurrWindow = FocusRequestNextWindow = NULL;
+        FocusRequestCurrWindow = FocusRequestNextWindow = nullptr;
         FocusRequestCurrCounterRegular = FocusRequestCurrCounterTabStop = INT_MAX;
         FocusRequestNextCounterRegular = FocusRequestNextCounterTabStop = INT_MAX;
         FocusTabPressed = false;
@@ -1610,9 +1614,9 @@ struct ImGuiContext
         DragDropHoldJustPressedId = 0;
         memset(DragDropPayloadBufLocal, 0, sizeof(DragDropPayloadBufLocal));
 
-        CurrentTabBar = NULL;
+        CurrentTabBar = nullptr;
 
-        LastValidMousePos = ImVec2(0.0f, 0.0f);
+        LastValidMousePos = vdl::float2(0.0f, 0.0f);
         TempInputId = 0;
         ColorEditOptions = ImGuiColorEditFlags__OptionsDefault;
         ColorEditLastHue = ColorEditLastSat = 0.0f;
@@ -1625,7 +1629,7 @@ struct ImGuiContext
         ScrollbarClickDeltaToGrabCenter = 0.0f;
         TooltipOverrideCount = 0;
 
-        PlatformImePos = PlatformImeLastPos = ImVec2(FLT_MAX, FLT_MAX);
+        PlatformImePos = PlatformImeLastPos = vdl::float2(FLT_MAX, FLT_MAX);
         PlatformImePosViewport = 0;
 
         SettingsLoaded = false;
@@ -1633,7 +1637,7 @@ struct ImGuiContext
 
         LogEnabled = false;
         LogType = ImGuiLogType_None;
-        LogFile = NULL;
+        LogFile = nullptr;
         LogLinePosY = FLT_MAX;
         LogLineFirstItem = false;
         LogDepthRef = 0;
@@ -1659,12 +1663,12 @@ struct ImGuiContext
 struct IMGUI_API ImGuiWindowTempData
 {
     // Layout
-    ImVec2                  CursorPos;              // Current emitting position, in absolute coordinates.
-    ImVec2                  CursorPosPrevLine;
-    ImVec2                  CursorStartPos;         // Initial position after Begin(), generally ~ window position + WindowPadding.
-    ImVec2                  CursorMaxPos;           // Used to implicitly calculate the size of our contents, always growing during the frame. Used to calculate window->ContentSize at the beginning of next frame
-    ImVec2                  CurrLineSize;
-    ImVec2                  PrevLineSize;
+    vdl::float2             CursorPos;              // Current emitting position, in absolute coordinates.
+    vdl::float2             CursorPosPrevLine;
+    vdl::float2             CursorStartPos;         // Initial position after Begin(), generally ~ window position + WindowPadding.
+    vdl::float2             CursorMaxPos;           // Used to implicitly calculate the size of our contents, always growing during the frame. Used to calculate window->ContentSize at the beginning of next frame
+    vdl::float2             CurrLineSize;
+    vdl::float2             PrevLineSize;
     float                   CurrLineTextBaseOffset; // Baseline offset (0.0f by default on a new line, generally == style.FramePadding.y when a framed item has been added).
     float                   PrevLineTextBaseOffset;
     ImVec1                  Indent;                 // Indentation / start position from left of window (increased by TreePush/TreePop, etc.)
@@ -1688,7 +1692,7 @@ struct IMGUI_API ImGuiWindowTempData
 
     // Miscellaneous
     bool                    MenuBarAppending;       // FIXME: Remove this
-    ImVec2                  MenuBarOffset;          // MenuBarOffset.x is sort of equivalent of a per-layer CursorPos.x, saved/restored as we switch to the menu bar. The only situation when MenuBarOffset.y is > 0 if when (SafeAreaPadding.y > FramePadding.y), often used on TVs.
+    vdl::float2             MenuBarOffset;          // MenuBarOffset.x is sort of equivalent of a per-layer CursorPos.x, saved/restored as we switch to the menu bar. The only situation when MenuBarOffset.y is > 0 if when (SafeAreaPadding.y > FramePadding.y), often used on TVs.
     ImGuiMenuColumns        MenuColumns;            // Simplified columns storage for menu items measurement
     int                     TreeDepth;              // Current tree depth.
     ImU32                   TreeJumpToParentOnPopMask; // Store a copy of !g.NavIdIsAlive for TreeDepth 0..31.. Could be turned into a ImU64 if necessary.
@@ -1713,8 +1717,8 @@ struct IMGUI_API ImGuiWindowTempData
 
     ImGuiWindowTempData()
     {
-        CursorPos = CursorPosPrevLine = CursorStartPos = CursorMaxPos = ImVec2(0.0f, 0.0f);
-        CurrLineSize = PrevLineSize = ImVec2(0.0f, 0.0f);
+        CursorPos = CursorPosPrevLine = CursorStartPos = CursorMaxPos = vdl::float2(0.0f, 0.0f);
+        CurrLineSize = PrevLineSize = vdl::float2(0.0f, 0.0f);
         CurrLineTextBaseOffset = PrevLineTextBaseOffset = 0.0f;
         Indent = ImVec1(0.0f);
         ColumnsOffset = ImVec1(0.0f);
@@ -1732,11 +1736,11 @@ struct IMGUI_API ImGuiWindowTempData
         NavHasScroll = false;
 
         MenuBarAppending = false;
-        MenuBarOffset = ImVec2(0.0f, 0.0f);
+        MenuBarOffset = vdl::float2(0.0f, 0.0f);
         TreeDepth = 0;
         TreeJumpToParentOnPopMask = 0x00;
-        StateStorage = NULL;
-        CurrentColumns = NULL;
+        StateStorage = nullptr;
+        CurrentColumns = nullptr;
         LayoutType = ParentLayoutType = ImGuiLayoutType_Vertical;
         FocusCounterRegular = FocusCounterTabStop = -1;
 
@@ -1754,26 +1758,26 @@ struct IMGUI_API ImGuiWindow
     ImGuiID                 ID;                                 // == ImHashStr(Name)
     ImGuiWindowFlags        Flags, FlagsPreviousFrame;          // See enum ImGuiWindowFlags_
     ImGuiWindowClass        WindowClass;                        // Advanced users only. Set with SetNextWindowClass()
-    ImGuiViewportP*         Viewport;                           // Always set in Begin(), only inactive windows may have a NULL value here
+    ImGuiViewportP*         Viewport;                           // Always set in Begin(), only inactive windows may have a nullptr value here
     ImGuiID                 ViewportId;                         // We backup the viewport id (since the viewport may disappear or never be created if the window is inactive)
-    ImVec2                  ViewportPos;                        // We backup the viewport position (since the viewport may disappear or never be created if the window is inactive)
+    vdl::float2             ViewportPos;                        // We backup the viewport position (since the viewport may disappear or never be created if the window is inactive)
     int                     ViewportAllowPlatformMonitorExtend; // Reset to -1 every frame (index is guaranteed to be valid between NewFrame..EndFrame), only used in the Appearing frame of a tooltip/popup to enforce clamping to a given monitor
-    ImVec2                  Pos;                                // Position (always rounded-up to nearest pixel)
-    ImVec2                  Size;                               // Current size (==SizeFull or collapsed title bar size)
-    ImVec2                  SizeFull;                           // Size when non collapsed
-    ImVec2                  ContentSize;                        // Size of contents/scrollable client area (calculated from the extents reach of the cursor) from previous frame. Does not include window decoration or window padding.
-    ImVec2                  ContentSizeExplicit;                // Size of contents/scrollable client area explicitly request by the user via SetNextWindowContentSize().
-    ImVec2                  WindowPadding;                      // Window padding at the time of Begin().
+    vdl::float2             Pos;                                // Position (always rounded-up to nearest pixel)
+    vdl::float2             Size;                               // Current size (==SizeFull or collapsed title bar size)
+    vdl::float2             SizeFull;                           // Size when non collapsed
+    vdl::float2             ContentSize;                        // Size of contents/scrollable client area (calculated from the extents reach of the cursor) from previous frame. Does not include window decoration or window padding.
+    vdl::float2             ContentSizeExplicit;                // Size of contents/scrollable client area explicitly request by the user via SetNextWindowContentSize().
+    vdl::float2             WindowPadding;                      // Window padding at the time of Begin().
     float                   WindowRounding;                     // Window rounding at the time of Begin(). May be clamped lower to avoid rendering artifacts with title bar, menu bar etc.
     float                   WindowBorderSize;                   // Window border size at the time of Begin().
     int                     NameBufLen;                         // Size of buffer storing Name. May be larger than strlen(Name)!
     ImGuiID                 MoveId;                             // == window->GetID("#MOVE")
     ImGuiID                 ChildId;                            // ID of corresponding item in parent window (for navigation to return from child window to parent window)
-    ImVec2                  Scroll;
-    ImVec2                  ScrollMax;
-    ImVec2                  ScrollTarget;                       // target scroll position. stored as cursor position with scrolling canceled out, so the highest point is always 0.0f. (FLT_MAX for no change)
-    ImVec2                  ScrollTargetCenterRatio;            // 0.0f = scroll so that target position is at top, 0.5f = scroll so that target position is centered
-    ImVec2                  ScrollbarSizes;                     // Size taken by each scrollbars on their smaller axis. Pay attention! ScrollbarSizes.x == width of the vertical scrollbar, ScrollbarSizes.y = height of the horizontal scrollbar.
+    vdl::float2             Scroll;
+    vdl::float2             ScrollMax;
+    vdl::float2             ScrollTarget;                       // target scroll position. stored as cursor position with scrolling canceled out, so the highest point is always 0.0f. (FLT_MAX for no change)
+    vdl::float2             ScrollTargetCenterRatio;            // 0.0f = scroll so that target position is at top, 0.5f = scroll so that target position is centered
+    vdl::float2             ScrollbarSizes;                     // Size taken by each scrollbars on their smaller axis. Pay attention! ScrollbarSizes.x == width of the vertical scrollbar, ScrollbarSizes.y = height of the horizontal scrollbar.
     bool                    ScrollbarX, ScrollbarY;             // Are scrollbars visible?
     bool                    ViewportOwned;
     bool                    Active;                             // Set to true on Begin(), unless Collapsed
@@ -1785,7 +1789,7 @@ struct IMGUI_API ImGuiWindow
     bool                    Appearing;                          // Set during the frame where the window is appearing (or re-appearing)
     bool                    Hidden;                             // Do not display (== HiddenFrames*** > 0)
     bool                    IsFallbackWindow;                   // Set on the "Debug##Default" window.
-    bool                    HasCloseButton;                     // Set when the window has a close button (p_open != NULL)
+    bool                    HasCloseButton;                     // Set when the window has a close button (p_open != nullptr)
     signed char             ResizeBorderHeld;                   // Current border being held for resize (-1: none, otherwise 0-3)
     short                   BeginCount;                         // Number of Begin() during the current frame (generally 0 or 1, 1+ if appending via multiple Begin/End pairs)
     short                   BeginOrderWithinParent;             // Order within immediate parent window, if we are a child window. Otherwise 0.
@@ -1801,8 +1805,8 @@ struct IMGUI_API ImGuiWindow
     ImGuiCond               SetWindowSizeAllowFlags;            // store acceptable condition flags for SetNextWindowSize() use.
     ImGuiCond               SetWindowCollapsedAllowFlags;       // store acceptable condition flags for SetNextWindowCollapsed() use.
     ImGuiCond               SetWindowDockAllowFlags;            // store acceptable condition flags for SetNextWindowDock() use.
-    ImVec2                  SetWindowPosVal;                    // store window position when using a non-zero Pivot (position set needs to be processed when we know the window size)
-    ImVec2                  SetWindowPosPivot;                  // store window pivot for positioning. ImVec2(0, 0) when positioning from top-left corner; ImVec2(0.5f, 0.5f) for centering; ImVec2(1, 1) for bottom right.
+    vdl::float2             SetWindowPosVal;                    // store window position when using a non-zero Pivot (position set needs to be processed when we know the window size)
+    vdl::float2             SetWindowPosPivot;                  // store window pivot for positioning. ImVec2(0, 0) when positioning from top-left corner; ImVec2(0.5f, 0.5f) for centering; ImVec2(1, 1) for bottom right.
 
     ImVector<ImGuiID>       IDStack;                            // ID stack. ID are hashes seeded with the value at the top of the stack. (In theory this should be in the TempData structure)
     ImGuiWindowTempData     DC;                                 // Temporary per-window data, reset at the beginning of the frame. This used to be called ImGuiDrawContext, hence the "DC" variable name.
@@ -1831,7 +1835,7 @@ struct IMGUI_API ImGuiWindow
 
     ImDrawList*             DrawList;                           // == &DrawListInst (for backward compatibility reason with code using imgui_internal.h we keep this a pointer)
     ImDrawList              DrawListInst;
-    ImGuiWindow*            ParentWindow;                       // If we are a child _or_ popup window, this is pointing to our parent. Otherwise NULL.
+    ImGuiWindow*            ParentWindow;                       // If we are a child _or_ popup window, this is pointing to our parent. Otherwise nullptr.
     ImGuiWindow*            RootWindow;                         // Point to ourself or first ancestor that is not a child window == Top-level window.
     ImGuiWindow*            RootWindowDockStop;                 // Point to ourself or first ancestor that is not a child window. Doesn't cross through dock nodes. We use this so IsWindowFocused() can behave consistently regardless of docking state.
     ImGuiWindow*            RootWindowForTitleBarHighlight;     // Point to ourself or first ancestor which will display TitleBgActive color when this window is active.
@@ -1852,7 +1856,7 @@ struct IMGUI_API ImGuiWindow
     ImGuiItemStatusFlags    DockTabItemStatusFlags;
     ImRect                  DockTabItemRect;
     short                   DockOrder;                          // Order of the last time the window was visible within its DockNode. This is used to reorder windows that are reappearing on the same frame. Same value between windows that were active and windows that were none are possible.
-    bool                    DockIsActive        :1;             // When docking artifacts are actually visible. When this is set, DockNode is guaranteed to be != NULL. ~~ (DockNode != NULL) && (DockNode->Windows.Size > 1).
+    bool                    DockIsActive        :1;             // When docking artifacts are actually visible. When this is set, DockNode is guaranteed to be != nullptr. ~~ (DockNode != nullptr) && (DockNode->Windows.Size > 1).
     bool                    DockTabIsVisible    :1;             // Is our window visible this frame? ~~ is the corresponding tab selected?
     bool                    DockTabWantClose    :1;
 
@@ -1860,10 +1864,10 @@ public:
     ImGuiWindow(ImGuiContext* context, const char* name);
     ~ImGuiWindow();
 
-    ImGuiID     GetID(const char* str, const char* str_end = NULL);
+    ImGuiID     GetID(const char* str, const char* str_end = nullptr);
     ImGuiID     GetID(const void* ptr);
     ImGuiID     GetID(int n);
-    ImGuiID     GetIDNoKeepAlive(const char* str, const char* str_end = NULL);
+    ImGuiID     GetIDNoKeepAlive(const char* str, const char* str_end = nullptr);
     ImGuiID     GetIDNoKeepAlive(const void* ptr);
     ImGuiID     GetIDNoKeepAlive(int n);
     ImGuiID     GetIDFromRectangle(const ImRect& r_abs);
@@ -1872,7 +1876,7 @@ public:
     ImRect      Rect() const            { return ImRect(Pos.x, Pos.y, Pos.x + Size.x, Pos.y + Size.y); }
     float       CalcFontSize() const    { ImGuiContext& g = *GImGui; float scale = g.FontBaseSize * FontWindowScale * FontDpiScale; if (ParentWindow) scale *= ParentWindow->FontWindowScale; return scale; }
     float       TitleBarHeight() const  { ImGuiContext& g = *GImGui; return (Flags & ImGuiWindowFlags_NoTitleBar) ? 0.0f : CalcFontSize() + g.Style.FramePadding.y * 2.0f; }
-    ImRect      TitleBarRect() const    { return ImRect(Pos, ImVec2(Pos.x + SizeFull.x, Pos.y + TitleBarHeight())); }
+    ImRect      TitleBarRect() const    { return ImRect(Pos, vdl::float2(Pos.x + SizeFull.x, Pos.y + TitleBarHeight())); }
     float       MenuBarHeight() const   { ImGuiContext& g = *GImGui; return (Flags & ImGuiWindowFlags_MenuBar) ? DC.MenuBarOffset.y + CalcFontSize() + g.Style.FramePadding.y * 2.0f : 0.0f; }
     ImRect      MenuBarRect() const     { float y1 = Pos.y + TitleBarHeight(); return ImRect(Pos.x, y1, Pos.x + SizeFull.x, y1 + MenuBarHeight()); }
 };
@@ -1921,10 +1925,10 @@ struct ImGuiTabItem
     float               Offset;                 // Position relative to beginning of tab
     float               Width;                  // Width currently displayed
     float               ContentWidth;           // Width of actual contents, stored during BeginTabItem() call
-    ImS16               NameOffset;             // When Window==NULL, offset to name within parent ImGuiTabBar::TabsNames
+    ImS16               NameOffset;             // When Window==nullptr, offset to name within parent ImGuiTabBar::TabsNames
     bool                WantClose;              // Marked as closed by SetTabItemClosed()
 
-    ImGuiTabItem()      { ID = 0; Flags = ImGuiTabItemFlags_None; Window = NULL; LastFrameVisible = LastFrameSelected = -1; NameOffset = -1; Offset = Width = ContentWidth = 0.0f; WantClose = false; }
+    ImGuiTabItem()      { ID = 0; Flags = ImGuiTabItemFlags_None; Window = nullptr; LastFrameVisible = LastFrameSelected = -1; NameOffset = -1; Offset = Width = ContentWidth = 0.0f; WantClose = false; }
 };
 
 // Storage for a tab bar (sizeof() 92~96 bytes)
@@ -1952,7 +1956,7 @@ struct ImGuiTabBar
     bool                WantLayout;
     bool                VisibleTabWasSubmitted;
     short               LastTabItemIdx;         // For BeginTabItem()/EndTabItem()
-    ImVec2              FramePadding;           // style.FramePadding locked at the time of BeginTabBar()
+    vdl::float2         FramePadding;           // style.FramePadding locked at the time of BeginTabBar()
     ImGuiTextBuffer     TabsNames;              // For non-docking tab bar we re-append names in a contiguous buffer.
 
     ImGuiTabBar();
@@ -1983,7 +1987,7 @@ namespace ImGui
 {
     // Windows
     // We should always have a CurrentWindow in the stack (there is an implicit "Debug" window)
-    // If this ever crash because g.CurrentWindow is NULL it means that either
+    // If this ever crash because g.CurrentWindow is nullptr it means that either
     // - ImGui::NewFrame() has never been called, which is illegal.
     // - You are calling ImGui functions after ImGui::EndFrame()/ImGui::Render() and before the next ImGui::NewFrame(), which is also illegal.
     inline    ImGuiWindow*  GetCurrentWindowRead()      { ImGuiContext& g = *GImGui; return g.CurrentWindow; }
@@ -1991,14 +1995,14 @@ namespace ImGui
     IMGUI_API ImGuiWindow*  FindWindowByID(ImGuiID id);
     IMGUI_API ImGuiWindow*  FindWindowByName(const char* name);
     IMGUI_API void          UpdateWindowParentAndRootLinks(ImGuiWindow* window, ImGuiWindowFlags flags, ImGuiWindow* parent_window);
-    IMGUI_API ImVec2        CalcWindowExpectedSize(ImGuiWindow* window);
+    IMGUI_API vdl::float2   CalcWindowExpectedSize(ImGuiWindow* window);
     IMGUI_API bool          IsWindowChildOf(ImGuiWindow* window, ImGuiWindow* potential_parent);
     IMGUI_API bool          IsWindowNavFocusable(ImGuiWindow* window);
     IMGUI_API ImRect        GetWindowAllowedExtentRect(ImGuiWindow* window);
-    IMGUI_API void          SetWindowPos(ImGuiWindow* window, const ImVec2& pos, ImGuiCond cond = 0);
-    IMGUI_API void          SetWindowSize(ImGuiWindow* window, const ImVec2& size, ImGuiCond cond = 0);
+    IMGUI_API void          SetWindowPos(ImGuiWindow* window, const vdl::float2& pos, ImGuiCond cond = 0);
+    IMGUI_API void          SetWindowSize(ImGuiWindow* window, const vdl::float2& size, ImGuiCond cond = 0);
     IMGUI_API void          SetWindowCollapsed(ImGuiWindow* window, bool collapsed, ImGuiCond cond = 0);
-    IMGUI_API void          SetWindowHitTestHole(ImGuiWindow* window, const ImVec2& pos, const ImVec2& size);
+    IMGUI_API void          SetWindowHitTestHole(ImGuiWindow* window, const vdl::float2& pos, const vdl::float2& size);
 
     // Windows: Display Order and Focus Order
     IMGUI_API void          FocusWindow(ImGuiWindow* window);
@@ -2024,7 +2028,7 @@ namespace ImGui
     IMGUI_API void          UpdateMouseMovingWindowEndFrame();
 
     // Viewports
-    IMGUI_API void                  TranslateWindowsInViewport(ImGuiViewportP* viewport, const ImVec2& old_pos, const ImVec2& new_pos);
+    IMGUI_API void                  TranslateWindowsInViewport(ImGuiViewportP* viewport, const vdl::float2& old_pos, const vdl::float2& new_pos);
     IMGUI_API void                  ScaleWindowsInViewport(ImGuiViewportP* viewport, float scale);
     IMGUI_API void                  DestroyPlatformWindow(ImGuiViewportP* viewport);
     IMGUI_API void                  ShowViewportThumbnails();
@@ -2039,12 +2043,12 @@ namespace ImGui
     IMGUI_API ImGuiSettingsHandler* FindSettingsHandler(const char* type_name);
 
     // Scrolling
-    IMGUI_API void          SetNextWindowScroll(const ImVec2& scroll); // Use -1.0f on one axis to leave as-is
+    IMGUI_API void          SetNextWindowScroll(const vdl::float2& scroll); // Use -1.0f on one axis to leave as-is
     IMGUI_API void          SetScrollX(ImGuiWindow* window, float new_scroll_x);
     IMGUI_API void          SetScrollY(ImGuiWindow* window, float new_scroll_y);
     IMGUI_API void          SetScrollFromPosX(ImGuiWindow* window, float local_x, float center_x_ratio = 0.5f);
     IMGUI_API void          SetScrollFromPosY(ImGuiWindow* window, float local_y, float center_y_ratio = 0.5f);
-    IMGUI_API ImVec2        ScrollToBringRectIntoView(ImGuiWindow* window, const ImRect& item_rect);
+    IMGUI_API vdl::float2   ScrollToBringRectIntoView(ImGuiWindow* window, const ImRect& item_rect);
 
     // Basic Accessors
     inline ImGuiID          GetItemID()     { ImGuiContext& g = *GImGui; return g.CurrentWindow->DC.LastItemId; }   // Get ID of last item (~~ often same ImGui::GetID(label) beforehand)
@@ -2061,21 +2065,21 @@ namespace ImGui
     IMGUI_API void          PushOverrideID(ImGuiID id);     // Push given value as-is at the top of the ID stack (whereas PushID combines old and new hashes)
 
     // Basic Helpers for widget code
-    IMGUI_API void          ItemSize(const ImVec2& size, float text_baseline_y = -1.0f);
+    IMGUI_API void          ItemSize(const vdl::float2& size, float text_baseline_y = -1.0f);
     IMGUI_API void          ItemSize(const ImRect& bb, float text_baseline_y = -1.0f);
-    IMGUI_API bool          ItemAdd(const ImRect& bb, ImGuiID id, const ImRect* nav_bb = NULL);
+    IMGUI_API bool          ItemAdd(const ImRect& bb, ImGuiID id, const ImRect* nav_bb = nullptr);
     IMGUI_API bool          ItemHoverable(const ImRect& bb, ImGuiID id);
     IMGUI_API bool          IsClippedEx(const ImRect& bb, ImGuiID id, bool clip_even_when_logged);
     IMGUI_API void          SetLastItemData(ImGuiWindow* window, ImGuiID item_id, ImGuiItemStatusFlags status_flags, const ImRect& item_rect);
     IMGUI_API bool          FocusableItemRegister(ImGuiWindow* window, ImGuiID id);   // Return true if focus is requested
     IMGUI_API void          FocusableItemUnregister(ImGuiWindow* window);
-    IMGUI_API ImVec2        CalcItemSize(ImVec2 size, float default_w, float default_h);
-    IMGUI_API float         CalcWrapWidthForPos(const ImVec2& pos, float wrap_pos_x);
+    IMGUI_API vdl::float2   CalcItemSize(vdl::float2 size, float default_w, float default_h);
+    IMGUI_API float         CalcWrapWidthForPos(const vdl::float2& pos, float wrap_pos_x);
     IMGUI_API void          PushMultiItemsWidths(int components, float width_full);
     IMGUI_API void          PushItemFlag(ImGuiItemFlags option, bool enabled);
     IMGUI_API void          PopItemFlag();
     IMGUI_API bool          IsItemToggledSelection();                                   // Was the last item selection toggled? (after Selectable(), TreeNode() etc. We only returns toggle _event_ in order to handle clipping correctly)
-    IMGUI_API ImVec2        GetContentRegionMaxAbs();
+    IMGUI_API vdl::float2   GetContentRegionMaxAbs();
     IMGUI_API void          ShrinkWidths(ImGuiShrinkWidthItem* items, int count, float width_excess);
 
     // Logging/Capture
@@ -2083,7 +2087,7 @@ namespace ImGui
     IMGUI_API void          LogToBuffer(int auto_open_depth = -1);                      // Start logging/capturing to internal buffer
 
     // Popups, Modals, Tooltips
-    IMGUI_API bool          BeginChildEx(const char* name, ImGuiID id, const ImVec2& size_arg, bool border, ImGuiWindowFlags flags);
+    IMGUI_API bool          BeginChildEx(const char* name, ImGuiID id, const vdl::float2& size_arg, bool border, ImGuiWindowFlags flags);
     IMGUI_API void          OpenPopupEx(ImGuiID id, ImGuiPopupFlags popup_flags = ImGuiPopupFlags_None);
     IMGUI_API void          ClosePopupToLevel(int remaining, bool restore_focus_to_window_under_popup);
     IMGUI_API void          ClosePopupsOverWindow(ImGuiWindow* ref_window, bool restore_focus_to_window_under_popup);
@@ -2091,8 +2095,8 @@ namespace ImGui
     IMGUI_API bool          BeginPopupEx(ImGuiID id, ImGuiWindowFlags extra_flags);
     IMGUI_API void          BeginTooltipEx(ImGuiWindowFlags extra_flags, ImGuiTooltipFlags tooltip_flags);
     IMGUI_API ImGuiWindow*  GetTopMostPopupModal();
-    IMGUI_API ImVec2        FindBestWindowPosForPopup(ImGuiWindow* window);
-    IMGUI_API ImVec2        FindBestWindowPosForPopupEx(const ImVec2& ref_pos, const ImVec2& size, ImGuiDir* last_dir, const ImRect& r_outer, const ImRect& r_avoid, ImGuiPopupPositionPolicy policy = ImGuiPopupPositionPolicy_Default);
+    IMGUI_API vdl::float2   FindBestWindowPosForPopup(ImGuiWindow* window);
+    IMGUI_API vdl::float2   FindBestWindowPosForPopupEx(const vdl::float2& ref_pos, const vdl::float2& size, ImGuiDir* last_dir, const ImRect& r_outer, const ImRect& r_avoid, ImGuiPopupPositionPolicy policy = ImGuiPopupPositionPolicy_Default);
 
     // Gamepad/Keyboard Navigation
     IMGUI_API void          NavInitWindow(ImGuiWindow* window, bool force_reinit);
@@ -2101,7 +2105,7 @@ namespace ImGui
     IMGUI_API void          NavMoveRequestForward(ImGuiDir move_dir, ImGuiDir clip_dir, const ImRect& bb_rel, ImGuiNavMoveFlags move_flags);
     IMGUI_API void          NavMoveRequestTryWrapping(ImGuiWindow* window, ImGuiNavMoveFlags move_flags);
     IMGUI_API float         GetNavInputAmount(ImGuiNavInput n, ImGuiInputReadMode mode);
-    IMGUI_API ImVec2        GetNavInputAmount2d(ImGuiNavDirSourceFlags dir_sources, ImGuiInputReadMode mode, float slow_factor = 0.0f, float fast_factor = 0.0f);
+    IMGUI_API vdl::float2   GetNavInputAmount2d(ImGuiNavDirSourceFlags dir_sources, ImGuiInputReadMode mode, float slow_factor = 0.0f, float fast_factor = 0.0f);
     IMGUI_API int           CalcTypematicRepeatAmount(float t0, float t1, float repeat_delay, float repeat_rate);
     IMGUI_API void          ActivateItem(ImGuiID id);   // Remotely activate a button, checkbox, tree node etc. given its unique ID. activation is queued and processed on the next frame when the item is encountered again.
     IMGUI_API void          SetNavID(ImGuiID id, int nav_layer, ImGuiID focus_scope_id);
@@ -2137,7 +2141,7 @@ namespace ImGui
     IMGUI_API void          DockContextQueueDock(ImGuiContext* ctx, ImGuiWindow* target, ImGuiDockNode* target_node, ImGuiWindow* payload, ImGuiDir split_dir, float split_ratio, bool split_outer);
     IMGUI_API void          DockContextQueueUndockWindow(ImGuiContext* ctx, ImGuiWindow* window);
     IMGUI_API void          DockContextQueueUndockNode(ImGuiContext* ctx, ImGuiDockNode* node);
-    IMGUI_API bool          DockContextCalcDropPosForDocking(ImGuiWindow* target, ImGuiDockNode* target_node, ImGuiWindow* payload, ImGuiDir split_dir, bool split_outer, ImVec2* out_pos);
+    IMGUI_API bool          DockContextCalcDropPosForDocking(ImGuiWindow* target, ImGuiDockNode* target_node, ImGuiWindow* payload, ImGuiDir split_dir, bool split_outer, vdl::float2* out_pos);
     inline ImGuiDockNode*   DockNodeGetRootNode(ImGuiDockNode* node)    { while (node->ParentNode) node = node->ParentNode; return node; }
     inline int              DockNodeGetDepth(const ImGuiDockNode* node) { int depth = 0; while (node->ParentNode) { node = node->ParentNode; depth++; } return depth; }
     inline ImGuiDockNode*   GetWindowDockNode()                         { ImGuiContext& g = *GImGui; return g.CurrentWindow->DockNode; }
@@ -2158,13 +2162,13 @@ namespace ImGui
     // - Call DockBuilderFinish() after you are done.
     IMGUI_API void          DockBuilderDockWindow(const char* window_name, ImGuiID node_id);
     IMGUI_API ImGuiDockNode*DockBuilderGetNode(ImGuiID node_id);
-    inline ImGuiDockNode*   DockBuilderGetCentralNode(ImGuiID node_id)              { ImGuiDockNode* node = DockBuilderGetNode(node_id); if (!node) return NULL; return DockNodeGetRootNode(node)->CentralNode; }
+    inline ImGuiDockNode*   DockBuilderGetCentralNode(ImGuiID node_id)              { ImGuiDockNode* node = DockBuilderGetNode(node_id); if (!node) return nullptr; return DockNodeGetRootNode(node)->CentralNode; }
     IMGUI_API ImGuiID       DockBuilderAddNode(ImGuiID node_id = 0, ImGuiDockNodeFlags flags = 0);
     IMGUI_API void          DockBuilderRemoveNode(ImGuiID node_id);                 // Remove node and all its child, undock all windows
     IMGUI_API void          DockBuilderRemoveNodeDockedWindows(ImGuiID node_id, bool clear_settings_refs = true);
     IMGUI_API void          DockBuilderRemoveNodeChildNodes(ImGuiID node_id);       // Remove all split/hierarchy. All remaining docked windows will be re-docked to the remaining root node (node_id).
-    IMGUI_API void          DockBuilderSetNodePos(ImGuiID node_id, ImVec2 pos);
-    IMGUI_API void          DockBuilderSetNodeSize(ImGuiID node_id, ImVec2 size);
+    IMGUI_API void          DockBuilderSetNodePos(ImGuiID node_id, const vdl::float2& pos);
+    IMGUI_API void          DockBuilderSetNodeSize(ImGuiID node_id, const vdl::float2& size);
     IMGUI_API ImGuiID       DockBuilderSplitNode(ImGuiID node_id, ImGuiDir split_dir, float size_ratio_for_node_at_dir, ImGuiID* out_id_at_dir, ImGuiID* out_id_at_opposite_dir); // Create 2 child nodes in this parent node.
     IMGUI_API void          DockBuilderCopyDockSpace(ImGuiID src_dockspace_id, ImGuiID dst_dockspace_id, ImVector<const char*>* in_window_remap_pairs);
     IMGUI_API void          DockBuilderCopyNode(ImGuiID src_node_id, ImGuiID dst_node_id, ImVector<ImGuiID>* out_node_remap_pairs);
@@ -2197,32 +2201,32 @@ namespace ImGui
     IMGUI_API void          TabBarCloseTab(ImGuiTabBar* tab_bar, ImGuiTabItem* tab);
     IMGUI_API void          TabBarQueueChangeTabOrder(ImGuiTabBar* tab_bar, const ImGuiTabItem* tab, int dir);
     IMGUI_API bool          TabItemEx(ImGuiTabBar* tab_bar, const char* label, bool* p_open, ImGuiTabItemFlags flags, ImGuiWindow* docked_window);
-    IMGUI_API ImVec2        TabItemCalcSize(const char* label, bool has_close_button);
+    IMGUI_API vdl::float2   TabItemCalcSize(const char* label, bool has_close_button);
     IMGUI_API void          TabItemBackground(ImDrawList* draw_list, const ImRect& bb, ImGuiTabItemFlags flags, ImU32 col);
-    IMGUI_API bool          TabItemLabelAndCloseButton(ImDrawList* draw_list, const ImRect& bb, ImGuiTabItemFlags flags, ImVec2 frame_padding, const char* label, ImGuiID tab_id, ImGuiID close_button_id, bool is_contents_visible);
+    IMGUI_API bool          TabItemLabelAndCloseButton(ImDrawList* draw_list, const ImRect& bb, ImGuiTabItemFlags flags, const vdl::float2& frame_padding, const char* label, ImGuiID tab_id, ImGuiID close_button_id, bool is_contents_visible);
 
     // Render helpers
     // AVOID USING OUTSIDE OF IMGUI.CPP! NOT FOR PUBLIC CONSUMPTION. THOSE FUNCTIONS ARE A MESS. THEIR SIGNATURE AND BEHAVIOR WILL CHANGE, THEY NEED TO BE REFACTORED INTO SOMETHING DECENT.
     // NB: All position are in absolute pixels coordinates (we are never using window coordinates internally)
-    IMGUI_API void          RenderText(ImVec2 pos, const char* text, const char* text_end = NULL, bool hide_text_after_hash = true);
-    IMGUI_API void          RenderTextWrapped(ImVec2 pos, const char* text, const char* text_end, float wrap_width);
-    IMGUI_API void          RenderTextClipped(const ImVec2& pos_min, const ImVec2& pos_max, const char* text, const char* text_end, const ImVec2* text_size_if_known, const ImVec2& align = ImVec2(0, 0), const ImRect* clip_rect = NULL);
-    IMGUI_API void          RenderTextClippedEx(ImDrawList* draw_list, const ImVec2& pos_min, const ImVec2& pos_max, const char* text, const char* text_end, const ImVec2* text_size_if_known, const ImVec2& align = ImVec2(0, 0), const ImRect* clip_rect = NULL);
-    IMGUI_API void          RenderTextEllipsis(ImDrawList* draw_list, const ImVec2& pos_min, const ImVec2& pos_max, float clip_max_x, float ellipsis_max_x, const char* text, const char* text_end, const ImVec2* text_size_if_known);
-    IMGUI_API void          RenderFrame(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool border = true, float rounding = 0.0f);
-    IMGUI_API void          RenderFrameBorder(ImVec2 p_min, ImVec2 p_max, float rounding = 0.0f);
-    IMGUI_API void          RenderColorRectWithAlphaCheckerboard(ImDrawList* draw_list, ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, float grid_step, ImVec2 grid_off, float rounding = 0.0f, int rounding_corners_flags = ~0);
+    IMGUI_API void          RenderText(const vdl::float2& pos, const char* text, const char* text_end = nullptr, bool hide_text_after_hash = true);
+    IMGUI_API void          RenderTextWrapped(const vdl::float2& pos, const char* text, const char* text_end, float wrap_width);
+    IMGUI_API void          RenderTextClipped(const vdl::float2& pos_min, const vdl::float2& pos_max, const char* text, const char* text_end, const vdl::float2* text_size_if_known, const vdl::float2& align = vdl::float2(0.0f, 0.0f), const ImRect* clip_rect = nullptr);
+    IMGUI_API void          RenderTextClippedEx(ImDrawList* draw_list, const vdl::float2& pos_min, const vdl::float2& pos_max, const char* text, const char* text_end, const vdl::float2* text_size_if_known, const vdl::float2& align = vdl::float2(0.0f, 0.0f), const ImRect* clip_rect = nullptr);
+    IMGUI_API void          RenderTextEllipsis(ImDrawList* draw_list, const vdl::float2& pos_min, const vdl::float2& pos_max, float clip_max_x, float ellipsis_max_x, const char* text, const char* text_end, const vdl::float2* text_size_if_known);
+    IMGUI_API void          RenderFrame(const vdl::float2& p_min, const vdl::float2& p_max, ImU32 fill_col, bool border = true, float rounding = 0.0f);
+    IMGUI_API void          RenderFrameBorder(const vdl::float2& p_min, const vdl::float2& p_max, float rounding = 0.0f);
+    IMGUI_API void          RenderColorRectWithAlphaCheckerboard(ImDrawList* draw_list, const vdl::float2& p_min, const vdl::float2& p_max, ImU32 fill_col, float grid_step, const vdl::float2& grid_off, float rounding = 0.0f, int rounding_corners_flags = ~0);
     IMGUI_API void          RenderNavHighlight(const ImRect& bb, ImGuiID id, ImGuiNavHighlightFlags flags = ImGuiNavHighlightFlags_TypeDefault); // Navigation highlight
-    IMGUI_API const char*   FindRenderedTextEnd(const char* text, const char* text_end = NULL); // Find the optional ## from which we stop displaying text.
-    IMGUI_API void          LogRenderedText(const ImVec2* ref_pos, const char* text, const char* text_end = NULL);
+    IMGUI_API const char*   FindRenderedTextEnd(const char* text, const char* text_end = nullptr); // Find the optional ## from which we stop displaying text.
+    IMGUI_API void          LogRenderedText(const vdl::float2* ref_pos, const char* text, const char* text_end = nullptr);
 
     // Render helpers (those functions don't access any ImGui state!)
-    IMGUI_API void          RenderArrow(ImDrawList* draw_list, ImVec2 pos, ImU32 col, ImGuiDir dir, float scale = 1.0f);
-    IMGUI_API void          RenderBullet(ImDrawList* draw_list, ImVec2 pos, ImU32 col);
-    IMGUI_API void          RenderCheckMark(ImDrawList* draw_list, ImVec2 pos, ImU32 col, float sz);
-    IMGUI_API void          RenderMouseCursor(ImDrawList* draw_list, ImVec2 pos, float scale, ImGuiMouseCursor mouse_cursor, ImU32 col_fill, ImU32 col_border, ImU32 col_shadow);
-    IMGUI_API void          RenderArrowPointingAt(ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, ImGuiDir direction, ImU32 col);
-    IMGUI_API void          RenderArrowDockMenu(ImDrawList* draw_list, ImVec2 p_min, float sz, ImU32 col);
+    IMGUI_API void          RenderArrow(ImDrawList* draw_list, vdl::float2 pos, ImU32 col, ImGuiDir dir, float scale = 1.0f);
+    IMGUI_API void          RenderBullet(ImDrawList* draw_list, vdl::float2 pos, ImU32 col);
+    IMGUI_API void          RenderCheckMark(ImDrawList* draw_list, vdl::float2 pos, ImU32 col, float sz);
+    IMGUI_API void          RenderMouseCursor(ImDrawList* draw_list, vdl::float2 pos, float scale, ImGuiMouseCursor mouse_cursor, ImU32 col_fill, ImU32 col_border, ImU32 col_shadow);
+    IMGUI_API void          RenderArrowPointingAt(ImDrawList* draw_list, vdl::float2 pos, const vdl::float2& half_sz, ImGuiDir direction, ImU32 col);
+    IMGUI_API void          RenderArrowDockMenu(ImDrawList* draw_list, const vdl::float2& p_min, float sz, ImU32 col);
     IMGUI_API void          RenderRectFilledRangeH(ImDrawList* draw_list, const ImRect& rect, ImU32 col, float x_start_norm, float x_end_norm, float rounding);
     IMGUI_API void          RenderRectFilledWithHole(ImDrawList* draw_list, ImRect outer, ImRect inner, ImU32 col, float rounding);
 
@@ -2233,14 +2237,14 @@ namespace ImGui
 #endif
 
     // Widgets
-    IMGUI_API void          TextEx(const char* text, const char* text_end = NULL, ImGuiTextFlags flags = 0);
-    IMGUI_API bool          ButtonEx(const char* label, const ImVec2& size_arg = ImVec2(0, 0), ImGuiButtonFlags flags = 0);
-    IMGUI_API bool          CloseButton(ImGuiID id, const ImVec2& pos);
-    IMGUI_API bool          CollapseButton(ImGuiID id, const ImVec2& pos, ImGuiDockNode* dock_node);
-    IMGUI_API bool          ArrowButtonEx(const char* str_id, ImGuiDir dir, ImVec2 size_arg, ImGuiButtonFlags flags = 0);
+    IMGUI_API void          TextEx(const char* text, const char* text_end = nullptr, ImGuiTextFlags flags = 0);
+    IMGUI_API bool          ButtonEx(const char* label, const vdl::float2& size_arg = vdl::float2(0, 0), ImGuiButtonFlags flags = 0);
+    IMGUI_API bool          CloseButton(ImGuiID id, const vdl::float2& pos);
+    IMGUI_API bool          CollapseButton(ImGuiID id, const vdl::float2& pos, ImGuiDockNode* dock_node);
+    IMGUI_API bool          ArrowButtonEx(const char* str_id, ImGuiDir dir, const vdl::float2& size_arg, ImGuiButtonFlags flags = 0);
     IMGUI_API void          Scrollbar(ImGuiAxis axis);
     IMGUI_API bool          ScrollbarEx(const ImRect& bb, ImGuiID id, ImGuiAxis axis, float* p_scroll_v, float avail_v, float contents_v, ImDrawCornerFlags rounding_corners);
-    IMGUI_API bool          ImageButtonEx(ImGuiID id, const ImTexture& texture, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec2& padding, const ImVec4& bg_col, const ImVec4& tint_col);
+    IMGUI_API bool          ImageButtonEx(ImGuiID id, const vdl::Texture& texture, const vdl::float2& size, const vdl::float2& uv0, const vdl::float2& uv1, const vdl::float2& padding, const vdl::Color4F& bg_col, const vdl::Color4F& tint_col);
     IMGUI_API ImRect        GetWindowScrollbarRect(ImGuiWindow* window, ImGuiAxis axis);
     IMGUI_API ImGuiID       GetWindowScrollbarID(ImGuiWindow* window, ImGuiAxis axis);
     IMGUI_API ImGuiID       GetWindowResizeID(ImGuiWindow* window, int n); // 0..3: corners, 4..7: borders
@@ -2251,7 +2255,7 @@ namespace ImGui
     IMGUI_API bool          DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v_speed, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags);
     IMGUI_API bool          SliderBehavior(const ImRect& bb, ImGuiID id, ImGuiDataType data_type, void* p_v, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags, ImRect* out_grab_bb);
     IMGUI_API bool          SplitterBehavior(const ImRect& bb, ImGuiID id, ImGuiAxis axis, float* size1, float* size2, float min_size1, float min_size2, float hover_extend = 0.0f, float hover_visibility_delay = 0.0f);
-    IMGUI_API bool          TreeNodeBehavior(ImGuiID id, ImGuiTreeNodeFlags flags, const char* label, const char* label_end = NULL);
+    IMGUI_API bool          TreeNodeBehavior(ImGuiID id, ImGuiTreeNodeFlags flags, const char* label, const char* label_end = nullptr);
     IMGUI_API bool          TreeNodeBehaviorIsOpen(ImGuiID id, ImGuiTreeNodeFlags flags = 0);                     // Consume previous SetNextItemOpen() data, if any. May return true when logging
     IMGUI_API void          TreePushOverrideID(ImGuiID id);
 
@@ -2273,11 +2277,11 @@ namespace ImGui
     IMGUI_API bool          DataTypeClamp(ImGuiDataType data_type, void* p_data, const void* p_min, const void* p_max);
 
     // InputText
-    IMGUI_API bool          InputTextEx(const char* label, const char* hint, char* buf, int buf_size, const ImVec2& size_arg, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
+    IMGUI_API bool          InputTextEx(const char* label, const char* hint, char* buf, int buf_size, const vdl::float2& size_arg, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
     IMGUI_API bool          TempInputText(const ImRect& bb, ImGuiID id, const char* label, char* buf, int buf_size, ImGuiInputTextFlags flags);
-    IMGUI_API bool          TempInputScalar(const ImRect& bb, ImGuiID id, const char* label, ImGuiDataType data_type, void* p_data, const char* format, const void* p_clamp_min = NULL, const void* p_clamp_max = NULL);
+    IMGUI_API bool          TempInputScalar(const ImRect& bb, ImGuiID id, const char* label, ImGuiDataType data_type, void* p_data, const char* format, const void* p_clamp_min = nullptr, const void* p_clamp_max = nullptr);
     inline bool             TempInputIsActive(ImGuiID id)       { ImGuiContext& g = *GImGui; return (g.ActiveId == id && g.TempInputId == id); }
-    inline ImGuiInputTextState* GetInputTextState(ImGuiID id)   { ImGuiContext& g = *GImGui; return (g.InputTextState.ID == id) ? &g.InputTextState : NULL; } // Get input text state if active
+    inline ImGuiInputTextState* GetInputTextState(ImGuiID id)   { ImGuiContext& g = *GImGui; return (g.InputTextState.ID == id) ? &g.InputTextState : nullptr; } // Get input text state if active
 
     // Color
     IMGUI_API void          ColorTooltip(const char* text, const float* col, ImGuiColorEditFlags flags);
@@ -2285,11 +2289,11 @@ namespace ImGui
     IMGUI_API void          ColorPickerOptionsPopup(const float* ref_col, ImGuiColorEditFlags flags);
 
     // Plot
-    IMGUI_API int           PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_getter)(void* data, int idx), void* data, int values_count, int values_offset, const char* overlay_text, float scale_min, float scale_max, ImVec2 frame_size);
+    IMGUI_API int           PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_getter)(void* data, int idx), void* data, int values_count, int values_offset, const char* overlay_text, float scale_min, float scale_max, vdl::float2 frame_size);
 
     // Shade functions (write over already created vertices)
-    IMGUI_API void          ShadeVertsLinearColorGradientKeepAlpha(ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, ImVec2 gradient_p0, ImVec2 gradient_p1, ImU32 col0, ImU32 col1);
-    IMGUI_API void          ShadeVertsLinearUV(ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, const ImVec2& a, const ImVec2& b, const ImVec2& uv_a, const ImVec2& uv_b, bool clamp);
+    IMGUI_API void          ShadeVertsLinearColorGradientKeepAlpha(ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, const vdl::float2& gradient_p0, const vdl::float2& gradient_p1, ImU32 col0, ImU32 col1);
+    IMGUI_API void          ShadeVertsLinearUV(ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, const vdl::float2& a, const vdl::float2& b, const vdl::float2& uv_a, const vdl::float2& uv_b, bool clamp);
 
     // Garbage collection
     IMGUI_API void          GcCompactTransientWindowBuffers(ImGuiWindow* window);

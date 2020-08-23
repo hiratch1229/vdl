@@ -4,21 +4,6 @@
 
 namespace
 {
-  inline vdl::float2 Cast(const ImVec2& _v)
-  {
-    return { _v.x, _v.y };
-  }
-
-  inline ImVec2 Cast(const vdl::float2& _v)
-  {
-    return { _v.x, _v.y };
-  }
-
-  inline ImVec4 Cast(const vdl::Color4F& _Color)
-  {
-    return { _Color.Red, _Color.Green, _Color.Blue, _Color.Alpha };
-  }
-
   inline ImGuiCond_ Cast(vdl::GUI::Condition _Condition)
   {
     switch (_Condition)
@@ -104,7 +89,7 @@ namespace vdl::GUI
 
   bool BeginChild(const char* _StrID, const float2& _Size, bool _isBorder, const WindowFlags& _Flags)
   {
-    return ImGui::BeginChild(_StrID, Cast(_Size), _isBorder, _Flags);
+    return ImGui::BeginChild(_StrID, _Size, _isBorder, _Flags);
   }
 
   void EndChild()
@@ -141,12 +126,12 @@ namespace vdl::GUI
 
   float2 GetWindowPos()
   {
-    return Cast(ImGui::GetWindowPos());
+    return ImGui::GetWindowPos();
   }
 
   float2 GetWindowSize()
   {
-    return Cast(ImGui::GetWindowSize());
+    return ImGui::GetWindowSize();
   }
 
   float GetWindowWidth()
@@ -163,17 +148,17 @@ namespace vdl::GUI
 
   void SetNextWindowPos(const float2& _Pos, Condition _Condition, const float2& _Pivot)
   {
-    ImGui::SetNextWindowPos(Cast(_Pos), Cast(_Condition), Cast(_Pivot));
+    ImGui::SetNextWindowPos(_Pos, Cast(_Condition), _Pivot);
   }
 
   void SetNextWindowSize(const float2& _Size, Condition _Condition)
   {
-    ImGui::SetNextWindowSize(Cast(_Size), Cast(_Condition));
+    ImGui::SetNextWindowSize(_Size, Cast(_Condition));
   }
 
   void SetNextWindowContentSize(const float2& _Size)
   {
-    ImGui::SetNextWindowContentSize(Cast(_Size));
+    ImGui::SetNextWindowContentSize(_Size);
   }
 
   void SetNextWindowCollapsed(bool _isCollapsed, Condition _Condition)
@@ -193,12 +178,12 @@ namespace vdl::GUI
 
   void SetWindowPos(const float2& _Pos, Condition _Condition)
   {
-    ImGui::SetWindowPos(Cast(_Pos), Cast(_Condition));
+    ImGui::SetWindowPos(_Pos, Cast(_Condition));
   }
 
   void SetWindowSize(const float2& _Size, Condition _Condition)
   {
-    ImGui::SetWindowSize(Cast(_Size), Cast(_Condition));
+    ImGui::SetWindowSize(_Size, Cast(_Condition));
   }
 
   void SetWindowCollapsed(bool _isCollapsed, Condition _Condition)
@@ -218,12 +203,12 @@ namespace vdl::GUI
 
   void SetWindowPos(const char* _Name, const float2& _Pos, Condition _Condition)
   {
-    ImGui::SetWindowPos(_Name, Cast(_Pos), Cast(_Condition));
+    ImGui::SetWindowPos(_Name, _Pos, Cast(_Condition));
   }
 
   void SetWindowSize(const char* _Name, const float2& _Size, Condition _Condition)
   {
-    ImGui::SetWindowSize(_Name, Cast(_Size), Cast(_Condition));
+    ImGui::SetWindowSize(_Name, _Size, Cast(_Condition));
   }
 
   void SetWindowCollapsed(const char* _Name, bool _isCollapsed, Condition _Condition)
@@ -240,22 +225,22 @@ namespace vdl::GUI
 
   float2 GetContentRegionMax()
   {
-    return Cast(ImGui::GetContentRegionMax());
+    return ImGui::GetContentRegionMax();
   }
 
   float2 GetContentRegionAvail()
   {
-    return Cast(ImGui::GetContentRegionAvail());
+    return ImGui::GetContentRegionAvail();
   }
 
   float2 GetWindowContentRegionMin()
   {
-    return Cast(ImGui::GetWindowContentRegionMin());
+    return ImGui::GetWindowContentRegionMin();
   }
 
   float2 GetWindowContentRegionMax()
   {
-    return Cast(ImGui::GetWindowContentRegionMax());
+    return ImGui::GetWindowContentRegionMax();
   }
 
   float GetWindowContentRegionWidth()
@@ -391,7 +376,7 @@ namespace vdl::GUI
 
   void Dummy(const float2& _Size)
   {
-    ImGui::Dummy(Cast(_Size));
+    ImGui::Dummy(_Size);
   }
 
   void Indent(float _IndentW)
@@ -458,7 +443,7 @@ namespace vdl::GUI
   {
     va_list Args;
     va_start(Args, _Format);
-    ImGui::TextColoredV(Cast(_Color), _Format, Args);
+    ImGui::TextColoredV(_Color, _Format, Args);
     va_end(Args);
   }
 
@@ -498,7 +483,7 @@ namespace vdl::GUI
 
   bool Button(const char* _Label, const float2& _Size)
   {
-    return ImGui::Button(_Label, Cast(_Size));
+    return ImGui::Button(_Label, _Size);
   }
 
   bool SmallButton(const char* _Label)
@@ -508,7 +493,7 @@ namespace vdl::GUI
 
   bool InvisibleButton(const char* _StrID, const float2& _Size)
   {
-    return ImGui::InvisibleButton(_StrID, Cast(_Size));
+    return ImGui::InvisibleButton(_StrID, _Size);
   }
 
   bool ArrowButton(const char* _StrID, DirectionType _Type)
@@ -518,12 +503,12 @@ namespace vdl::GUI
 
   void Image(const Texture& _Texture, const float2& _Size, const float2& _UV0, const float2& _UV1, const Color4F& _TintColor, const Color4F& _BorderColor)
   {
-    ImGui::Image(_Texture, Cast(_Size), Cast(_UV0), Cast(_UV1), Cast(_TintColor), Cast(_BorderColor));
+    ImGui::Image(_Texture, _Size, _UV0, _UV1, _TintColor, _BorderColor);
   }
 
   bool ImageButton(const Texture& _Texture, const float2& _Size, const float2& _UV0, const float2& _UV1, int _FramePadding, const Color4F& _BackgroundColor, const Color4F& _TintColor)
   {
-    return ImGui::ImageButton(_Texture, Cast(_Size), Cast(_UV0), Cast(_UV1), _FramePadding, Cast(_BackgroundColor), Cast(_TintColor));
+    return ImGui::ImageButton(_Texture, _Size, _UV0, _UV1, _FramePadding, _BackgroundColor, _TintColor);
   }
 
   bool Checkbox(const char* _Label, bool* _Flag)
@@ -543,7 +528,7 @@ namespace vdl::GUI
 
   void ProgressBar(float _Fraction, const float2& _SizeArg, const char* _Overlay)
   {
-    ImGui::ProgressBar(_Fraction, Cast(_SizeArg), _Overlay);
+    ImGui::ProgressBar(_Fraction, _SizeArg, _Overlay);
   }
 
   void Bullet()
@@ -587,7 +572,7 @@ namespace vdl::GUI
 
   bool InputTextMultiline(const char* _Label, char* _Buffer, size_t _BufferSize, const float2& _Size, const InputTextFlags& _Flags)
   {
-    return ImGui::InputTextMultiline(_Label, _Buffer, _BufferSize, Cast(_Size), _Flags);
+    return ImGui::InputTextMultiline(_Label, _Buffer, _BufferSize, _Size, _Flags);
   }
 
   bool InputTextWithHint(const char* _Label, const char* _Hint, char* _Buffer, size_t _BufferSize, const InputTextFlags& _Flags)
@@ -619,7 +604,7 @@ namespace vdl::GUI
 
   bool ColorButton(const char* _DescID, const Color4F& _Color, const ColorEditFlags& _Flags, const float2& _Size)
   {
-    return ImGui::ColorButton(_DescID, Cast(_Color), _Flags, Cast(_Size));
+    return ImGui::ColorButton(_DescID, _Color, _Flags, _Size);
   }
 
   void SetColorEditOptions(const ColorEditFlags& _Flags)
@@ -693,12 +678,12 @@ namespace vdl::GUI
 
   bool Selectable(const char* _Label, bool _Selected, const SelectableFlags& _Flags, const float2& _Size)
   {
-    return ImGui::Selectable(_Label, _Selected, _Flags, Cast(_Size));
+    return ImGui::Selectable(_Label, _Selected, _Flags, _Size);
   }
 
   bool Selectable(const char* _Label, bool* _pSelected, const SelectableFlags& _Flags, const float2& _Size)
   {
-    return ImGui::Selectable(_Label, _pSelected, _Flags, Cast(_Size));
+    return ImGui::Selectable(_Label, _pSelected, _Flags, _Size);
   }
 
   //--------------------------------------------------
@@ -715,7 +700,7 @@ namespace vdl::GUI
 
   bool ListBoxHeader(const char* _Label, const float2& _Size)
   {
-    return ImGui::ListBoxHeader(_Label, Cast(_Size));
+    return ImGui::ListBoxHeader(_Label, _Size);
   }
 
   bool ListBoxHeader(const char* _Label, int _ItemNum, int _HeightInItems)
@@ -732,22 +717,22 @@ namespace vdl::GUI
 
   void PlotLines(const char* _Label, const float* _Values, int _ValueNum, int _ValuesOffset, const char* _OverlayText, float _ScaleMin, float _ScaleMax, const float2& _GraphSize)
   {
-    ImGui::PlotLines(_Label, _Values, _ValueNum, _ValuesOffset, _OverlayText, _ScaleMin, _ScaleMax, Cast(_GraphSize));
+    ImGui::PlotLines(_Label, _Values, _ValueNum, _ValuesOffset, _OverlayText, _ScaleMin, _ScaleMax, _GraphSize);
   }
 
   void PlotLines(const char* _Label, float(*_ValuesGetter)(void* _pData, int _Index), void* _pData, int _ValueNum, int _ValuesOffset, const char* _OverlayText, float _ScaleMin, float _ScaleMax, const float2& _GraphSize)
   {
-    ImGui::PlotLines(_Label, _ValuesGetter, _pData, _ValueNum, _ValuesOffset, _OverlayText, _ScaleMin, _ScaleMax, Cast(_GraphSize));
+    ImGui::PlotLines(_Label, _ValuesGetter, _pData, _ValueNum, _ValuesOffset, _OverlayText, _ScaleMin, _ScaleMax, _GraphSize);
   }
 
   void PlotHistogram(const char* _Label, const float* _Values, int _ValueNum, int _ValuesOffset, const char* _OverlayText, float _ScaleMin, float _ScaleMax, const float2& _GraphSize)
   {
-    ImGui::PlotHistogram(_Label, _Values, _ValueNum, _ValuesOffset, _OverlayText, _ScaleMin, _ScaleMax, Cast(_GraphSize));
+    ImGui::PlotHistogram(_Label, _Values, _ValueNum, _ValuesOffset, _OverlayText, _ScaleMin, _ScaleMax, _GraphSize);
   }
 
   void PlotHistogram(const char* _Label, float(*_ValuesGetter)(void* _pData, int _Index), void* _pData, int _ValueNum, int _ValuesOffset, const char* _OverlayText, float _ScaleMin, float _ScaleMax, const float2& _GraphSize)
   {
-    ImGui::PlotHistogram(_Label, _ValuesGetter, _pData, _ValueNum, _ValuesOffset, _OverlayText, _ScaleMin, _ScaleMax, Cast(_GraphSize));
+    ImGui::PlotHistogram(_Label, _ValuesGetter, _pData, _ValueNum, _ValuesOffset, _OverlayText, _ScaleMin, _ScaleMax, _GraphSize);
   }
 
   //--------------------------------------------------
@@ -849,21 +834,6 @@ namespace vdl::GUI
     ImGui::EndPopup();
   }
 
-  bool OpenPopupOnItemClick(const char* _StrID)
-  {
-    return ImGui::OpenPopupOnItemClick(_StrID);
-  }
-
-  bool IsPopupOpen(const char* _StrID)
-  {
-    return ImGui::IsPopupOpen(_StrID);
-  }
-
-  void CloseCurrentPopup()
-  {
-    ImGui::CloseCurrentPopup();
-  }
-
   //--------------------------------------------------
 
   void Columns(int _Count, const char* _StrID, bool _Border)
@@ -937,7 +907,7 @@ namespace vdl::GUI
 
   void PushClipRect(const float2& _MinClipRect, const float2& _MaxClipRect, bool _IntersectWithCurrentClipRect)
   {
-    ImGui::PushClipRect(Cast(_MinClipRect), Cast(_MaxClipRect), _IntersectWithCurrentClipRect);
+    ImGui::PushClipRect(_MinClipRect, _MaxClipRect, _IntersectWithCurrentClipRect);
   }
 
   void PopClipRect()
@@ -1026,17 +996,17 @@ namespace vdl::GUI
 
   float2 GetItemRectMin()
   {
-    return Cast(ImGui::GetItemRectMin());
+    return ImGui::GetItemRectMin();
   }
 
   float2 GetItemRectMax()
   {
-    return Cast(ImGui::GetItemRectMax());
+    return ImGui::GetItemRectMax();
   }
 
   float2 GetItemRectSize()
   {
-    return Cast(ImGui::GetItemRectSize());
+    return ImGui::GetItemRectSize();
   }
 
   void SetItemAllowOverlap()
@@ -1048,17 +1018,17 @@ namespace vdl::GUI
 
   bool IsRectVisible(const float2& _Size)
   {
-    return ImGui::IsRectVisible(Cast(_Size));
+    return ImGui::IsRectVisible(_Size);
   }
 
   bool IsRectVisible(const float2& _MinRect, const float2& _MaxRect)
   {
-    return ImGui::IsRectVisible(Cast(_MinRect), Cast(_MaxRect));
+    return ImGui::IsRectVisible(_MinRect, _MaxRect);
   }
 
   float2 CalcTextSize(const char* _Text, const char* _TextEnd, bool _HideTextAfterDoubleHash, float _WrapWidth)
   {
-    return Cast(ImGui::CalcTextSize(_Text, _TextEnd, _HideTextAfterDoubleHash, _WrapWidth));
+    return ImGui::CalcTextSize(_Text, _TextEnd, _HideTextAfterDoubleHash, _WrapWidth);
   }
 
   void CalcListClipping(int _ItemNum, float _ItemHeight, int* _OutItemDisplayStart, int* _OutItemDisplayEnd)
@@ -1082,24 +1052,24 @@ namespace vdl::GUI
 
   namespace Detail
   {
-    bool DragScalar(const char* _Label, DataType _Type, void* _pData, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
+    bool DragScalar(const char* _Label, DataType _Type, void* _pData, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, const SliderFlags& _Flags)
     {
-      return ImGui::DragScalar(_Label, Cast(_Type), _pData, _Speed, _pMin, _pMax, _Format, _Power);
+      return ImGui::DragScalar(_Label, Cast(_Type), _pData, _Speed, _pMin, _pMax, _Format, _Flags);
     }
 
-    bool DragScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
+    bool DragScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, float _Speed, const void* _pMin, const void* _pMax, const char* _Format, const SliderFlags& _Flags)
     {
-      return ImGui::DragScalarN(_Label, Cast(_Type), _pData, _Components, _Speed, _pMin, _pMax, _Format, _Power);
+      return ImGui::DragScalarN(_Label, Cast(_Type), _pData, _Components, _Speed, _pMin, _pMax, _Format, _Flags);
     }
 
-    bool SliderScalar(const char* _Label, DataType _Type, void* _pData, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
+    bool SliderScalar(const char* _Label, DataType _Type, void* _pData, const void* _pMin, const void* _pMax, const char* _Format, const SliderFlags& _Flags)
     {
-      return ImGui::SliderScalar(_Label, Cast(_Type), _pData, _pMin, _pMax, _Format, _Power);
+      return ImGui::SliderScalar(_Label, Cast(_Type), _pData, _pMin, _pMax, _Format, _Flags);
     }
 
-    bool SliderScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pMin, const void* _pMax, const char* _Format, float _Power)
+    bool SliderScalarN(const char* _Label, DataType _Type, void* _pData, int _Components, const void* _pMin, const void* _pMax, const char* _Format, const SliderFlags& _Flags)
     {
-      return ImGui::SliderScalarN(_Label, Cast(_Type), _pData, _Components, _pMin, _pMax, _Format, _Power);
+      return ImGui::SliderScalarN(_Label, Cast(_Type), _pData, _Components, _pMin, _pMax, _Format, _Flags);
     }
 
     bool InputScalar(const char* _Label, DataType _Type, void* _pData, const void* _pStep, const void* _pStepFast, const char* _Format, const InputTextFlags& _Flags)

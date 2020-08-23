@@ -9,6 +9,14 @@
 #include <vdl/Input/Mouse/IMouse.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
 
+#include <vdl/Platform.hpp>
+
+#if defined VDL_TARGET_WINDOWS
+#include <vdl/Main/Windows/MsgProc/MsgProc.hpp>
+#elif defined VDL_TARGET_LINUX
+
+#endif
+
 #include <ThirdParty/ImGui/imgui.h>
 
 #include <vdl/Math.hpp>
@@ -18,10 +26,9 @@
 #include <vdl/Texture.hpp>
 #include <vdl/GUI.hpp>
 #include <vdl/Mouse.hpp>
+#include <vdl/Keyboard.hpp>
 #include <vdl/Macro.hpp>
 #include <vdl/DetectMemoryLeak.hpp>
-
-#include <Vdl/pch/Windows/pch.hpp>
 
 #include <ctype.h>
 
@@ -594,17 +601,6 @@ namespace
     "{"
     "  return In.Color * Texture.Sample(Sampler, In.Texcoord);"
     "}" };
-
-  template<class T>
-  inline ImVec2 Cast(const vdl::Type2<T>& _v)
-  {
-    return { static_cast<float>(_v.x), static_cast<float>(_v.y) };
-  }
-
-  inline ImVec4 Cast(const vdl::Color4F& _color)
-  {
-    return { _color.Red, _color.Green, _color.Blue, _color.Alpha };
-  }
 }
 
 void CGUI::Initialize()
@@ -662,107 +658,41 @@ void CGUI::Initialize()
       io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;        // We can honor io.WantSetMousePos requests (optional, rarely used)
       io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;    // We can create multi-viewports on the Platform side (optional)
       io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can set io.MouseHoveredViewport correctly (optional, not easy)
+      io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
+      //io.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;  // We can create multi-viewports on the Renderer side (optional)
       io.BackendRendererName = "vdl";
       io.BackendPlatformName = "vdl";
 
       // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array that we will update during the application lifetime.
-      io.KeyMap[ImGuiKey_Tab] = VK_TAB;
-      io.KeyMap[ImGuiKey_LeftArrow] = VK_LEFT;
-      io.KeyMap[ImGuiKey_RightArrow] = VK_RIGHT;
-      io.KeyMap[ImGuiKey_UpArrow] = VK_UP;
-      io.KeyMap[ImGuiKey_DownArrow] = VK_DOWN;
-      io.KeyMap[ImGuiKey_PageUp] = VK_PRIOR;
-      io.KeyMap[ImGuiKey_PageDown] = VK_NEXT;
-      io.KeyMap[ImGuiKey_Home] = VK_HOME;
-      io.KeyMap[ImGuiKey_End] = VK_END;
-      io.KeyMap[ImGuiKey_Insert] = VK_INSERT;
-      io.KeyMap[ImGuiKey_Delete] = VK_DELETE;
-      io.KeyMap[ImGuiKey_Backspace] = VK_BACK;
-      io.KeyMap[ImGuiKey_Space] = VK_SPACE;
-      io.KeyMap[ImGuiKey_Enter] = VK_RETURN;
-      io.KeyMap[ImGuiKey_Escape] = VK_ESCAPE;
-      io.KeyMap[ImGuiKey_A] = 'A';
-      io.KeyMap[ImGuiKey_C] = 'C';
-      io.KeyMap[ImGuiKey_V] = 'V';
-      io.KeyMap[ImGuiKey_X] = 'X';
-      io.KeyMap[ImGuiKey_Y] = 'Y';
-      io.KeyMap[ImGuiKey_Z] = 'Z';
+      io.KeyMap[ImGuiKey_Tab] = vdl::Input::Keyboard::KeyTab.GetCode();
+      io.KeyMap[ImGuiKey_LeftArrow] = vdl::Input::Keyboard::KeyLeft.GetCode();
+      io.KeyMap[ImGuiKey_RightArrow] = vdl::Input::Keyboard::KeyRight.GetCode();
+      io.KeyMap[ImGuiKey_UpArrow] = vdl::Input::Keyboard::KeyUp.GetCode();
+      io.KeyMap[ImGuiKey_DownArrow] = vdl::Input::Keyboard::KeyDown.GetCode();
+      io.KeyMap[ImGuiKey_PageUp] = vdl::Input::Keyboard::KeyPageUp.GetCode();
+      io.KeyMap[ImGuiKey_PageDown] = vdl::Input::Keyboard::KeyPageDown.GetCode();
+      io.KeyMap[ImGuiKey_Home] = vdl::Input::Keyboard::KeyHome.GetCode();
+      io.KeyMap[ImGuiKey_End] = vdl::Input::Keyboard::KeyEnd.GetCode();
+      io.KeyMap[ImGuiKey_Insert] = vdl::Input::Keyboard::KeyInsert.GetCode();
+      io.KeyMap[ImGuiKey_Delete] = vdl::Input::Keyboard::KeyDelete.GetCode();
+      io.KeyMap[ImGuiKey_Backspace] = vdl::Input::Keyboard::KeyBackspace.GetCode();
+      io.KeyMap[ImGuiKey_Space] = vdl::Input::Keyboard::KeyBackspace.GetCode();
+      io.KeyMap[ImGuiKey_Enter] = vdl::Input::Keyboard::KeyEnter.GetCode();
+      io.KeyMap[ImGuiKey_Escape] = vdl::Input::Keyboard::KeyEscape.GetCode();
+      io.KeyMap[ImGuiKey_KeyPadEnter] = vdl::Input::Keyboard::KeyEnter.GetCode();
+      io.KeyMap[ImGuiKey_A] = vdl::Input::Keyboard::KeyA.GetCode();
+      io.KeyMap[ImGuiKey_C] = vdl::Input::Keyboard::KeyC.GetCode();
+      io.KeyMap[ImGuiKey_V] = vdl::Input::Keyboard::KeyV.GetCode();
+      io.KeyMap[ImGuiKey_X] = vdl::Input::Keyboard::KeyX.GetCode();
+      io.KeyMap[ImGuiKey_Y] = vdl::Input::Keyboard::KeyY.GetCode();
+      io.KeyMap[ImGuiKey_Z] = vdl::Input::Keyboard::KeyZ.GetCode();
     }
 
     //  見た目の設定
-    {
-      ImGuiStyle* pStyle = &ImGui::GetStyle();
-      ImGui::StyleColorsDark(pStyle);
+    SetupStyle();
 
-      pStyle->FrameBorderSize = 1.0f;
-      pStyle->WindowRounding = 0.0f;
-      pStyle->TabRounding = 0.0f;
-      pStyle->FrameRounding = 0.0f;
-      pStyle->AntiAliasedLines = true;
-      pStyle->AntiAliasedFill = true;
-
-      //  TODO
-      //ImVec4* Colors = pStyle->Colors;
-      //{
-      //  constexpr vdl::Color3 kColorPrimaryBase = vdl::Color3(0x1c, 0xfe, 0xff);
-      //  constexpr vdl::Color4 kColorPrimary = vdl::Color4(kColorPrimaryBase, 0xcc);
-      //  constexpr vdl::Color4 kColorPrimaryA99 = vdl::Color4(kColorPrimaryBase, 0xff);
-      //  constexpr vdl::Color4 kColorPrimaryA66 = vdl::Color4(kColorPrimaryBase, 0x66);
-      //  constexpr vdl::Color4 kColorPrimaryA33 = vdl::Color4(kColorPrimaryBase, 0x33);
-      //  constexpr vdl::Color4 kColorPrimaryDark = vdl::Color4(0x03, 0x19, 0x1a, 0xff);
-      //
-      //  constexpr vdl::Color3 kColorAccentBase = vdl::Color3(0xff, 0xa1, 0x00);
-      //  constexpr vdl::Color4 kColorAccent = vdl::Color4(kColorAccentBase, 0xee);
-      //  constexpr vdl::Color4 kColorAccentAcc = vdl::Color4(kColorAccentBase, 0xcc);
-      //  constexpr vdl::Color4 kColorAccentA99 = vdl::Color4(kColorAccentBase, 0x99);
-      //
-      //  constexpr vdl::Color4 kColorWhite = vdl::Color4(0xdd, 0xdd, 0xdd, 0xcc);
-      //  constexpr vdl::Color4 kColorBlackA55 = vdl::Color4(0x11, 0x11, 0x11, 0x55);
-      //
-      //  Colors[ImGuiCol_MenuBarBg] = Cast(kColorPrimaryA33);
-      //  Colors[ImGuiCol_TitleBg] = Cast(kColorPrimaryDark);
-      //  Colors[ImGuiCol_TitleBgCollapsed] = Cast(kColorPrimaryDark);
-      //  Colors[ImGuiCol_TitleBgActive] = Cast(kColorPrimaryA99);
-      //  Colors[ImGuiCol_WindowBg] = Cast(kColorPrimaryDark);
-      //  Colors[ImGuiCol_Border] = Cast(kColorPrimaryA99);
-      //  Colors[ImGuiCol_FrameBg] = Cast(kColorPrimaryA33);
-      //  Colors[ImGuiCol_FrameBgHovered] = Cast(kColorAccentAcc);
-      //  Colors[ImGuiCol_FrameBgActive] = Cast(kColorAccent);
-      //  Colors[ImGuiCol_ScrollbarBg] = Cast(kColorPrimaryA33);
-      //  Colors[ImGuiCol_ScrollbarGrab] = Cast(kColorPrimaryA99);
-      //  Colors[ImGuiCol_ScrollbarGrabHovered] = Cast(kColorPrimaryA99);
-      //  Colors[ImGuiCol_ScrollbarGrabActive] = Cast(kColorPrimary);
-      //  Colors[ImGuiCol_CheckMark] = Cast(kColorAccent);
-      //  Colors[ImGuiCol_SliderGrab] = Cast(kColorPrimaryA99);
-      //  Colors[ImGuiCol_SliderGrabActive] = Cast(kColorPrimary);
-      //  Colors[ImGuiCol_Button] = Cast(kColorPrimaryA33);
-      //  Colors[ImGuiCol_ButtonHovered] = Cast(kColorAccentAcc);
-      //  Colors[ImGuiCol_ButtonActive] = Cast(kColorAccent);
-      //  Colors[ImGuiCol_Header] = Cast(kColorAccentA99);
-      //  Colors[ImGuiCol_HeaderHovered] = Cast(kColorAccentAcc);
-      //  Colors[ImGuiCol_HeaderActive] = Cast(kColorAccent);
-      //  //Colors[ImGuiCol_Column] = Cast(kColorBlackA55);
-      //  //Colors[ImGuiCol_ColumnHovered] = Cast(kColorAccentAcc);
-      //  //Colors[ImGuiCol_ColumnActive] = Cast(kColorAccent);
-      //  Colors[ImGuiCol_PlotLines] = Cast(kColorPrimaryA99);
-      //  Colors[ImGuiCol_PlotLinesHovered] = Cast(kColorPrimary);
-      //  Colors[ImGuiCol_PlotHistogram] = Cast(kColorPrimaryA99);
-      //  Colors[ImGuiCol_PlotHistogramHovered] = Cast(kColorPrimary);
-      //  Colors[ImGuiCol_Text] = Cast(kColorPrimary);
-      //  Colors[ImGuiCol_TextDisabled] = Cast(kColorPrimaryA66);
-      //  Colors[ImGuiCol_TextSelectedBg] = Cast(kColorAccent);
-      //  Colors[ImGuiCol_PopupBg] = Cast(kColorPrimaryDark);
-      //}
-    }
-
-    //{
-    //  ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-    //  main_viewport->PlatformHandle = main_viewport->PlatformHandleRaw = Engine::Get<IWindow>()->;
-    //  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    //  {
-    //    ImGui_ImplWin32_InitPlatformInterface();
-    //  }
-    //}
+    //  マルチビューポート設定
+    SetupMultiViewport();
   }
 
   //  コマンドリストの初期化
@@ -795,7 +725,7 @@ void CGUI::Update()
   IM_ASSERT(io.Fonts->IsBuilt() && "Font atlas not built! It is generally built by the renderer back-end. Missing call to renderer _NewFrame() function? e.g. ImGui_ImplOpenGL3_NewFrame().");
 
   // Setup display size (every frame to accommodate for window resizing)
-  io.DisplaySize = Cast(pWindow_->GetWindowSize());
+  io.DisplaySize = pWindow_->GetWindowSize();
   GraphicsCommandList_.SetViewport({ 0.0f, 0.0f, io.DisplaySize.x, io.DisplaySize.y });
 
   // Setup time step
@@ -809,12 +739,12 @@ void CGUI::Update()
 
       if (pKeyboard_->Pressed(i))
       {
-        io.AddInputCharacter(::MapVirtualKey(i, MAPVK_VK_TO_CHAR));
+        io.AddInputCharacterUTF16(toascii(i));
       }
     }
-    io.KeyCtrl = pKeyboard_->Press(VK_CONTROL);
-    io.KeyShift = pKeyboard_->Press(VK_SHIFT);
-    io.KeyAlt = pKeyboard_->Press(VK_MENU);
+    io.KeyCtrl = pKeyboard_->Press(vdl::Input::Keyboard::KeyControl.GetCode());
+    io.KeyShift = pKeyboard_->Press(vdl::Input::Keyboard::KeyShift.GetCode());
+    io.KeyAlt = pKeyboard_->Press(vdl::Input::Keyboard::KeyAlt.GetCode());
     io.KeySuper = false;
   }
 
@@ -834,6 +764,23 @@ void CGUI::Update()
     const vdl::float2 Pos = pMouse_->GetPos();
     io.MousePos.x = Pos.x;
     io.MousePos.y = Pos.y;
+
+#if defined VDL_TARGET_WINDOWS
+    POINT MousePos;
+    MousePos.x = static_cast<long>(io.MousePos.x);
+    MousePos.y = static_cast<long>(io.MousePos.y);
+
+    if (HWND HoveredhWnd = ::WindowFromPoint(MousePos))
+    {
+      if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(HoveredhWnd))
+      {
+        if ((viewport->Flags & ImGuiViewportFlags_NoInputs) == 0) // FIXME: We still get our NoInputs window with WM_NCHITTEST/HTTRANSPARENT code when decorated?
+        {
+          io.MouseHoveredViewport = viewport->ID;
+        }
+      }
+    }
+#endif
 
     // Show OS mouse cursor
     {
@@ -914,8 +861,8 @@ void CGUI::Draw()
   }
 
   // Will project scissor/clipping rectangles into framebuffer space
-  const ImVec2 ClipOffset = pDrawData->DisplayPos;      // (0,0) unless using multi-viewports
-  const ImVec2 ClipScale = pDrawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
+  const vdl::float2 ClipOffset = pDrawData->DisplayPos;      // (0,0) unless using multi-viewports
+  const vdl::float2 ClipScale = pDrawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
 
   ConstantBufferData& ConstantBufferData = pConstantBuffer_->GetData();
   {
@@ -928,7 +875,7 @@ void CGUI::Draw()
   // (Because we merged all buffers into a single one, we maintain our own offset into them)
   int VertexOffset = 0;
   int IndexOffset = 0;
-  ImVec4 ClipRect;
+  vdl::float4 ClipRect;
   for (int i = 0; i < pDrawData->CmdListsCount; ++i)
   {
     const ImDrawList* pCmdList = pDrawData->CmdLists[i];
@@ -961,4 +908,367 @@ void CGUI::Draw()
   pDeviceContext_->Execute(GraphicsCommandList_);
 
   GraphicsCommandList_.Reset();
+
+  ImGui::UpdatePlatformWindows();
+  ImGui::RenderPlatformWindowsDefault();
+}
+
+//--------------------------------------------------
+
+void CGUI::SetupStyle()
+{
+  ImGuiStyle* pStyle = &ImGui::GetStyle();
+  ImGui::StyleColorsDark(pStyle);
+
+  pStyle->FrameBorderSize = 1.0f;
+  pStyle->WindowRounding = 0.0f;
+  pStyle->TabRounding = 0.0f;
+  pStyle->FrameRounding = 0.0f;
+  pStyle->AntiAliasedLines = true;
+  pStyle->AntiAliasedFill = true;
+
+  //  TODO
+  //ImVec4* Colors = pStyle->Colors;
+  //{
+  //  constexpr vdl::Color3 kColorPrimaryBase = vdl::Color3(0x1c, 0xfe, 0xff);
+  //  constexpr vdl::Color4 kColorPrimary = vdl::Color4(kColorPrimaryBase, 0xcc);
+  //  constexpr vdl::Color4 kColorPrimaryA99 = vdl::Color4(kColorPrimaryBase, 0xff);
+  //  constexpr vdl::Color4 kColorPrimaryA66 = vdl::Color4(kColorPrimaryBase, 0x66);
+  //  constexpr vdl::Color4 kColorPrimaryA33 = vdl::Color4(kColorPrimaryBase, 0x33);
+  //  constexpr vdl::Color4 kColorPrimaryDark = vdl::Color4(0x03, 0x19, 0x1a, 0xff);
+  //
+  //  constexpr vdl::Color3 kColorAccentBase = vdl::Color3(0xff, 0xa1, 0x00);
+  //  constexpr vdl::Color4 kColorAccent = vdl::Color4(kColorAccentBase, 0xee);
+  //  constexpr vdl::Color4 kColorAccentAcc = vdl::Color4(kColorAccentBase, 0xcc);
+  //  constexpr vdl::Color4 kColorAccentA99 = vdl::Color4(kColorAccentBase, 0x99);
+  //
+  //  constexpr vdl::Color4 kColorWhite = vdl::Color4(0xdd, 0xdd, 0xdd, 0xcc);
+  //  constexpr vdl::Color4 kColorBlackA55 = vdl::Color4(0x11, 0x11, 0x11, 0x55);
+  //
+  //  Colors[ImGuiCol_MenuBarBg] = Cast(kColorPrimaryA33);
+  //  Colors[ImGuiCol_TitleBg] = Cast(kColorPrimaryDark);
+  //  Colors[ImGuiCol_TitleBgCollapsed] = Cast(kColorPrimaryDark);
+  //  Colors[ImGuiCol_TitleBgActive] = Cast(kColorPrimaryA99);
+  //  Colors[ImGuiCol_WindowBg] = Cast(kColorPrimaryDark);
+  //  Colors[ImGuiCol_Border] = Cast(kColorPrimaryA99);
+  //  Colors[ImGuiCol_FrameBg] = Cast(kColorPrimaryA33);
+  //  Colors[ImGuiCol_FrameBgHovered] = Cast(kColorAccentAcc);
+  //  Colors[ImGuiCol_FrameBgActive] = Cast(kColorAccent);
+  //  Colors[ImGuiCol_ScrollbarBg] = Cast(kColorPrimaryA33);
+  //  Colors[ImGuiCol_ScrollbarGrab] = Cast(kColorPrimaryA99);
+  //  Colors[ImGuiCol_ScrollbarGrabHovered] = Cast(kColorPrimaryA99);
+  //  Colors[ImGuiCol_ScrollbarGrabActive] = Cast(kColorPrimary);
+  //  Colors[ImGuiCol_CheckMark] = Cast(kColorAccent);
+  //  Colors[ImGuiCol_SliderGrab] = Cast(kColorPrimaryA99);
+  //  Colors[ImGuiCol_SliderGrabActive] = Cast(kColorPrimary);
+  //  Colors[ImGuiCol_Button] = Cast(kColorPrimaryA33);
+  //  Colors[ImGuiCol_ButtonHovered] = Cast(kColorAccentAcc);
+  //  Colors[ImGuiCol_ButtonActive] = Cast(kColorAccent);
+  //  Colors[ImGuiCol_Header] = Cast(kColorAccentA99);
+  //  Colors[ImGuiCol_HeaderHovered] = Cast(kColorAccentAcc);
+  //  Colors[ImGuiCol_HeaderActive] = Cast(kColorAccent);
+  //  //Colors[ImGuiCol_Column] = Cast(kColorBlackA55);
+  //  //Colors[ImGuiCol_ColumnHovered] = Cast(kColorAccentAcc);
+  //  //Colors[ImGuiCol_ColumnActive] = Cast(kColorAccent);
+  //  Colors[ImGuiCol_PlotLines] = Cast(kColorPrimaryA99);
+  //  Colors[ImGuiCol_PlotLinesHovered] = Cast(kColorPrimary);
+  //  Colors[ImGuiCol_PlotHistogram] = Cast(kColorPrimaryA99);
+  //  Colors[ImGuiCol_PlotHistogramHovered] = Cast(kColorPrimary);
+  //  Colors[ImGuiCol_Text] = Cast(kColorPrimary);
+  //  Colors[ImGuiCol_TextDisabled] = Cast(kColorPrimaryA66);
+  //  Colors[ImGuiCol_TextSelectedBg] = Cast(kColorAccent);
+  //  Colors[ImGuiCol_PopupBg] = Cast(kColorPrimaryDark);
+  //}
+}
+
+void CGUI::SetupMultiViewport()
+{
+  ImGuiViewport* pMainViewport = ImGui::GetMainViewport();
+  pMainViewport->PlatformHandle = pMainViewport->PlatformHandleRaw = pWindow_->GetHandle();
+
+#if defined VDL_TARGET_WINDOWS
+  WNDCLASSEX WindowClass;
+  {
+    WindowClass.cbSize = sizeof(WNDCLASSEX);
+    WindowClass.style = CS_HREDRAW | CS_VREDRAW;
+    WindowClass.lpfnWndProc = ::SubWndProc;
+    WindowClass.cbClsExtra = 0;
+    WindowClass.cbWndExtra = 0;
+    WindowClass.hInstance = ::GetModuleHandle(nullptr);
+    WindowClass.hIcon = nullptr;
+    WindowClass.hCursor = nullptr;
+    WindowClass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
+    WindowClass.lpszMenuName = nullptr;
+    WindowClass.lpszClassName = L"vdl SubWindow";
+    WindowClass.hIconSm = nullptr;
+  }
+  ::RegisterClassEx(&WindowClass);
+
+  struct ImGuiViewportDataWin32
+  {
+    HWND    Hwnd;
+    bool    HwndOwned;
+    DWORD   DwStyle;
+    DWORD   DwExStyle;
+
+    ImGuiViewportDataWin32() { Hwnd = NULL; HwndOwned = false;  DwStyle = DwExStyle = 0; }
+    ~ImGuiViewportDataWin32() { IM_ASSERT(Hwnd == NULL); }
+  };
+
+  auto ImGui_ImplWin32_CreateWindow = [](ImGuiViewport* viewport)->void
+  {
+    auto ImGui_ImplWin32_GetWin32StyleFromViewportFlags = [](ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style)->void
+    {
+      if (flags & ImGuiViewportFlags_NoDecoration)
+        *out_style = WS_POPUP;
+      else
+        *out_style = WS_OVERLAPPEDWINDOW;
+
+      if (flags & ImGuiViewportFlags_NoTaskBarIcon)
+        *out_ex_style = WS_EX_TOOLWINDOW;
+      else
+        *out_ex_style = WS_EX_APPWINDOW;
+
+      if (flags & ImGuiViewportFlags_TopMost)
+        *out_ex_style |= WS_EX_TOPMOST;
+    };
+
+    ImGuiViewportDataWin32* data = new ImGuiViewportDataWin32();
+    viewport->PlatformUserData = data;
+
+    // Select style and parent window
+    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &data->DwStyle, &data->DwExStyle);
+    HWND parent_window = NULL;
+    if (viewport->ParentViewportId != 0)
+      if (ImGuiViewport* parent_viewport = ImGui::FindViewportByID(viewport->ParentViewportId))
+        parent_window = (HWND)parent_viewport->PlatformHandle;
+
+    // Create window
+    RECT rect = { (LONG)viewport->Pos.x, (LONG)viewport->Pos.y, (LONG)(viewport->Pos.x + viewport->Size.x), (LONG)(viewport->Pos.y + viewport->Size.y) };
+    ::AdjustWindowRectEx(&rect, data->DwStyle, FALSE, data->DwExStyle);
+    data->Hwnd = ::CreateWindowEx(
+      data->DwExStyle, L"ImGui Platform", L"Untitled", data->DwStyle,   // Style, class name, window name
+      rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,    // Window area
+      parent_window, NULL, ::GetModuleHandle(NULL), NULL);                    // Parent window, Menu, Instance, Param
+    data->HwndOwned = true;
+    viewport->PlatformRequestResize = false;
+    viewport->PlatformHandle = viewport->PlatformHandleRaw = data->Hwnd;
+  };
+
+  auto ImGui_ImplWin32_DestroyWindow = [](ImGuiViewport* viewport)->void
+  {
+    if (ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData)
+    {
+      if (::GetCapture() == data->Hwnd)
+      {
+        // Transfer capture so if we started dragging from a window that later disappears, we'll still receive the MOUSEUP event.
+        ::ReleaseCapture();
+        ::SetCapture(static_cast<HWND>(Engine::Get<IWindow>()->GetHandle()));
+      }
+      if (data->Hwnd && data->HwndOwned)
+        ::DestroyWindow(data->Hwnd);
+      data->Hwnd = NULL;
+      IM_DELETE(data);
+    }
+    viewport->PlatformUserData = viewport->PlatformHandle = NULL;
+  };
+
+  auto ImGui_ImplWin32_ShowWindow = [](ImGuiViewport* viewport)->void
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    if (viewport->Flags & ImGuiViewportFlags_NoFocusOnAppearing)
+      ::ShowWindow(data->Hwnd, SW_SHOWNA);
+    else
+      ::ShowWindow(data->Hwnd, SW_SHOW);
+  };
+
+  auto ImGui_ImplWin32_UpdateWindow = [](ImGuiViewport* viewport)->void
+  {
+    auto ImGui_ImplWin32_GetWin32StyleFromViewportFlags = [](ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style)->void
+    {
+      if (flags & ImGuiViewportFlags_NoDecoration)
+        *out_style = WS_POPUP;
+      else
+        *out_style = WS_OVERLAPPEDWINDOW;
+
+      if (flags & ImGuiViewportFlags_NoTaskBarIcon)
+        *out_ex_style = WS_EX_TOOLWINDOW;
+      else
+        *out_ex_style = WS_EX_APPWINDOW;
+
+      if (flags & ImGuiViewportFlags_TopMost)
+        *out_ex_style |= WS_EX_TOPMOST;
+    };
+
+    // (Optional) Update Win32 style if it changed _after_ creation.
+    // Generally they won't change unless configuration flags are changed, but advanced uses (such as manually rewriting viewport flags) make this useful.
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    DWORD new_style;
+    DWORD new_ex_style;
+    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &new_style, &new_ex_style);
+
+    // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
+    if (data->DwStyle != new_style || data->DwExStyle != new_ex_style)
+    {
+      data->DwStyle = new_style;
+      data->DwExStyle = new_ex_style;
+      ::SetWindowLong(data->Hwnd, GWL_STYLE, data->DwStyle);
+      ::SetWindowLong(data->Hwnd, GWL_EXSTYLE, data->DwExStyle);
+      RECT rect = { (LONG)viewport->Pos.x, (LONG)viewport->Pos.y, (LONG)(viewport->Pos.x + viewport->Size.x), (LONG)(viewport->Pos.y + viewport->Size.y) };
+      ::AdjustWindowRectEx(&rect, data->DwStyle, FALSE, data->DwExStyle); // Client to Screen
+      ::SetWindowPos(data->Hwnd, NULL, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+      ::ShowWindow(data->Hwnd, SW_SHOWNA); // This is necessary when we alter the style
+      viewport->PlatformRequestMove = viewport->PlatformRequestResize = true;
+    }
+  };
+
+  auto ImGui_ImplWin32_GetWindowPos = [](ImGuiViewport* viewport)->vdl::float2
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    POINT pos = { 0, 0 };
+    ::ClientToScreen(data->Hwnd, &pos);
+    return vdl::float2((float)pos.x, (float)pos.y);
+  };
+
+  auto ImGui_ImplWin32_SetWindowPos = [](ImGuiViewport* viewport, vdl::float2 pos)->void
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    RECT rect = { (LONG)pos.x, (LONG)pos.y, (LONG)pos.x, (LONG)pos.y };
+    ::AdjustWindowRectEx(&rect, data->DwStyle, FALSE, data->DwExStyle);
+    ::SetWindowPos(data->Hwnd, NULL, rect.left, rect.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+  };
+
+  auto ImGui_ImplWin32_GetWindowSize = [](ImGuiViewport* viewport)->vdl::float2
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    RECT rect;
+    ::GetClientRect(data->Hwnd, &rect);
+    return vdl::float2(float(rect.right - rect.left), float(rect.bottom - rect.top));
+  };
+
+  auto ImGui_ImplWin32_SetWindowSize = [](ImGuiViewport* viewport, vdl::float2 size)->void
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    RECT rect = { 0, 0, (LONG)size.x, (LONG)size.y };
+    ::AdjustWindowRectEx(&rect, data->DwStyle, FALSE, data->DwExStyle); // Client to Screen
+    ::SetWindowPos(data->Hwnd, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+  };
+
+  auto ImGui_ImplWin32_SetWindowFocus = [](ImGuiViewport* viewport)->void
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    ::BringWindowToTop(data->Hwnd);
+    ::SetForegroundWindow(data->Hwnd);
+    ::SetFocus(data->Hwnd);
+  };
+
+  auto ImGui_ImplWin32_GetWindowFocus = [](ImGuiViewport* viewport)->bool
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    return ::GetForegroundWindow() == data->Hwnd;
+  };
+
+  auto ImGui_ImplWin32_GetWindowMinimized = [](ImGuiViewport* viewport)->bool
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    return ::IsIconic(data->Hwnd) != 0;
+  };
+
+  auto ImGui_ImplWin32_SetWindowTitle = [](ImGuiViewport* viewport, const char* title)->void
+  {
+    // ::SetWindowTextA() doesn't properly handle UTF-8 so we explicitely convert our string.
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    int n = ::MultiByteToWideChar(CP_UTF8, 0, title, -1, NULL, 0);
+    ImVector<wchar_t> title_w;
+    title_w.resize(n);
+    ::MultiByteToWideChar(CP_UTF8, 0, title, -1, title_w.Data, n);
+    ::SetWindowTextW(data->Hwnd, title_w.Data);
+  };
+
+  auto ImGui_ImplWin32_SetWindowAlpha = [](ImGuiViewport* viewport, float alpha)->void
+  {
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    IM_ASSERT(data->Hwnd != 0);
+    IM_ASSERT(alpha >= 0.0f && alpha <= 1.0f);
+    if (alpha < 1.0f)
+    {
+      DWORD style = ::GetWindowLongW(data->Hwnd, GWL_EXSTYLE) | WS_EX_LAYERED;
+      ::SetWindowLongW(data->Hwnd, GWL_EXSTYLE, style);
+      ::SetLayeredWindowAttributes(data->Hwnd, 0, (BYTE)(255 * alpha), LWA_ALPHA);
+    }
+    else
+    {
+      DWORD style = ::GetWindowLongW(data->Hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED;
+      ::SetWindowLongW(data->Hwnd, GWL_EXSTYLE, style);
+    }
+  };
+
+  //  auto ImGui_ImplWin32_GetWindowDpiScale = [](ImGuiViewport* viewport)->float
+  //  {
+  //    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+  //    IM_ASSERT(data->Hwnd != 0);
+  //    return ImGui_ImplWin32_GetDpiScaleForHwnd(data->Hwnd);
+  //  };
+  //
+  //  // FIXME-DPI: Testing DPI related ideas
+  //  auto ImGui_ImplWin32_OnChangedViewport = [](ImGuiViewport* viewport)->void
+  //  {
+  //    (void)viewport;
+  //#if 0
+  //    ImGuiStyle default_style;
+  //    //default_style.WindowPadding = vdl::float2(0, 0);
+  //    //default_style.WindowBorderSize = 0.0f;
+  //    //default_style.ItemSpacing.y = 3.0f;
+  //    //default_style.FramePadding = vdl::float2(0, 0);
+  //    default_style.ScaleAllSizes(viewport->DpiScale);
+  //    ImGuiStyle& style = ImGui::GetStyle();
+  //    style = default_style;
+  //#endif
+  //  };
+
+  // Register platform interface (will be coupled with a renderer interface)
+  ImGuiPlatformIO& PlatformIO = ImGui::GetPlatformIO();
+  {
+    PlatformIO.Platform_CreateWindow = ImGui_ImplWin32_CreateWindow;
+    PlatformIO.Platform_DestroyWindow = ImGui_ImplWin32_DestroyWindow;
+    PlatformIO.Platform_ShowWindow = ImGui_ImplWin32_ShowWindow;
+    PlatformIO.Platform_SetWindowPos = ImGui_ImplWin32_SetWindowPos;
+    PlatformIO.Platform_GetWindowPos = ImGui_ImplWin32_GetWindowPos;
+    PlatformIO.Platform_SetWindowSize = ImGui_ImplWin32_SetWindowSize;
+    PlatformIO.Platform_GetWindowSize = ImGui_ImplWin32_GetWindowSize;
+    PlatformIO.Platform_SetWindowFocus = ImGui_ImplWin32_SetWindowFocus;
+    PlatformIO.Platform_GetWindowFocus = ImGui_ImplWin32_GetWindowFocus;
+    PlatformIO.Platform_GetWindowMinimized = ImGui_ImplWin32_GetWindowMinimized;
+    PlatformIO.Platform_SetWindowTitle = ImGui_ImplWin32_SetWindowTitle;
+    PlatformIO.Platform_SetWindowAlpha = ImGui_ImplWin32_SetWindowAlpha;
+    PlatformIO.Platform_UpdateWindow = ImGui_ImplWin32_UpdateWindow;
+    //PlatformIO.Platform_GetWindowDpiScale = ImGui_ImplWin32_GetWindowDpiScale; // FIXME-DPI
+    //PlatformIO.Platform_OnChangedViewport = ImGui_ImplWin32_OnChangedViewport; // FIXME-DPI
+    //PlatformIO.Renderer_CreateWindow = ImGui_ImplDX11_CreateWindow;
+    //PlatformIO.Renderer_DestroyWindow = ImGui_ImplDX11_DestroyWindow;
+    //PlatformIO.Renderer_SetWindowSize = ImGui_ImplDX11_SetWindowSize;
+    //PlatformIO.Renderer_RenderWindow = ImGui_ImplDX11_RenderWindow;
+    //PlatformIO.Renderer_SwapBuffers = ImGui_ImplDX11_SwapBuffers;
+  }
+
+  ImGuiViewportDataWin32* data = new ImGuiViewportDataWin32();
+  {
+    data->Hwnd = static_cast<HWND>(pWindow_->GetHandle());
+    data->HwndOwned = false;
+  }
+#elif defined VDL_TARGET_LINUX
+
+#endif
+
+  pMainViewport->PlatformUserData = data;
 }

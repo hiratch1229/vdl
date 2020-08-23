@@ -23,6 +23,7 @@ class IWindow;
 class IKeyboard;
 class IMouse;
 class IBufferManager;
+struct ImGuiViewport;
 
 class CGUI : public IGUI
 {
@@ -49,6 +50,23 @@ private:
   vdl::uint VertexBufferSize_ = 0;
   IndexBuffer IndexBuffer_;
   vdl::uint IndexBufferSize_ = 0;
+private:
+  void SetupStyle();
+  void SetupMultiViewport();
+private:
+  void PlatformCreateWindow(ImGuiViewport*);
+  void PlatformDestroyWindow(ImGuiViewport*);
+  void PlatformShowWindow(ImGuiViewport*);
+  void PlatformSetWindowPos(ImGuiViewport*);
+  void PlatformGetWindowPos(ImGuiViewport*);
+  void PlatformSetWindowSize(ImGuiViewport*);
+  void PlatformGetWindowSize(ImGuiViewport*);
+  void PlatformSetWindowFocus(ImGuiViewport*);
+  void PlatformGetWindowFocus(ImGuiViewport*);
+  void PlatformGetWindowMinimized(ImGuiViewport*);
+  void PlatformSetWindowTitle(ImGuiViewport*);
+  void PlatformSetWindowAlpha(ImGuiViewport*);
+  void PlatformUpdateWindow(ImGuiViewport*);
 public:
   CGUI() = default;
 

@@ -69,6 +69,9 @@ namespace vdl
   public:
     Color4() = default;
 
+    constexpr Color4(uint32_t _Color)noexcept
+      : Bit(_Color) {}
+
     constexpr Color4(uint8_t _Red, uint8_t _Green, uint8_t _Blue, uint8_t _Alpha = 255u)noexcept
       : Red(_Red)
       , Green(_Green)
