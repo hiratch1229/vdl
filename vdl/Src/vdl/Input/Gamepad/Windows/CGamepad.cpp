@@ -2,7 +2,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Platform/IPlatform.hpp>
-#include <vdl/Window/Windows/CWindow.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/Input/XInput/IXInput.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
 
@@ -52,7 +52,7 @@ namespace
 void CGamepad::Initialize()
 {
   pXInput_ = Engine::Get<IXInput>();
-  hWnd_ = Cast<CWindow>(Engine::Get<IWindow>())->GetHandle();
+  hWnd_ = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());
 
   HRESULT hr = S_OK;
 

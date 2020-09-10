@@ -1071,7 +1071,7 @@ bool ImGui::Checkbox(const char* label, bool* v)
     if (window->DC.ItemFlags & ImGuiItemFlags_MixedValue)
     {
         // Undocumented tristate/mixed/indeterminate checkbox (#2644)
-      vdl::float2 pad(ImMax(1.0f, IM_FLOOR(square_sz / 3.6f)), ImMax(1.0f, IM_FLOOR(square_sz / 3.6f)));
+        vdl::float2 pad(ImMax(1.0f, IM_FLOOR(square_sz / 3.6f)), ImMax(1.0f, IM_FLOOR(square_sz / 3.6f)));
         window->DrawList->AddRectFilled(check_bb.Min + pad, check_bb.Max - pad, check_col, style.FrameRounding);
     }
     else if (*v)
@@ -1381,7 +1381,7 @@ bool ImGui::SplitterBehavior(const ImRect& bb, ImGuiID id, ImGuiAxis axis, float
     ImRect bb_render = bb;
     if (held)
     {
-      vdl::float2 mouse_delta_2d = g.IO.MousePos - g.ActiveIdClickOffset - bb_interact.Min;
+        vdl::float2 mouse_delta_2d = g.IO.MousePos - g.ActiveIdClickOffset - bb_interact.Min;
         float mouse_delta = (axis == ImGuiAxis_Y) ? mouse_delta_2d.y : mouse_delta_2d.x;
 
         // Minimum pane size
@@ -5106,7 +5106,7 @@ bool ImGui::ColorPicker4(const char* label, float col[4], ImGuiColorEditFlags fl
     ImU32 hue_color32 = ColorConvertFloat4ToU32(hue_color_f);
     ImU32 user_col32_striped_of_alpha = ColorConvertFloat4ToU32(vdl::Color4F(R, G, B, style.Alpha)); // Important: this is still including the main rendering/style alpha!!
 
-    vdl::float2 sv_cursor_pos;
+    vdl::float2 sv_cursor_pos = vdl::float2(0.0f, 0.0f);
 
     if (flags & ImGuiColorEditFlags_PickerHueWheel)
     {
@@ -6813,6 +6813,7 @@ ImGuiTabBar::ImGuiTabBar()
     ReorderRequestDir = 0;
     WantLayout = VisibleTabWasSubmitted = false;
     LastTabItemIdx = -1;
+    FramePadding = vdl::float2(0.0f, 0.0f);
 }
 
 static int IMGUI_CDECL TabItemComparerByVisibleOffset(const void* lhs, const void* rhs)

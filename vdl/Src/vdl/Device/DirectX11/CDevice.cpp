@@ -1,7 +1,7 @@
 #include "CDevice.hpp"
 
 #include <vdl/Engine.hpp>
-#include <vdl/Window/Windows/CWindow.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/DeviceContext/DirectX11/CDeviceContext.hpp>
 #include <vdl/TextureManager/ITextureManager.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
@@ -107,7 +107,7 @@ void CDevice::Initialize()
   pTextureManager_ = Engine::Get<ITextureManager>();
   pBufferManager_ = Engine::Get<IBufferManager>();
 
-  const HWND& hWnd = Cast<CWindow>(Engine::Get<IWindow>())->GetHandle();
+  const HWND hWnd = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());
 
   //  エラーチェック用
   HRESULT hr = S_OK;

@@ -2,7 +2,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Platform/IPlatform.hpp>
-#include <vdl/Window/Windows/CWindow.hpp>
+#include <vdl/Window/IWindow.hpp>
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
 
 #include <vdl/DetectMemoryLeak.hpp>
@@ -10,7 +10,7 @@
 void CMouse::Initialize()
 {
   pKeyboard_ = Engine::Get<IKeyboard>();
-  hWnd_ = Cast<CWindow>(Engine::Get<IWindow>())->GetHandle();
+  hWnd_ = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());
 
   HDC DisplayDeviceContext = ::GetDC(::GetDesktopWindow());
   DpiScale_ = { ::GetDeviceCaps(DisplayDeviceContext , LOGPIXELSX), ::GetDeviceCaps(DisplayDeviceContext , LOGPIXELSY) };

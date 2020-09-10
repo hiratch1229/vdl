@@ -5,6 +5,7 @@
 #include <vdl/Color.hpp>
 #include <vdl/Macro.hpp>
 #include <vdl/Format.hpp>
+#include <vdl/Platform.hpp>
 
 namespace Constants
 {
@@ -66,17 +67,21 @@ namespace Constants
 
   constexpr const char* kBinaryFileFormat = ".bin";
 
-#if defined VDL_USING_DIRECTX11
+#if defined VDL_EXECUTE_DIRECTX11
   constexpr const char* kShaderBinaryFileFormat = ".d3d11bin";
-#elif defined VDL_USING_DIRECTX12
+#elif defined VDL_EXECUTE_DIRECTX12
   constexpr const char* kShaderBinaryFileFormat = ".d3d12bin";
-#elif defined VDL_USING_VULKAN
+#elif defined VDL_EXECUTE_VULKAN
   constexpr const char* kShaderBinaryFileFormat = ".vkbin";
 #endif
 
   constexpr const char* kScreenShotFileDirectory = "ScreenShot/";
 
-  constexpr const char* kClassName = "vdl";
+#if defined VDL_TARGET_WINDOWS
+  constexpr const wchar_t* kClassName = L"vdl MainWindow";
+
+  constexpr const wchar_t* kGUIClassName = L"vdl SubWindow";
+#endif
 
   constexpr const char* kDefaultWindowName = "vdl";
 

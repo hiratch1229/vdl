@@ -1153,7 +1153,7 @@ ID3D11RenderTargetView* CDeviceContext::GetRenderTargetView(const vdl::RenderTex
   ITexture* pTexture = pTextureManager_->GetTexture(_RenderTexture.GetID());
   if (pTexture->GetType() == TextureType::eSwapChainRenderTexture)
   {
-    return SwapChain_.GetRenderTargetView();
+    return Cast<CSwapChainRenderTexture>(pTexture)->pRenderTargetView;
   }
   else
   {

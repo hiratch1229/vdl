@@ -692,6 +692,7 @@
       <AdditionalIncludeDirectories>..\vdl\Include;..\vdl\Include\ThirdParty</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

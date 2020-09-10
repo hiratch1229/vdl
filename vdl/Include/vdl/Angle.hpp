@@ -111,6 +111,8 @@ namespace vdl
     }
   };
 
+  //----------------------------------------------------------------------------------------------------
+
   //  ìxêîñ@
   class Degree
   {
@@ -150,6 +152,8 @@ namespace vdl
     }
   };
 
+  //----------------------------------------------------------------------------------------------------
+
   inline constexpr Radian::Radian(const Degree& _Degree)noexcept
     : Value_(Math::ToRadian(static_cast<float>(_Degree))) {}
 
@@ -159,6 +163,8 @@ namespace vdl
   COMMON_OPERATOR(Radian);
 
   COMMON_OPERATOR(Degree);
+
+  //----------------------------------------------------------------------------------------------------
 
   namespace Math
   {

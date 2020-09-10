@@ -5,7 +5,7 @@
 #include <vdl/TextureManager/ITextureManager.hpp>
 
 #if defined VDL_TARGET_WINDOWS
-#include <vdl/Window/Windows/CWindow.hpp>
+#include <vdl/Window/IWindow.hpp>
 #elif defined VDL_TARGET_LINUX
 #include <vdl/Window/Linux/CWindow.hpp>
 #endif
@@ -30,7 +30,7 @@ void SwapChain::Initialize(CDevice* _pDevice)
       vk::Win32SurfaceCreateInfoKHR SurfaceInfo;
       {
         SurfaceInfo.hinstance = ::GetModuleHandle(nullptr);
-        SurfaceInfo.hwnd = Cast<CWindow>(Engine::Get<IWindow>())->GetHandle();
+        SurfaceInfo.hwnd = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());
       }
       Surface_ = _pDevice->GetInstance().createWin32SurfaceKHRUnique(SurfaceInfo);
 #elif defined VK_USE_PLATFORM_XCB_KHR

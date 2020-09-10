@@ -45,6 +45,8 @@ public:
 
 struct CSwapChainRenderTexture : public ITexture
 {
+  ID3D11RenderTargetView* pRenderTargetView;
+  vdl::uint2 TextureSize;
 public:
   CSwapChainRenderTexture() = default;
 
@@ -52,7 +54,7 @@ public:
 
   TextureType GetType()const final { return TextureType::eSwapChainRenderTexture; }
 
-  vdl::uint2 GetSize()const final { return vdl::Window::GetWindowSize(); }
+  vdl::uint2 GetSize()const final { return TextureSize; }
 
   vdl::FormatType GetFormat()const final { return vdl::FormatType::eSwapChain; }
 };

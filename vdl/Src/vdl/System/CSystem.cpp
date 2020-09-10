@@ -18,10 +18,9 @@
 #include <vdl/Scissor.hpp>
 #include <vdl/DetectMemoryLeak.hpp>
 
-#include <thread>
-
 void CSystem::Initialize()
 {
+  pWindow_ = Engine::Get<IWindow>();
   pDeviceContext_ = Engine::Get<IDeviceContext>();
   pCPUProfiler_ = Engine::Get<ICPUProfiler>();
   pMemoryProfiler_ = Engine::Get<IMemoryProfiler>();
@@ -42,10 +41,9 @@ bool CSystem::Update()
 {
   if (SystemState_ == SystemState::eInitialized)
   {
-    IWindow* pWindow = Engine::Get<IWindow>();
-    pWindow->Show(true);
+    pWindow_->Show(true);
 
-    const vdl::uint2& WindowSize = pWindow->GetWindowSize();
+    const vdl::uint2& WindowSize = pWindow_->GetWindowSize();
     const vdl::Viewport Viewport(0.0f, WindowSize);
     const vdl::Scissor Scissor(0, WindowSize);
 
@@ -103,6 +101,8 @@ bool CSystem::Update()
 
     while (true)
     {
+      pWindow_->Update();
+
       CurrentTime = std::chrono::high_resolution_clock::now();
       DeltaTime = std::chrono::duration(CurrentTime - LastTime_);
       SleepTime = FrameInterval_ - DeltaTime;

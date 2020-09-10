@@ -16,15 +16,19 @@ class CWindow : public IWindow
 public:
   CWindow() = default;
 
+  ~CWindow();
+
   PlatformFlags GetPlatform()const final { return PlatformFlag::eWindows; }
 
   void Initialize()override;
 
+  void Update()override;
+
   void Show(bool _isShow)override;
+
+  void* GetHandle()const override { return static_cast<void*>(hWnd_); }
 
   const vdl::uint2& GetWindowSize()const override { return WindowSize_; }
 
   const vdl::Color4F& GetScreenClearColor()const override { return ScreenClearColor; }
-
-  [[nodiscard]] const HWND& GetHandle()const { return hWnd_; }
 };

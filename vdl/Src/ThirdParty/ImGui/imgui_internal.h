@@ -560,16 +560,16 @@ struct IMGUI_API ImChunkStream
 // You may want to create your own instance of this if you want to use ImDrawList completely without ImGui. In that case, watch out for future changes to this structure.
 struct IMGUI_API ImDrawListSharedData
 {
-  vdl::float2       TexUvWhitePixel;            // UV of white pixel in the atlas
-    ImFont*         Font;                       // Current/default font (optional, for simplified AddText overload)
-    float           FontSize;                   // Current/default font size (optional, for simplified AddText overload)
-    float           CurveTessellationTol;       // Tessellation tolerance when using PathBezierCurveTo()
-    float           CircleSegmentMaxError;      // Number of circle segments to use per pixel of radius for AddCircle() etc
-    vdl::float4     ClipRectFullscreen;         // Value for PushClipRectFullscreen()
-    ImDrawListFlags InitialFlags;               // Initial flags at the beginning of the frame (it is possible to alter flags on a per-drawlist basis afterwards)
+    vdl::float2     TexUvWhitePixel = vdl::float2(0.0f, 0.0f);// UV of white pixel in the atlas
+    ImFont*         Font;                                     // Current/default font (optional, for simplified AddText overload)
+    float           FontSize;                                 // Current/default font size (optional, for simplified AddText overload)
+    float           CurveTessellationTol;                     // Tessellation tolerance when using PathBezierCurveTo()
+    float           CircleSegmentMaxError;                    // Number of circle segments to use per pixel of radius for AddCircle() etc
+    vdl::float4     ClipRectFullscreen;                       // Value for PushClipRectFullscreen()
+    ImDrawListFlags InitialFlags;                             // Initial flags at the beginning of the frame (it is possible to alter flags on a per-drawlist basis afterwards)
 
     // [Internal] Lookup tables
-    vdl::float2         ArcFastVtx[12 * IM_DRAWLIST_ARCFAST_TESSELLATION_MULTIPLIER];  // FIXME: Bake rounded corners fill/borders in atlas
+    vdl::float2         ArcFastVtx[12 * IM_DRAWLIST_ARCFAST_TESSELLATION_MULTIPLIER] = {};  // FIXME: Bake rounded corners fill/borders in atlas
     ImU8                CircleSegmentCounts[64];    // Precomputed segment count for given radius (array index + 1) before we calculate it dynamically (to avoid calculation overhead)
     const vdl::float4*  TexUvLines;                 // UV of anti-aliased lines in the atlas
 
@@ -837,11 +837,11 @@ struct ImGuiStyleMod
 // Stacked storage data for BeginGroup()/EndGroup()
 struct ImGuiGroupData
 {
-    vdl::float2 BackupCursorPos;
-    vdl::float2 BackupCursorMaxPos;
+    vdl::float2 BackupCursorPos = vdl::float2(0.0f, 0.0f);
+    vdl::float2 BackupCursorMaxPos = vdl::float2(0.0f, 0.0f);
     ImVec1      BackupIndent;
     ImVec1      BackupGroupOffset;
-    vdl::float2 BackupCurrLineSize;
+    vdl::float2 BackupCurrLineSize = vdl::float2(0.0f, 0.0f);
     float       BackupCurrLineTextBaseOffset;
     ImGuiID     BackupActiveIdIsAlive;
     bool        BackupActiveIdPreviousFrameIsAlive;
@@ -908,7 +908,7 @@ struct ImGuiPopupData
     vdl::float2         OpenPopupPos;   // Set on OpenPopup(), preferred popup position (typically == OpenMousePos when using mouse)
     vdl::float2         OpenMousePos;   // Set on OpenPopup(), copy of mouse position at the time of opening popup
 
-    ImGuiPopupData() { PopupId = 0; Window = SourceWindow = nullptr; OpenFrameCount = -1; OpenParentId = 0; }
+    ImGuiPopupData() { PopupId = 0; Window = SourceWindow = nullptr; OpenFrameCount = -1; OpenParentId = 0; OpenPopupPos = vdl::float2(0.0f, 0.0f); OpenMousePos = vdl::float2(0.0f, 0.0f); }
 };
 
 struct ImGuiNavMoveResult
@@ -1215,7 +1215,7 @@ struct ImGuiViewportP : public ImGuiViewport
     vdl::float2         CurrWorkOffsetMin;        // Work area top-left offset being increased during the frame
     vdl::float2         CurrWorkOffsetMax;        // Work area bottom-right offset being decreased during the frame
 
-    ImGuiViewportP()                { Idx = -1; LastFrameActive = LastFrameDrawLists[0] = LastFrameDrawLists[1] = LastFrontMostStampCount = -1; LastNameHash = 0; Alpha = LastAlpha = 1.0f; PlatformMonitor = -1; PlatformWindowCreated = false; Window = nullptr; DrawLists[0] = DrawLists[1] = nullptr; LastPlatformPos = LastPlatformSize = LastRendererSize = vdl::float2(FLT_MAX, FLT_MAX); }
+    ImGuiViewportP() { Idx = -1; LastFrameActive = LastFrameDrawLists[0] = LastFrameDrawLists[1] = LastFrontMostStampCount = -1; LastNameHash = 0; LastPos = vdl::float2(0.0f, 0.0f); Alpha = LastAlpha = 1.0f; PlatformMonitor = -1; PlatformWindowCreated = false; Window = nullptr; DrawLists[0] = DrawLists[1] = nullptr; LastPlatformPos = LastPlatformSize = LastRendererSize = vdl::float2(FLT_MAX, FLT_MAX); CurrWorkOffsetMin = CurrWorkOffsetMax = vdl::float2(0.0f, 0.0f); }
     ~ImGuiViewportP()               { if (DrawLists[0]) IM_DELETE(DrawLists[0]); if (DrawLists[1]) IM_DELETE(DrawLists[1]); }
     ImRect  GetMainRect() const     { return ImRect(Pos.x, Pos.y, Pos.x + Size.x, Pos.y + Size.y); }
     ImRect  GetWorkRect() const     { return ImRect(Pos.x + WorkOffsetMin.x, Pos.y + WorkOffsetMin.y, Pos.x + Size.x + WorkOffsetMax.x, Pos.y + Size.y + WorkOffsetMax.y); }
@@ -1529,6 +1529,7 @@ struct ImGuiContext
         HoveredDockNode = nullptr;
         MovingWindow = nullptr;
         WheelingWindow = nullptr;
+        WheelingWindowRefMousePos = vdl::float2(0.0f, 0.0f);
         WheelingWindowTimer = 0.0f;
 
         HoveredId = HoveredIdPreviousFrame = 0;

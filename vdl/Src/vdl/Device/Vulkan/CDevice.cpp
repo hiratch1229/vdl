@@ -368,7 +368,7 @@ void CDevice::Initialize()
   }
 
   GraphicsQueueIndex_ = FindQueue(vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eCompute);
-  assert(GraphicsQueueIndex_ != UINT_MAX);
+  assert(GraphicsQueueIndex_ != vdl::Math::kMax<vdl::uint>);
   ComputeQueueIndex_ = FindQueue(vk::QueueFlagBits::eCompute, vk::QueueFlagBits::eGraphics);
 
   //  論理デバイスの作成
@@ -384,7 +384,7 @@ void CDevice::Initialize()
     {
       vdl::uint GraphicsQueueCount = 1;
 
-      if (ComputeQueueIndex_ == UINT_MAX)
+      if (ComputeQueueIndex_ == vdl::Math::kMax<vdl::uint>)
       {
         ++GraphicsQueueCount;
         ComputeQueueIndex_ = GraphicsQueueIndex_;

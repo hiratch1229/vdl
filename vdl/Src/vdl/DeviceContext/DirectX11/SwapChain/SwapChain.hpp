@@ -11,8 +11,6 @@ class SwapChain
   vdl::RenderTextures RenderTextures_;
   vdl::DepthStencilTexture DepthStencilTexture_;
 public:
-  [[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView()const { return pRenderTargetView_.Get(); }
-
   [[nodiscard]] const vdl::RenderTexture& GetRenderTexture()const { return RenderTextures_[0]; }
 
   [[nodiscard]] const vdl::RenderTextures& GetRenderTextures()const { return RenderTextures_; }

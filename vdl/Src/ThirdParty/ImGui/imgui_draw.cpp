@@ -386,8 +386,8 @@ void ImDrawList::_ResetForNewFrame()
     // Verify that the ImDrawCmd fields we want to memcmp() are contiguous in memory.
     // (those should be IM_STATIC_ASSERT() in theory but with our pre C++11 setup the whole check doesn't compile with GCC)
     IM_ASSERT(IM_OFFSETOF(ImDrawCmd, ClipRect) == 0);
-    IM_ASSERT(IM_OFFSETOF(ImDrawCmd, Texture) == sizeof(ImVec4));
-    IM_ASSERT(IM_OFFSETOF(ImDrawCmd, VtxOffset) == sizeof(ImVec4) + sizeof(vdl::Texture));
+    IM_ASSERT(IM_OFFSETOF(ImDrawCmd, Texture) == sizeof(vdl::float4));
+    IM_ASSERT(IM_OFFSETOF(ImDrawCmd, VtxOffset) == sizeof(vdl::float4) + sizeof(vdl::Texture));
 
     CmdBuffer.resize(0);
     IdxBuffer.resize(0);
@@ -621,7 +621,7 @@ void ImDrawList::PrimUnreserve(int idx_count, int vtx_count)
 // Fully unrolled with inline call to keep our debug builds decently fast.
 void ImDrawList::PrimRect(const vdl::float2& a, const vdl::float2& c, ImU32 col)
 {
-  vdl::float2 b(c.x, a.y), d(a.x, c.y), uv(_Data->TexUvWhitePixel);
+    vdl::float2 b(c.x, a.y), d(a.x, c.y), uv(_Data->TexUvWhitePixel);
     ImDrawIdx idx = (ImDrawIdx)_VtxCurrentIdx;
     _IdxWritePtr[0] = idx; _IdxWritePtr[1] = (ImDrawIdx)(idx+1); _IdxWritePtr[2] = (ImDrawIdx)(idx+2);
     _IdxWritePtr[3] = idx; _IdxWritePtr[4] = (ImDrawIdx)(idx+2); _IdxWritePtr[5] = (ImDrawIdx)(idx+3);
@@ -636,7 +636,7 @@ void ImDrawList::PrimRect(const vdl::float2& a, const vdl::float2& c, ImU32 col)
 
 void ImDrawList::PrimRectUV(const vdl::float2& a, const vdl::float2& c, const vdl::float2& uv_a, const vdl::float2& uv_c, ImU32 col)
 {
-  vdl::float2 b(c.x, a.y), d(a.x, c.y), uv_b(uv_c.x, uv_a.y), uv_d(uv_a.x, uv_c.y);
+    vdl::float2 b(c.x, a.y), d(a.x, c.y), uv_b(uv_c.x, uv_a.y), uv_d(uv_a.x, uv_c.y);
     ImDrawIdx idx = (ImDrawIdx)_VtxCurrentIdx;
     _IdxWritePtr[0] = idx; _IdxWritePtr[1] = (ImDrawIdx)(idx+1); _IdxWritePtr[2] = (ImDrawIdx)(idx+2);
     _IdxWritePtr[3] = idx; _IdxWritePtr[4] = (ImDrawIdx)(idx+2); _IdxWritePtr[5] = (ImDrawIdx)(idx+3);
@@ -1085,7 +1085,7 @@ static void PathBezierToCasteljau(ImVector<vdl::float2>* path, float x1, float y
 
 void ImDrawList::PathBezierCurveTo(const vdl::float2& p2, const vdl::float2& p3, const vdl::float2& p4, int num_segments)
 {
-  vdl::float2 p1 = _Path.back();
+    vdl::float2 p1 = _Path.back();
     if (num_segments == 0)
     {
         PathBezierToCasteljau(&_Path, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y, _Data->CurveTessellationTol, 0); // Auto-tessellated

@@ -2,7 +2,7 @@
 
 #include <vdl/Engine.hpp>
 #include <vdl/Platform/IPlatform.hpp>
-#include <vdl/Window/Windows/CWindow.hpp>
+#include <vdl/Window/IWindow.hpp>
 
 #include <vdl/Constants/Constants.hpp>
 #include <vdl/Misc/Windows/Misc.hpp>
@@ -11,7 +11,7 @@
 
 void CSoundManager::Initialize()
 {
-  hWnd_ = Cast<CWindow>(Engine::Get<IWindow>())->GetHandle();
+  hWnd_ = static_cast<HWND>(Engine::Get<IWindow>()->GetHandle());
 }
 
 vdl::ID CSoundManager::Load(const char* _FilePath)

@@ -8,13 +8,26 @@
 #include <vdl/Input/Keyboard/IKeyboard.hpp>
 #include <vdl/Input/Mouse/IMouse.hpp>
 #include <vdl/BufferManager/IBufferManager.hpp>
+#include <vdl/TextureManager/ITextureManager.hpp>
 
 #include <vdl/Platform.hpp>
 
 #if defined VDL_TARGET_WINDOWS
 #include <vdl/Main/Windows/MsgProc/MsgProc.hpp>
+#include <vdl/Misc/Windows/Misc.hpp>
 #elif defined VDL_TARGET_LINUX
 
+#endif
+
+#include <vdl/Platform/IPlatform.hpp>
+#if defined VDL_EXECUTE_DIRECTX11
+#include <vdl/Device/DirectX11/CDevice.hpp>
+#include <vdl/Texture/DirectX11/CTexture.hpp>
+#include <vdl/Format/DirectX/Format.hpp>
+#elif defined VDL_EXECUTE_DIRECTX12
+#include <vdl/Device/DirectX12/CDevice.hpp>
+#elif defined VDL_EXECUTE_VULKAN
+#include <vdl/Device/Vulkan/CDevice.hpp>
 #endif
 
 #include <ThirdParty/ImGui/imgui.h>
@@ -28,7 +41,6 @@
 #include <vdl/Mouse.hpp>
 #include <vdl/Keyboard.hpp>
 #include <vdl/Macro.hpp>
-#include <vdl/DetectMemoryLeak.hpp>
 
 #include <ctype.h>
 
@@ -612,6 +624,7 @@ void CGUI::Initialize()
   pKeyboard_ = Engine::Get<IKeyboard>();
   pMouse_ = Engine::Get<IMouse>();
   pBufferManager_ = Engine::Get<IBufferManager>();
+  pTextureManager_ = Engine::Get<ITextureManager>();
 
   pConstantBuffer_ = std::make_unique<vdl::ConstantBuffer<ConstantBufferData>>();
 
@@ -654,14 +667,12 @@ void CGUI::Initialize()
       io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   //  ドッキング有効化
       io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; //  マルチビューポート有効化
 
-      io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;       // We can honor GetMouseCursor() values (optional)
-      io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;        // We can honor io.WantSetMousePos requests (optional, rarely used)
+      io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
+      io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
       io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;    // We can create multi-viewports on the Platform side (optional)
       io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can set io.MouseHoveredViewport correctly (optional, not easy)
-      io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
-      //io.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;  // We can create multi-viewports on the Renderer side (optional)
-      io.BackendRendererName = "vdl";
-      io.BackendPlatformName = "vdl";
+      io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;    // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
+      io.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;    // We can create multi-viewports on the Renderer side (optional)
 
       // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array that we will update during the application lifetime.
       io.KeyMap[ImGuiKey_Tab] = vdl::Input::Keyboard::KeyTab.GetCode();
@@ -715,6 +726,11 @@ CGUI::~CGUI()
 {
   if (ImGui::GetCurrentContext())
   {
+#if defined VDL_TARGET_WINDOWS
+    ::UnregisterClass(Constants::kGUIClassName, ::GetModuleHandle(NULL));
+#endif
+
+    ImGui::DestroyPlatformWindows();
     ImGui::DestroyContext();
   }
 }
@@ -760,15 +776,14 @@ void CGUI::Update()
     io.MouseWheel += Wheel.y;
     io.MouseWheelH += Wheel.x;
 
-    // Set mouse position
-    const vdl::float2 Pos = pMouse_->GetPos();
-    io.MousePos.x = Pos.x;
-    io.MousePos.y = Pos.y;
+    io.MousePos = vdl::float2(-FLT_MAX, -FLT_MAX);
+    io.MouseHoveredViewport = 0;
 
+    // Set imgui mouse position
 #if defined VDL_TARGET_WINDOWS
     POINT MousePos;
-    MousePos.x = static_cast<long>(io.MousePos.x);
-    MousePos.y = static_cast<long>(io.MousePos.y);
+    ::GetCursorPos(&MousePos);
+    io.MousePos = vdl::float2((float)MousePos.x, (float)MousePos.y);
 
     if (HWND HoveredhWnd = ::WindowFromPoint(MousePos))
     {
@@ -811,107 +826,421 @@ void CGUI::Draw()
 {
   ImGui::Render();
 
-  ImDrawData* pDrawData = ImGui::GetDrawData();
-
-  // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-  const vdl::int2 FrameBufferSize = { pDrawData->DisplaySize.x * pDrawData->FramebufferScale.x, pDrawData->DisplaySize.y * pDrawData->FramebufferScale.y };
-  if (FrameBufferSize.x <= 0 || FrameBufferSize.y <= 0 || pDrawData->TotalVtxCount == 0)
-  {
-    return;
-  }
-
-  // Create or resize the vertex/index buffers
-  {
-    if (const vdl::uint VertexSize = static_cast<vdl::uint>(pDrawData->TotalVtxCount * sizeof(ImDrawVert));
-      VertexBufferSize_ < VertexSize)
-    {
-      VertexBuffer_ = VertexBuffer(VertexBufferSize_ = VertexSize);
-      GraphicsCommandList_.SetVertexBuffer(VertexBuffer_);
-
-    }
-    if (const vdl::uint IndexSize = static_cast<vdl::uint>(pDrawData->TotalIdxCount * sizeof(ImDrawIdx));
-      IndexBufferSize_ < IndexSize)
-    {
-      IndexBuffer_ = IndexBuffer(IndexBufferSize_ = IndexSize, kIndexType);
-      GraphicsCommandList_.SetIndexBuffer(IndexBuffer_);
-    }
-  }
-
-  // Upload vertex/index data into a single contiguous GPU buffer
-  {
-    std::vector<ImDrawVert> VertexDatas;
-    std::vector<ImDrawIdx> IndexDatas;
-    for (int n = 0; n < pDrawData->CmdListsCount; n++)
-    {
-      const ImDrawList* cmd_list = pDrawData->CmdLists[n];
-
-      for (vdl::uint i = 0, Size = cmd_list->VtxBuffer.Size; i < Size; ++i)
-      {
-        VertexDatas.push_back(cmd_list->VtxBuffer[i]);
-      }
-
-      for (vdl::uint i = 0, Size = cmd_list->IdxBuffer.Size; i < Size; ++i)
-      {
-        IndexDatas.push_back(cmd_list->IdxBuffer[i]);
-      }
-    }
-
-    pDevice_->WriteMemory(pBufferManager_->GetBuffer(VertexBuffer_.GetID()), VertexDatas.data(), static_cast<vdl::uint>(VertexDatas.size() * sizeof(ImDrawVert)));
-    pDevice_->WriteMemory(pBufferManager_->GetBuffer(IndexBuffer_.GetID()), IndexDatas.data(), static_cast<vdl::uint>(IndexDatas.size() * sizeof(ImDrawIdx)));
-  }
-
-  // Will project scissor/clipping rectangles into framebuffer space
-  const vdl::float2 ClipOffset = pDrawData->DisplayPos;      // (0,0) unless using multi-viewports
-  const vdl::float2 ClipScale = pDrawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
-
-  ConstantBufferData& ConstantBufferData = pConstantBuffer_->GetData();
-  {
-    ConstantBufferData.Scale = { 2.0f / pDrawData->DisplaySize.x, -2.0f / pDrawData->DisplaySize.y };
-    ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
-  }
-
   pDeviceContext_->SetRenderTextures(RenderTextures_, DepthStencilTexture_);
-  // Render command lists
-  // (Because we merged all buffers into a single one, we maintain our own offset into them)
-  int VertexOffset = 0;
-  int IndexOffset = 0;
-  vdl::float4 ClipRect;
-  for (int i = 0; i < pDrawData->CmdListsCount; ++i)
-  {
-    const ImDrawList* pCmdList = pDrawData->CmdLists[i];
-    for (auto& Cmd : pCmdList->CmdBuffer)
-    {
-      // Project scissor/clipping rectangles into framebuffer space
-      {
-        ClipRect.x = (Cmd.ClipRect.x - ClipOffset.x) * ClipScale.x;
-        ClipRect.y = (Cmd.ClipRect.y - ClipOffset.y) * ClipScale.y;
-        ClipRect.z = (Cmd.ClipRect.z - ClipOffset.x) * ClipScale.x;
-        ClipRect.w = (Cmd.ClipRect.w - ClipOffset.y) * ClipScale.y;
-      }
-
-      if (ClipRect.x < FrameBufferSize.x && ClipRect.y < FrameBufferSize.y && ClipRect.z >= 0.0f && ClipRect.w >= 0.0f)
-      {
-        ClipRect.x = vdl::Math::Max(ClipRect.x, 0.0f);
-        ClipRect.y = vdl::Math::Max(ClipRect.y, 0.0f);
-
-        // Apply scissor/clipping rectangle
-        GraphicsCommandList_.SetScissor({ static_cast<int>(ClipRect.x), static_cast<int>(ClipRect.y), static_cast<vdl::uint>(ClipRect.z - ClipRect.x), static_cast<vdl::uint>(ClipRect.w - ClipRect.y) });
-
-        // Draw
-        GraphicsCommandList_.SetDrawData(Cmd.Texture, { Cmd.ElemCount, 1, Cmd.IdxOffset + IndexOffset, Cmd.VtxOffset + VertexOffset, 0 });
-      }
-    }
-
-    VertexOffset += pCmdList->VtxBuffer.Size;
-    IndexOffset += pCmdList->IdxBuffer.Size;
-  }
-  pDeviceContext_->Execute(GraphicsCommandList_);
-
-  GraphicsCommandList_.Reset();
+  Draw(ImGui::GetDrawData());
 
   ImGui::UpdatePlatformWindows();
   ImGui::RenderPlatformWindowsDefault();
 }
+
+//--------------------------------------------------
+
+#if defined VDL_TARGET_WINDOWS
+struct ImGuiViewportDataWin32
+{
+  HWND    Hwnd;
+  bool    HwndOwned;
+  DWORD   DwStyle;
+  DWORD   DwExStyle;
+
+  ImGuiViewportDataWin32() { Hwnd = nullptr; HwndOwned = false;  DwStyle = DwExStyle = 0; }
+  ~ImGuiViewportDataWin32() { IM_ASSERT(Hwnd == nullptr); }
+};
+
+inline void GetWin32StyleFromViewportFlags(ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style)
+{
+  if (flags & ImGuiViewportFlags_NoDecoration)
+  {
+    *out_style = WS_POPUP;
+  }
+  else
+  {
+    *out_style = WS_OVERLAPPEDWINDOW;
+  }
+
+  if (flags & ImGuiViewportFlags_NoTaskBarIcon)
+  {
+    *out_ex_style = WS_EX_TOOLWINDOW;
+  }
+  else
+  {
+    *out_ex_style = WS_EX_APPWINDOW;
+  }
+
+  if (flags & ImGuiViewportFlags_TopMost)
+  {
+    *out_ex_style |= WS_EX_TOPMOST;
+  }
+};
+
+void CGUI::PlatformCreateWindow(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataWin32* pData = IM_NEW(ImGuiViewportDataWin32)();
+  _pViewport->PlatformUserData = pData;
+
+  // Select style and parent window
+  ::GetWin32StyleFromViewportFlags(_pViewport->Flags, &pData->DwStyle, &pData->DwExStyle);
+
+  HWND parent_window = nullptr;
+  if (_pViewport->ParentViewportId != 0)
+  {
+    if (ImGuiViewport* parent_viewport = ImGui::FindViewportByID(_pViewport->ParentViewportId))
+    {
+      parent_window = static_cast<HWND>(parent_viewport->PlatformHandle);
+    }
+  }
+
+  // Create window
+  RECT rect = { static_cast<LONG>(_pViewport->Pos.x), static_cast<LONG>(_pViewport->Pos.y), static_cast<LONG>(_pViewport->Pos.x + _pViewport->Size.x), static_cast<LONG>(_pViewport->Pos.y + _pViewport->Size.y) };
+  ::AdjustWindowRectEx(&rect, pData->DwStyle, false, pData->DwExStyle);
+  pData->Hwnd = ::CreateWindowEx(
+    pData->DwExStyle, Constants::kGUIClassName, L"Untitled", pData->DwStyle,  // Style, class name, window name
+    rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,      // Window area
+    parent_window, nullptr, ::GetModuleHandle(nullptr), nullptr);             // Parent window, Menu, Instance, Param
+
+  pData->HwndOwned = true;
+  _pViewport->PlatformRequestResize = false;
+  _pViewport->PlatformHandle = _pViewport->PlatformHandleRaw = pData->Hwnd;
+}
+
+void CGUI::PlatformDestroyWindow(ImGuiViewport* _pViewport)
+{
+  if (ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData))
+  {
+    if (::GetCapture() == pData->Hwnd)
+    {
+      // Transfer capture so if we started dragging from a window that later disappears, we'll still receive the MOUSEUP event.
+      ::ReleaseCapture();
+      ::SetCapture(static_cast<HWND>(Engine::Get<IWindow>()->GetHandle()));
+    }
+    if (pData->Hwnd && pData->HwndOwned)
+    {
+      ::DestroyWindow(pData->Hwnd);
+    }
+    pData->Hwnd = nullptr;
+    IM_DELETE(pData);
+  }
+  _pViewport->PlatformUserData = _pViewport->PlatformHandle = nullptr;
+}
+
+void CGUI::PlatformShowWindow(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  if (_pViewport->Flags & ImGuiViewportFlags_NoFocusOnAppearing)
+  {
+    ::ShowWindow(pData->Hwnd, SW_SHOWNA);
+  }
+  else
+  {
+    ::ShowWindow(pData->Hwnd, SW_SHOW);
+  }
+}
+
+void CGUI::PlatformSetWindowPos(ImGuiViewport* _pViewport, vdl::float2 _Pos)
+{
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  RECT rect = { static_cast<LONG>(_Pos.x), static_cast<LONG>(_Pos.y), static_cast<LONG>(_Pos.x), static_cast<LONG>(_Pos.y) };
+  ::AdjustWindowRectEx(&rect, pData->DwStyle, false, pData->DwExStyle);
+  ::SetWindowPos(pData->Hwnd, nullptr, rect.left, rect.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+}
+
+vdl::float2 CGUI::PlatformGetWindowPos(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  POINT pos = { 0, 0 };
+  ::ClientToScreen(pData->Hwnd, &pos);
+  return vdl::float2((float)pos.x, (float)pos.y);
+}
+
+void CGUI::PlatformSetWindowSize(ImGuiViewport* _pViewport, vdl::float2 _Size)
+{
+  ImGuiViewportDataWin32* pData = (ImGuiViewportDataWin32*)_pViewport->PlatformUserData;
+  IM_ASSERT(pData->Hwnd != 0);
+
+  RECT rect = { 0, 0, static_cast<LONG>(_Size.x), static_cast<LONG>(_Size.y) };
+  ::AdjustWindowRectEx(&rect, pData->DwStyle, false, pData->DwExStyle); // Client to Screen
+  ::SetWindowPos(pData->Hwnd, nullptr, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+}
+
+vdl::float2 CGUI::PlatformGetWindowSize(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  RECT rect;
+  ::GetClientRect(pData->Hwnd, &rect);
+  return vdl::float2(float(rect.right - rect.left), float(rect.bottom - rect.top));
+}
+
+void CGUI::PlatformSetWindowFocus(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  ::BringWindowToTop(pData->Hwnd);
+  ::SetForegroundWindow(pData->Hwnd);
+  ::SetFocus(pData->Hwnd);
+}
+
+bool CGUI::PlatformGetWindowFocus(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  return ::GetForegroundWindow() == pData->Hwnd;
+}
+
+bool CGUI::PlatformGetWindowMinimized(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  return ::IsIconic(pData->Hwnd) != 0;
+}
+
+void CGUI::PlatformSetWindowTitle(ImGuiViewport* _pViewport, const char* _Str)
+{
+  // ::SetWindowTextA() doesn't properly handle UTF-8 so we explicitely convert our string.
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  int n = ::MultiByteToWideChar(CP_UTF8, 0, _Str, -1, nullptr, 0);
+  ImVector<wchar_t> title_w;
+  title_w.resize(n);
+  ::MultiByteToWideChar(CP_UTF8, 0, _Str, -1, title_w.Data, n);
+  ::SetWindowTextW(pData->Hwnd, title_w.Data);
+}
+
+void CGUI::PlatformUpdateWindow(ImGuiViewport* _pViewport)
+{
+  // (Optional) Update Win32 style if it changed _after_ creation.
+  // Generally they won't change unless configuration flags are changed, but advanced uses (such as manually rewriting viewport flags) make this useful.
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  DWORD new_style;
+  DWORD new_ex_style;
+  ::GetWin32StyleFromViewportFlags(_pViewport->Flags, &new_style, &new_ex_style);
+
+  // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
+  if (pData->DwStyle != new_style || pData->DwExStyle != new_ex_style)
+  {
+    pData->DwStyle = new_style;
+    pData->DwExStyle = new_ex_style;
+    ::SetWindowLong(pData->Hwnd, GWL_STYLE, pData->DwStyle);
+    ::SetWindowLong(pData->Hwnd, GWL_EXSTYLE, pData->DwExStyle);
+
+    RECT rect = { static_cast<LONG>(_pViewport->Pos.x), static_cast<LONG>(_pViewport->Pos.y), static_cast<LONG>(_pViewport->Pos.x + _pViewport->Size.x), static_cast<LONG>(_pViewport->Pos.y + _pViewport->Size.y) };
+    ::AdjustWindowRectEx(&rect, pData->DwStyle, FALSE, pData->DwExStyle); // Client to Screen
+    ::SetWindowPos(pData->Hwnd, nullptr, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    ::ShowWindow(pData->Hwnd, SW_SHOWNA); // This is necessary when we alter the style
+    _pViewport->PlatformRequestMove = _pViewport->PlatformRequestResize = true;
+  }
+}
+
+inline float GetDpiScaleForMonitor(void* monitor)
+{
+  const HDC dc = ::GetDC(nullptr);
+  vdl::uint xdpi = ::GetDeviceCaps(dc, LOGPIXELSX);
+  vdl::uint ydpi = ::GetDeviceCaps(dc, LOGPIXELSY);
+  ::ReleaseDC(nullptr, dc);
+
+  IM_ASSERT(xdpi == ydpi); // Please contact me if you hit this assert!
+  return xdpi / 96.0f;
+}
+
+inline BOOL CALLBACK UpdateMonitors_EnumFunc(HMONITOR monitor, HDC, LPRECT, LPARAM)
+{
+  MONITORINFO info = { 0 };
+  info.cbSize = sizeof(MONITORINFO);
+  if (!::GetMonitorInfo(monitor, &info))
+  {
+    return true;
+  }
+
+  ImGuiPlatformMonitor Monitor;
+  {
+    Monitor.MainPos = vdl::float2((float)info.rcMonitor.left, (float)info.rcMonitor.top);
+    Monitor.MainSize = vdl::float2((float)(info.rcMonitor.right - info.rcMonitor.left), (float)(info.rcMonitor.bottom - info.rcMonitor.top));
+    Monitor.WorkPos = vdl::float2((float)info.rcWork.left, (float)info.rcWork.top);
+    Monitor.WorkSize = vdl::float2((float)(info.rcWork.right - info.rcWork.left), (float)(info.rcWork.bottom - info.rcWork.top));
+    Monitor.DpiScale = ::GetDpiScaleForMonitor(monitor);
+  }
+
+  ImGuiPlatformIO& io = ImGui::GetPlatformIO();
+  if (info.dwFlags & MONITORINFOF_PRIMARY)
+  {
+    io.Monitors.push_front(Monitor);
+  }
+  else
+  {
+    io.Monitors.push_back(Monitor);
+  }
+
+  return true;
+}
+
+float CGUI::PlatformGetWindowDpiScale(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataWin32* pData = static_cast<ImGuiViewportDataWin32*>(_pViewport->PlatformUserData);
+  IM_ASSERT(pData->Hwnd != 0);
+
+  HMONITOR monitor = ::MonitorFromWindow(pData->Hwnd, MONITOR_DEFAULTTONEAREST);
+  return GetDpiScaleForMonitor(monitor);
+}
+#elif defined VDL_TARGET_LINUX
+
+#endif
+
+#if defined VDL_EXECUTE_DIRECTX11
+// Helper structure we store in the void* RenderUserData field of each ImGuiViewport to easily retrieve our backend data.
+struct ImGuiViewportDataDx11
+{
+  Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
+  Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView;
+  vdl::RenderTextures RenderTextures;
+};
+
+void CGUI::RendererCreateWindow(ImGuiViewport* _pViewport)
+{
+  ImGuiViewportDataDx11* pData = IM_NEW(ImGuiViewportDataDx11)();
+  _pViewport->RendererUserData = pData;
+
+  // PlatformHandleRaw should always be a HWND, whereas PlatformHandle might be a higher-level handle (e.g. GLFWWindow*, SDL_Window*).
+  // Some back-end will leave PlatformHandleRaw NULL, in which case we assume PlatformHandle will contain the HWND.
+  HWND hwnd = static_cast<HWND>(_pViewport->PlatformHandleRaw ? _pViewport->PlatformHandleRaw : _pViewport->PlatformHandle);
+  IM_ASSERT(hwnd != 0);
+
+  ID3D11Device* pDevice = Cast<CDevice>(pDevice_)->GetDevice();
+  Microsoft::WRL::ComPtr<IDXGIFactory> pFactory;
+  {
+    HRESULT hr = S_OK;
+    Microsoft::WRL::ComPtr<IDXGIDevice> pDXGIDevice;
+    Microsoft::WRL::ComPtr<IDXGIAdapter> pDXGIAdapter;
+    hr = pDevice->QueryInterface(IID_PPV_ARGS(pDXGIDevice.GetAddressOf()));
+    ERROR_CHECK(hr);
+    hr = pDXGIDevice->GetParent(IID_PPV_ARGS(pDXGIAdapter.GetAddressOf()));
+    ERROR_CHECK(hr);
+    pDXGIAdapter->GetParent(IID_PPV_ARGS(pFactory.GetAddressOf()));
+    ERROR_CHECK(hr);
+  }
+
+  // Create swap chain
+  DXGI_SWAP_CHAIN_DESC SwapChainDesc = {};
+  {
+    SwapChainDesc.BufferDesc.Width = static_cast<vdl::uint>(_pViewport->Size.x);
+    SwapChainDesc.BufferDesc.Height = static_cast<vdl::uint>(_pViewport->Size.y);
+    SwapChainDesc.BufferDesc.Format = Cast(vdl::FormatType::eSwapChain);
+    SwapChainDesc.SampleDesc.Count = 1;
+    SwapChainDesc.SampleDesc.Quality = 0;
+    SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    SwapChainDesc.BufferCount = 2;
+    SwapChainDesc.OutputWindow = hwnd;
+    SwapChainDesc.Windowed = true;
+    SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    SwapChainDesc.Flags = 0;
+  }
+  pFactory->CreateSwapChain(pDevice, &SwapChainDesc, pData->pSwapChain.GetAddressOf());
+
+  // Create the render target
+  if (pData->pSwapChain)
+  {
+    pData->RenderTextures[0] = vdl::RenderTexture(_pViewport->Size, vdl::FormatType::eSwapChain);
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
+    pData->pSwapChain->GetBuffer(0, IID_PPV_ARGS(pBackBuffer.GetAddressOf()));
+    pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pData->pRenderTargetView.GetAddressOf());
+
+    CSwapChainRenderTexture* pRenderTexture = new CSwapChainRenderTexture;
+    {
+      pRenderTexture->TextureSize = _pViewport->Size;
+      pRenderTexture->pRenderTargetView = pData->pRenderTargetView.Get();
+    }
+    pTextureManager_->SetTexture(pData->RenderTextures[0].GetID(), pRenderTexture);
+  }
+}
+
+void CGUI::RendererDestroyWindow(ImGuiViewport* _pViewport)
+{
+  // The main viewport (owned by the application) will always have RendererUserData == NULL since we didn't create the data for it.
+  if (ImGuiViewportDataDx11* pData = static_cast<ImGuiViewportDataDx11*>(_pViewport->RendererUserData))
+  {
+    if (pData->pSwapChain)
+    {
+      pData->pSwapChain.Reset();
+    }
+    if (!pData->RenderTextures[0].isEmpty())
+    {
+      pData->RenderTextures[0] = vdl::RenderTexture();
+    }
+    IM_DELETE(pData);
+  }
+  _pViewport->RendererUserData = nullptr;
+}
+
+void CGUI::RendererSetWindowSize(ImGuiViewport* _pViewport, vdl::float2 _Size)
+{
+  ImGuiViewportDataDx11* pData = static_cast<ImGuiViewportDataDx11*>(_pViewport->RendererUserData);
+
+  if (!pData->RenderTextures[0].isEmpty())
+  {
+    pData->pRenderTargetView = nullptr;
+    pData->RenderTextures[0] = vdl::RenderTexture();
+  }
+  if (pData->pSwapChain)
+  {
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
+    pData->pSwapChain->ResizeBuffers(0, static_cast<vdl::uint>(_Size.x), static_cast<vdl::uint>(_Size.y), DXGI_FORMAT_UNKNOWN, 0);
+    pData->pSwapChain->GetBuffer(0, IID_PPV_ARGS(pBackBuffer.GetAddressOf()));
+    pData->RenderTextures[0] = vdl::RenderTexture(_pViewport->Size, vdl::FormatType::eSwapChain);
+
+    if (pBackBuffer == nullptr)
+    {
+      fprintf(stderr, "ImGui_ImplDX11_SetWindowSize() failed creating buffers.\n");
+      return;
+    }
+    Cast<CDevice>(pDevice_)->GetDevice()->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pData->pRenderTargetView.GetAddressOf());
+
+    CSwapChainRenderTexture* pRenderTexture = new CSwapChainRenderTexture;
+    {
+      pRenderTexture->TextureSize = _pViewport->Size;
+      pRenderTexture->pRenderTargetView = pData->pRenderTargetView.Get();
+    }
+    pTextureManager_->SetTexture(pData->RenderTextures[0].GetID(), pRenderTexture);
+  }
+}
+
+void CGUI::RendererRenderWindow(ImGuiViewport* _pViewport, void*)
+{
+  ImGuiViewportDataDx11* pData = static_cast<ImGuiViewportDataDx11*>(_pViewport->RendererUserData);
+
+  constexpr vdl::Color4F kClearColor = vdl::Color4F(vdl::Palette::Black, 1.0f);
+  pDeviceContext_->SetRenderTextures(pData->RenderTextures, vdl::DepthStencilTexture());
+  if (!(_pViewport->Flags & ImGuiViewportFlags_NoRendererClear))
+  {
+    pDeviceContext_->ClearRenderTexture(pData->RenderTextures[0], kClearColor);
+  }
+
+  GraphicsCommandList_.SetViewport({ 0.0f, 0.0f, _pViewport->Size.x, _pViewport->Size.y });
+  Draw(_pViewport->DrawData);
+}
+
+void CGUI::RendererSwapBuffers(ImGuiViewport* _pViewport, void* _RenderArg)
+{
+  ImGuiViewportDataDx11* pData = static_cast<ImGuiViewportDataDx11*>(_pViewport->RendererUserData);
+  pData->pSwapChain->Present(0, 0); // Present without vsync
+}
+#elif defined VDL_EXECUTE_DIRECTX12
+
+#elif defined VDL_EXECUTE_VULKAN
+
+#endif
 
 //--------------------------------------------------
 
@@ -986,6 +1315,31 @@ void CGUI::SetupMultiViewport()
   ImGuiViewport* pMainViewport = ImGui::GetMainViewport();
   pMainViewport->PlatformHandle = pMainViewport->PlatformHandleRaw = pWindow_->GetHandle();
 
+  // Register platform interface (will be coupled with a renderer interface)
+  ImGuiPlatformIO& PlatformIO = ImGui::GetPlatformIO();
+  {
+    PlatformIO.Platform_CreateWindow = [this](ImGuiViewport* _pViewport)->void { PlatformCreateWindow(_pViewport); };
+    PlatformIO.Platform_DestroyWindow = [this](ImGuiViewport* _pViewport)->void { PlatformDestroyWindow(_pViewport); };
+    PlatformIO.Platform_ShowWindow = [this](ImGuiViewport* _pViewport)->void { PlatformShowWindow(_pViewport); };
+    PlatformIO.Platform_GetWindowPos = [this](ImGuiViewport* _pViewport)->vdl::float2 { return PlatformGetWindowPos(_pViewport); };
+    PlatformIO.Platform_SetWindowPos = [this](ImGuiViewport* _pViewport, vdl::float2 _Pos) { PlatformSetWindowPos(_pViewport, _Pos); };
+    PlatformIO.Platform_GetWindowSize = [this](ImGuiViewport* _pViewport)->vdl::float2 { return PlatformGetWindowSize(_pViewport); };
+    PlatformIO.Platform_SetWindowSize = [this](ImGuiViewport* _pViewport, vdl::float2 _Size)->void { PlatformSetWindowSize(_pViewport, _Size); };
+    PlatformIO.Platform_GetWindowFocus = [this](ImGuiViewport* _pViewport)->bool { return PlatformGetWindowFocus(_pViewport); };
+    PlatformIO.Platform_SetWindowFocus = [this](ImGuiViewport* _pViewport)->void { PlatformSetWindowFocus(_pViewport); };
+    PlatformIO.Platform_GetWindowMinimized = [this](ImGuiViewport* _pViewport)->bool { return PlatformGetWindowMinimized(_pViewport); };
+    PlatformIO.Platform_SetWindowTitle = [this](ImGuiViewport* _pViewport, const char* _Str) { PlatformSetWindowTitle(_pViewport, _Str); };
+    PlatformIO.Platform_UpdateWindow = [this](ImGuiViewport* _pViewport)->void { PlatformUpdateWindow(_pViewport); };
+    PlatformIO.Platform_GetWindowDpiScale = [this](ImGuiViewport* _pViewport)->float { return PlatformGetWindowDpiScale(_pViewport); };
+
+    PlatformIO.Renderer_CreateWindow = [this](ImGuiViewport* _pViewport)->void { RendererCreateWindow(_pViewport); };
+    PlatformIO.Renderer_DestroyWindow = [this](ImGuiViewport* _pViewport)->void { RendererDestroyWindow(_pViewport); };
+    PlatformIO.Renderer_SetWindowSize = [this](ImGuiViewport* _pViewport, vdl::float2 _Size)->void { RendererSetWindowSize(_pViewport, _Size); };
+    PlatformIO.Renderer_RenderWindow = [this](ImGuiViewport* _pViewport, void* _RenderArg)->void { RendererRenderWindow(_pViewport, _RenderArg); };
+    PlatformIO.Renderer_SwapBuffers = [this](ImGuiViewport* _pViewport, void* _RenderArg)->void { RendererSwapBuffers(_pViewport, _RenderArg); };
+  }
+  PlatformIO.Monitors.resize(0);
+
 #if defined VDL_TARGET_WINDOWS
   WNDCLASSEX WindowClass;
   {
@@ -999,276 +1353,119 @@ void CGUI::SetupMultiViewport()
     WindowClass.hCursor = nullptr;
     WindowClass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
     WindowClass.lpszMenuName = nullptr;
-    WindowClass.lpszClassName = L"vdl SubWindow";
+    WindowClass.lpszClassName = Constants::kGUIClassName;
     WindowClass.hIconSm = nullptr;
   }
   ::RegisterClassEx(&WindowClass);
 
-  struct ImGuiViewportDataWin32
+  ::EnumDisplayMonitors(nullptr, nullptr, UpdateMonitors_EnumFunc, 0);
+
+  ImGuiViewportDataWin32* pData = IM_NEW(ImGuiViewportDataWin32)();
   {
-    HWND    Hwnd;
-    bool    HwndOwned;
-    DWORD   DwStyle;
-    DWORD   DwExStyle;
-
-    ImGuiViewportDataWin32() { Hwnd = NULL; HwndOwned = false;  DwStyle = DwExStyle = 0; }
-    ~ImGuiViewportDataWin32() { IM_ASSERT(Hwnd == NULL); }
-  };
-
-  auto ImGui_ImplWin32_CreateWindow = [](ImGuiViewport* viewport)->void
-  {
-    auto ImGui_ImplWin32_GetWin32StyleFromViewportFlags = [](ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style)->void
-    {
-      if (flags & ImGuiViewportFlags_NoDecoration)
-        *out_style = WS_POPUP;
-      else
-        *out_style = WS_OVERLAPPEDWINDOW;
-
-      if (flags & ImGuiViewportFlags_NoTaskBarIcon)
-        *out_ex_style = WS_EX_TOOLWINDOW;
-      else
-        *out_ex_style = WS_EX_APPWINDOW;
-
-      if (flags & ImGuiViewportFlags_TopMost)
-        *out_ex_style |= WS_EX_TOPMOST;
-    };
-
-    ImGuiViewportDataWin32* data = new ImGuiViewportDataWin32();
-    viewport->PlatformUserData = data;
-
-    // Select style and parent window
-    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &data->DwStyle, &data->DwExStyle);
-    HWND parent_window = NULL;
-    if (viewport->ParentViewportId != 0)
-      if (ImGuiViewport* parent_viewport = ImGui::FindViewportByID(viewport->ParentViewportId))
-        parent_window = (HWND)parent_viewport->PlatformHandle;
-
-    // Create window
-    RECT rect = { (LONG)viewport->Pos.x, (LONG)viewport->Pos.y, (LONG)(viewport->Pos.x + viewport->Size.x), (LONG)(viewport->Pos.y + viewport->Size.y) };
-    ::AdjustWindowRectEx(&rect, data->DwStyle, FALSE, data->DwExStyle);
-    data->Hwnd = ::CreateWindowEx(
-      data->DwExStyle, L"ImGui Platform", L"Untitled", data->DwStyle,   // Style, class name, window name
-      rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,    // Window area
-      parent_window, NULL, ::GetModuleHandle(NULL), NULL);                    // Parent window, Menu, Instance, Param
-    data->HwndOwned = true;
-    viewport->PlatformRequestResize = false;
-    viewport->PlatformHandle = viewport->PlatformHandleRaw = data->Hwnd;
-  };
-
-  auto ImGui_ImplWin32_DestroyWindow = [](ImGuiViewport* viewport)->void
-  {
-    if (ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData)
-    {
-      if (::GetCapture() == data->Hwnd)
-      {
-        // Transfer capture so if we started dragging from a window that later disappears, we'll still receive the MOUSEUP event.
-        ::ReleaseCapture();
-        ::SetCapture(static_cast<HWND>(Engine::Get<IWindow>()->GetHandle()));
-      }
-      if (data->Hwnd && data->HwndOwned)
-        ::DestroyWindow(data->Hwnd);
-      data->Hwnd = NULL;
-      IM_DELETE(data);
-    }
-    viewport->PlatformUserData = viewport->PlatformHandle = NULL;
-  };
-
-  auto ImGui_ImplWin32_ShowWindow = [](ImGuiViewport* viewport)->void
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    if (viewport->Flags & ImGuiViewportFlags_NoFocusOnAppearing)
-      ::ShowWindow(data->Hwnd, SW_SHOWNA);
-    else
-      ::ShowWindow(data->Hwnd, SW_SHOW);
-  };
-
-  auto ImGui_ImplWin32_UpdateWindow = [](ImGuiViewport* viewport)->void
-  {
-    auto ImGui_ImplWin32_GetWin32StyleFromViewportFlags = [](ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style)->void
-    {
-      if (flags & ImGuiViewportFlags_NoDecoration)
-        *out_style = WS_POPUP;
-      else
-        *out_style = WS_OVERLAPPEDWINDOW;
-
-      if (flags & ImGuiViewportFlags_NoTaskBarIcon)
-        *out_ex_style = WS_EX_TOOLWINDOW;
-      else
-        *out_ex_style = WS_EX_APPWINDOW;
-
-      if (flags & ImGuiViewportFlags_TopMost)
-        *out_ex_style |= WS_EX_TOPMOST;
-    };
-
-    // (Optional) Update Win32 style if it changed _after_ creation.
-    // Generally they won't change unless configuration flags are changed, but advanced uses (such as manually rewriting viewport flags) make this useful.
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    DWORD new_style;
-    DWORD new_ex_style;
-    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &new_style, &new_ex_style);
-
-    // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
-    if (data->DwStyle != new_style || data->DwExStyle != new_ex_style)
-    {
-      data->DwStyle = new_style;
-      data->DwExStyle = new_ex_style;
-      ::SetWindowLong(data->Hwnd, GWL_STYLE, data->DwStyle);
-      ::SetWindowLong(data->Hwnd, GWL_EXSTYLE, data->DwExStyle);
-      RECT rect = { (LONG)viewport->Pos.x, (LONG)viewport->Pos.y, (LONG)(viewport->Pos.x + viewport->Size.x), (LONG)(viewport->Pos.y + viewport->Size.y) };
-      ::AdjustWindowRectEx(&rect, data->DwStyle, FALSE, data->DwExStyle); // Client to Screen
-      ::SetWindowPos(data->Hwnd, NULL, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
-      ::ShowWindow(data->Hwnd, SW_SHOWNA); // This is necessary when we alter the style
-      viewport->PlatformRequestMove = viewport->PlatformRequestResize = true;
-    }
-  };
-
-  auto ImGui_ImplWin32_GetWindowPos = [](ImGuiViewport* viewport)->vdl::float2
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    POINT pos = { 0, 0 };
-    ::ClientToScreen(data->Hwnd, &pos);
-    return vdl::float2((float)pos.x, (float)pos.y);
-  };
-
-  auto ImGui_ImplWin32_SetWindowPos = [](ImGuiViewport* viewport, vdl::float2 pos)->void
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    RECT rect = { (LONG)pos.x, (LONG)pos.y, (LONG)pos.x, (LONG)pos.y };
-    ::AdjustWindowRectEx(&rect, data->DwStyle, FALSE, data->DwExStyle);
-    ::SetWindowPos(data->Hwnd, NULL, rect.left, rect.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-  };
-
-  auto ImGui_ImplWin32_GetWindowSize = [](ImGuiViewport* viewport)->vdl::float2
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    RECT rect;
-    ::GetClientRect(data->Hwnd, &rect);
-    return vdl::float2(float(rect.right - rect.left), float(rect.bottom - rect.top));
-  };
-
-  auto ImGui_ImplWin32_SetWindowSize = [](ImGuiViewport* viewport, vdl::float2 size)->void
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    RECT rect = { 0, 0, (LONG)size.x, (LONG)size.y };
-    ::AdjustWindowRectEx(&rect, data->DwStyle, FALSE, data->DwExStyle); // Client to Screen
-    ::SetWindowPos(data->Hwnd, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
-  };
-
-  auto ImGui_ImplWin32_SetWindowFocus = [](ImGuiViewport* viewport)->void
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    ::BringWindowToTop(data->Hwnd);
-    ::SetForegroundWindow(data->Hwnd);
-    ::SetFocus(data->Hwnd);
-  };
-
-  auto ImGui_ImplWin32_GetWindowFocus = [](ImGuiViewport* viewport)->bool
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    return ::GetForegroundWindow() == data->Hwnd;
-  };
-
-  auto ImGui_ImplWin32_GetWindowMinimized = [](ImGuiViewport* viewport)->bool
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    return ::IsIconic(data->Hwnd) != 0;
-  };
-
-  auto ImGui_ImplWin32_SetWindowTitle = [](ImGuiViewport* viewport, const char* title)->void
-  {
-    // ::SetWindowTextA() doesn't properly handle UTF-8 so we explicitely convert our string.
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    int n = ::MultiByteToWideChar(CP_UTF8, 0, title, -1, NULL, 0);
-    ImVector<wchar_t> title_w;
-    title_w.resize(n);
-    ::MultiByteToWideChar(CP_UTF8, 0, title, -1, title_w.Data, n);
-    ::SetWindowTextW(data->Hwnd, title_w.Data);
-  };
-
-  auto ImGui_ImplWin32_SetWindowAlpha = [](ImGuiViewport* viewport, float alpha)->void
-  {
-    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-    IM_ASSERT(data->Hwnd != 0);
-    IM_ASSERT(alpha >= 0.0f && alpha <= 1.0f);
-    if (alpha < 1.0f)
-    {
-      DWORD style = ::GetWindowLongW(data->Hwnd, GWL_EXSTYLE) | WS_EX_LAYERED;
-      ::SetWindowLongW(data->Hwnd, GWL_EXSTYLE, style);
-      ::SetLayeredWindowAttributes(data->Hwnd, 0, (BYTE)(255 * alpha), LWA_ALPHA);
-    }
-    else
-    {
-      DWORD style = ::GetWindowLongW(data->Hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED;
-      ::SetWindowLongW(data->Hwnd, GWL_EXSTYLE, style);
-    }
-  };
-
-  //  auto ImGui_ImplWin32_GetWindowDpiScale = [](ImGuiViewport* viewport)->float
-  //  {
-  //    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
-  //    IM_ASSERT(data->Hwnd != 0);
-  //    return ImGui_ImplWin32_GetDpiScaleForHwnd(data->Hwnd);
-  //  };
-  //
-  //  // FIXME-DPI: Testing DPI related ideas
-  //  auto ImGui_ImplWin32_OnChangedViewport = [](ImGuiViewport* viewport)->void
-  //  {
-  //    (void)viewport;
-  //#if 0
-  //    ImGuiStyle default_style;
-  //    //default_style.WindowPadding = vdl::float2(0, 0);
-  //    //default_style.WindowBorderSize = 0.0f;
-  //    //default_style.ItemSpacing.y = 3.0f;
-  //    //default_style.FramePadding = vdl::float2(0, 0);
-  //    default_style.ScaleAllSizes(viewport->DpiScale);
-  //    ImGuiStyle& style = ImGui::GetStyle();
-  //    style = default_style;
-  //#endif
-  //  };
-
-  // Register platform interface (will be coupled with a renderer interface)
-  ImGuiPlatformIO& PlatformIO = ImGui::GetPlatformIO();
-  {
-    PlatformIO.Platform_CreateWindow = ImGui_ImplWin32_CreateWindow;
-    PlatformIO.Platform_DestroyWindow = ImGui_ImplWin32_DestroyWindow;
-    PlatformIO.Platform_ShowWindow = ImGui_ImplWin32_ShowWindow;
-    PlatformIO.Platform_SetWindowPos = ImGui_ImplWin32_SetWindowPos;
-    PlatformIO.Platform_GetWindowPos = ImGui_ImplWin32_GetWindowPos;
-    PlatformIO.Platform_SetWindowSize = ImGui_ImplWin32_SetWindowSize;
-    PlatformIO.Platform_GetWindowSize = ImGui_ImplWin32_GetWindowSize;
-    PlatformIO.Platform_SetWindowFocus = ImGui_ImplWin32_SetWindowFocus;
-    PlatformIO.Platform_GetWindowFocus = ImGui_ImplWin32_GetWindowFocus;
-    PlatformIO.Platform_GetWindowMinimized = ImGui_ImplWin32_GetWindowMinimized;
-    PlatformIO.Platform_SetWindowTitle = ImGui_ImplWin32_SetWindowTitle;
-    PlatformIO.Platform_SetWindowAlpha = ImGui_ImplWin32_SetWindowAlpha;
-    PlatformIO.Platform_UpdateWindow = ImGui_ImplWin32_UpdateWindow;
-    //PlatformIO.Platform_GetWindowDpiScale = ImGui_ImplWin32_GetWindowDpiScale; // FIXME-DPI
-    //PlatformIO.Platform_OnChangedViewport = ImGui_ImplWin32_OnChangedViewport; // FIXME-DPI
-    //PlatformIO.Renderer_CreateWindow = ImGui_ImplDX11_CreateWindow;
-    //PlatformIO.Renderer_DestroyWindow = ImGui_ImplDX11_DestroyWindow;
-    //PlatformIO.Renderer_SetWindowSize = ImGui_ImplDX11_SetWindowSize;
-    //PlatformIO.Renderer_RenderWindow = ImGui_ImplDX11_RenderWindow;
-    //PlatformIO.Renderer_SwapBuffers = ImGui_ImplDX11_SwapBuffers;
-  }
-
-  ImGuiViewportDataWin32* data = new ImGuiViewportDataWin32();
-  {
-    data->Hwnd = static_cast<HWND>(pWindow_->GetHandle());
-    data->HwndOwned = false;
+    pData->Hwnd = static_cast<HWND>(pWindow_->GetHandle());
+    pData->HwndOwned = false;
   }
 #elif defined VDL_TARGET_LINUX
 
 #endif
 
-  pMainViewport->PlatformUserData = data;
+  pMainViewport->PlatformUserData = pData;
+  }
+
+void CGUI::Draw(ImDrawData* _pDrawData)
+{
+  // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+  const vdl::int2 FrameBufferSize = { _pDrawData->DisplaySize.x * _pDrawData->FramebufferScale.x, _pDrawData->DisplaySize.y * _pDrawData->FramebufferScale.y };
+  if (FrameBufferSize.x <= 0 || FrameBufferSize.y <= 0 || _pDrawData->TotalVtxCount == 0)
+  {
+    return;
+  }
+
+  // Create or resize the vertex/index buffers
+  {
+    if (const vdl::uint VertexSize = static_cast<vdl::uint>(_pDrawData->TotalVtxCount * sizeof(ImDrawVert));
+      VertexBufferSize_ < VertexSize)
+    {
+      VertexBuffer_ = VertexBuffer(VertexBufferSize_ = VertexSize);
+      GraphicsCommandList_.SetVertexBuffer(VertexBuffer_);
+
+    }
+    if (const vdl::uint IndexSize = static_cast<vdl::uint>(_pDrawData->TotalIdxCount * sizeof(ImDrawIdx));
+      IndexBufferSize_ < IndexSize)
+    {
+      IndexBuffer_ = IndexBuffer(IndexBufferSize_ = IndexSize, kIndexType);
+      GraphicsCommandList_.SetIndexBuffer(IndexBuffer_);
+    }
+  }
+
+  // Upload vertex/index data into a single contiguous GPU buffer
+  {
+    std::vector<ImDrawVert> VertexDatas;
+    std::vector<ImDrawIdx> IndexDatas;
+    for (int n = 0; n < _pDrawData->CmdListsCount; n++)
+    {
+      const ImDrawList* cmd_list = _pDrawData->CmdLists[n];
+
+      for (vdl::uint i = 0, Size = cmd_list->VtxBuffer.Size; i < Size; ++i)
+      {
+        VertexDatas.push_back(cmd_list->VtxBuffer[i]);
+      }
+
+      for (vdl::uint i = 0, Size = cmd_list->IdxBuffer.Size; i < Size; ++i)
+      {
+        IndexDatas.push_back(cmd_list->IdxBuffer[i]);
+      }
+    }
+
+    pDevice_->WriteMemory(pBufferManager_->GetBuffer(VertexBuffer_.GetID()), VertexDatas.data(), static_cast<vdl::uint>(VertexDatas.size() * sizeof(ImDrawVert)));
+    pDevice_->WriteMemory(pBufferManager_->GetBuffer(IndexBuffer_.GetID()), IndexDatas.data(), static_cast<vdl::uint>(IndexDatas.size() * sizeof(ImDrawIdx)));
+  }
+
+  // Will project scissor/clipping rectangles into framebuffer space
+  const vdl::float2 ClipOffset = _pDrawData->DisplayPos;      // (0,0) unless using multi-viewports
+  const vdl::float2 ClipScale = _pDrawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
+
+  ConstantBufferData& ConstantBufferData = pConstantBuffer_->GetData();
+  {
+    ConstantBufferData.Scale = { 2.0f / _pDrawData->DisplaySize.x, -2.0f / _pDrawData->DisplaySize.y };
+    ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
+  }
+
+  // Render command lists
+  // (Because we merged all buffers into a single one, we maintain our own offset into them)
+  int VertexOffset = 0;
+  int IndexOffset = 0;
+  vdl::float4 ClipRect;
+  for (int i = 0; i < _pDrawData->CmdListsCount; ++i)
+  {
+    const ImDrawList* pCmdList = _pDrawData->CmdLists[i];
+    for (auto& Cmd : pCmdList->CmdBuffer)
+    {
+      // Project scissor/clipping rectangles into framebuffer space
+      {
+        ClipRect.x = (Cmd.ClipRect.x - ClipOffset.x) * ClipScale.x;
+        ClipRect.y = (Cmd.ClipRect.y - ClipOffset.y) * ClipScale.y;
+        ClipRect.z = (Cmd.ClipRect.z - ClipOffset.x) * ClipScale.x;
+        ClipRect.w = (Cmd.ClipRect.w - ClipOffset.y) * ClipScale.y;
+      }
+
+      if (ClipRect.x < FrameBufferSize.x && ClipRect.y < FrameBufferSize.y && ClipRect.z >= 0.0f && ClipRect.w >= 0.0f)
+      {
+        ClipRect.x = vdl::Math::Max(ClipRect.x, 0.0f);
+        ClipRect.y = vdl::Math::Max(ClipRect.y, 0.0f);
+
+        // Apply scissor/clipping rectangle
+        GraphicsCommandList_.SetScissor({ static_cast<int>(ClipRect.x), static_cast<int>(ClipRect.y), static_cast<vdl::uint>(ClipRect.z - ClipRect.x), static_cast<vdl::uint>(ClipRect.w - ClipRect.y) });
+
+        // Draw
+        GraphicsCommandList_.SetDrawData(Cmd.Texture, { Cmd.ElemCount, 1, Cmd.IdxOffset + IndexOffset, Cmd.VtxOffset + VertexOffset, 0 });
+      }
+    }
+
+    VertexOffset += pCmdList->VtxBuffer.Size;
+    IndexOffset += pCmdList->IdxBuffer.Size;
+  }
+  pDeviceContext_->Execute(GraphicsCommandList_);
+
+  GraphicsCommandList_.Reset();
 }

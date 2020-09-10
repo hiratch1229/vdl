@@ -4,7 +4,7 @@
 
 #include <vdl/Platform/Platform.hpp>
 
-enum class MouseCursorType
+enum class MouseCursorType : vdl::uint8_t
 {
   eArrow,
   eTextInput,

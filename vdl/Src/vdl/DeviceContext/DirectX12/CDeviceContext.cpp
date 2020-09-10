@@ -558,7 +558,7 @@ void CDeviceContext::Initialize()
     //  パイプラインステートの初期化
     {
       GraphicsPipelineStateDesc_.pRootSignature = pGraphicsRootSignature_.Get();
-      GraphicsPipelineStateDesc_.SampleMask = UINT_MAX;
+      GraphicsPipelineStateDesc_.SampleMask = vdl::Math::kMax<vdl::uint>;
       GraphicsPipelineStateDesc_.SampleDesc.Count = 1;
       GraphicsPipelineStateDesc_.SampleDesc.Quality = 0;
       GraphicsPipelineStateDesc_.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;

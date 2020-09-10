@@ -31,7 +31,10 @@ void SwapChain::Initialize(ID3D11Device* _pDevice, IDXGISwapChain* _pSwapChain)
     RenderTextures_[0] = vdl::RenderTexture(Constants::kDefaultWindowSize, vdl::FormatType::eSwapChain);
 
     CSwapChainRenderTexture* pRenderTexture = new CSwapChainRenderTexture;
-
+    {
+      pRenderTexture->TextureSize = Constants::kDefaultWindowSize;
+      pRenderTexture->pRenderTargetView = pRenderTargetView_.Get();
+    }
     Engine::Get<ITextureManager>()->SetTexture(RenderTextures_[0].GetID(), pRenderTexture);
   }
 

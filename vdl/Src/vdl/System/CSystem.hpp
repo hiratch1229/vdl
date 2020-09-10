@@ -5,6 +5,7 @@
 
 #include <chrono>
 
+class IWindow;
 class IDeviceContext;
 class ICPUProfiler;
 class IMemoryProfiler;
@@ -24,6 +25,7 @@ class CSystem : public ISystem
     ePause,
   };
 private:
+  IWindow* pWindow_;
   IDeviceContext* pDeviceContext_;
   ICPUProfiler* pCPUProfiler_;
   IMemoryProfiler* pMemoryProfiler_;

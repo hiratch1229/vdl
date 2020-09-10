@@ -46,6 +46,9 @@
     <Filter Include="Src\Platform">
       <UniqueIdentifier>{ccbed34f-849e-4ef2-ad3c-f442d1f02c34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Main\MsgProc">
+      <UniqueIdentifier>{9c5a30be-716b-4c73-beac-d544d2884673}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Window\Windows\CWindow.cpp">
@@ -81,6 +84,9 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Platform\Windows\CPlatform.cpp">
       <Filter>Src\Platform</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Main\Windows\MsgProc\MsgProc.cpp">
+      <Filter>Src\Main\MsgProc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Window\Windows\CWindow.hpp">
@@ -115,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\CPUProfiler\Windows\CCPUProfiler.hpp">
       <Filter>Src\CPUProfiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Main\Windows\MsgProc\MsgProc.hpp">
+      <Filter>Src\Main\MsgProc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

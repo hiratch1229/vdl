@@ -1,21 +1,11 @@
 #include "CKeyboard.hpp"
 
-#include <vdl/Engine.hpp>
-#include <vdl/Platform/IPlatform.hpp>
-#include <vdl/Window/Windows/CWindow.hpp>
-
 #include <vdl/DetectMemoryLeak.hpp>
 
 #include <vdl/pch/Windows/pch.hpp>
 
 void CKeyboard::Update()
 {
-  if (!isInputAttach_)
-  {
-    ::AttachThreadInput(::GetWindowThreadProcessId(Cast<CWindow>(Engine::Get<IWindow>())->GetHandle(), nullptr), ::GetCurrentThreadId(), TRUE);
-    isInputAttach_ = true;
-  }
-
   BYTE KeyState[kKeyNum];
   //  ‘S‚Ä‚ÌƒL[‚Ìî•ñ‚ğæ“¾
   if (::GetKeyboardState(KeyState))

@@ -116,6 +116,7 @@
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\..\..\vdl\Include;..\..\..\..\vdl\Src;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

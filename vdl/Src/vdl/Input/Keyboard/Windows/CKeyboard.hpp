@@ -8,7 +8,6 @@ class CKeyboard : public IKeyboard
   //  使用キー数
   static constexpr vdl::uint kKeyNum = 256;
 private:
-  bool isInputAttach_ = false;
   InputState InputStatus_[kKeyNum];
 private:
   bool isWithinRange(vdl::uint _Code)const

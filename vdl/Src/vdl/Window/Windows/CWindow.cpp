@@ -13,17 +13,37 @@ void CWindow::Initialize()
   RECT Rect = { 0, 0, static_cast<long>(WindowSize_.x), static_cast<long>(WindowSize_.y) };
   ::AdjustWindowRect(&Rect, kStyle, false);
 
-  hWnd_ = ::CreateWindowA(Constants::kClassName,
-    WindowName_,
+  wchar_t wWindowName[Constants::kMaxCharacterNum];
+  ::mbsrtowcs_s(nullptr, wWindowName, &WindowName_, Constants::kMaxCharacterNum, nullptr);
+  WindowName_;
+
+  hWnd_ = ::CreateWindow(Constants::kClassName,
+    wWindowName,
     kStyle,
     CW_USEDEFAULT,
     CW_USEDEFAULT,
     Rect.right - Rect.left,
     Rect.bottom - Rect.top,
-    ::GetDesktopWindow(),
+    nullptr,
     nullptr,
     ::GetModuleHandle(nullptr),
     nullptr);
+}
+
+void CWindow::Update()
+{
+  MSG Msg = {};
+  //  メッセージを全て処理
+  while (::PeekMessage(&Msg, nullptr, 0, 0, PM_REMOVE))
+  {
+    ::TranslateMessage(&Msg);
+    ::DispatchMessage(&Msg);
+  }
+}
+
+CWindow::~CWindow()
+{
+  ::DestroyWindow(hWnd_);
 }
 
 void CWindow::Show(bool _isShow)

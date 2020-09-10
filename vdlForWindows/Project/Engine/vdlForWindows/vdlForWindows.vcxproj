@@ -16,6 +16,7 @@
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\Windows\CKeyboard.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Windows\CMouse.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Input\XInput\Windows\CXInput.cpp" />
+    <ClCompile Include="..\..\..\..\vdl\Src\vdl\Main\Windows\MsgProc\MsgProc.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\Main\Windows\WinMain.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.cpp" />
     <ClCompile Include="..\..\..\..\vdl\Src\vdl\pch\Windows\pch.cpp">
@@ -32,6 +33,7 @@
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Keyboard\Windows\CKeyboard.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\Mouse\Windows\CMouse.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Input\XInput\Windows\CXInput.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Src\vdl\Main\Windows\MsgProc\MsgProc.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\MemoryProfiler\Windows\CMemoryProfiler.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\Misc\Windows\Misc.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Src\vdl\pch\Windows\pch.hpp" />
@@ -85,7 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;VDL_USING_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -116,7 +118,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

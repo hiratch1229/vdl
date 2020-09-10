@@ -64,6 +64,7 @@ Index of this file:
 #include <stdarg.h>                 // va_list, va_start, va_end
 #include <stddef.h>                 // ptrdiff_t, nullptr
 #include <string.h>                 // memset, memmove, memcpy, strlen, strchr, strcpy, strcmp
+#include <functional>
 
 // Version
 // (Integer encoded as XYYZZ for use in #if preprocessor conditionals. Work in progress versions typically starts at XYY99 then bounce up to XYY00, XYY01 etc. when release tagging happens)
@@ -2629,32 +2630,33 @@ struct ImGuiPlatformIO
     // Platform functions are typically called before their Renderer counterpart, apart from Destroy which are called the other way.
 
     // Platform function --------------------------------------------------- Called by -----
-    void        (*Platform_CreateWindow)(ImGuiViewport* vp);                    // . . U . .  // Create a new platform window for the given viewport
-    void        (*Platform_DestroyWindow)(ImGuiViewport* vp);                   // N . U . D  //
-    void        (*Platform_ShowWindow)(ImGuiViewport* vp);                      // . . U . .  // Newly created windows are initially hidden so SetWindowPos/Size/Title can be called on them before showing the window
-    void        (*Platform_SetWindowPos)(ImGuiViewport* vp, vdl::float2 pos);   // . . U . .  // Set platform window position (given the upper-left corner of client area)
-    vdl::float2 (*Platform_GetWindowPos)(ImGuiViewport* vp);                    // N . . . .  //
-    void        (*Platform_SetWindowSize)(ImGuiViewport* vp, vdl::float2 size); // . . U . .  // Set platform window client area size (ignoring OS decorations such as OS title bar etc.)
-    vdl::float2 (*Platform_GetWindowSize)(ImGuiViewport* vp);                   // N . . . .  // Get platform window client area size
-    void        (*Platform_SetWindowFocus)(ImGuiViewport* vp);                  // N . . . .  // Move window to front and set input focus
-    bool        (*Platform_GetWindowFocus)(ImGuiViewport* vp);                  // . . U . .  //
-    bool        (*Platform_GetWindowMinimized)(ImGuiViewport* vp);              // N . . . .  // Get platform window minimized state. When minimized, we generally won't attempt to get/set size and contents will be culled more easily
-    void        (*Platform_SetWindowTitle)(ImGuiViewport* vp, const char* str); // . . U . .  // Set platform window title (given an UTF-8 string)
-    void        (*Platform_SetWindowAlpha)(ImGuiViewport* vp, float alpha);     // . . U . .  // (Optional) Setup window transparency
-    void        (*Platform_UpdateWindow)(ImGuiViewport* vp);                    // . . U . .  // (Optional) Called by UpdatePlatformWindows(). Optional hook to allow the platform back-end from doing general book-keeping every frame.
-    void        (*Platform_RenderWindow)(ImGuiViewport* vp, void* render_arg);  // . . . R .  // (Optional) Main rendering (platform side! This is often unused, or just setting a "current" context for OpenGL bindings). 'render_arg' is the value passed to RenderPlatformWindowsDefault().
-    void        (*Platform_SwapBuffers)(ImGuiViewport* vp, void* render_arg);   // . . . R .  // (Optional) Call Present/SwapBuffers (platform side! This is often unused!). 'render_arg' is the value passed to RenderPlatformWindowsDefault().
-    float       (*Platform_GetWindowDpiScale)(ImGuiViewport* vp);               // N . . . .  // (Optional) [BETA] FIXME-DPI: DPI handling: Return DPI scale for this viewport. 1.0f = 96 DPI.
-    void        (*Platform_OnChangedViewport)(ImGuiViewport* vp);               // . F . . .  // (Optional) [BETA] FIXME-DPI: DPI handling: Called during Begin() every time the viewport we are outputting into changes, so back-end has a chance to swap fonts to adjust style.
-    void        (*Platform_SetImeInputPos)(ImGuiViewport* vp, vdl::float2 pos); // . F . . .  // (Optional) Set IME (Input Method Editor, e.g. for Asian languages) input position, so text preview appears over the imgui input box. FIXME: The call timing of this is inconsistent because we want to support without multi-viewports.
-    int         (*Platform_CreateVkSurface)(ImGuiViewport* vp, ImU64 vk_inst, const void* vk_allocators, ImU64* out_vk_surface); // (Optional) For a Vulkan Renderer to call into Platform code (since the surface creation needs to tie them both).
+    //void        (*Platform_CreateWindow)(ImGuiViewport* vp);                                                          // . . U . .  // Create a new platform window for the given viewport
+    std::function<void(ImGuiViewport* vp)> Platform_CreateWindow;                                                       // . . U . .  // Create a new platform window for the given viewport
+    std::function<void(ImGuiViewport* vp)> Platform_DestroyWindow;                                                      // N . U . D  //
+    std::function<void(ImGuiViewport* vp)> Platform_ShowWindow;                                                         // . . U . .  // Newly created windows are initially hidden so SetWindowPos/Size/Title can be called on them before showing the window
+    std::function<void(ImGuiViewport* vp, vdl::float2 pos)> Platform_SetWindowPos;                                      // . . U . .  // Set platform window position (given the upper-left corner of client area)
+    std::function<vdl::float2(ImGuiViewport* vp)> Platform_GetWindowPos;                                                // N . . . .  //
+    std::function<void(ImGuiViewport* vp, vdl::float2 size)> Platform_SetWindowSize;                                    // . . U . .  // Set platform window client area size (ignoring OS decorations such as OS title bar etc.)
+    std::function<vdl::float2(ImGuiViewport* vp)> Platform_GetWindowSize;                                               // N . . . .  // Get platform window client area size
+    std::function<void(ImGuiViewport* vp)> Platform_SetWindowFocus;                                                     // N . . . .  // Move window to front and set input focus
+    std::function<bool(ImGuiViewport* vp)> Platform_GetWindowFocus;                                                     // . . U . .  //
+    std::function<bool(ImGuiViewport* vp)> Platform_GetWindowMinimized;                                                 // N . . . .  // Get platform window minimized state. When minimized, we generally won't attempt to get/set size and contents will be culled more easily
+    std::function<void(ImGuiViewport* vp, const char* str)> Platform_SetWindowTitle;                                    // . . U . .  // Set platform window title (given an UTF-8 string)
+    std::function<void(ImGuiViewport* vp, float alpha)> Platform_SetWindowAlpha;                                        // . . U . .  // (Optional) Setup window transparency
+    std::function<void(ImGuiViewport* vp)> Platform_UpdateWindow;                                                       // . . U . .  // (Optional) Called by UpdatePlatformWindows(). Optional hook to allow the platform back-end from doing general book-keeping every frame.
+    std::function<void(ImGuiViewport* vp, void* render_arf)> Platform_RenderWindow;                                     // . . . R .  // (Optional) Main rendering (platform side! This is often unused, or just setting a "current" context for OpenGL bindings). 'render_arg' is the value passed to RenderPlatformWindowsDefault().
+    std::function<void(ImGuiViewport* vp, void* render_arg)> Platform_SwapBuffers;                                      // . . . R .  // (Optional) Call Present/SwapBuffers (platform side! This is often unused!). 'render_arg' is the value passed to RenderPlatformWindowsDefault().
+    std::function<float(ImGuiViewport* vp)> Platform_GetWindowDpiScale;                                                 // N . . . .  // (Optional) [BETA] FIXME-DPI: DPI handling: Return DPI scale for this viewport. 1.0f = 96 DPI.
+    std::function<void(ImGuiViewport* vp)> Platform_OnChangedViewport;                                                  // . F . . .  // (Optional) [BETA] FIXME-DPI: DPI handling: Called during Begin() every time the viewport we are outputting into changes, so back-end has a chance to swap fonts to adjust style.
+    std::function<void(ImGuiViewport* vp, vdl::float2 pos)> Platform_SetImeInputPos;                                    // . F . . .  // (Optional) Set IME (Input Method Editor, e.g. for Asian languages) input position, so text preview appears over the imgui input box. FIXME: The call timing of this is inconsistent because we want to support without multi-viewports.
+    std::function<int(ImGuiViewport* vp, ImU64 vk_inst, const void* vk_allocators, ImU64* oyt_vk_surface)> Platform_CreateVkSurface;  // (Optional) For a Vulkan Renderer to call into Platform code (since the surface creation needs to tie them both).
 
     // (Optional) Renderer functions (e.g. DirectX, OpenGL, Vulkan)
-    void        (*Renderer_CreateWindow)(ImGuiViewport* vp);                    // . . U . .  // Create swap chain, frame buffers etc. (called after Platform_CreateWindow)
-    void        (*Renderer_DestroyWindow)(ImGuiViewport* vp);                   // N . U . D  // Destroy swap chain, frame buffers etc. (called before Platform_DestroyWindow)
-    void        (*Renderer_SetWindowSize)(ImGuiViewport* vp, vdl::float2 size); // . . U . .  // Resize swap chain, frame buffers etc. (called after Platform_SetWindowSize)
-    void        (*Renderer_RenderWindow)(ImGuiViewport* vp, void* render_arg);  // . . . R .  // (Optional) Clear framebuffer, setup render target, then render the viewport->DrawData. 'render_arg' is the value passed to RenderPlatformWindowsDefault().
-    void        (*Renderer_SwapBuffers)(ImGuiViewport* vp, void* render_arg);   // . . . R .  // (Optional) Call Present/SwapBuffers. 'render_arg' is the value passed to RenderPlatformWindowsDefault().
+    std::function<void(ImGuiViewport* vp)> Renderer_CreateWindow;                                                       // . . U . .  // Create swap chain, frame buffers etc. (called after Platform_CreateWindow)
+    std::function<void(ImGuiViewport* vp)> Renderer_DestroyWindow;                                                      // N . U . D  // Destroy swap chain, frame buffers etc. (called before Platform_DestroyWindow)
+    std::function<void(ImGuiViewport* vp, vdl::float2 size)> Renderer_SetWindowSize;                                    // . . U . .  // Resize swap chain, frame buffers etc. (called after Platform_SetWindowSize)
+    std::function<void(ImGuiViewport* vp, void* render_arg)> Renderer_RenderWindow;                                     // . . . R .  // (Optional) Clear framebuffer, setup render target, then render the viewport->DrawData. 'render_arg' is the value passed to RenderPlatformWindowsDefault().
+    std::function<void(ImGuiViewport* vp, void* render_arg)> Renderer_SwapBuffers;                                      // . . . R .  // (Optional) Call Present/SwapBuffers. 'render_arg' is the value passed to RenderPlatformWindowsDefault().
 
     // (Optional) Monitor list
     // - Updated by: app/back-end. Update every frame to dynamically support changing monitor or DPI configuration.
@@ -2725,7 +2727,7 @@ struct ImGuiViewport
     bool                PlatformRequestResize;  // Platform window requested resize (e.g. window was resized by the OS / host window manager, authoritative size will be OS window size)
     bool                PlatformRequestClose;   // Platform window requested closure (e.g. window was moved by the OS / host window manager, e.g. pressing ALT-F4)
 
-    ImGuiViewport()     { ID = 0; Flags = 0; DpiScale = 0.0f; DrawData = nullptr; ParentViewportId = 0; RendererUserData = PlatformUserData = PlatformHandle = PlatformHandleRaw = nullptr; PlatformRequestMove = PlatformRequestResize = PlatformRequestClose = false; }
+    ImGuiViewport()     { ID = 0; Flags = 0; Pos = Size = WorkOffsetMin = WorkOffsetMax = vdl::float2(0.0f, 0.0f); DpiScale = 0.0f; DrawData = nullptr; ParentViewportId = 0; RendererUserData = PlatformUserData = PlatformHandle = PlatformHandleRaw = nullptr; PlatformRequestMove = PlatformRequestResize = PlatformRequestClose = false; }
     ~ImGuiViewport()    { IM_ASSERT(PlatformUserData == nullptr && RendererUserData == nullptr); }
 
     // Access work-area rectangle with GetWorkXXX functions (see comments above)

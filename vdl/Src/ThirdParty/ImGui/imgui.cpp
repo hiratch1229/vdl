@@ -1146,7 +1146,7 @@ vdl::float2 ImBezierClosestPoint(const vdl::float2& p1, const vdl::float2& p2, c
 {
     IM_ASSERT(num_segments > 0); // Use ImBezierClosestPointCasteljau()
     vdl::float2 p_last = p1;
-    vdl::float2 p_closest;
+    vdl::float2 p_closest = vdl::float2(0.0f, 0.0f);
     float p_closest_dist2 = FLT_MAX;
     float t_step = 1.0f / (float)num_segments;
     for (int i_step = 1; i_step <= num_segments; i_step++)
@@ -2782,6 +2782,7 @@ ImGuiWindow::ImGuiWindow(ImGuiContext* context, const char* name)
     MoveId = GetID("#MOVE");
     ChildId = 0;
     Scroll = vdl::float2(0.0f, 0.0f);
+    ScrollMax = vdl::float2(0.0f, 0.0f);
     ScrollTarget = vdl::float2(FLT_MAX, FLT_MAX);
     ScrollTargetCenterRatio = vdl::float2(0.5f, 0.5f);
     ScrollbarSizes = vdl::float2(0.0f, 0.0f);
@@ -4528,7 +4529,7 @@ void ImGui::Render()
         if (windows_to_render_top_most[n] && IsWindowActiveAndVisible(windows_to_render_top_most[n])) // NavWindowingTarget is always temporarily displayed as the top-most window
             AddRootWindowToDrawData(windows_to_render_top_most[n]);
 
-    vdl::float2 mouse_cursor_offset, mouse_cursor_size, mouse_cursor_uv[4];
+    vdl::float2 mouse_cursor_offset, mouse_cursor_size = 0.0f, mouse_cursor_uv[4];
     if (g.IO.MouseDrawCursor && g.MouseCursor != ImGuiMouseCursor_None)
         g.IO.Fonts->GetMouseCursorTexData(g.MouseCursor, &mouse_cursor_offset, &mouse_cursor_size, &mouse_cursor_uv[0], &mouse_cursor_uv[2]);
 
@@ -8092,10 +8093,10 @@ static vdl::float2 CalcNextScrollFromScrollTargetAndClamp(ImGuiWindow* window)
 vdl::float2 ImGui::ScrollToBringRectIntoView(ImGuiWindow* window, const ImRect& item_rect)
 {
     ImGuiContext& g = *GImGui;
-    ImRect window_rect(window->InnerRect.Min - vdl::float2(1, 1), window->InnerRect.Max + vdl::float2(1, 1));
+    ImRect window_rect(window->InnerRect.Min - vdl::float2(1.0f, 1.0f), window->InnerRect.Max + vdl::float2(1.0f, 1.0f));
     //GetForegroundDrawList(window)->AddRect(window_rect.Min, window_rect.Max, IM_COL32_WHITE); // [DEBUG]
 
-    vdl::float2 delta_scroll;
+    vdl::float2 delta_scroll = vdl::float2(0.0f, 0.0f);
     if (!window_rect.Contains(item_rect))
     {
         if (window->ScrollbarX && item_rect.Min.x < window_rect.Min.x)
@@ -9558,7 +9559,7 @@ static void ImGui::NavUpdateMoveResult()
     // Scroll to keep newly navigated item fully into view.
     if (g.NavLayer == ImGuiNavLayer_Main)
     {
-        vdl::float2 delta_scroll;
+        vdl::float2 delta_scroll = vdl::float2(0.0f, 0.0f);
         if (g.NavMoveRequestFlags & ImGuiNavMoveFlags_ScrollToEdge)
         {
             float scroll_target = (g.NavMoveDir == ImGuiDir_Up) ? result->Window->ScrollMax.y : 0.0f;
@@ -9842,7 +9843,7 @@ static void ImGui::NavUpdateWindowing()
     // Move window
     if (g.NavWindowingTarget && !(g.NavWindowingTarget->Flags & ImGuiWindowFlags_NoMove))
     {
-        vdl::float2 move_delta;
+        vdl::float2 move_delta = vdl::float2(0.0f, 0.0f);
         if (g.NavInputSource == ImGuiInputSource_NavKeyboard && !g.IO.KeyShift)
             move_delta = GetNavInputAmount2d(ImGuiNavDirSourceFlags_Keyboard, ImGuiInputReadMode_Down);
         if (g.NavInputSource == ImGuiInputSource_NavGamepad)
@@ -11481,7 +11482,7 @@ void ImGui::UpdatePlatformWindows()
 
     // Update our implicit z-order knowledge of platform windows, which is used when the back-end cannot provide io.MouseHoveredViewport.
     // When setting Platform_GetWindowFocus, it is expected that the platform back-end can handle calls without crashing if it doesn't have data stored.
-    if (g.PlatformIO.Platform_GetWindowFocus != nullptr)
+    if (g.PlatformIO.Platform_GetWindowFocus)
     {
         ImGuiViewportP* focused_viewport = nullptr;
         for (int n = 0; n < g.Viewports.Size && focused_viewport == nullptr; n++)
@@ -12403,6 +12404,7 @@ ImGuiDockNode::ImGuiDockNode(ImGuiID id)
     SharedFlags = LocalFlags = ImGuiDockNodeFlags_None;
     ParentNode = ChildNodes[0] = ChildNodes[1] = nullptr;
     TabBar = nullptr;
+    Pos = Size = SizeRef = vdl::float2(0.0f, 0.0f);
     SplitAxis = ImGuiAxis_None;
 
     State = ImGuiDockNodeState_Unknown;
