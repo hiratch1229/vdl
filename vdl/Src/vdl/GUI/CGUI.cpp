@@ -44,8 +44,6 @@
 
 #include <ctype.h>
 
-//#define USING_MULTI_VIEWPORT
-
 namespace
 {
   constexpr IndexType kIndexType = (sizeof(ImDrawIdx) == 2 ? IndexType::eUint16 : IndexType::eUint32);
@@ -847,6 +845,7 @@ void CGUI::Draw()
 
 //--------------------------------------------------
 
+#ifdef USING_MULTI_VIEWPORT
 #if defined VDL_TARGET_WINDOWS
 struct ImGuiViewportDataWin32
 {
@@ -1253,6 +1252,7 @@ void CGUI::RendererSwapBuffers(ImGuiViewport* _pViewport, void* _RenderArg)
 #elif defined VDL_EXECUTE_VULKAN
 
 #endif
+#endif
 
 //--------------------------------------------------
 
@@ -1327,6 +1327,7 @@ void CGUI::SetupMultiViewport()
   ImGuiViewport* pMainViewport = ImGui::GetMainViewport();
   pMainViewport->PlatformHandle = pMainViewport->PlatformHandleRaw = pWindow_->GetHandle();
 
+#ifdef USING_MULTI_VIEWPORT
   // Register platform interface (will be coupled with a renderer interface)
   ImGuiPlatformIO& PlatformIO = ImGui::GetPlatformIO();
   {
@@ -1382,6 +1383,7 @@ void CGUI::SetupMultiViewport()
 #endif
 
   pMainViewport->PlatformUserData = pData;
+#endif
 }
 
 void CGUI::Draw(ImDrawData* _pDrawData)

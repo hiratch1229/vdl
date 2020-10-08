@@ -16,6 +16,8 @@
 
 #include <memory>
 
+//#define USING_MULTI_VIEWPORT
+
 class ISystem;
 class IDevice;
 class IDeviceContext;
@@ -53,6 +55,7 @@ private:
   vdl::uint VertexBufferSize_ = 0;
   IndexBuffer IndexBuffer_;
   vdl::uint IndexBufferSize_ = 0;
+#ifdef USING_MULTI_VIEWPORT
 private:
   void PlatformCreateWindow(ImGuiViewport* _pViewport);
   void PlatformDestroyWindow(ImGuiViewport* _pViewport);
@@ -73,6 +76,7 @@ private:
   void RendererSetWindowSize(ImGuiViewport* _pViewport, vdl::float2 _Size);
   void RendererRenderWindow(ImGuiViewport* _pViewport, void* _RenderArg);
   void RendererSwapBuffers(ImGuiViewport* _pViewport, void* _RenderArg);
+#endif // USING_MULTI_VIEWPORT
 private:
   void SetupStyle();
   void SetupMultiViewport();
