@@ -470,7 +470,7 @@ void ImDrawList::AddCallback(ImDrawCallback callback, void* callback_data)
 // Compare ClipRect, TextureId and VtxOffset with a single memcmp()
 #define ImDrawCmd_HeaderSize                        (IM_OFFSETOF(ImDrawCmd, VtxOffset) + sizeof(unsigned int))
 #define ImDrawCmd_HeaderCompare(CMD_LHS, CMD_RHS)   (memcmp(CMD_LHS, CMD_RHS, ImDrawCmd_HeaderSize))    // Compare ClipRect, TextureId, VtxOffset
-#define ImDrawCmd_HeaderCopy(CMD_DST, CMD_SRC)      (memcpy(CMD_DST, CMD_SRC, ImDrawCmd_HeaderSize))    // Copy ClipRect, TextureId, VtxOffset
+#define ImDrawCmd_HeaderCopy(CMD_DST, CMD_SRC)      (*CMD_DST = *CMD_SRC)    // Copy ClipRect, TextureId, VtxOffset
 
 // Our scheme may appears a bit unusual, basically we want the most-common calls AddLine AddRect etc. to not have to perform any check so we always have a command ready in the stack.
 // The cost of figuring out if a new command has to be added or if we can merge is paid in those Update** functions only.
@@ -3435,7 +3435,7 @@ void ImGui::RenderMouseCursor(ImDrawList* draw_list, vdl::float2 pos, float scal
     if (font_atlas->GetMouseCursorTexData(mouse_cursor, &offset, &size, &uv[0], &uv[2]))
     {
         pos -= offset;
-        const vdl::Texture texture = font_atlas->Texture;
+        const vdl::Texture& texture = font_atlas->Texture;
         draw_list->PushTexture(texture);
         draw_list->AddImage(texture, pos + vdl::float2(1.0f, 0.0f) * scale, pos + (vdl::float2(1.0f, 0.0f) + size) * scale,    uv[2], uv[3], col_shadow);
         draw_list->AddImage(texture, pos + vdl::float2(2.0f, 0.0f) * scale, pos + (vdl::float2(2.0f, 0.0f) + size) * scale,    uv[2], uv[3], col_shadow);

@@ -2494,7 +2494,7 @@ struct ImFontAtlas
     ImVector<ImFont*>           Fonts;              // Hold all the fonts returned by AddFont*. Fonts[0] is the default font upon calling ImGui::NewFrame(), use ImGui::PushFont()/PopFont() to change the current font.
     ImVector<ImFontAtlasCustomRect> CustomRects;    // Rectangles for packing custom texture data into the atlas.
     ImVector<ImFontConfig>      ConfigData;         // Configuration data
-    vdl::float4                 TexUvLines[IM_DRAWLIST_TEX_LINES_WIDTH_MAX + 1];  // UVs for baked anti-aliased lines
+    vdl::float4                 TexUvLines[IM_DRAWLIST_TEX_LINES_WIDTH_MAX + 1] = {};  // UVs for baked anti-aliased lines
 
     // [Internal] Packing data
     int                         PackIdMouseCursors; // Custom texture rectangle ID for white pixel and mouse cursors

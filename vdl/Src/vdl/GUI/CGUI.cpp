@@ -44,6 +44,8 @@
 
 #include <ctype.h>
 
+//#define USING_MULTI_VIEWPORT
+
 namespace
 {
   constexpr IndexType kIndexType = (sizeof(ImDrawIdx) == 2 ? IndexType::eUint16 : IndexType::eUint32);
@@ -665,7 +667,9 @@ void CGUI::Initialize()
     //  フラグの設定
     {
       io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   //  ドッキング有効化
+#ifdef USING_MULTI_VIEWPORT
       io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; //  マルチビューポート有効化
+#endif
 
       io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
       io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
@@ -742,7 +746,7 @@ void CGUI::Update()
 
   // Setup display size (every frame to accommodate for window resizing)
   io.DisplaySize = pWindow_->GetWindowSize();
-  GraphicsCommandList_.SetViewport({ 0.0f, 0.0f, io.DisplaySize.x, io.DisplaySize.y });
+  GraphicsCommandList_.SetViewport({ 0.0f, io.DisplaySize });
 
   // Setup time step
   io.DeltaTime = pSystem_->GetDeltaTime();
@@ -775,15 +779,23 @@ void CGUI::Update()
     const vdl::int2& Wheel = pMouse_->GetWheel();
     io.MouseWheel += Wheel.y;
     io.MouseWheelH += Wheel.x;
-
-    io.MousePos = vdl::float2(-FLT_MAX, -FLT_MAX);
     io.MouseHoveredViewport = 0;
 
     // Set imgui mouse position
 #if defined VDL_TARGET_WINDOWS
     POINT MousePos;
     ::GetCursorPos(&MousePos);
-    io.MousePos = vdl::float2((float)MousePos.x, (float)MousePos.y);
+
+    if (HWND Focused_hWnd = ::GetForegroundWindow())
+    {
+#ifdef USING_MULTI_VIEWPORT
+      io.MousePos = vdl::float2(static_cast<float>(MousePos.x), static_cast<float>(MousePos.y));
+#else
+      POINT MouseClientPos = MousePos;
+      ::ScreenToClient(static_cast<HWND>(pWindow_->GetHandle()), &MouseClientPos);
+      io.MousePos = vdl::float2(static_cast<float>(MouseClientPos.x), static_cast<float>(MouseClientPos.y));
+#endif
+    }
 
     if (HWND HoveredhWnd = ::WindowFromPoint(MousePos))
     {
@@ -1227,7 +1239,7 @@ void CGUI::RendererRenderWindow(ImGuiViewport* _pViewport, void*)
     pDeviceContext_->ClearRenderTexture(pData->RenderTextures[0], kClearColor);
   }
 
-  GraphicsCommandList_.SetViewport({ 0.0f, 0.0f, _pViewport->Size.x, _pViewport->Size.y });
+  GraphicsCommandList_.SetViewport({ 0.0f, _pViewport->Size });
   Draw(_pViewport->DrawData);
 }
 
@@ -1370,7 +1382,7 @@ void CGUI::SetupMultiViewport()
 #endif
 
   pMainViewport->PlatformUserData = pData;
-  }
+}
 
 void CGUI::Draw(ImDrawData* _pDrawData)
 {
@@ -1421,21 +1433,22 @@ void CGUI::Draw(ImDrawData* _pDrawData)
     pDevice_->WriteMemory(pBufferManager_->GetBuffer(IndexBuffer_.GetID()), IndexDatas.data(), static_cast<vdl::uint>(IndexDatas.size() * sizeof(ImDrawIdx)));
   }
 
-  // Will project scissor/clipping rectangles into framebuffer space
-  const vdl::float2 ClipOffset = _pDrawData->DisplayPos;      // (0,0) unless using multi-viewports
-  const vdl::float2 ClipScale = _pDrawData->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
+  const vdl::float2 ClipOffset = _pDrawData->DisplayPos;
 
-  ConstantBufferData& ConstantBufferData = pConstantBuffer_->GetData();
+  // Setup constant buffer
   {
-    ConstantBufferData.Scale = { 2.0f / _pDrawData->DisplaySize.x, -2.0f / _pDrawData->DisplaySize.y };
-    ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
+    ConstantBufferData& ConstantBufferData = pConstantBuffer_->GetData();
+    {
+      ConstantBufferData.Scale = { 2.0f / _pDrawData->DisplaySize.x, -2.0f / _pDrawData->DisplaySize.y };
+      ConstantBufferData.Translate = { -1.0f - ClipOffset.x * ConstantBufferData.Scale.x, 1.0f - ClipOffset.y * ConstantBufferData.Scale.y };
+    }
   }
 
   // Render command lists
   // (Because we merged all buffers into a single one, we maintain our own offset into them)
-  int VertexOffset = 0;
-  int IndexOffset = 0;
-  vdl::float4 ClipRect;
+  vdl::uint VertexOffset = 0;
+  vdl::uint IndexOffset = 0;
+  vdl::Scissor ClipRect;
   for (int i = 0; i < _pDrawData->CmdListsCount; ++i)
   {
     const ImDrawList* pCmdList = _pDrawData->CmdLists[i];
@@ -1443,19 +1456,14 @@ void CGUI::Draw(ImDrawData* _pDrawData)
     {
       // Project scissor/clipping rectangles into framebuffer space
       {
-        ClipRect.x = (Cmd.ClipRect.x - ClipOffset.x) * ClipScale.x;
-        ClipRect.y = (Cmd.ClipRect.y - ClipOffset.y) * ClipScale.y;
-        ClipRect.z = (Cmd.ClipRect.z - ClipOffset.x) * ClipScale.x;
-        ClipRect.w = (Cmd.ClipRect.w - ClipOffset.y) * ClipScale.y;
+        ClipRect.LeftTop = Cmd.ClipRect.xy() - ClipOffset;
+        ClipRect.Size = Cmd.ClipRect.zw() - ClipOffset;
       }
 
-      if (ClipRect.x < FrameBufferSize.x && ClipRect.y < FrameBufferSize.y && ClipRect.z >= 0.0f && ClipRect.w >= 0.0f)
+      if (ClipRect.LeftTop.x < FrameBufferSize.x && ClipRect.LeftTop.y < FrameBufferSize.y && ClipRect.Size.x >= 0.0f && ClipRect.Size.y >= 0.0f)
       {
-        ClipRect.x = vdl::Math::Max(ClipRect.x, 0.0f);
-        ClipRect.y = vdl::Math::Max(ClipRect.y, 0.0f);
-
         // Apply scissor/clipping rectangle
-        GraphicsCommandList_.SetScissor({ static_cast<int>(ClipRect.x), static_cast<int>(ClipRect.y), static_cast<vdl::uint>(ClipRect.z - ClipRect.x), static_cast<vdl::uint>(ClipRect.w - ClipRect.y) });
+        GraphicsCommandList_.SetScissor(ClipRect);
 
         // Draw
         GraphicsCommandList_.SetDrawData(Cmd.Texture, { Cmd.ElemCount, 1, Cmd.IdxOffset + IndexOffset, Cmd.VtxOffset + VertexOffset, 0 });

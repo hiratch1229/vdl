@@ -107,6 +107,7 @@ bool CSystem::Update()
       DeltaTime = std::chrono::duration(CurrentTime - LastTime_);
       SleepTime = FrameInterval_ - DeltaTime;
 
+      //  更新する必要が無い時別スレッドを優先させる
       if (SleepTime.count() > 0.0 || SystemState_ == SystemState::ePause)
       {
         std::this_thread::yield();
