@@ -371,6 +371,7 @@ void CDevice::Initialize()
   assert(GraphicsQueueIndex_ != vdl::Math::kMax<vdl::uint>);
   ComputeQueueIndex_ = FindQueue(vk::QueueFlagBits::eCompute, vk::QueueFlagBits::eGraphics);
 
+  vdl::uint GraphicsQueueCount = 1;
   //  論理デバイスの作成
   {
     const char* Extensions[] = {
@@ -382,12 +383,14 @@ void CDevice::Initialize()
 
     std::vector<vk::DeviceQueueCreateInfo> DeviceQueueInfos(1);
     {
-      vdl::uint GraphicsQueueCount = 1;
-
       if (ComputeQueueIndex_ == vdl::Math::kMax<vdl::uint>)
       {
-        ++GraphicsQueueCount;
         ComputeQueueIndex_ = GraphicsQueueIndex_;
+
+        if (PhysicalDevice_.getQueueFamilyProperties().size() > 1)
+        {
+          ++GraphicsQueueCount;
+        }
       }
       else
       {
@@ -456,7 +459,7 @@ void CDevice::Initialize()
     GraphicsQueue_ = VkDevice_->getQueue(GraphicsQueueIndex_, 0);
     assert(GraphicsQueue_);
 
-    ComputeQueue_ = VkDevice_->getQueue(ComputeQueueIndex_, (GraphicsQueueIndex_ == ComputeQueueIndex_ ? 1 : 0));
+    ComputeQueue_ = VkDevice_->getQueue(ComputeQueueIndex_, (GraphicsQueueIndex_ == ComputeQueueIndex_ && GraphicsQueueCount > 1 ? 1 : 0));
     assert(ComputeQueue_);
   }
 
