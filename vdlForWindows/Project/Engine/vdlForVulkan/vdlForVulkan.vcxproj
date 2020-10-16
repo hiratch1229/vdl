@@ -86,7 +86,7 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\..\..\vdl\Include;..\..\..\..\vdl\Src;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Src;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
     </ClCompile>
@@ -97,7 +97,7 @@
     <Lib>
       <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;glslang_d.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\..\..\Lib\ThirdParty</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\Vulkan</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -113,7 +113,7 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\..\..\..\vdl\Include;..\..\..\..\vdl\Src;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Src;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src\ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ForcedIncludeFiles>pch.hpp</ForcedIncludeFiles>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -127,7 +127,7 @@
     <Lib>
       <AdditionalDependencies>vulkan-1.lib;glslang.lib</AdditionalDependencies>
       <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\..\..\Lib\ThirdParty</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\Vulkan</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

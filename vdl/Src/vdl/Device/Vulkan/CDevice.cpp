@@ -16,9 +16,9 @@
 #undef min
 #undef max
 #pragma warning(disable:26495)
-#include <ThirdParty/glslang/SPIRV/GlslangToSpv.h>
-#include <ThirdParty/glslang/StandAlone/DirStackFileIncluder.h>
-#include <ThirdParty/glslang/StandAlone/ResourceLimits.hpp>
+#include <glslang/SPIRV/GlslangToSpv.h>
+#include <glslang/StandAlone/DirStackFileIncluder.h>
+#include <glslang/StandAlone/ResourceLimits.hpp>
 #pragma warning(default:26495)
 
 #include <vdl/DetectMemoryLeak.hpp>

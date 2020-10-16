@@ -479,7 +479,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6001;26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -532,7 +532,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;VDL_USING_WINDOWS;VDL_USING_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\vdl\Include;..\..\..\..\vdl\Include\ThirdParty;..\..\..\..\vdl\Src;..\..\..\..\vdl\Src\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>6001;26451;26495;</DisableSpecificWarnings>
