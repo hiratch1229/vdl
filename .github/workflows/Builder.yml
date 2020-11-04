@@ -14,21 +14,37 @@ jobs:
         uses: microsoft/setup-msbuild@v1
         with:
           vs-version: '[16.7, 16.8)'
-      
-      - name: CheckOut IWYU
-        uses: actions/checkout@v2.3.4
-        with:
-          repository: hiratch1229/IWYU
-          path: IWYU
-          
-      - name: Build IWYU
-        run: msbuild IWYU\IWYU.sln -p:Configuration=Release -p:Platform=x64 -p:OutDir=.\
-          
+                
       - name: CheckOut vdl
         uses: actions/checkout@v2.3.4
         with:
           path: vdl
           lfs: true
+       
+      - name: CheckOut IWYU
+        uses: actions/checkout@v2.3.4
+        with:
+          repository: hiratch1229/IWYU
+          path: IWYU
+                    
+      - name: Build IWYU
+        run: msbuild IWYU\IWYU.sln -p:Configuration=Release -p:Platform=x64 -p:OutDir=.\ -p:DefineConstants=ENBALE_ALL_INCLUDE_PATH
+
+      - name: IWYU
+        shell: cmd
+        run: |
+          mkdir Result
+          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdl\vdl.vcxproj 2>> Result\IWYU.txt
+          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdlForDirectX11\vdlForDirectX11.vcxproj 2>> Result\IWYU.txt
+          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdlForDirectX12\vdlForDirectX12.vcxproj 2>> Result\IWYU.txt
+          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdlForVulkan\vdlForVulkan.vcxproj 2>> Result\IWYU.txt
+          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdlForWindows\vdlForWindows.vcxproj 2>> Result\IWYU.txt
+
+      - name: Upload Result Files
+        uses: actions/upload-artifact@v2
+        with:
+          name: Result
+          path: Result
        
       - name: Build vdl
         run: |
@@ -38,7 +54,6 @@ jobs:
             msbuild vdlForWindows\vdlForWindows.sln -p:Configuration=VulkanOnWindows_Release -p:Platform=x64
 
       - name: Copy exe Files
-        #shell: cmd
         run: |
           cd vdl
           mkdir Bin
@@ -46,9 +61,9 @@ jobs:
           copy vdlTest\x64\DirectX12OnWindows_Release\vdlTestForWindows.exe Bin\DirectX12.exe
           copy vdlTest\x64\VulkanOnWindows_Release\vdlTestForWindows.exe Bin\Vulkan.exe
         
-      - name: Upload Files
+      - name: Upload Exe Files
         uses: actions/upload-artifact@v2
         with:
           name: vdl
           path: vdl\Bin
-          
+                   
