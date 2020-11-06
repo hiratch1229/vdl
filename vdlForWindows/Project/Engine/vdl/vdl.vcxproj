@@ -440,7 +440,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX11_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib;libxml2-md_d.lib;zlib-md_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX11_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib;libxml2-md_d.lib;zlib-md_d.lib;benchmark_d.lib</AdditionalDependencies>
       <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -464,7 +464,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX12_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib;libxml2-md_d.lib;zlib-md_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>vdlForWindows_d.lib;vdlForDirectX12_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib;libxml2-md_d.lib;zlib-md_d.lib;benchmark_d.lib</AdditionalDependencies>
       <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -488,7 +488,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vdlForWindows_d.lib;vdlForVulkan_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib;libxml2-md_d.lib;zlib-md_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>vdlForWindows_d.lib;vdlForVulkan_d.lib;ImGui_d.lib;meshoptimizer_d.lib;zstd_d.lib;libfbxsdk-md_d.lib;libxml2-md_d.lib;zlib-md_d.lib;benchmark_d.lib</AdditionalDependencies>
       <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -544,7 +544,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vdlForWindows.lib;vdlForVulkan.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib</AdditionalDependencies>
+      <AdditionalDependencies>vdlForWindows.lib;vdlForVulkan.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;benchmark.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
       <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
@@ -574,7 +574,7 @@
     </Link>
     <Lib>
       <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX11.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib</AdditionalDependencies>
+      <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX11.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;benchmark.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -602,7 +602,7 @@
     </Link>
     <Lib>
       <OutputFile>$(SolutionDir)Lib\Engine\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX12.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib</AdditionalDependencies>
+      <AdditionalDependencies>vdlForWindows.lib;vdlForDirectX12.lib;ImGui.lib;meshoptimizer.lib;zstd.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;benchmark.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\Lib\Engine;..\..\..\Lib\ThirdParty;..\..\..\..\vdl\Src\ThirdParty\FBXSDK</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

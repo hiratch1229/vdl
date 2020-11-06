@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{7c31119c-db00-4941-b9e6-a5dd391e0d1f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\arraysize.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark_api_internal.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark_register.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark_runner.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\check.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\colorprint.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\commandlineflags.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\complexity.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\counter.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\cycleclock.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\internal_macros.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\log.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\mutex.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\re.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\sleep.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\statistics.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\string_util.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\thread_manager.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\thread_timer.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\timers.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark_api_internal.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark_name.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark_register.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark_runner.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\colorprint.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\commandlineflags.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\complexity.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\console_reporter.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\counter.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\csv_reporter.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\json_reporter.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\reporter.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\sleep.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\statistics.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\string_util.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\sysinfo.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\timers.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vdl\Src\ThirdParty\benchmark\benchmark_main.cc">
+      <Filter>Src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
