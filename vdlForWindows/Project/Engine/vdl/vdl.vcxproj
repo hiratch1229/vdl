@@ -63,6 +63,7 @@
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\InputLayout.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Keyboard.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Light.hpp" />
+    <ClInclude Include="..\..\..\..\vdl\Include\vdl\Lock.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Macro.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\Math.hpp" />
     <ClInclude Include="..\..\..\..\vdl\Include\vdl\MathConstants.hpp" />
