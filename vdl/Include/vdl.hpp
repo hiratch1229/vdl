@@ -16,9 +16,9 @@
 #include <vdl/Platform.hpp>
 #include <vdl/Types.hpp>
 #include <vdl/Fwd.hpp>
+#include <vdl/Constants.hpp>
 #include <vdl/System.hpp>
 #include <vdl/Window.hpp>
-#include <vdl/Constants.hpp>
 
 //--------------------------------------------------
 //  êîäw
@@ -30,6 +30,7 @@
 #include <vdl/Type4.hpp>
 #include <vdl/Half.hpp>
 #include <vdl/Angle.hpp>
+#include <vdl/SIMD.hpp>
 #include <vdl/Quaternion.hpp>
 #include <vdl/Matrix.hpp>
 

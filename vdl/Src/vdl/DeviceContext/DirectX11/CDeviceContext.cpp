@@ -428,12 +428,14 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
     break;
     case GraphicsCommandFlag::eSetScissor:
     {
-      pD3D11ImmediateContext_->RSSetScissorRects(1, &Cast(_GraphicsCommandList.GetScissor(GraphicsCommand.second)));
+      RECT Scissor = Cast(_GraphicsCommandList.GetScissor(GraphicsCommand.second));
+      pD3D11ImmediateContext_->RSSetScissorRects(1, &Scissor);
     }
     break;
     case GraphicsCommandFlag::eSetViewport:
     {
-      pD3D11ImmediateContext_->RSSetViewports(1, &Cast(_GraphicsCommandList.GetViewport(GraphicsCommand.second)));
+      D3D11_VIEWPORT ViewPort = Cast(_GraphicsCommandList.GetViewport(GraphicsCommand.second));
+      pD3D11ImmediateContext_->RSSetViewports(1, &ViewPort);
     }
     break;
     case GraphicsCommandFlag::eSetBlendState:
@@ -1236,7 +1238,8 @@ ID3D11SamplerState* CDeviceContext::GetSamplerState(const vdl::Sampler& _Sampler
         SamplerDesc.MipLODBias = 0.0f;
         SamplerDesc.MaxAnisotropy = _Sampler.MaxAnisotropy;
         SamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-        ::memcpy(SamplerDesc.BorderColor, &Cast(_Sampler.BorderColor), sizeof(float) * 4);
+        vdl::Color4F BorderColor = Cast(_Sampler.BorderColor);
+        ::memcpy(SamplerDesc.BorderColor, &BorderColor, sizeof(float) * 4);
         SamplerDesc.MinLOD = 0;
         SamplerDesc.MaxLOD = FLT_MAX;
       }

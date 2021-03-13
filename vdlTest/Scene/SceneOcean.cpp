@@ -188,7 +188,8 @@ void SceneOcean::Initialize()
     Renderer::SetPixelStageSamplers(2, 1, &ClampSampler);
     Renderer::SetPixelStageShaderResources(0, kGBufferNum, WaterSurfaceGBufferTextures_.data());
     Renderer::SetPixelStageShaderResources(kGBufferNum, kGBufferNum, GBufferTextures_.data());
-    Renderer::SetPixelStageShaderResources(kGBufferNum + kGBufferNum, 1, &ShadowMap_.GetDepthTexture());
+    vdl::Texture DepthTexture = ShadowMap_.GetDepthTexture();
+    Renderer::SetPixelStageShaderResources(kGBufferNum + kGBufferNum, 1, &DepthTexture);
     Renderer::SetPixelStageShaderResources(kGBufferNum + kGBufferNum + 1, 1, &SkyboxTexture_);
     Renderer::SetPixelStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
     Renderer::SetPixelStageConstantBuffers(1, 1, &LightDataConstantBuffer_);
@@ -199,7 +200,8 @@ void SceneOcean::Initialize()
   //  Renderer2Dのステートの設定
   {
     Renderer2D::SetPixelStageSamplers(1, 1, &ClampSampler);
-    Renderer2D::SetPixelStageShaderResources(2, 1, &DepthTexture_.GetDepthTexture());
+    vdl::Texture DepthTexture = DepthTexture_.GetDepthTexture();
+    Renderer2D::SetPixelStageShaderResources(2, 1, &DepthTexture);
     Renderer2D::SetPixelStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
     Renderer2D::SetPixelStageConstantBuffers(1, 1, &DepthOfFieldConstantBuffer_);
   }

@@ -47,30 +47,74 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Scene\SceneDeferred.cpp" />
-    <ClCompile Include="Scene\SceneGPUParticle.cpp" />
-    <ClCompile Include="Scene\SceneModel.cpp" />
-    <ClCompile Include="Scene\SceneMultiRenderTexture.cpp" />
-    <ClCompile Include="Scene\SceneOcean.cpp" />
-    <ClCompile Include="Scene\ScenePBR.cpp" />
-    <ClCompile Include="Scene\ScenePostEffect.cpp" />
-    <ClCompile Include="Scene\SceneSprite.cpp" />
-    <ClCompile Include="Scene\SceneTBDR.cpp" />
-    <ClCompile Include="Scene\SceneTessellation.cpp" />
+    <ClCompile Include="Main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneDeferred.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneGPUParticle.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneModel.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneMultiRenderTexture.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneOcean.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\ScenePBR.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\ScenePostEffect.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneSprite.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneTBDR.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneTessellation.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Scene\Scene.hpp" />
-    <ClInclude Include="Scene\SceneDeferred.hpp" />
-    <ClInclude Include="Scene\SceneGPUParticle.hpp" />
-    <ClInclude Include="Scene\SceneModel.hpp" />
-    <ClInclude Include="Scene\SceneMultiRenderTexture.hpp" />
-    <ClInclude Include="Scene\SceneOcean.hpp" />
-    <ClInclude Include="Scene\ScenePBR.hpp" />
-    <ClInclude Include="Scene\ScenePostEffect.hpp" />
-    <ClInclude Include="Scene\SceneSprite.hpp" />
-    <ClInclude Include="Scene\SceneTBDR.hpp" />
-    <ClInclude Include="Scene\SceneTessellation.hpp" />
+    <ClInclude Include="Scene\Scene.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneDeferred.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneGPUParticle.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneModel.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneMultiRenderTexture.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneOcean.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\ScenePBR.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\ScenePostEffect.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneSprite.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneTBDR.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneTessellation.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DirectX11OnWindows_Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\GBufferPass\GBufferPass.hlsli" />
@@ -1050,6 +1094,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\vdl\Include;..\vdl\Include\ThirdParty</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

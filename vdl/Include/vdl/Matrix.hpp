@@ -4,7 +4,6 @@
 #include "Type4.hpp"
 #include "Quaternion.hpp"
 #include "Angle.hpp"
-#include "Macro.hpp"
 
 #include <string>
 #include <fstream>

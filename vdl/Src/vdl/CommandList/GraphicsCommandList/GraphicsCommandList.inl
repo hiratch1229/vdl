@@ -811,7 +811,8 @@ template<class InstanceData>
 inline void GraphicsCommandList<vdl::Texture, InstanceData>::SetDrawData(const vdl::Texture& _Texture, InstanceData&& _InstanceData)
 {
   //  必要ステートの設定
-  WrapGraphicsCommandList::SetShaderResources<ShaderType::ePixelShader>(0, 1, &vdl::ShaderResource(_Texture));
+  vdl::ShaderResource ShaderResource(_Texture);
+  WrapGraphicsCommandList::SetShaderResources<ShaderType::ePixelShader>(0, 1, &ShaderResource);
 
   std::unique_lock ResetLock(ResetMutex_);
   ConditionVariable_.wait(ResetLock, [&] { return isReady_; });
@@ -852,7 +853,8 @@ inline void GraphicsCommandList<vdl::Texture, std::nullptr_t>::Initialize(vdl::I
 inline void GraphicsCommandList<vdl::Texture, std::nullptr_t>::SetDrawData(const vdl::Texture& _Texture, DrawIndexedData&& _DrawIndexedData)
 {
   //  必要ステートの設定
-  WrapGraphicsCommandList::SetShaderResources<ShaderType::ePixelShader>(0, 1, &vdl::ShaderResource(_Texture));
+  vdl::ShaderResource ShaderResource(_Texture);
+  WrapGraphicsCommandList::SetShaderResources<ShaderType::ePixelShader>(0, 1, &ShaderResource);
 
   std::unique_lock ResetLock(ResetMutex_);
   ConditionVariable_.wait(ResetLock, [&] { return isReady_; });

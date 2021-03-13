@@ -979,15 +979,15 @@ void CDeviceContext::Execute(const BaseGraphicsCommandList& _GraphicsCommandList
     break;
     case GraphicsCommandFlag::eSetScissor:
     {
-      CurrentGraphicsCommandList->RSSetScissorRects(1, &Cast(ScissorEnable ? _GraphicsCommandList.GetScissor(GraphicsCommand.second)
-        : vdl::Scissor(Viewport.LeftTop, Viewport.Size)));
+      RECT Scissor = Cast(ScissorEnable ? _GraphicsCommandList.GetScissor(GraphicsCommand.second)
+        : vdl::Scissor(Viewport.LeftTop, Viewport.Size));
+      CurrentGraphicsCommandList->RSSetScissorRects(1, &Scissor);
     }
     break;
     case GraphicsCommandFlag::eSetViewport:
     {
-      Viewport = _GraphicsCommandList.GetViewport(GraphicsCommand.second);
-
-      CurrentGraphicsCommandList->RSSetViewports(1, &Cast(Viewport));
+      D3D12_VIEWPORT ViewPort = Cast(Viewport = _GraphicsCommandList.GetViewport(GraphicsCommand.second));
+      CurrentGraphicsCommandList->RSSetViewports(1, &ViewPort);
     }
     break;
     case GraphicsCommandFlag::eSetBlendState:
@@ -1465,7 +1465,7 @@ void CDeviceContext::Present()
   ERROR_CHECK(hr);
 
   ++CurrentBackBufferIndex_ %= Constants::kBackBufferNum;
-  
+
   //  éüÇÃÉtÉåÅ[ÉÄÇÃèÄîı
   const vdl::RenderTextures& RenderTextures = SwapChain_.GetRenderTextures();
   const vdl::DepthStencilTexture& DepthStencilTexture = SwapChain_.GetDepthStencilTexture();
@@ -1671,7 +1671,8 @@ const D3D12_CPU_DESCRIPTOR_HANDLE& CDeviceContext::GetSamplerCPUHandle(const vdl
       SamplerDesc.MipLODBias = 0.0f;
       SamplerDesc.MaxAnisotropy = _Sampler.MaxAnisotropy;
       SamplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-      ::memcpy(SamplerDesc.BorderColor, &Cast(_Sampler.BorderColor), sizeof(float) * 4);
+      vdl::Color4F BorderColor = Cast(_Sampler.BorderColor);
+      ::memcpy(SamplerDesc.BorderColor, &BorderColor, sizeof(float) * 4);
       SamplerDesc.MinLOD = 0;
       SamplerDesc.MaxLOD = FLT_MAX;
     }

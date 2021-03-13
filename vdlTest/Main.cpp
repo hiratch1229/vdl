@@ -185,5 +185,5 @@ void Main()
 
     GUI::End();
   }
-#endif // ENABLE_BENCHMARK
+#endif
 }

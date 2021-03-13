@@ -6,31 +6,31 @@ namespace vdl
 {
   namespace Constants
   {
-    constexpr uint2 kDefaultWindowSize = { 1280, 720 };
+    inline constexpr uint2 kDefaultWindowSize = { 1280, 720 };
 
-    constexpr uint kDefaultMaxFPS = 60;
+    inline constexpr uint kDefaultMaxFPS = 60;
 
-    constexpr uint kMaxBoneNum = 32;
+    inline constexpr uint kMaxBoneNum = 32;
 
-    constexpr uint kMaxBoneInfluence = 4;
+    inline constexpr uint kMaxBoneInfluence = 4;
 
-    constexpr uint kMaxController = 4;
+    inline constexpr uint kMaxController = 4;
 
-    constexpr uint kMaxCharacterNum = 256;
+    inline constexpr uint kMaxCharacterNum = 256;
 
-    constexpr uint kMaxRenderTextureNum = 8;
+    inline constexpr uint kMaxRenderTextureNum = 8;
 
-    constexpr uint kMaxSamplerNum = 8;
+    inline constexpr uint kMaxSamplerNum = 8;
 
-    constexpr uint kMaxShaderResourceNum = 32;
+    inline constexpr uint kMaxShaderResourceNum = 32;
 
-    constexpr uint kMaxConstantBufferNum = 14;
+    inline constexpr uint kMaxConstantBufferNum = 14;
 
-    constexpr uint kMaxUnorderedAccessObjectNum = 8;
+    inline constexpr uint kMaxUnorderedAccessObjectNum = 8;
 
-    constexpr ID kDisableID = 0xffffffff;
+    inline constexpr ID kDisableID = 0xffffffff;
 
-    constexpr const char kDefaultTextureShaderCode[] = {
+    inline constexpr const char kDefaultTextureShaderCode[] = {
       "struct VS_IN"
       "{"
       "  float4 Position : POSITION;"
@@ -69,7 +69,7 @@ namespace vdl
       "}"
     };
 
-    constexpr const char kDefaultStaticMeshShaderCode[] = {
+    inline constexpr const char kDefaultStaticMeshShaderCode[] = {
       "struct VS_IN"
       "{"
       "  float4 Position : POSITION;"
@@ -116,7 +116,7 @@ namespace vdl
       "}"
     };
 
-    constexpr const char kDefaultSkinnedMeshShaderCode[] = {
+    inline constexpr const char kDefaultSkinnedMeshShaderCode[] = {
       "struct VS_IN"
       "{"
       "  float4 Position : POSITION;"
@@ -165,8 +165,8 @@ namespace vdl
       "}"
     };
 
-    constexpr const char* kDefaultShaderEntryPointVS = "VSMain";
+    inline constexpr const char* kDefaultShaderEntryPointVS = "VSMain";
 
-    constexpr const char* kDefaultShaderEntryPointPS = "PSMain";
+    inline constexpr const char* kDefaultShaderEntryPointPS = "PSMain";
   }
 }
