@@ -24,18 +24,18 @@ QuadConstantData CulcQuadConstantData(InputPatch<VS_OUT, CONTROL_POINT_QUAD> IPa
   QuadConstantData Out;
 
   Out.TessFactor[0] = TessFactor.x;
-  Out.TessFactor[1] = TessFactor.y;
-  Out.TessFactor[2] = TessFactor.z;
-  Out.TessFactor[3] = 64.0f;
+  Out.TessFactor[1] = TessFactor.x;
+  Out.TessFactor[2] = TessFactor.x;
+  Out.TessFactor[3] = TessFactor.x;
 
-  Out.InsideTessFactor[0] = InsideFactor;
-  Out.InsideTessFactor[1] = InsideFactor;
+  Out.InsideTessFactor[0] = TessFactor.x;
+  Out.InsideTessFactor[1] = TessFactor.x;
 
   return Out;
 }
 
 [domain("quad")]
-[partitioning("fractional_odd")]
+[partitioning("integer")]
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(CONTROL_POINT_QUAD)]
 [patchconstantfunc("CulcQuadConstantData")]

@@ -210,10 +210,10 @@ void SceneOcean::Initialize()
   {
     Renderer3D::SetHullStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
 
-    Sampler WrapSampler = Sampler::kDefault3D;
-    WrapSampler.AddressModeU = WrapSampler.AddressModeV = WrapSampler.AddressModeW = AddressModeType::eWrap;
+    Sampler ClampSampler = Sampler::kDefault3D;
+    ClampSampler.AddressModeU = ClampSampler.AddressModeV = ClampSampler.AddressModeW = AddressModeType::eClamp;
 
-    Renderer3D::SetDomainStageSamplers(0, 1, &WrapSampler);
+    Renderer3D::SetDomainStageSamplers(0, 1, &ClampSampler);
     Renderer3D::SetDomainStageShaderResources(0, 1, &TerrainHeightMap_);
     Renderer3D::SetDomainStageConstantBuffers(0, 1, &CameraDataConstantBuffer_);
     Renderer3D::SetDomainStageConstantBuffers(1, 1, &LightDataConstantBuffer_);
@@ -300,7 +300,7 @@ void SceneOcean::Update()
           Renderer::Clear(TerrainHeightMap_);
           Renderer::Clear(TerrainNormalMap_, Palette::NormalMap);
         }
-        GUI::Slider("BlushSize", &TerrainUpdateData.BlushSize, 0.1f, 150.0f);
+        GUI::Slider("BlushSize", &TerrainUpdateData.BlushSize, 1u, 150u);
         GUI::Slider("BlushHardness", &TerrainUpdateData.BlushHardness, -1.0f, 1.0f);
         TerrainData& TerrainData = TerrainDataConstantBuffer_.GetData();
         uint TextureLoopNum = TerrainData.TextureLoopNum;
@@ -396,7 +396,7 @@ void SceneOcean::Update()
           //  ハイトマップの更新
           {
             Computer::SetShader(TerrainHeightMapUpdateComputeShader_);
-            Computer::Dispatch(1, 1, 1);
+            Computer::Dispatch(TerrainUpdateData.BlushSize, TerrainUpdateData.BlushSize, 1);
           }
 
           //  法線マップの更新

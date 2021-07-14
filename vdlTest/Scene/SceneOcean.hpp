@@ -12,7 +12,7 @@ class SceneOcean : public IScene
   static constexpr vdl::float3 kSkyboxScale = 500.0f;
   static constexpr vdl::uint2 kGBufferSize = vdl::Constants::kDefaultWindowSize;
   static constexpr vdl::uint2 kShadowMapSize = vdl::uint2(4096, 4096);
-  static constexpr vdl::uint2 kHeightMapSize = vdl::uint2(1024, 1024);
+  static constexpr vdl::uint2 kHeightMapSize = vdl::uint2(4096, 4096);
   static constexpr vdl::uint kTerrainTextureNum = 4;
   static constexpr const char* kTerrainTextureFileNames[kTerrainTextureNum] = { "sand_diffuse.png", "terrain_rock4.png", "terrain_slope.png","terrain_grass.png" };
   static constexpr const char* kTerrainHeightMapUpdateComputeShaderFilePath = "Shader/Ocean/Terrain/TerrainHeightMapUpdateCS.hlsl";
@@ -20,8 +20,9 @@ class SceneOcean : public IScene
   static constexpr const char* kTerrainPixelShaderFilePath = "Shader/Ocean/Terrain/TerrainPS.hlsl";
   static constexpr const char* kTerrainPixelShaderEntryPoint = "GBufferPass";
   static constexpr vdl::Color4F kTerrainTexcoordMapClearColor = vdl::Color4F(-1.0f, -1.0f, -1.0f, 0.0f);
-  static constexpr vdl::uint2 kThreadGroupNum = vdl::uint2(32, 32);
-  static constexpr vdl::uint3 kTerrainNormalMapDispatchNum = vdl::uint3(kHeightMapSize.x / kThreadGroupNum.x + (kHeightMapSize.x % kThreadGroupNum.x == 0 ? 0 : 1), kHeightMapSize.y / kThreadGroupNum.y + (kHeightMapSize.y % kThreadGroupNum.y == 0 ? 0 : 1), 1);
+
+  static constexpr vdl::uint2 kTerrainNormalMapThreadGroupNum = vdl::uint2(32, 32);
+  static constexpr vdl::uint3 kTerrainNormalMapDispatchNum = vdl::uint3(kHeightMapSize.x / kTerrainNormalMapThreadGroupNum.x + (kHeightMapSize.x % kTerrainNormalMapThreadGroupNum.x == 0 ? 0 : 1), kHeightMapSize.y / kTerrainNormalMapThreadGroupNum.y + (kHeightMapSize.y % kTerrainNormalMapThreadGroupNum.y == 0 ? 0 : 1), 1);
   static constexpr vdl::uint kMaxWaveNum = 25;
   static constexpr float kWaveMedianLength = 2.0f;
   static constexpr float kWaveMinLength = kWaveMedianLength * 0.5f;
@@ -85,7 +86,7 @@ private:
   struct TerrainUpdateData
   {
     vdl::int2 MousePosition;
-    float BlushSize;
+    vdl::uint BlushSize;
     float BlushHardness;
   };
   struct TerrainData

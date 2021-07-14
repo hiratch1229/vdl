@@ -19,7 +19,7 @@ struct LightData
 struct TerrainUpdateData
 {
   uint2 MousePosition;
-  float BlushSize;
+  uint BlushSize;
   float BlushHardness;
 };
 
