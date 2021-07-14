@@ -11,10 +11,9 @@ cbuffer ConstantBuffer : register(b0)
 void main(uint3 DTid : SV_GroupID)
 {
   const float2 Texcoord = TexcoordMap[TerrainUpdateConstantData.MousePosition].xy;
-  if (Texcoord.x < 0.0f || Texcoord.y < 0.0f)
-  {
-    return;
-  }
+  
+  float Power = TerrainUpdateConstantData.BlushHardness;
+  Power *= ((Texcoord.x < 0.0f || Texcoord.y < 0.0f) ? 0.0f : 1.0f);
 
   uint2 HeightMapSize;
   HeightMap.GetDimensions(HeightMapSize.x, HeightMapSize.y);
@@ -23,10 +22,7 @@ void main(uint3 DTid : SV_GroupID)
   const float2 Offset = BlushRadius - DTid.xy;
   const int2 HeightMapTexcoord = Texcoord * HeightMapSize + Offset;
   
-  if (HeightMapTexcoord.x < 0 || HeightMapTexcoord.y < 0 || HeightMapSize.x <= HeightMapTexcoord.x || HeightMapSize.y <= HeightMapTexcoord.y)
-  {
-    return;
-  }
-
-  HeightMap[HeightMapTexcoord] += smoothstep(0.0f, 1.0f, clamp(1.0f - (length(Offset) / BlushRadius), 0.0f, 1.0f)) * TerrainUpdateConstantData.BlushHardness;
+  Power *= ((HeightMapTexcoord.x < 0 || HeightMapTexcoord.y < 0 || HeightMapSize.x <= HeightMapTexcoord.x || HeightMapSize.y <= HeightMapTexcoord.y) ? 0.0f : 1.0f);
+  
+  HeightMap[HeightMapTexcoord] += smoothstep(0.0f, 1.0f, clamp(1.0f - (length(Offset) / BlushRadius), 0.0f, 1.0f)) * Power;
 }
