@@ -396,7 +396,8 @@ void SceneOcean::Update()
           //  ハイトマップの更新
           {
             Computer::SetShader(TerrainHeightMapUpdateComputeShader_);
-            Computer::Dispatch(TerrainUpdateData.BlushSize, TerrainUpdateData.BlushSize, 1);
+            Computer::Dispatch((TerrainUpdateData.BlushSize / kTerrainHeightMapThreadGroupNum.x) + (TerrainUpdateData.BlushSize % kTerrainHeightMapThreadGroupNum.x == 0 ? 0 : 1),
+              (TerrainUpdateData.BlushSize / kTerrainHeightMapThreadGroupNum.y) + (TerrainUpdateData.BlushSize % kTerrainHeightMapThreadGroupNum.y == 0 ? 0 : 1), 1);
           }
 
           //  法線マップの更新

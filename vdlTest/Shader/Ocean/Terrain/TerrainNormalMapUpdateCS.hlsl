@@ -2,8 +2,6 @@ RWTexture2D<float> HeightMap : register(u0);
 RWTexture2D<float4> NormalMap : register(u1);
 
 static const uint2 kThreadGroupNum = uint2(32, 32);
-static const uint2 kHeightMapSize = uint2(4096, 4096);
-
 [numthreads(kThreadGroupNum.x, kThreadGroupNum.y, 1)]
 void main(uint3 DispatchThreadID : SV_DispatchThreadID)
 {
