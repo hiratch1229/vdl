@@ -154,10 +154,6 @@ inline Buffer* Cast(IBuffer* _pBuffer)
   {
     assert(Type == BufferType::eUnorderedAccessBuffer);
   }
-  else
-  {
-    static_assert(false);
-  }
 
   return Cast<Buffer, IBuffer>(_pBuffer);
 }

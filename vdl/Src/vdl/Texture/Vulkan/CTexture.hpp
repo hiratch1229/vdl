@@ -203,10 +203,6 @@ inline Texture* Cast(ITexture* _pTexture)
   {
     assert(Type == TextureType::eUnorderedAccessTexture);
   }
-  else
-  {
-    static_assert(false);
-  }
 
   return Cast<Texture, ITexture>(_pTexture);
 }

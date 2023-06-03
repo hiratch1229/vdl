@@ -123,10 +123,6 @@ inline Shader* Cast(IShader* _pShader)
   {
     assert(Type == ShaderType::eComputeShader);
   }
-  else
-  {
-    static_assert(false);
-  }
 
   return Cast<Shader, IShader>(_pShader);
 }
