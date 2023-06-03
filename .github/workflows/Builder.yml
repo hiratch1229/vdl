@@ -19,26 +19,6 @@ jobs:
           path: vdl
           lfs: true
        
-      - name: CheckOut IWYU
-        uses: actions/checkout@v2.3.4
-        with:
-          repository: hiratch1229/IWYU
-          path: IWYU
-                    
-      - name: Build IWYU
-        run: msbuild IWYU\IWYU.sln -p:Configuration=Release -p:Platform=x64 -p:OutDir=.\
-
-      - name: IWYU
-        shell: cmd
-        run: |
-          mkdir Result
-          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdl\vdl.vcxproj 2>> Result\IWYU.txt
-          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdlForDirectX11\vdlForDirectX11.vcxproj 2>> Result\IWYU.txt
-          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdlForDirectX12\vdlForDirectX12.vcxproj 2>> Result\IWYU.txt
-          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdlForVulkan\vdlForVulkan.vcxproj 2>> Result\IWYU.txt
-          IWYU\IWYU vdl\vdlForWindows\Project\Engine\vdlForWindows\vdlForWindows.vcxproj 2>> Result\IWYU.txt
-          IWYU\IWYU vdl\vdlTest\vdlTestForWindows.vcxproj 2>> Result\IWYU.txt
-
       - name: Upload Result Files
         uses: actions/upload-artifact@v2
         with:
