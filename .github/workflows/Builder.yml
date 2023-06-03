@@ -19,12 +19,6 @@ jobs:
           path: vdl
           lfs: true
        
-      - name: Upload Result Files
-        uses: actions/upload-artifact@v2
-        with:
-          name: Result
-          path: Result
-       
       - name: Build vdl
         run: |
             cd vdl
